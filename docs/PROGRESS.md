@@ -8,7 +8,7 @@ Update this file at the end of every task (`00-START-HERE.md` §2). The newest l
 |---|---|---|---|---|---|
 | M1.1 | Foundation | P1 $300 | Tue 3 Nov | In progress (all ACs pass locally; AC-05 waits for the first push) | — |
 | M1.2 | Design system + i18n shell | P1 | Wed 4 Nov | Done (agent checks; AC-03 side-by-side and the checklist are human) | — |
-| M1.3 | CMS, pages, settings, roles | P1 | Thu 5 Nov | In progress | — |
+| M1.3 | CMS, pages, settings, roles | P1 | Thu 5 Nov | In progress (all ACs pass except AC-04's real e-mail delivery, which waits for SMTP) | — |
 | M2.1 | Catalogue + inventory core | P2 $250 | Sat 7 Nov | Not started | — |
 | M2.2 | Shop, cart, accounts, SEO | P2 | Mon 9 Nov | Not started | — |
 | M2.3 | Checkout, orders, reservations | P2 | Tue 10 Nov | Not started | — |
@@ -21,7 +21,7 @@ Update this file at the end of every task (`00-START-HERE.md` §2). The newest l
 
 | Payment | Amount | Release gate passed | Requested | Released |
 |---|---|---|---|---|
-| P1 | $300 (funded) | — | — | — |
+| P1 | $300 (funded) | Partly: local gate passes; CI (not pushed), staging (DEP-02) and human checklists pending | — | — |
 | P2 | $250 | — | — | — |
 | P3 | $250 | — | — | — |
 | P4 | $300 | — | — | — |
@@ -34,7 +34,7 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 |---|---|---|---|---|
 | Q-01 | Confirm D-01: MongoDB + Payload auth + S3 storage instead of Supabase PostgreSQL/Auth/Storage, to be written into the Rev 2.2 addendum | APPLUX | M1.1 (proceeding at risk) | Open |
 | Q-02 | Original brand photos (DEP-01): the prototype only has Lovable CDN pointers. Missing files listed in the M1.2 T6 log entry | APPLUX / Ivo | M1.2 T6 (home covered by stand-ins) | Open |
-| Q-03 | Staging host and MongoDB Atlas project (DEP-02) | APPLUX | M1.1 T5 (staging deploy only: `Blocked: DEP-02`) | Open |
+| Q-03 | Staging host and MongoDB Atlas project (DEP-02). An Atlas cluster now exists in `.env`; use a dedicated `golden_grape` database (the cluster is shared with other projects) | APPLUX | M1.1 T5 (staging deploy only: `Blocked: DEP-02`) | Open |
 | Q-04 | Promotions do not apply to B2B list prices (A-03)? | APPLUX | M3.2 T4 | Open |
 | Q-05 | Loyalty points earned on `completed`, reversed on refund (A-08)? | APPLUX | M3.2 T3 | Open |
 | Q-06 | Voucher VAT treatment and invoice legal mentions (DEP-07) | Golden Grape accountant | M3.2 T5 | Open |
@@ -53,6 +53,45 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-11 | Catering packages have a minimum of 10 guests (the prototype set none) | M1.3 T7 seed | — |
 
 ## 4. Log
+
+### 2026-11-03 · M1.3 report and P1 release gate
+| AC | Result | How verified |
+|---|---|---|
+| AC-M1.3-01 [V-I18N] | Pass | `tests/e2e/locale.spec.ts` on desktop, Pixel 7 and iPhone 14 viewports (16 passed, 2 desktop-only skips): `/` → `/fr` with an English browser; the switcher keeps `/contact` and the cookie; on home/maison/events/catering/contact in each locale, no visible dictionary sample or localized CMS field (Maison subtitle) from another locale |
+| AC-M1.3-02 [V-ADMIN] [R9] | Pass | Admin REST save of BusinessSettings with Saturday 09:00–13:00 → the next `/fr/contact` load shows it (not shown before); no redeploy (afterChange → `revalidateTag(…, { expire: 0 })`) |
+| AC-M1.3-03 [V-CONT] | Pass | Admin REST edit of the Maison hero subtitle in EN → `/en/maison` shows it, `/fr/maison` unchanged |
+| AC-M1.3-04 [V-NOTIF] [V-CONT] | **Partly** | Mesa Farta × 20 in the browser → stored estimate 110000 = 5500 × 20, REQ-2026-0001; `requestCatering` int tests (forged client estimate ignored). Staff and customer e-mails are rendered in the customer's locale and logged. **Real delivery not performed**: SMTP not configured yet (Aniket will add it) |
+| AC-M1.3-05 [V-ADMIN] | Pass | A `stock` user in `/admin`: the menu offers only "log out" (the Stock group's collections arrive in M2.1); `/admin/globals/BusinessSettings` → Not Found; int: stock read and sales update of BusinessSettings forbidden, manager read allowed |
+| AC-M1.3-06 [R9] | Pass | int: `isModuleOn('attendance')` false when unchecked, `reviews` true when checked |
+| AC-M1.3-07 [V-DES] | Pass (agent), human to confirm | Playwright at 360/768/1280 on home/maison/events/catering/contact: 0 px horizontal overflow; inner-page headers solid bone with ink text |
+| AC-M1.3-08 [V-CONT] | Pass | The bar shows on first visit at each width, hides after "Essentiels uniquement" and stays hidden on the next pages; **0 third-party requests** in the whole run |
+
+**P1 release gate (`06` §5):**
+1. Gate:
+   - `npm run check` passes (28 unit) and `npm run test:int` passes (20: tx, rate limit, numbering, access, catering);
+   - `env -i … next build` passes (exit 0);
+   - `test:e2e` passes **locally** against `next dev` on a seeded throwaway database. `npm run gate` was not run in one go, because its `npm start` would boot against `.env`'s Atlas URL.
+   - **CI: not run**: main is not pushed (AC-M1.1-05 also waits for this).
+2. Traceability loop: all P1 IDs (V-DES, V-I18N, V-CONT, V-ADMIN, V-NOTIF, V-SEO, V-SEC, R9) are mapped.
+3. `rebuild-stock`: n/a until P2.
+4. ACs: M1.1 (AC-05 = CI pending), M1.2 (AC-03 side-by-side = human), M1.3 (AC-04 delivery = SMTP pending).
+5. Staging: **Blocked: DEP-02**. Human checklists (roles, DE edits, PT forms in a real inbox, upload without ALT, phones) **not performed**.
+
+**Not ready to request P1 yet.** Needed:
+- push and green CI;
+- `DATABASE_URL` pointing at the dedicated `golden_grape` database, then `npm run seed`;
+- SMTP (and S3) values in `.env`, then re-check AC-04 in a real inbox;
+- a staging deploy (DEP-02);
+- the human checklists, sent to APPLUX as one list.
+
+### 2026-11-03 · M1.3 T8 · Tests
+- `tests/setup-int.ts` stubs `next/cache` (`cacheTag`, `cacheLife`, `revalidateTag`) and `next/server` (`connection`, `after`): they only exist inside a Next request. Payload, Mongo and access stay real. `tests/helpers.ts` gained `makeStaff(payload, roles)`.
+- Integration:
+  - `modules/settings/access.int.test.ts`: inactive login rejected (+ an active control); sales cannot update BusinessSettings; stock cannot read it, manager can; a non-admin cannot self-promote to admin; an admin cannot remove their own admin role; `isModuleOn`.
+  - `lib/numbering.int.test.ts`: 1, 2, 3 per series and year; a failed transaction does not consume a number.
+  - `modules/catering/service.int.test.ts`: server estimate (a forged client value is ignored), REQ-2026-0001/0002, minimum guests, the +2-days rule (boundary included), a failed validation consumes no number.
+- E2E: `tests/e2e/locale.spec.ts` (journey #1). It reads `innerText` (visible only), so the hidden Activity copy of the previous page cannot cause false failures. CI now seeds before e2e, and `--pass-with-no-tests` is removed.
+- Verified: `npm run test:int` 20/20; `npx playwright test` 16 passed / 2 skipped.
 
 ### 2026-11-03 · M1.3 T7 · Cookie consent and seed
 - `components/site/cookie-consent.tsx`: a bottom bar on first visit, "Essentiels uniquement" / "Accepter la mesure d'audience", stored in the `gg_consent` cookie (1 year). The choice is read with `useSyncExternalStore` and nothing renders on the server, so returning visitors never see a flash. No third-party script in either case (Q§12); the spot for a future GA4 tag is documented in the component. New `cookies.*` keys in 4 languages.
