@@ -185,11 +185,11 @@ Every variable lives in `.env.example` and is parsed by `lib/env.ts`. The build 
 
 The site runs as one standalone Next process that serves the site, the admin and `/staff`. Scheduled jobs (low-stock digest, outbox, reviews refresh, backups) are HTTP routes protected by `CRON_SECRET` and called by the host's cron, so no extra worker process is needed. Production deployment, DNS and live credentials belong to APPLUX (Q§12); the `Dockerfile` stays available for such a host.
 
-**Current host: `goldengrape.devsomeware.com` (redeploys on every push to `main`).**
+**Current host: `goldengrape.devsomeware.com`.** A push to `main` deploys by itself once CI has passed.
 
-1. `.github/workflows/ci.yml` runs `check` (lint, types, unit, integration, build with no env) and `release` (build with the public `APP_URL`, packaged as `release.tgz`) in parallel. `deploy` runs only if both pass. Pushes that touch only `docs/**` or `*.md` trigger nothing.
-2. `deploy` sends the release over SSH with the `DEPLOY_SSH_KEY` secret. On the server that key is locked with `restrict,command="/usr/local/bin/gg-receive-release"`: it can do nothing except hand over a release. The server host key is pinned in the workflow.
-3. `scripts/server/receive-release.sh` (installed as `gg-receive-release`) unpacks into `/opt/golden-grape/releases/<sha>`, points the `current` symlink at it, and runs `pm2 reload` (cluster mode: the new process starts before the old one stops). It then checks that the running process is this release and that `/api/health` and `/fr` answer. If not, it **rolls back** to the previous release and the workflow fails. It keeps 3 releases.
+- **Automatic:** `/etc/cron.d/golden-grape` runs `gg-deploy --auto` every minute. It compares GitHub's `main` with the running release, and when they differ and that commit's CI run succeeded, it deploys. Pushes that touch only `docs/**` or `*.md` have no CI run and deploy nothing. A failed commit is not retried until the next push. Log: `/var/log/gg-deploy.log`. This relies on the repo being public; a private repo needs a read token on the server.
+- **By hand:** `npm run deploy` (asks for the server password), or `gg-deploy` on the server.
+- **What it does** (`scripts/server/deploy.sh`): fetches `main`, builds on the server, packages the standalone release and hands it to `scripts/server/receive-release.sh`. That unpacks into `/opt/golden-grape/releases/<sha>`, points the `current` symlink at it and runs `pm2 reload` (cluster mode: the new process starts before the old one stops). It then checks that the running process is this release and that `/api/health` and `/fr` answer. If not, it **rolls back** to the previous release. It keeps 3 releases.
 
 | Path on the server | What |
 |---|---|
@@ -197,9 +197,9 @@ The site runs as one standalone Next process that serves the site, the admin and
 | `/opt/golden-grape/current` | Symlink to the active release |
 | `/opt/golden-grape/releases/` | The last 3 releases |
 | `/opt/golden-grape/shared/next-cache` | Optimised images, kept across deployments |
-| `/opt/golden-grape/source` | Git checkout with `node_modules`, for running the seed |
+| `/opt/golden-grape/source` | Git checkout where releases are built, also used for the seed |
 | `/opt/golden-grape/ecosystem.config.cjs`, `/etc/nginx/conf.d/goldengrape.conf` | Copies of `scripts/server/*`. Change them there and copy by hand: a push does not update server config |
 
 Manual rollback: `ln -sfn /opt/golden-grape/releases/<sha> /opt/golden-grape/current && pm2 reload /opt/golden-grape/ecosystem.config.cjs`.
 
-A push never changes the database. Content changes in the seed need `cd /opt/golden-grape/source && git pull && npm run seed`, which overwrites CMS edits to the seeded documents.
+A push never changes the database. Content changes in the seed need `cd /opt/golden-grape/source && npm run seed`, which overwrites CMS edits to the seeded documents.

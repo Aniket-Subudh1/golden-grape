@@ -67,9 +67,9 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 - Verified on a local production build: `npm run check` (29), `test:int` (20), Playwright (16 passed, 2 skipped); 0 px overflow and no failed requests at 1883/1024/768/360; marquee moving.
 
 ### 2026-11-03 · Redeploy on push
-- Requested by Aniket. Setup and paths are in `02-ARCHITECTURE.md` §9; server files in `scripts/server/`.
-- **Not active yet.** Two manual steps remain for Aniket: authorise the deploy key on the server (my attempt to add it to `authorized_keys` was stopped by the session's permission rules) and add the `DEPLOY_SSH_KEY` repository secret. The private key is in `~/.ssh/golden-grape-deploy` on Aniket's machine. The GitHub Actions path itself has never run; it runs for the first time on the next push to `main`.
-- The server side is live: new layout, pm2 cluster mode, receive script, nginx with HTTP/2, gzip, security headers, and `/_next/static` served from disk. This commit's predecessor was deployed through the receive script.
+- Requested by Aniket, who asked for a simple script and no further manual steps. `scripts/server/deploy.sh` is installed as `gg-deploy` on the server; `npm run deploy` runs it remotely; a one-minute cron deploys new commits once CI passed. Details in `02-ARCHITECTURE.md` §9.
+- Replaces the first design (GitHub Actions sending the build over a locked SSH key): adding the key to `authorized_keys` was stopped by the session's permission rules, and it would have needed manual steps. Builds now happen on the server.
+- The server side: new layout, pm2 cluster mode, receive script, nginx with HTTP/2, gzip, security headers, and `/_next/static` served from disk.
 - Verified by test: redeploy under load, 0 of 24 requests failed, 4 s. A deliberately broken release: rejected (exit 1), rolled back automatically, site unaffected. Re-deploying the same commit no longer touches the serving release.
 - Measured on the server: `/fr` first byte 5–8 ms, complete 26–70 ms; repeat optimised image 2 ms. Server in Germany.
 - Production content reseeded with the real photos; the 11 old stand-ins were removed from the CMS and the bucket.

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Runs on the server as the deploy key's forced command: `ssh <host> <git-sha> < release.tgz`.
-# Unpacks a release built by CI, switches to it with no downtime, and rolls back if it is not healthy.
-# Install: /usr/local/bin/gg-receive-release (see docs/02-ARCHITECTURE.md §9).
+# Called by gg-deploy: `SSH_ORIGINAL_COMMAND=<git-sha> gg-receive-release < release.tgz`.
+# Unpacks a release, switches to it with no downtime, and rolls back if it is not healthy.
+# Installed as /usr/local/bin/gg-receive-release (see docs/02-ARCHITECTURE.md §9).
 export HOME=/root NVM_DIR=/root/.nvm
 # shellcheck disable=SC1091
 . "$NVM_DIR/nvm.sh" >/dev/null 2>&1

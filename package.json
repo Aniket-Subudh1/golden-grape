@@ -15,7 +15,8 @@
     "seed": "node --import tsx --env-file-if-exists=.env scripts/seed.mts",
     "generate:types": "node --import tsx ./node_modules/payload/bin.js generate:types --disable-transpile",
     "generate:importmap": "node --import tsx ./node_modules/payload/bin.js generate:importmap --disable-transpile",
-    "payload": "node --import tsx ./node_modules/payload/bin.js"
+    "payload": "node --import tsx ./node_modules/payload/bin.js",
+    "deploy": "ssh root@goldengrape.devsomeware.com gg-deploy"
   },
   "dependencies": {
     "@payloadcms/db-mongodb": "3.92.1",
