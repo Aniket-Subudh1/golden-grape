@@ -56,11 +56,12 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 ## 4. Log
 
 ### 2026-11-03 · Deployment to goldengrape.devsomeware.com
-- Requested by Aniket: remove the repos from the server and deploy this one. See the entry's notes on what was kept.
+- Requested by Aniket: remove the repos from the server and deploy this one.
 - Server: Ubuntu 26.04 (Vultr, 2 vCPU, 1.6 GB RAM + swap). Node 24.22.2 via nvm, app in `/opt/golden-grape` (clone of GitHub `main`), `.env` mode 600 with a dedicated `golden_grape` Atlas database, its own `PAYLOAD_SECRET`, `APP_URL` = the domain.
 - Process: pm2 (`/opt/golden-grape.ecosystem.config.cjs`) runs the standalone server on 127.0.0.1:3000; `pm2-root` systemd unit restarts it on boot. Nginx proxies with `proxy_buffering off` (streaming) and overwrites `X-Forwarded-For` so visitors cannot spoof their IP past the rate limiter. A catch-all default server drops unknown hostnames. HTTPS by Let's Encrypt, auto-renewed.
 - Medivoice removed: pm2 processes, `/root/medivoice`, its nginx blocks. Its `.env.local`, `ecosystem.config.cjs`, `nginx.conf` and pm2 dump are kept in `/root/medivoice-removed-2026-11-03/` (mode 700). `/root/.nvm` (the Node installer) and the medivoice certificate were kept.
 - **Bug found by the live browser check:** only the first seeded photo reached S3. The seed reused one `context` object, and the storage plugin marks the context `skipCloudStorage` after an upload. Fixed in `scripts/seed.mts` with a fresh context per call. Admin uploads get a fresh context per request and were not affected.
+- Verified on the public URL: home, maison, contact, catering, events at 1280 and 360 px: every image loads, 0 px overflow, no console errors, canonical URLs on the domain. Admin login OK, first-register closed (403), anonymous BusinessSettings 403, an admin upload is served back and its deletion works, SMTP connects and authenticates. No real e-mail sent yet. This is the deployment Q-03/DEP-02 was waiting for only if APPLUX accepts this host as staging.
 
 ### 2026-11-03 · M1.1 AC-05 closed
 - CI run on `6f89ff4` (push to main): completed, success (`check`, `test:int`, `build` with no env). AC-M1.1-05 passes, so M1.1 is Done. The e2e job runs on pull requests only and has not run in CI yet.
