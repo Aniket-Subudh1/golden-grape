@@ -68,6 +68,8 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    auditLogs: AuditLog;
+    rateLimits: RateLimit;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -76,6 +78,8 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    auditLogs: AuditLogsSelect<false> | AuditLogsSelect<true>;
+    rateLimits: RateLimitsSelect<false> | RateLimitsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -147,6 +151,47 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "auditLogs".
+ */
+export interface AuditLog {
+  id: string;
+  user?: (string | null) | User;
+  action: string;
+  collection: string;
+  docId: string;
+  before?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  after?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rateLimits".
+ */
+export interface RateLimit {
+  id: string;
+  key: string;
+  count: number;
+  expiresAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -168,10 +213,19 @@ export interface PayloadKv {
  */
 export interface PayloadLockedDocument {
   id: string;
-  document?: {
-    relationTo: 'users';
-    value: string | User;
-  } | null;
+  document?:
+    | ({
+        relationTo: 'users';
+        value: string | User;
+      } | null)
+    | ({
+        relationTo: 'auditLogs';
+        value: string | AuditLog;
+      } | null)
+    | ({
+        relationTo: 'rateLimits';
+        value: string | RateLimit;
+      } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
@@ -239,6 +293,29 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "auditLogs_select".
+ */
+export interface AuditLogsSelect<T extends boolean = true> {
+  user?: T;
+  action?: T;
+  collection?: T;
+  docId?: T;
+  before?: T;
+  after?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rateLimits_select".
+ */
+export interface RateLimitsSelect<T extends boolean = true> {
+  key?: T;
+  count?: T;
+  expiresAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

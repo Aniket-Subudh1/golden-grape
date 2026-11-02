@@ -12,7 +12,20 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 export default buildConfig({
   admin: { user: 'users', importMap: { baseDir: dirname } },
   collections: [...settingsCollections],
-  db: mongooseAdapter({ url: isBuildPhase ? false : env.DATABASE_URL, transactionOptions: {} }),
+  db: mongooseAdapter({
+    url: isBuildPhase ? false : env.DATABASE_URL,
+    transactionOptions: {},
+    // Payload has no TTL index option; collections declare `custom.ttl` and get one here.
+    afterOpenConnection: async (adapter) => {
+      for (const { slug, custom } of adapter.payload.config.collections) {
+        if (!custom?.ttl) continue;
+        await adapter.collections[slug].collection.createIndex(
+          { [custom.ttl.field]: 1 },
+          { expireAfterSeconds: custom.ttl.seconds },
+        );
+      }
+    },
+  }),
   editor: lexicalEditor(),
   secret: isBuildPhase ? 'build-phase-no-secret' : env.PAYLOAD_SECRET,
   sharp,
