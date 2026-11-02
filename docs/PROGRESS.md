@@ -8,7 +8,7 @@ Update this file at the end of every task (`00-START-HERE.md` §2). The newest l
 |---|---|---|---|---|---|
 | M1.1 | Foundation | P1 $300 | Tue 3 Nov | In progress (all ACs pass locally; AC-05 waits for the first push) | — |
 | M1.2 | Design system + i18n shell | P1 | Wed 4 Nov | Done (agent checks; AC-03 side-by-side and the checklist are human) | — |
-| M1.3 | CMS, pages, settings, roles | P1 | Thu 5 Nov | Not started | — |
+| M1.3 | CMS, pages, settings, roles | P1 | Thu 5 Nov | In progress | — |
 | M2.1 | Catalogue + inventory core | P2 $250 | Sat 7 Nov | Not started | — |
 | M2.2 | Shop, cart, accounts, SEO | P2 | Mon 9 Nov | Not started | — |
 | M2.3 | Checkout, orders, reservations | P2 | Tue 10 Nov | Not started | — |
@@ -52,6 +52,17 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-10 | Until a real sample: CashMag CSV columns are mapped through configurable settings | M3.3 | — |
 
 ## 4. Log
+
+### 2026-11-02 · M1.3 T1 · Staff users and roles
+- Packages (exact): @payloadcms/storage-s3 3.92.1, **@payloadcms/email-nodemailer 3.92.1** (added at Aniket's request for staff password-reset e-mails; not in the milestone list), nodemailer 10.3.1 (same major as the adapter's dependency, deduped), @types/nodemailer 8.0.2.
+- Env: `S3_*`, `SMTP_*`, `MAIL_FROM`, `MAIL_STAFF_TO` in `.env.example` and `lib/env.ts`, all optional. Empty values count as unset. S3 unset → uploads in `./media`; SMTP unset → e-mails logged. Aniket fills in the real values. `S3_PUBLIC_URL` is dropped: media are served through the app (decision, see T3).
+- `users`:
+  - `locale` field;
+  - `roles` and `active` can be set by an admin only (field access); no default role, so a new user never becomes admin by accident;
+  - `beforeLogin` rejects `active: false`; `beforeChange` blocks an admin removing their own admin role.
+  - Read: self, or everyone for admin/manager. Update: self or admin. Create/delete/unlock: admin. Note: the data model said update = admin only. Staff may edit their **own** profile (name, password, locale) because `roles`/`active` are field-protected.
+- `hiddenUnless(...roles)` in `lib/access.ts` for `admin.hidden`; `hasRole` accepts Payload's loose `ClientUser`. Groups: users → People, auditLogs → Settings.
+- Verified: `npm run check`. Login and role tests run in T8.
 
 ### 2026-11-02 · M1.2 change · French first, dropdown switcher (requested by Aniket)
 - `proxy.ts`: an unprefixed URL now goes to the `NEXT_LOCALE` cookie's locale, otherwise **always `/fr`**. `Accept-Language` is no longer used. AC-M1.2-01, M1.2 T2, D-05 and `05` §3.2 updated.

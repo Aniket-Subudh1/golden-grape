@@ -1,10 +1,41 @@
-import type { CollectionConfig } from 'payload';
-import { isStaff, none, ROLES } from '@/lib/access';
+import { APIError, type CollectionConfig, type FieldAccess } from 'payload';
+import { hasRole, hiddenUnless, isStaff, none, ROLES } from '@/lib/access';
+import { LOCALES } from '@/lib/i18n';
+
+const adminOnly: FieldAccess = ({ req }) => hasRole(req.user, ['admin']);
 
 const users: CollectionConfig = {
   slug: 'users',
   auth: true,
-  admin: { useAsTitle: 'name' },
+  admin: { useAsTitle: 'name', group: 'People', defaultColumns: ['name', 'email', 'roles', 'active'], hidden: hiddenUnless('manager') },
+  access: {
+    // Every staff member reads and edits their own profile; admin/manager read everyone; only admin manages accounts.
+    read: ({ req: { user } }) => (hasRole(user, ['manager']) ? true : user?.collection === 'users' ? { id: { equals: user.id } } : false),
+    create: isStaff('admin'),
+    update: ({ req: { user } }) => (hasRole(user, ['admin']) ? true : user?.collection === 'users' ? { id: { equals: user.id } } : false),
+    delete: isStaff('admin'),
+    unlock: isStaff('admin'),
+  },
+  hooks: {
+    beforeLogin: [
+      ({ user }) => {
+        if (user.active === false) throw new APIError('This account is disabled.', 401, null, true);
+        return user;
+      },
+    ],
+    beforeChange: [
+      ({ data, originalDoc, req, operation }) => {
+        const removesOwnAdmin =
+          operation === 'update' &&
+          req.user?.id === originalDoc?.id &&
+          originalDoc?.roles?.includes('admin') &&
+          Array.isArray(data.roles) &&
+          !data.roles.includes('admin');
+        if (removesOwnAdmin) throw new APIError('You cannot remove your own admin role.', 400, null, true);
+        return data;
+      },
+    ],
+  },
   fields: [
     { name: 'name', type: 'text', required: true },
     {
@@ -13,16 +44,22 @@ const users: CollectionConfig = {
       hasMany: true,
       required: true,
       saveToJWT: true,
-      defaultValue: ['admin'],
       options: [...ROLES],
+      access: { create: adminOnly, update: adminOnly },
     },
-    { name: 'active', type: 'checkbox', defaultValue: true },
+    { name: 'active', type: 'checkbox', defaultValue: true, access: { create: adminOnly, update: adminOnly } },
+    { name: 'locale', type: 'select', options: [...LOCALES], defaultValue: 'fr', required: true },
   ],
 };
 
 const auditLogs: CollectionConfig = {
   slug: 'auditLogs',
-  admin: { useAsTitle: 'action', defaultColumns: ['action', 'targetCollection', 'docId', 'user', 'createdAt'] },
+  admin: {
+    useAsTitle: 'action',
+    group: 'Settings',
+    defaultColumns: ['action', 'targetCollection', 'docId', 'user', 'createdAt'],
+    hidden: hiddenUnless('manager'),
+  },
   access: { read: isStaff('manager'), create: none, update: none, delete: none },
   fields: [
     { name: 'user', type: 'relationship', relationTo: 'users' },

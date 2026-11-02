@@ -129,6 +129,7 @@ export interface User {
   name: string;
   roles: ('admin' | 'manager' | 'sales' | 'stock' | 'attendance')[];
   active?: boolean | null;
+  locale: 'fr' | 'en' | 'de' | 'pt';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -276,6 +277,7 @@ export interface UsersSelect<T extends boolean = true> {
   name?: T;
   roles?: T;
   active?: T;
+  locale?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
