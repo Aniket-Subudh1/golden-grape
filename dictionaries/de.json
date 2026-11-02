@@ -1,11 +1,5 @@
 {
   "nav": {
-    "shop": "Shop",
-    "snack": "Theke",
-    "catering": "Catering",
-    "events": "Events",
-    "maison": "Haus",
-    "contact": "Kontakt",
     "account": "Mein Konto",
     "search": "Suchen",
     "bag": "Warenkorb",
@@ -96,9 +90,7 @@
     "titleB": "die Tür.",
     "body": "Ein diskreter Ort im Herzen von Luxemburg-Stadt. Entdecken Sie unseren Keller, unsere Theke und unser Team.",
     "addressLabel": "Adresse",
-    "addressValue": "25 Zac Klengbousbierg\nL-7795 Bissen, Luxemburg",
     "hoursLabel": "Öffnungszeiten",
-    "hoursValue": "Montag — Freitag\n10:00 — 18:00",
     "directions": "Wegbeschreibung",
     "tasting": "Verkostung buchen",
     "openNow": "Jetzt geöffnet",
@@ -110,9 +102,6 @@
   },
   "happyHour": {
     "eyebrow": "Ritual des Hauses",
-    "titleA": "Nächste",
-    "titleB": "Happy Hour.",
-    "subtitle": "Drei Tage die Woche schenken wir <gold>halb voll ein</gold> — und öffnen unser Herz weit.",
     "days": "Tage",
     "hours": "Stunden",
     "minutes": "Minuten",
@@ -125,27 +114,7 @@
     "titleA": "Jede Woche",
     "titleB": "ein Rendezvous.",
     "fullCal": "Vollständige Agenda",
-    "reserve": "Reservieren",
-    "items": {
-      "friday": {
-        "date": "Freitagabend",
-        "time": "19:00 — 23:00",
-        "title": "Fado-Abend",
-        "desc": "Portugiesischer Live-Gesang, Tapas und Port — die Seele Lissabons in Luxemburg."
-      },
-      "golden": {
-        "date": "Jeden Mittwoch",
-        "time": "17:00 — 20:00",
-        "title": "Golden Hour",
-        "desc": "Willkommensglas geschenkt, Sharing-Boards und portugiesischer Jazz."
-      },
-      "tasting": {
-        "date": "Einmal im Monat samstags",
-        "time": "16:00 — 18:00",
-        "title": "Geführte Verkostung",
-        "desc": "Sechs Weine, ein Winzer zu Gast, eine Geografie des Geschmacks."
-      }
-    }
+    "reserve": "Reservieren"
   },
   "socialProof": {
     "eyebrow": "Man spricht über uns",
@@ -184,23 +153,8 @@
     ]
   },
   "footer": {
-    "tagline": "Ein portugiesisches Haus im Herzen Luxemburgs. Weine, Feinkost, Theke, Catering und Abende.",
-    "colMaison": "Das Haus",
-    "colServices": "Leistungen",
     "colContact": "Uns finden",
-    "links": {
-      "history": "Unsere Geschichte",
-      "shop": "Shop",
-      "counter": "Theke",
-      "contact": "Kontakt",
-      "catering": "Catering",
-      "events": "Events",
-      "happy": "Happy Hour",
-      "gifts": "Geschenkboxen"
-    },
     "rights": "© {{year}} Golden Grape Luxembourg. Alle Rechte vorbehalten.",
-    "legal": "Impressum",
-    "privacy": "Datenschutz",
     "moderation": "Bitte trinken Sie verantwortungsvoll."
   },
   "floatingCart": {
@@ -414,35 +368,6 @@
     "titleB": "mit portugiesischer Seele.",
     "subtitle": "Drei Formeln für Ihr Event — Cocktail, Dinner oder Chef's Table. Bestätigung binnen 24h.",
     "perGuest": "pro Gast",
-    "packages": {
-      "convivio": {
-        "name": "Convívio",
-        "tagline": "Aperitif & Tapas",
-        "includes": [
-          "8 portugiesische Tapas",
-          "Weiß-, Rot-, Roséweine",
-          "Service 3h inklusive"
-        ]
-      },
-      "mesa": {
-        "name": "Mesa Farta",
-        "tagline": "Sitzendes Dinner",
-        "includes": [
-          "Vorspeise, Hauptgang, Dessert",
-          "Bacalhau oder Spanferkel",
-          "Weinbegleitung, portugiesischer Kaffee"
-        ]
-      },
-      "prestige": {
-        "name": "Prestige",
-        "tagline": "Chef's Table",
-        "includes": [
-          "6-Gänge-Menü Signature",
-          "Kollektionsweine",
-          "Sommelier & Maître d'hôtel"
-        ]
-      }
-    },
     "request": {
       "eyebrow": "Angebot anfragen",
       "title": "Erzählen Sie uns von Ihrem Event.",
@@ -477,32 +402,6 @@
     "subtitle": "Fado, Verkostungen, Happy Hour, Chef's Table — die Agenda des Hauses in Luxemburg.",
     "free": "Auf Einladung",
     "reserve": "Reservieren",
-    "list": {
-      "fri": {
-        "title": "Fado-Abend",
-        "date": "Freitag, 8. August",
-        "time": "19:00 — 23:00",
-        "desc": "Live-Fado, Tapas und Port — 45€ p.P., Getränke inklusive."
-      },
-      "hh": {
-        "title": "Golden Hour",
-        "date": "Mittwoch, 6. August",
-        "time": "17:00 — 20:00",
-        "desc": "Willkommensglas geschenkt, Sharing-Boards und portugiesischer Jazz — 24€."
-      },
-      "tast": {
-        "title": "Douro Verkostung",
-        "date": "Samstag, 16. August",
-        "time": "16:00 — 18:00",
-        "desc": "Sechs Douro-Weine, Winzer zu Gast — 65€ p.P."
-      },
-      "chef": {
-        "title": "Chef's Table",
-        "date": "Donnerstag, 21. August",
-        "time": "20:00 — 23:00",
-        "desc": "6-Gang-Signature-Menü mit Weinbegleitung — 120€ p.P., 12 Plätze."
-      }
-    },
     "dialog": {
       "guests": "Anzahl der Gäste",
       "name": "Name",
@@ -521,88 +420,6 @@
     "empty": "Derzeit keine anstehenden Veranstaltungen. Schauen Sie bald wieder vorbei — oder schreiben Sie uns, um als Erste informiert zu werden.",
     "back": "Alle Events"
   },
-  "maisonPage": {
-    "eyebrow": "Das Haus",
-    "titleA": "Eine portugiesische",
-    "titleB": "Geschichte.",
-    "subtitle": "Golden Grape entstand aus einem einfachen Traum: in Luxemburg die Seele eines geliebten Portugals zu teilen, sorgfältig gewählt und erzählt.",
-    "founderEyebrow": "Der Gründer",
-    "founderTitleA": "Ivo,",
-    "founderTitleB": "der Gastgeber.",
-    "founderP1": "Im Norden Portugals geboren, wuchs Ivo zwischen den Reben seines Großvaters und der Küche seiner Mutter auf. Fünfzehn Jahre lang arbeitete er in der Gastronomie in Porto, Lissabon und Luxemburg.",
-    "founderP2": "2019 gründet er Golden Grape — ein Haus, das die Handwerker ehrt, die er beim Vornamen kennt, die Weine, die er liebt, die Gesten, die er nicht verschwinden sehen möchte.",
-    "founderQuote": "Mein Keller ist eine Karte Portugals — jede Flasche ein Dorf, jedes Dorf eine Familie.",
-    "regionsEyebrow": "Unsere Regionen",
-    "regionsTitleA": "Sechs Terroirs,",
-    "regionsTitleB": "eine Identität.",
-    "regions": {
-      "douro": {
-        "name": "Douro",
-        "desc": "Terrassenweinberge, glühender Schiefer, kraftvolle mineralische Weine — Wiege des Portweins."
-      },
-      "alentejo": {
-        "name": "Alentejo",
-        "desc": "Goldene Ebenen, Oliven, Korkeichen. Großzügige Rote, Olivenöl, Brot und Geselligkeit."
-      },
-      "minho": {
-        "name": "Minho",
-        "desc": "Grüner Norden, leichte Vinhos Verdes, Gärten und Granitscheunen."
-      },
-      "dao": {
-        "name": "Dão",
-        "desc": "Höhenlagen, Touriga Nacional, Eleganz und Frische."
-      },
-      "acores": {
-        "name": "Azoren",
-        "desc": "Vulkaninseln, DOP-Käse, atlantische Winde und üppige Weiden."
-      },
-      "algarve": {
-        "name": "Algarve",
-        "desc": "Salz, Fisch, Zitrus. Südliches Licht, Gold von Sand und Meer."
-      }
-    },
-    "producersEyebrow": "Unsere Erzeuger",
-    "producersTitleA": "Familien,",
-    "producersTitleB": "Gesichter.",
-    "since": "Seit {{year}}",
-    "producers": {
-      "vale": {
-        "name": "Quinta do Vale Meão",
-        "region": "Douro",
-        "year": "1877"
-      },
-      "grous": {
-        "name": "Herdade dos Grous",
-        "region": "Alentejo",
-        "year": "2001"
-      },
-      "sezim": {
-        "name": "Casa de Sezim",
-        "region": "Minho",
-        "year": "1390"
-      }
-    },
-    "values": [
-      {
-        "t": "Wählen",
-        "d": "Ein Wein kommt nur nach Besuch, Handschlag, gemeinsamer Geschichte ins Haus."
-      },
-      {
-        "t": "Empfangen",
-        "d": "Service ist Kunst. Er beginnt mit einem Blick und endet in einer Stille."
-      },
-      {
-        "t": "Fortsetzen",
-        "d": "Ein guter Moment endet nie — er wird erzählt, wiederholt, weitergegeben."
-      }
-    ],
-    "ctaEyebrow": "Besuchen Sie uns",
-    "ctaTitleA": "Die Tür",
-    "ctaTitleB": "steht offen.",
-    "ctaSubtitle": "Eine Frage, ein Projekt, ein Wunsch? Schreiben Sie uns oder kommen Sie vorbei.",
-    "ctaContact": "Schreiben Sie uns",
-    "ctaShop": "Zum Shop"
-  },
   "contactPage": {
     "eyebrow": "Kontakt",
     "titleA": "Schreiben Sie uns,",
@@ -614,36 +431,6 @@
       "email": "E-Mail",
       "hours": "Öffnungszeiten"
     },
-    "hours": [
-      {
-        "day": "Montag",
-        "h": "10:00 — 18:00"
-      },
-      {
-        "day": "Dienstag",
-        "h": "10:00 — 18:00"
-      },
-      {
-        "day": "Mittwoch",
-        "h": "10:00 — 18:00"
-      },
-      {
-        "day": "Donnerstag",
-        "h": "10:00 — 18:00"
-      },
-      {
-        "day": "Freitag",
-        "h": "10:00 — 18:00"
-      },
-      {
-        "day": "Samstag",
-        "h": "Geschlossen"
-      },
-      {
-        "day": "Sonntag",
-        "h": "Geschlossen"
-      }
-    ],
     "form": {
       "eyebrow": "Formular",
       "title": "Ihre Nachricht.",
@@ -746,5 +533,11 @@
       "number": "Referenz",
       "language": "Sprache"
     }
+  },
+  "cookies": {
+    "label": "Cookies",
+    "text": "Diese Website verwendet nur Cookies, die für ihren Betrieb notwendig sind (Sprache, Sicherheit). Mit Ihrer Zustimmung können wir die Nutzung anonym messen.",
+    "essential": "Nur notwendige",
+    "accept": "Analyse akzeptieren"
   }
 }

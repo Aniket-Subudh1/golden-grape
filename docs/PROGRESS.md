@@ -50,8 +50,23 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-07 | Until DEP-07: LU VAT 17/14/8/3 %, invoice format `INV-{YYYY}-{00000}`, PDFs marked DRAFT on staging | M3.2 | — |
 | A-08 | Loyalty points earned on order completion | M3.2 | — |
 | A-10 | Until a real sample: CashMag CSV columns are mapped through configurable settings | M3.3 | — |
+| A-11 | Catering packages have a minimum of 10 guests (the prototype set none) | M1.3 T7 seed | — |
 
 ## 4. Log
+
+### 2026-11-03 · M1.3 T7 · Cookie consent and seed
+- `components/site/cookie-consent.tsx`: a bottom bar on first visit, "Essentiels uniquement" / "Accepter la mesure d'audience", stored in the `gg_consent` cookie (1 year). The choice is read with `useSyncExternalStore` and nothing renders on the server, so returning visitors never see a flash. No third-party script in either case (Q§12); the spot for a future GA4 tag is documented in the component. New `cookies.*` keys in 4 languages.
+- **Seed-only content moved out of the dictionaries** into `scripts/seed-content.json` (4 locales): Header/Footer labels, Happy Hour texts, `maisonPage`, `eventsPage.list`, `cateringPage.packages`. The dictionaries lost these, plus `eventsHome.items`, `store.addressValue/hoursValue`, `contactPage.hours`, `footer.legal/privacy` (now from the CMS). The seed does not depend on the gitignored prototype. (A first extraction attempt failed before writing; the dictionaries were restored from git, and the extraction now writes the JSON before stripping.)
+- `scripts/seed.mts` (`npm run seed -- --email … --password … --name …`), idempotent:
+  - Writes: first admin; 11 brand stand-in photos as `media` with alts in 4 languages; BusinessSettings (contact details, Mon–Fri 10–18, LU VAT); Header (Shop/Snack without href until M2.2); Footer; HappyHour (Wed–Fri 17:00–20:00); the `maison` page (published: hero, founder mediaText with quote, regions hairline grid, producers cards, values dark band, CTA "Write to us"; the prototype's Shop button returns in M2.2); 4 legal stubs (**draft**, DEP-05); 3 catering packages (28/55/95 €, min 10 guests = A-11); 4 events (**draft**, decision).
+  - FR is written first; EN/DE/PT update the **same** array/block rows (row ids merged), so translations never duplicate structure.
+  - `.mts` because the package is CommonJS; the config is loaded with a dynamic import (a static default import from ESM receives the CJS wrapper).
+- `indexesReady(payload)` in `lib/tx.ts` (callers: seed, test helper): on a fresh database, the first transaction otherwise races mongoose's index builds ("Unable to acquire IX lock").
+- **Database incident (handled with Aniket):** `.env` had been switched to an Atlas cluster shared with other projects, with no database name. My dev server and seed boots created 18 empty Golden Grape collections + 1 rate-limit doc in its `test` database. No content was written; the seed stopped at its admin check. With Aniket's OK, I dropped exactly those collections (each checked empty first). Nothing else on the cluster was touched. Aniket is changing the URL to `…/golden_grape`.
+- Verified on a **throwaway local replica set** (port 27018; Atlas untouched):
+  - seed run twice → 1 user, 11 media, 1 page, 4 legal (draft), 3 packages, 4 events (draft), 4 globals, no duplicates; localized rows shared (e.g. package `includes` ids identical across the 4 locales);
+  - `next dev` on that DB: home/maison/events/catering/contact × 4 locales all 200; EN maison renders English blocks and alts; DE contact shows German weekdays + "Geschlossen";
+  - catering in the browser: a too-soon date → "Choisissez une date au moins 2 jours à l'avance."; a valid Mesa Farta × 20 → "Merci Marie", stored **REQ-2026-0001, estimateCents 110000**, counter 1, both e-mails rendered (logged; SMTP unset).
 
 ### 2026-11-02 · M1.3 T5 + T6 · Contact and catering requests, e-mail
 Committed together: the two actions send the e-mails, so neither task builds without the other.

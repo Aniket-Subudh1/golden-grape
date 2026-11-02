@@ -1,0 +1,670 @@
+{
+  "fr": {
+    "nav": {
+      "shop": "Boutique",
+      "snack": "Comptoir",
+      "catering": "Traiteur",
+      "events": "Événements",
+      "maison": "Maison",
+      "contact": "Contact"
+    },
+    "footer": {
+      "tagline": "Une maison portugaise au cœur de Luxembourg. Vins, épicerie, comptoir, traiteur et soirées.",
+      "colMaison": "La Maison",
+      "colServices": "Services",
+      "links": {
+        "history": "Notre histoire",
+        "shop": "Boutique",
+        "counter": "Comptoir",
+        "contact": "Contact",
+        "catering": "Traiteur",
+        "events": "Événements",
+        "happy": "Happy Hour",
+        "gifts": "Coffrets cadeaux"
+      }
+    },
+    "happyHour": {
+      "titleA": "Prochain",
+      "titleB": "Happy Hour.",
+      "text": "Trois jours par semaine, la maison ouvre ses <gold>verres à moitié</gold> et son cœur en grand."
+    },
+    "maison": {
+      "eyebrow": "La Maison",
+      "titleA": "Une histoire",
+      "titleB": "portugaise.",
+      "subtitle": "Golden Grape est né d'un rêve simple : partager, à Luxembourg, l'âme d'un Portugal aimé, choisi et raconté avec soin.",
+      "founderEyebrow": "Le fondateur",
+      "founderTitleA": "Ivo,",
+      "founderTitleB": "l'hôte.",
+      "founderP1": "Né dans le nord du Portugal, Ivo a grandi entre les vignes de son grand-père et la cuisine de sa mère. Il a passé quinze années dans la restauration à Porto, Lisbonne, puis Luxembourg.",
+      "founderP2": "En 2019, il fonde Golden Grape — une maison qui met à l'honneur les artisans qu'il connaît par leur prénom, les vins qu'il aime, les gestes qu'il ne veut pas voir disparaître.",
+      "founderQuote": "Ma cave est une carte du Portugal — chaque bouteille est un village, chaque village une famille.",
+      "regionsEyebrow": "Nos régions",
+      "regionsTitleA": "Six terroirs,",
+      "regionsTitleB": "une identité.",
+      "regions": {
+        "douro": {
+          "name": "Douro",
+          "desc": "Vignes en terrasses, schistes brûlants, vins puissants et minéraux — berceau du Porto."
+        },
+        "alentejo": {
+          "name": "Alentejo",
+          "desc": "Plaines dorées, oliviers, chênes-lièges. Rouges généreux, huile d'olive, pain et convivialité."
+        },
+        "minho": {
+          "name": "Minho",
+          "desc": "Le vert du nord, ses Vinhos Verdes légers, ses jardins et ses granges de granit."
+        },
+        "dao": {
+          "name": "Dão",
+          "desc": "Vignes de haute altitude, Touriga Nacional, élégance et fraîcheur."
+        },
+        "acores": {
+          "name": "Açores",
+          "desc": "Îles volcaniques, fromages DOP, vents d'Atlantique et pâturages luxuriants."
+        },
+        "algarve": {
+          "name": "Algarve",
+          "desc": "Sel, poissons, agrumes. La lumière du sud, l'or du sable et de la mer."
+        }
+      },
+      "producersEyebrow": "Nos producteurs",
+      "producersTitleA": "Des familles,",
+      "producersTitleB": "des visages.",
+      "since": "Depuis {{year}}",
+      "producers": {
+        "vale": {
+          "name": "Quinta do Vale Meão",
+          "region": "Douro",
+          "year": "1877"
+        },
+        "grous": {
+          "name": "Herdade dos Grous",
+          "region": "Alentejo",
+          "year": "2001"
+        },
+        "sezim": {
+          "name": "Casa de Sezim",
+          "region": "Minho",
+          "year": "1390"
+        }
+      },
+      "values": [
+        {
+          "t": "Choisir",
+          "d": "Un vin n'entre chez nous qu'après une visite, une poignée de main, une histoire partagée."
+        },
+        {
+          "t": "Recevoir",
+          "d": "Le service est un art. Il commence par un regard et se prolonge dans le silence."
+        },
+        {
+          "t": "Prolonger",
+          "d": "Un bon moment ne se finit pas — il se raconte, se recommence, se transmet."
+        }
+      ],
+      "ctaEyebrow": "Venez nous voir",
+      "ctaTitleA": "La porte",
+      "ctaTitleB": "est ouverte.",
+      "ctaSubtitle": "Une question, un projet, une envie ? Écrivez-nous ou passez à la boutique.",
+      "ctaContact": "Nous écrire",
+      "ctaShop": "Voir la boutique"
+    },
+    "events": {
+      "fri": {
+        "title": "Soirée Fado",
+        "date": "Vendredi 8 août",
+        "time": "19:00 — 23:00",
+        "desc": "Chants portugais en live, tapas et Porto — 45€ par personne, boissons incluses."
+      },
+      "hh": {
+        "title": "Golden Hour",
+        "date": "Mercredi 6 août",
+        "time": "17:00 — 20:00",
+        "desc": "Le verre de bienvenue offert, planches de partage et jazz portugais — 24€."
+      },
+      "tast": {
+        "title": "Dégustation Douro",
+        "date": "Samedi 16 août",
+        "time": "16:00 — 18:00",
+        "desc": "Six vins du Douro, un vigneron invité — 65€ par personne."
+      },
+      "chef": {
+        "title": "Table du Chef",
+        "date": "Jeudi 21 août",
+        "time": "20:00 — 23:00",
+        "desc": "Menu 6 services signature, accords vins — 120€ par personne, 12 couverts."
+      }
+    },
+    "packages": {
+      "convivio": {
+        "name": "Convívio",
+        "tagline": "Apéro & tapas",
+        "includes": [
+          "8 tapas portugaises",
+          "Vin blanc, rouge, rosé",
+          "Service inclus 3h"
+        ]
+      },
+      "mesa": {
+        "name": "Mesa Farta",
+        "tagline": "Repas assis",
+        "includes": [
+          "Entrée, plat, dessert",
+          "Bacalhau ou Cochon de lait",
+          "Vins d'accord, café portugais"
+        ]
+      },
+      "prestige": {
+        "name": "Prestige",
+        "tagline": "Table du chef",
+        "includes": [
+          "Menu 6 services signature",
+          "Vins de collection",
+          "Sommelier & maître d'hôtel"
+        ]
+      }
+    }
+  },
+  "en": {
+    "nav": {
+      "shop": "Shop",
+      "snack": "Counter",
+      "catering": "Catering",
+      "events": "Events",
+      "maison": "House",
+      "contact": "Contact"
+    },
+    "footer": {
+      "tagline": "A Portuguese house in the heart of Luxembourg. Wines, grocery, counter, catering and evenings.",
+      "colMaison": "The House",
+      "colServices": "Services",
+      "links": {
+        "history": "Our story",
+        "shop": "Shop",
+        "counter": "Counter",
+        "contact": "Contact",
+        "catering": "Catering",
+        "events": "Events",
+        "happy": "Happy Hour",
+        "gifts": "Gift boxes"
+      }
+    },
+    "happyHour": {
+      "titleA": "Next",
+      "titleB": "Happy Hour.",
+      "text": "Three days a week, we pour our <gold>glasses half full</gold> — and our hearts wide open."
+    },
+    "maison": {
+      "eyebrow": "The House",
+      "titleA": "A Portuguese",
+      "titleB": "story.",
+      "subtitle": "Golden Grape was born from a simple dream: to share, in Luxembourg, the soul of a Portugal we love, choose and tell with care.",
+      "founderEyebrow": "The founder",
+      "founderTitleA": "Ivo,",
+      "founderTitleB": "the host.",
+      "founderP1": "Born in northern Portugal, Ivo grew up between his grandfather's vines and his mother's kitchen. He spent fifteen years in hospitality across Porto, Lisbon, then Luxembourg.",
+      "founderP2": "In 2019, he founded Golden Grape — a house that celebrates artisans he knows by first name, the wines he loves, and the gestures he refuses to see fade.",
+      "founderQuote": "My cellar is a map of Portugal — every bottle is a village, every village a family.",
+      "regionsEyebrow": "Our regions",
+      "regionsTitleA": "Six terroirs,",
+      "regionsTitleB": "one identity.",
+      "regions": {
+        "douro": {
+          "name": "Douro",
+          "desc": "Terraced vines, burning schists, powerful and mineral wines — the cradle of Port."
+        },
+        "alentejo": {
+          "name": "Alentejo",
+          "desc": "Golden plains, olive trees, cork oaks. Generous reds, olive oil, bread and friendship."
+        },
+        "minho": {
+          "name": "Minho",
+          "desc": "The green of the north, its light Vinhos Verdes, its gardens and granite barns."
+        },
+        "dao": {
+          "name": "Dão",
+          "desc": "High-altitude vines, Touriga Nacional, elegance and freshness."
+        },
+        "acores": {
+          "name": "Azores",
+          "desc": "Volcanic islands, DOP cheeses, Atlantic winds and lush pastures."
+        },
+        "algarve": {
+          "name": "Algarve",
+          "desc": "Salt, fish, citrus. Southern light, the gold of sand and sea."
+        }
+      },
+      "producersEyebrow": "Our producers",
+      "producersTitleA": "Families,",
+      "producersTitleB": "faces.",
+      "since": "Since {{year}}",
+      "producers": {
+        "vale": {
+          "name": "Quinta do Vale Meão",
+          "region": "Douro",
+          "year": "1877"
+        },
+        "grous": {
+          "name": "Herdade dos Grous",
+          "region": "Alentejo",
+          "year": "2001"
+        },
+        "sezim": {
+          "name": "Casa de Sezim",
+          "region": "Minho",
+          "year": "1390"
+        }
+      },
+      "values": [
+        {
+          "t": "Choose",
+          "d": "A wine only enters our house after a visit, a handshake, a shared story."
+        },
+        {
+          "t": "Host",
+          "d": "Service is an art. It begins with a glance and ends in a silence."
+        },
+        {
+          "t": "Continue",
+          "d": "A good moment never ends — it is told, replayed, passed on."
+        }
+      ],
+      "ctaEyebrow": "Come and see us",
+      "ctaTitleA": "The door",
+      "ctaTitleB": "is open.",
+      "ctaSubtitle": "A question, a project, a craving? Write to us or drop by the boutique.",
+      "ctaContact": "Write to us",
+      "ctaShop": "Visit the shop"
+    },
+    "events": {
+      "fri": {
+        "title": "Fado Night",
+        "date": "Friday, 8 August",
+        "time": "7:00 — 11:00 PM",
+        "desc": "Live Portuguese singing, tapas and Port — €45 pp, drinks included."
+      },
+      "hh": {
+        "title": "Golden Hour",
+        "date": "Wednesday, 6 August",
+        "time": "5:00 — 8:00 PM",
+        "desc": "Welcome glass on us, sharing boards and Portuguese jazz — €24."
+      },
+      "tast": {
+        "title": "Douro Tasting",
+        "date": "Saturday, 16 August",
+        "time": "4:00 — 6:00 PM",
+        "desc": "Six Douro wines, a guest winemaker — €65 pp."
+      },
+      "chef": {
+        "title": "Chef's Table",
+        "date": "Thursday, 21 August",
+        "time": "8:00 — 11:00 PM",
+        "desc": "6-course signature menu with wine pairing — €120 pp, 12 seats."
+      }
+    },
+    "packages": {
+      "convivio": {
+        "name": "Convívio",
+        "tagline": "Cocktail & tapas",
+        "includes": [
+          "8 Portuguese tapas",
+          "White, red, rosé wines",
+          "3h service included"
+        ]
+      },
+      "mesa": {
+        "name": "Mesa Farta",
+        "tagline": "Seated dinner",
+        "includes": [
+          "Starter, main, dessert",
+          "Bacalhau or Suckling pig",
+          "Wine pairing, Portuguese coffee"
+        ]
+      },
+      "prestige": {
+        "name": "Prestige",
+        "tagline": "Chef's table",
+        "includes": [
+          "6-course signature menu",
+          "Collection wines",
+          "Sommelier & maître d'hôtel"
+        ]
+      }
+    }
+  },
+  "de": {
+    "nav": {
+      "shop": "Shop",
+      "snack": "Theke",
+      "catering": "Catering",
+      "events": "Events",
+      "maison": "Haus",
+      "contact": "Kontakt"
+    },
+    "footer": {
+      "tagline": "Ein portugiesisches Haus im Herzen Luxemburgs. Weine, Feinkost, Theke, Catering und Abende.",
+      "colMaison": "Das Haus",
+      "colServices": "Leistungen",
+      "links": {
+        "history": "Unsere Geschichte",
+        "shop": "Shop",
+        "counter": "Theke",
+        "contact": "Kontakt",
+        "catering": "Catering",
+        "events": "Events",
+        "happy": "Happy Hour",
+        "gifts": "Geschenkboxen"
+      }
+    },
+    "happyHour": {
+      "titleA": "Nächste",
+      "titleB": "Happy Hour.",
+      "text": "Drei Tage die Woche schenken wir <gold>halb voll ein</gold> — und öffnen unser Herz weit."
+    },
+    "maison": {
+      "eyebrow": "Das Haus",
+      "titleA": "Eine portugiesische",
+      "titleB": "Geschichte.",
+      "subtitle": "Golden Grape entstand aus einem einfachen Traum: in Luxemburg die Seele eines geliebten Portugals zu teilen, sorgfältig gewählt und erzählt.",
+      "founderEyebrow": "Der Gründer",
+      "founderTitleA": "Ivo,",
+      "founderTitleB": "der Gastgeber.",
+      "founderP1": "Im Norden Portugals geboren, wuchs Ivo zwischen den Reben seines Großvaters und der Küche seiner Mutter auf. Fünfzehn Jahre lang arbeitete er in der Gastronomie in Porto, Lissabon und Luxemburg.",
+      "founderP2": "2019 gründet er Golden Grape — ein Haus, das die Handwerker ehrt, die er beim Vornamen kennt, die Weine, die er liebt, die Gesten, die er nicht verschwinden sehen möchte.",
+      "founderQuote": "Mein Keller ist eine Karte Portugals — jede Flasche ein Dorf, jedes Dorf eine Familie.",
+      "regionsEyebrow": "Unsere Regionen",
+      "regionsTitleA": "Sechs Terroirs,",
+      "regionsTitleB": "eine Identität.",
+      "regions": {
+        "douro": {
+          "name": "Douro",
+          "desc": "Terrassenweinberge, glühender Schiefer, kraftvolle mineralische Weine — Wiege des Portweins."
+        },
+        "alentejo": {
+          "name": "Alentejo",
+          "desc": "Goldene Ebenen, Oliven, Korkeichen. Großzügige Rote, Olivenöl, Brot und Geselligkeit."
+        },
+        "minho": {
+          "name": "Minho",
+          "desc": "Grüner Norden, leichte Vinhos Verdes, Gärten und Granitscheunen."
+        },
+        "dao": {
+          "name": "Dão",
+          "desc": "Höhenlagen, Touriga Nacional, Eleganz und Frische."
+        },
+        "acores": {
+          "name": "Azoren",
+          "desc": "Vulkaninseln, DOP-Käse, atlantische Winde und üppige Weiden."
+        },
+        "algarve": {
+          "name": "Algarve",
+          "desc": "Salz, Fisch, Zitrus. Südliches Licht, Gold von Sand und Meer."
+        }
+      },
+      "producersEyebrow": "Unsere Erzeuger",
+      "producersTitleA": "Familien,",
+      "producersTitleB": "Gesichter.",
+      "since": "Seit {{year}}",
+      "producers": {
+        "vale": {
+          "name": "Quinta do Vale Meão",
+          "region": "Douro",
+          "year": "1877"
+        },
+        "grous": {
+          "name": "Herdade dos Grous",
+          "region": "Alentejo",
+          "year": "2001"
+        },
+        "sezim": {
+          "name": "Casa de Sezim",
+          "region": "Minho",
+          "year": "1390"
+        }
+      },
+      "values": [
+        {
+          "t": "Wählen",
+          "d": "Ein Wein kommt nur nach Besuch, Handschlag, gemeinsamer Geschichte ins Haus."
+        },
+        {
+          "t": "Empfangen",
+          "d": "Service ist Kunst. Er beginnt mit einem Blick und endet in einer Stille."
+        },
+        {
+          "t": "Fortsetzen",
+          "d": "Ein guter Moment endet nie — er wird erzählt, wiederholt, weitergegeben."
+        }
+      ],
+      "ctaEyebrow": "Besuchen Sie uns",
+      "ctaTitleA": "Die Tür",
+      "ctaTitleB": "steht offen.",
+      "ctaSubtitle": "Eine Frage, ein Projekt, ein Wunsch? Schreiben Sie uns oder kommen Sie vorbei.",
+      "ctaContact": "Schreiben Sie uns",
+      "ctaShop": "Zum Shop"
+    },
+    "events": {
+      "fri": {
+        "title": "Fado-Abend",
+        "date": "Freitag, 8. August",
+        "time": "19:00 — 23:00",
+        "desc": "Live-Fado, Tapas und Port — 45€ p.P., Getränke inklusive."
+      },
+      "hh": {
+        "title": "Golden Hour",
+        "date": "Mittwoch, 6. August",
+        "time": "17:00 — 20:00",
+        "desc": "Willkommensglas geschenkt, Sharing-Boards und portugiesischer Jazz — 24€."
+      },
+      "tast": {
+        "title": "Douro Verkostung",
+        "date": "Samstag, 16. August",
+        "time": "16:00 — 18:00",
+        "desc": "Sechs Douro-Weine, Winzer zu Gast — 65€ p.P."
+      },
+      "chef": {
+        "title": "Chef's Table",
+        "date": "Donnerstag, 21. August",
+        "time": "20:00 — 23:00",
+        "desc": "6-Gang-Signature-Menü mit Weinbegleitung — 120€ p.P., 12 Plätze."
+      }
+    },
+    "packages": {
+      "convivio": {
+        "name": "Convívio",
+        "tagline": "Aperitif & Tapas",
+        "includes": [
+          "8 portugiesische Tapas",
+          "Weiß-, Rot-, Roséweine",
+          "Service 3h inklusive"
+        ]
+      },
+      "mesa": {
+        "name": "Mesa Farta",
+        "tagline": "Sitzendes Dinner",
+        "includes": [
+          "Vorspeise, Hauptgang, Dessert",
+          "Bacalhau oder Spanferkel",
+          "Weinbegleitung, portugiesischer Kaffee"
+        ]
+      },
+      "prestige": {
+        "name": "Prestige",
+        "tagline": "Chef's Table",
+        "includes": [
+          "6-Gänge-Menü Signature",
+          "Kollektionsweine",
+          "Sommelier & Maître d'hôtel"
+        ]
+      }
+    }
+  },
+  "pt": {
+    "nav": {
+      "shop": "Loja",
+      "snack": "Balcão",
+      "catering": "Catering",
+      "events": "Eventos",
+      "maison": "A Casa",
+      "contact": "Contacto"
+    },
+    "footer": {
+      "tagline": "Uma casa portuguesa no coração do Luxemburgo. Vinhos, mercearia, balcão, catering e noites.",
+      "colMaison": "A Casa",
+      "colServices": "Serviços",
+      "links": {
+        "history": "A nossa história",
+        "shop": "Loja",
+        "counter": "Balcão",
+        "contact": "Contacto",
+        "catering": "Catering",
+        "events": "Eventos",
+        "happy": "Happy Hour",
+        "gifts": "Caixas de oferta"
+      }
+    },
+    "happyHour": {
+      "titleA": "Próxima",
+      "titleB": "Happy Hour.",
+      "text": "Três dias por semana servimos os <gold>copos a meio</gold> — e o coração inteiro."
+    },
+    "maison": {
+      "eyebrow": "A Casa",
+      "titleA": "Uma história",
+      "titleB": "portuguesa.",
+      "subtitle": "A Golden Grape nasceu de um sonho simples: partilhar, no Luxemburgo, a alma de um Portugal amado, escolhido e contado com cuidado.",
+      "founderEyebrow": "O fundador",
+      "founderTitleA": "Ivo,",
+      "founderTitleB": "o anfitrião.",
+      "founderP1": "Nascido no norte de Portugal, Ivo cresceu entre as vinhas do avô e a cozinha da mãe. Passou quinze anos na restauração no Porto, em Lisboa e depois em Luxemburgo.",
+      "founderP2": "Em 2019 funda a Golden Grape — uma casa que honra os artesãos que conhece pelo primeiro nome, os vinhos que ama, os gestos que se recusa a ver desaparecer.",
+      "founderQuote": "A minha cave é um mapa de Portugal — cada garrafa é uma aldeia, cada aldeia uma família.",
+      "regionsEyebrow": "As regiões",
+      "regionsTitleA": "Seis terroirs,",
+      "regionsTitleB": "uma identidade.",
+      "regions": {
+        "douro": {
+          "name": "Douro",
+          "desc": "Socalcos, xisto ardente, vinhos poderosos e minerais — berço do Porto."
+        },
+        "alentejo": {
+          "name": "Alentejo",
+          "desc": "Planícies douradas, oliveiras, sobreiros. Tintos generosos, azeite, pão e convívio."
+        },
+        "minho": {
+          "name": "Minho",
+          "desc": "O verde do norte, os Vinhos Verdes leves, jardins e granitos."
+        },
+        "dao": {
+          "name": "Dão",
+          "desc": "Vinhas de altitude, Touriga Nacional, elegância e frescura."
+        },
+        "acores": {
+          "name": "Açores",
+          "desc": "Ilhas vulcânicas, queijos DOP, ventos atlânticos e pastagens."
+        },
+        "algarve": {
+          "name": "Algarve",
+          "desc": "Sal, peixe, citrinos. A luz do sul, o ouro da areia e do mar."
+        }
+      },
+      "producersEyebrow": "Os produtores",
+      "producersTitleA": "Famílias,",
+      "producersTitleB": "rostos.",
+      "since": "Desde {{year}}",
+      "producers": {
+        "vale": {
+          "name": "Quinta do Vale Meão",
+          "region": "Douro",
+          "year": "1877"
+        },
+        "grous": {
+          "name": "Herdade dos Grous",
+          "region": "Alentejo",
+          "year": "2001"
+        },
+        "sezim": {
+          "name": "Casa de Sezim",
+          "region": "Minho",
+          "year": "1390"
+        }
+      },
+      "values": [
+        {
+          "t": "Escolher",
+          "d": "Um vinho só entra em casa após uma visita, um aperto de mão, uma história partilhada."
+        },
+        {
+          "t": "Receber",
+          "d": "O serviço é uma arte. Começa num olhar e prolonga-se num silêncio."
+        },
+        {
+          "t": "Prolongar",
+          "d": "Um bom momento nunca termina — conta-se, repete-se, transmite-se."
+        }
+      ],
+      "ctaEyebrow": "Venha ver-nos",
+      "ctaTitleA": "A porta",
+      "ctaTitleB": "está aberta.",
+      "ctaSubtitle": "Uma pergunta, um projeto, uma vontade? Escreva-nos ou passe pela loja.",
+      "ctaContact": "Escrever-nos",
+      "ctaShop": "Ver a loja"
+    },
+    "events": {
+      "fri": {
+        "title": "Noite de Fado",
+        "date": "Sexta, 8 de agosto",
+        "time": "19:00 — 23:00",
+        "desc": "Fado ao vivo, petiscos e Porto — 45€ p.p., bebidas incluídas."
+      },
+      "hh": {
+        "title": "Golden Hour",
+        "date": "Quarta, 6 de agosto",
+        "time": "17:00 — 20:00",
+        "desc": "Copo de boas-vindas por conta da casa, tábuas e jazz — 24€."
+      },
+      "tast": {
+        "title": "Prova Douro",
+        "date": "Sábado, 16 de agosto",
+        "time": "16:00 — 18:00",
+        "desc": "Seis vinhos do Douro, produtor convidado — 65€ p.p."
+      },
+      "chef": {
+        "title": "Mesa do Chef",
+        "date": "Quinta, 21 de agosto",
+        "time": "20:00 — 23:00",
+        "desc": "Menu 6 tempos signature com harmonização — 120€ p.p., 12 lugares."
+      }
+    },
+    "packages": {
+      "convivio": {
+        "name": "Convívio",
+        "tagline": "Aperitivo & petiscos",
+        "includes": [
+          "8 petiscos portugueses",
+          "Vinho branco, tinto, rosé",
+          "Serviço 3h incluído"
+        ]
+      },
+      "mesa": {
+        "name": "Mesa Farta",
+        "tagline": "Jantar sentado",
+        "includes": [
+          "Entrada, prato, sobremesa",
+          "Bacalhau ou Leitão",
+          "Harmonização, café português"
+        ]
+      },
+      "prestige": {
+        "name": "Prestige",
+        "tagline": "Mesa do chef",
+        "includes": [
+          "Menu 6 tempos signature",
+          "Vinhos de coleção",
+          "Sommelier & maître"
+        ]
+      }
+    }
+  }
+}

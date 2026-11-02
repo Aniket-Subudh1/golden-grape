@@ -21,6 +21,12 @@ export type Tx = { req: PayloadRequest; session: Session; model: (slug: Collecti
 export const model = (payload: Payload, slug: CollectionSlug): Model =>
   (payload.db as unknown as MongooseAdapter).collections[slug];
 
+/** Waits for every model's index builds: on a fresh database, a transaction that races one fails with
+ * "Unable to acquire IX lock". Used before the first writes of the seed and the integration tests. */
+export const indexesReady = async (payload: Payload) => {
+  await Promise.all(Object.values((payload.db as unknown as MongooseAdapter).collections).map((m) => m.init()));
+};
+
 export const ping = async (payload: Payload) => {
   await (payload.db as unknown as MongooseAdapter).connection.db?.admin().ping();
 };

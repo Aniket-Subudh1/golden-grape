@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Cormorant_Garamond, Inter } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
+import { CookieConsent } from '@/components/site/cookie-consent';
 import { Footer } from '@/components/site/footer';
 import { Nav } from '@/components/site/nav';
 import type { NavItem } from '@/components/site/nav-link';
@@ -70,6 +71,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
         <Suspense fallback={null}>
           <SiteFooter locale={locale} t={t} />
         </Suspense>
+        <CookieConsent t={t.cookies} />
         <Toaster position="top-center" />
       </body>
     </html>

@@ -1,11 +1,5 @@
 {
   "nav": {
-    "shop": "Shop",
-    "snack": "Counter",
-    "catering": "Catering",
-    "events": "Events",
-    "maison": "House",
-    "contact": "Contact",
     "account": "My account",
     "search": "Search",
     "bag": "Bag",
@@ -96,9 +90,7 @@
     "titleB": "the door.",
     "body": "A quiet setting in the heart of Luxembourg City. Discover our cellar, our counter and our team — feel at home.",
     "addressLabel": "Address",
-    "addressValue": "25 Zac Klengbousbierg\nL-7795 Bissen, Luxembourg",
     "hoursLabel": "Hours",
-    "hoursValue": "Monday — Friday\n10:00 — 18:00",
     "directions": "Directions",
     "tasting": "Book a tasting",
     "openNow": "Open now",
@@ -110,9 +102,6 @@
   },
   "happyHour": {
     "eyebrow": "House ritual",
-    "titleA": "Next",
-    "titleB": "Happy Hour.",
-    "subtitle": "Three days a week, we pour our <gold>glasses half full</gold> — and our hearts wide open.",
     "days": "Days",
     "hours": "Hours",
     "minutes": "Minutes",
@@ -125,27 +114,7 @@
     "titleA": "Every week,",
     "titleB": "a rendez-vous.",
     "fullCal": "Full calendar",
-    "reserve": "Reserve",
-    "items": {
-      "friday": {
-        "date": "Friday evening",
-        "time": "7:00 — 11:00 PM",
-        "title": "Fado Night",
-        "desc": "Portuguese live singing, tapas and Port — Lisbon's soul, in Luxembourg."
-      },
-      "golden": {
-        "date": "Every Wednesday",
-        "time": "5:00 — 8:00 PM",
-        "title": "Golden Hour",
-        "desc": "Welcome glass on us, sharing boards and Portuguese jazz."
-      },
-      "tasting": {
-        "date": "One Saturday a month",
-        "time": "4:00 — 6:00 PM",
-        "title": "Guided tasting",
-        "desc": "Six chosen wines, a guest winemaker, a geography of taste."
-      }
-    }
+    "reserve": "Reserve"
   },
   "socialProof": {
     "eyebrow": "They talk about us",
@@ -184,23 +153,8 @@
     ]
   },
   "footer": {
-    "tagline": "A Portuguese house in the heart of Luxembourg. Wines, grocery, counter, catering and evenings.",
-    "colMaison": "The House",
-    "colServices": "Services",
     "colContact": "Find us",
-    "links": {
-      "history": "Our story",
-      "shop": "Shop",
-      "counter": "Counter",
-      "contact": "Contact",
-      "catering": "Catering",
-      "events": "Events",
-      "happy": "Happy Hour",
-      "gifts": "Gift boxes"
-    },
     "rights": "© {{year}} Golden Grape Luxembourg. All rights reserved.",
-    "legal": "Legal notice",
-    "privacy": "Privacy",
     "moderation": "Please drink responsibly."
   },
   "floatingCart": {
@@ -414,35 +368,6 @@
     "titleB": "with a Portuguese soul.",
     "subtitle": "Three formulas for your event — cocktail, seated dinner, or chef's table. Confirmed within 24h.",
     "perGuest": "per guest",
-    "packages": {
-      "convivio": {
-        "name": "Convívio",
-        "tagline": "Cocktail & tapas",
-        "includes": [
-          "8 Portuguese tapas",
-          "White, red, rosé wines",
-          "3h service included"
-        ]
-      },
-      "mesa": {
-        "name": "Mesa Farta",
-        "tagline": "Seated dinner",
-        "includes": [
-          "Starter, main, dessert",
-          "Bacalhau or Suckling pig",
-          "Wine pairing, Portuguese coffee"
-        ]
-      },
-      "prestige": {
-        "name": "Prestige",
-        "tagline": "Chef's table",
-        "includes": [
-          "6-course signature menu",
-          "Collection wines",
-          "Sommelier & maître d'hôtel"
-        ]
-      }
-    },
     "request": {
       "eyebrow": "Request a quote",
       "title": "Tell us about your event.",
@@ -477,32 +402,6 @@
     "subtitle": "Fado, tastings, Happy Hour, chef's table — the House agenda in Luxembourg.",
     "free": "By invitation",
     "reserve": "Reserve",
-    "list": {
-      "fri": {
-        "title": "Fado Night",
-        "date": "Friday, 8 August",
-        "time": "7:00 — 11:00 PM",
-        "desc": "Live Portuguese singing, tapas and Port — €45 pp, drinks included."
-      },
-      "hh": {
-        "title": "Golden Hour",
-        "date": "Wednesday, 6 August",
-        "time": "5:00 — 8:00 PM",
-        "desc": "Welcome glass on us, sharing boards and Portuguese jazz — €24."
-      },
-      "tast": {
-        "title": "Douro Tasting",
-        "date": "Saturday, 16 August",
-        "time": "4:00 — 6:00 PM",
-        "desc": "Six Douro wines, a guest winemaker — €65 pp."
-      },
-      "chef": {
-        "title": "Chef's Table",
-        "date": "Thursday, 21 August",
-        "time": "8:00 — 11:00 PM",
-        "desc": "6-course signature menu with wine pairing — €120 pp, 12 seats."
-      }
-    },
     "dialog": {
       "guests": "Number of guests",
       "name": "Name",
@@ -521,88 +420,6 @@
     "empty": "No upcoming events right now. Check back soon — or write to us to be told first.",
     "back": "All events"
   },
-  "maisonPage": {
-    "eyebrow": "The House",
-    "titleA": "A Portuguese",
-    "titleB": "story.",
-    "subtitle": "Golden Grape was born from a simple dream: to share, in Luxembourg, the soul of a Portugal we love, choose and tell with care.",
-    "founderEyebrow": "The founder",
-    "founderTitleA": "Ivo,",
-    "founderTitleB": "the host.",
-    "founderP1": "Born in northern Portugal, Ivo grew up between his grandfather's vines and his mother's kitchen. He spent fifteen years in hospitality across Porto, Lisbon, then Luxembourg.",
-    "founderP2": "In 2019, he founded Golden Grape — a house that celebrates artisans he knows by first name, the wines he loves, and the gestures he refuses to see fade.",
-    "founderQuote": "My cellar is a map of Portugal — every bottle is a village, every village a family.",
-    "regionsEyebrow": "Our regions",
-    "regionsTitleA": "Six terroirs,",
-    "regionsTitleB": "one identity.",
-    "regions": {
-      "douro": {
-        "name": "Douro",
-        "desc": "Terraced vines, burning schists, powerful and mineral wines — the cradle of Port."
-      },
-      "alentejo": {
-        "name": "Alentejo",
-        "desc": "Golden plains, olive trees, cork oaks. Generous reds, olive oil, bread and friendship."
-      },
-      "minho": {
-        "name": "Minho",
-        "desc": "The green of the north, its light Vinhos Verdes, its gardens and granite barns."
-      },
-      "dao": {
-        "name": "Dão",
-        "desc": "High-altitude vines, Touriga Nacional, elegance and freshness."
-      },
-      "acores": {
-        "name": "Azores",
-        "desc": "Volcanic islands, DOP cheeses, Atlantic winds and lush pastures."
-      },
-      "algarve": {
-        "name": "Algarve",
-        "desc": "Salt, fish, citrus. Southern light, the gold of sand and sea."
-      }
-    },
-    "producersEyebrow": "Our producers",
-    "producersTitleA": "Families,",
-    "producersTitleB": "faces.",
-    "since": "Since {{year}}",
-    "producers": {
-      "vale": {
-        "name": "Quinta do Vale Meão",
-        "region": "Douro",
-        "year": "1877"
-      },
-      "grous": {
-        "name": "Herdade dos Grous",
-        "region": "Alentejo",
-        "year": "2001"
-      },
-      "sezim": {
-        "name": "Casa de Sezim",
-        "region": "Minho",
-        "year": "1390"
-      }
-    },
-    "values": [
-      {
-        "t": "Choose",
-        "d": "A wine only enters our house after a visit, a handshake, a shared story."
-      },
-      {
-        "t": "Host",
-        "d": "Service is an art. It begins with a glance and ends in a silence."
-      },
-      {
-        "t": "Continue",
-        "d": "A good moment never ends — it is told, replayed, passed on."
-      }
-    ],
-    "ctaEyebrow": "Come and see us",
-    "ctaTitleA": "The door",
-    "ctaTitleB": "is open.",
-    "ctaSubtitle": "A question, a project, a craving? Write to us or drop by the boutique.",
-    "ctaContact": "Write to us",
-    "ctaShop": "Visit the shop"
-  },
   "contactPage": {
     "eyebrow": "Contact",
     "titleA": "Write to us,",
@@ -614,36 +431,6 @@
       "email": "Email",
       "hours": "Hours"
     },
-    "hours": [
-      {
-        "day": "Monday",
-        "h": "10:00 — 18:00"
-      },
-      {
-        "day": "Tuesday",
-        "h": "10:00 — 18:00"
-      },
-      {
-        "day": "Wednesday",
-        "h": "10:00 — 18:00"
-      },
-      {
-        "day": "Thursday",
-        "h": "10:00 — 18:00"
-      },
-      {
-        "day": "Friday",
-        "h": "10:00 — 18:00"
-      },
-      {
-        "day": "Saturday",
-        "h": "Closed"
-      },
-      {
-        "day": "Sunday",
-        "h": "Closed"
-      }
-    ],
     "form": {
       "eyebrow": "Form",
       "title": "Your message.",
@@ -746,5 +533,11 @@
       "number": "Reference",
       "language": "Language"
     }
+  },
+  "cookies": {
+    "label": "Cookies",
+    "text": "This site only uses cookies essential to how it works (language, security). With your consent, we may measure audience anonymously.",
+    "essential": "Essential only",
+    "accept": "Accept analytics"
   }
 }
