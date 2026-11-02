@@ -53,6 +53,14 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-02 · M1.2 T4 · Site components
+- `Container`, `Reveal` (merged with its hook; reduced motion is handled in CSS with `motion-reduce:*`, so there is no hidden-then-shown flash), `LanguageSwitcher` (real links with `hrefLang`, sets the `NEXT_LOCALE` cookie; each language is labelled by its own name), `Nav`, `Footer`, and `NavLink` (a link, or plain text when the page does not exist yet; used by Nav and Footer).
+- Nav: search, account and cart are hidden until M2.2, with a spacer so the mobile logo stays centred. The mobile menu is `inert` while closed. New keys `nav.openMenu`/`nav.closeMenu` in all four dictionaries (the prototype hard-coded English). The dictionaries were re-serialised with 2-space indentation by the script that added the keys.
+- Footer: contact details are constants until M1.3 settings; the year comes from a `'use cache'` function (Cache Components forbids `new Date()` in a prerender). Hidden until real targets exist: the social icon row (no URLs; lucide 1.x has no brand icons) and the legal/privacy links (M1.3).
+- Shop, Snack and Gift boxes render as text (user decision, until M2.2). Catering, Events, Maison and Contact link to pages that ship in M1.3.
+- **Deferred to their first caller:** `PageHero`, `MediaCard`, `MediaGrid` (M1.3 events and catering pages) and `QtyStepper` (M2.2). The home page uses none of them (law 3).
+- Verified: `npm run check` passes.
+
 ### 2026-11-02 · M1.2 T3 · Primitive components
 - Packages (exact): class-variance-authority 0.7.1, clsx 2.1.1, tailwind-merge 3.7.0, lucide-react 1.66.0, sonner 2.0.8, @radix-ui/react-slot 1.5.0. Note: lucide 1.x has no brand icons (Instagram/Facebook); the footer social icons need a solution when they come back in M1.3.
 - `lib/cn.ts` (deferred from M1.1). `Button`: variants from `05` §3.2 plus `goldGlass` for the square translucent CTA repeated in Hero, Store and Happy Hour (`05` §3.2 updated). `Field` (input/textarea/select, error under the input via `aria-describedby`). `ActionForm` + `SubmitButton`: `useActionState`, pending label via `useFormStatus`, success/error toasts. It submits with `startTransition` instead of `action=`, so React's automatic form reset doesn't wipe the inputs on a validation error; the form resets on success only. `Toaster` ported.

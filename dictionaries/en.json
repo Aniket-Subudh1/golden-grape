@@ -8,7 +8,9 @@
     "contact": "Contact",
     "account": "My account",
     "search": "Search",
-    "bag": "Bag"
+    "bag": "Bag",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "hero": {
     "eyebrow": "Since 2019 · Luxembourg",
@@ -30,19 +32,51 @@
     "eyebrow": "Four universes · One house",
     "titleA": "Far more",
     "titleB": "than a wine shop.",
-    "shop": { "title": "Shop", "tagline": "Wines & Grocery", "desc": "Exceptional Portuguese wines, Port, DOP cheeses, charcuterie, fine grocery and gift boxes.", "cta": "Enter the shop" },
-    "snack": { "title": "Counter", "tagline": "Takeaway", "desc": "Bifana, Prego, Alheira, Pastel de Nata. Portuguese tradition to go, every day.", "cta": "See the menu" },
-    "catering": { "title": "Catering", "tagline": "Receptions", "desc": "Three formulas to host with Portuguese soul, from cocktails to seated dinners.", "cta": "Our packages" },
-    "events": { "title": "Events", "tagline": "Nights & Happy Hour", "desc": "Fado nights, guided tastings, weekly Happy Hour, chef's tables.", "cta": "The agenda" }
+    "shop": {
+      "title": "Shop",
+      "tagline": "Wines & Grocery",
+      "desc": "Exceptional Portuguese wines, Port, DOP cheeses, charcuterie, fine grocery and gift boxes.",
+      "cta": "Enter the shop"
+    },
+    "snack": {
+      "title": "Counter",
+      "tagline": "Takeaway",
+      "desc": "Bifana, Prego, Alheira, Pastel de Nata. Portuguese tradition to go, every day.",
+      "cta": "See the menu"
+    },
+    "catering": {
+      "title": "Catering",
+      "tagline": "Receptions",
+      "desc": "Three formulas to host with Portuguese soul, from cocktails to seated dinners.",
+      "cta": "Our packages"
+    },
+    "events": {
+      "title": "Events",
+      "tagline": "Nights & Happy Hour",
+      "desc": "Fado nights, guided tastings, weekly Happy Hour, chef's tables.",
+      "cta": "The agenda"
+    }
   },
   "craft": {
     "eyebrow": "Objects of artisans",
     "titleA": "The gesture,",
     "titleB": "above all.",
     "body": "Every product is hand-picked from families who have carried a craft across generations.",
-    "port": { "label": "Vinho do Porto", "title": "Tawny 20 years", "desc": "Notes of candied fig, walnut, golden caramel." },
-    "cheese": { "label": "DOP cheese", "title": "São Jorge, matured", "desc": "Pressed paste from the Azores, 12 months in the cellar." },
-    "pastel": { "label": "Pastry", "title": "Pastel de Nata", "desc": "Baked every two hours, golden puff pastry." }
+    "port": {
+      "label": "Vinho do Porto",
+      "title": "Tawny 20 years",
+      "desc": "Notes of candied fig, walnut, golden caramel."
+    },
+    "cheese": {
+      "label": "DOP cheese",
+      "title": "São Jorge, matured",
+      "desc": "Pressed paste from the Azores, 12 months in the cellar."
+    },
+    "pastel": {
+      "label": "Pastry",
+      "title": "Pastel de Nata",
+      "desc": "Baked every two hours, golden puff pastry."
+    }
   },
   "hospitality": {
     "eyebrow": "The art of hosting",
@@ -90,9 +124,24 @@
     "fullCal": "Full calendar",
     "reserve": "Reserve",
     "items": {
-      "friday": { "date": "Friday evening", "time": "7:00 — 11:00 PM", "title": "Fado Night", "desc": "Portuguese live singing, tapas and Port — Lisbon's soul, in Luxembourg." },
-      "golden": { "date": "Every Wednesday", "time": "5:00 — 8:00 PM", "title": "Golden Hour", "desc": "Welcome glass on us, sharing boards and Portuguese jazz." },
-      "tasting": { "date": "One Saturday a month", "time": "4:00 — 6:00 PM", "title": "Guided tasting", "desc": "Six chosen wines, a guest winemaker, a geography of taste." }
+      "friday": {
+        "date": "Friday evening",
+        "time": "7:00 — 11:00 PM",
+        "title": "Fado Night",
+        "desc": "Portuguese live singing, tapas and Port — Lisbon's soul, in Luxembourg."
+      },
+      "golden": {
+        "date": "Every Wednesday",
+        "time": "5:00 — 8:00 PM",
+        "title": "Golden Hour",
+        "desc": "Welcome glass on us, sharing boards and Portuguese jazz."
+      },
+      "tasting": {
+        "date": "One Saturday a month",
+        "time": "4:00 — 6:00 PM",
+        "title": "Guided tasting",
+        "desc": "Six chosen wines, a guest winemaker, a geography of taste."
+      }
     }
   },
   "socialProof": {
@@ -102,13 +151,34 @@
     "reviewsSuffix": " · 214 reviews · ",
     "readAll": "Read reviews",
     "reviews": [
-      { "name": "Camille D.", "source": "Google", "text": "A one-of-a-kind address. The wine, the charcuterie, Ivo's welcome — everything in its right place." },
-      { "name": "Marco L.", "source": "Google", "text": "Best Bifana in Luxembourg, hands down. And the Port is a lesson." },
-      { "name": "Ana P.", "source": "Instagram", "text": "Like coming home — but with better wine on the table." }
+      {
+        "name": "Camille D.",
+        "source": "Google",
+        "text": "A one-of-a-kind address. The wine, the charcuterie, Ivo's welcome — everything in its right place."
+      },
+      {
+        "name": "Marco L.",
+        "source": "Google",
+        "text": "Best Bifana in Luxembourg, hands down. And the Port is a lesson."
+      },
+      {
+        "name": "Ana P.",
+        "source": "Instagram",
+        "text": "Like coming home — but with better wine on the table."
+      }
     ]
   },
   "marquee": {
-    "words": ["Vinho", "Convívio", "Saudade", "Bacalhau", "Fado", "Tinto", "Azeite", "Mesa"]
+    "words": [
+      "Vinho",
+      "Convívio",
+      "Saudade",
+      "Bacalhau",
+      "Fado",
+      "Tinto",
+      "Azeite",
+      "Mesa"
+    ]
   },
   "footer": {
     "tagline": "A Portuguese house in the heart of Luxembourg. Wines, grocery, counter, catering and evenings.",
@@ -130,19 +200,29 @@
     "privacy": "Privacy",
     "moderation": "Please drink responsibly."
   },
-  "floatingCart": { "label": "Bag", "openAria": "Open bag" },
+  "floatingCart": {
+    "label": "Bag",
+    "openAria": "Open bag"
+  },
   "cart": {
     "orderTitle": "Your order",
     "reservationTitle": "Your reservation",
     "reservation": "Reservation",
     "panier": "Bag",
-    "modes": { "pickup": "Pickup", "delivery": "Delivery", "table": "Table" },
+    "modes": {
+      "pickup": "Pickup",
+      "delivery": "Delivery",
+      "table": "Table"
+    },
     "hints": {
       "pickup": "Collect your order at the boutique.",
       "delivery": "Delivery in Luxembourg City within 45 min.",
       "table": "Book a table, optionally pre-order your food."
     },
-    "empty": { "title": "Your bag is empty", "subtitle": "Add a few treasures from the counter or the shop." },
+    "empty": {
+      "title": "Your bag is empty",
+      "subtitle": "Add a few treasures from the counter or the shop."
+    },
     "tableAwaitTitle": "A table, tailor-made.",
     "tableAwaitSubtitle": "Fill in your details below — we'll confirm your slot shortly.",
     "fields": {
@@ -179,7 +259,10 @@
     "successPickup": "Thank you {{name}}, your order is set for {{date}} at {{time}}.",
     "successDelivery": "Thank you {{name}}, delivery scheduled on {{date}} at {{time}}.",
     "successTable": "Reservation request sent. We will confirm your booking shortly.",
-    "toast": { "orderTitle": "Order sent", "reservationTitle": "Request sent" }
+    "toast": {
+      "orderTitle": "Order sent",
+      "reservationTitle": "Request sent"
+    }
   },
   "shop": {
     "eyebrow": "Shop · Wines & Grocery",
@@ -190,29 +273,94 @@
     "empty": "No product matches.",
     "addAria": "Add {{name}} to bag",
     "categories": {
-      "all": "All", "wines": "Wines", "port": "Port", "beers": "Beers",
-      "cheese": "Cheeses", "charcuterie": "Charcuterie", "grocery": "Grocery", "gifts": "Gift boxes"
+      "all": "All",
+      "wines": "Wines",
+      "port": "Port",
+      "beers": "Beers",
+      "cheese": "Cheeses",
+      "charcuterie": "Charcuterie",
+      "grocery": "Grocery",
+      "gifts": "Gift boxes"
     },
-    "tags": { "signature": "Signature", "rare": "Rare", "dop": "DOP", "bestseller": "Best-seller" },
+    "tags": {
+      "signature": "Signature",
+      "rare": "Rare",
+      "dop": "DOP",
+      "bestseller": "Best-seller"
+    },
     "products": {
-      "douro-reserva": { "name": "Douro Reserva 2019", "region": "Douro" },
-      "alentejo-tinto": { "name": "Alentejo Tinto", "region": "Alentejo" },
-      "vinho-verde": { "name": "Vinho Verde", "region": "Minho" },
-      "dao-quinta": { "name": "Quinta do Dão", "region": "Dão" },
-      "port-tawny": { "name": "Port Tawny 20 years", "region": "Porto" },
-      "port-lbv": { "name": "Port LBV 2017", "region": "Porto" },
-      "sagres": { "name": "Sagres · 6-pack", "region": "Beer" },
-      "super-bock": { "name": "Super Bock", "region": "Beer" },
-      "sao-jorge": { "name": "São Jorge, 12 months", "region": "Azores" },
-      "serra": { "name": "Serra da Estrela", "region": "Beira" },
-      "chourico": { "name": "Smoked Chouriço", "region": "Trás-os-Montes" },
-      "presunto": { "name": "Presunto Bísaro", "region": "Trás-os-Montes" },
-      "azeite": { "name": "Extra virgin olive oil", "region": "Alentejo" },
-      "sardines": { "name": "Sardines in oil", "region": "Preserve" },
-      "flor-sal": { "name": "Algarve fleur de sel", "region": "Algarve" },
-      "box-descoberta": { "name": "Descoberta Gift Box", "region": "Gift" },
-      "box-prestige": { "name": "Prestige Gift Box", "region": "Gift" },
-      "box-porto": { "name": "Port & Chocolate Box", "region": "Gift" }
+      "douro-reserva": {
+        "name": "Douro Reserva 2019",
+        "region": "Douro"
+      },
+      "alentejo-tinto": {
+        "name": "Alentejo Tinto",
+        "region": "Alentejo"
+      },
+      "vinho-verde": {
+        "name": "Vinho Verde",
+        "region": "Minho"
+      },
+      "dao-quinta": {
+        "name": "Quinta do Dão",
+        "region": "Dão"
+      },
+      "port-tawny": {
+        "name": "Port Tawny 20 years",
+        "region": "Porto"
+      },
+      "port-lbv": {
+        "name": "Port LBV 2017",
+        "region": "Porto"
+      },
+      "sagres": {
+        "name": "Sagres · 6-pack",
+        "region": "Beer"
+      },
+      "super-bock": {
+        "name": "Super Bock",
+        "region": "Beer"
+      },
+      "sao-jorge": {
+        "name": "São Jorge, 12 months",
+        "region": "Azores"
+      },
+      "serra": {
+        "name": "Serra da Estrela",
+        "region": "Beira"
+      },
+      "chourico": {
+        "name": "Smoked Chouriço",
+        "region": "Trás-os-Montes"
+      },
+      "presunto": {
+        "name": "Presunto Bísaro",
+        "region": "Trás-os-Montes"
+      },
+      "azeite": {
+        "name": "Extra virgin olive oil",
+        "region": "Alentejo"
+      },
+      "sardines": {
+        "name": "Sardines in oil",
+        "region": "Preserve"
+      },
+      "flor-sal": {
+        "name": "Algarve fleur de sel",
+        "region": "Algarve"
+      },
+      "box-descoberta": {
+        "name": "Descoberta Gift Box",
+        "region": "Gift"
+      },
+      "box-prestige": {
+        "name": "Prestige Gift Box",
+        "region": "Gift"
+      },
+      "box-porto": {
+        "name": "Port & Chocolate Box",
+        "region": "Gift"
+      }
     }
   },
   "snackPage": {
@@ -220,16 +368,41 @@
     "titleA": "Tradition,",
     "titleB": "to go.",
     "subtitle": "Choose, adjust, order — in under a minute. Pick up, delivery or at your table.",
-    "ctas": { "pickup": "Pickup", "delivery": "Delivery", "table": "Reserve a table" },
-    "tags": { "signature": "Signature", "homemade": "Homemade" },
+    "ctas": {
+      "pickup": "Pickup",
+      "delivery": "Delivery",
+      "table": "Reserve a table"
+    },
+    "tags": {
+      "signature": "Signature",
+      "homemade": "Homemade"
+    },
     "add": "Add",
     "menu": {
-      "bifana": { "name": "Bifana", "desc": "Portuguese-marinated pork, piri-piri mustard, crusty bread." },
-      "prego": { "name": "Prego no Pão", "desc": "Juicy garlic steak in a golden buttered bun." },
-      "alheira": { "name": "Alheira de Mirandela", "desc": "Traditional sausage, fried egg, house fries." },
-      "pastel": { "name": "Pastel de Nata", "desc": "Crispy puff pastry, golden vanilla custard." },
-      "queijo": { "name": "Cheese board", "desc": "São Jorge, Serra, Azeitão, jam, bread, olives." },
-      "vinho": { "name": "Wine of the day", "desc": "Ivo's pick — red, white or rosé, by the glass." }
+      "bifana": {
+        "name": "Bifana",
+        "desc": "Portuguese-marinated pork, piri-piri mustard, crusty bread."
+      },
+      "prego": {
+        "name": "Prego no Pão",
+        "desc": "Juicy garlic steak in a golden buttered bun."
+      },
+      "alheira": {
+        "name": "Alheira de Mirandela",
+        "desc": "Traditional sausage, fried egg, house fries."
+      },
+      "pastel": {
+        "name": "Pastel de Nata",
+        "desc": "Crispy puff pastry, golden vanilla custard."
+      },
+      "queijo": {
+        "name": "Cheese board",
+        "desc": "São Jorge, Serra, Azeitão, jam, bread, olives."
+      },
+      "vinho": {
+        "name": "Wine of the day",
+        "desc": "Ivo's pick — red, white or rosé, by the glass."
+      }
     }
   },
   "cateringPage": {
@@ -239,9 +412,33 @@
     "subtitle": "Three formulas for your event — cocktail, seated dinner, or chef's table. Confirmed within 24h.",
     "perGuest": "per guest",
     "packages": {
-      "convivio": { "name": "Convívio", "tagline": "Cocktail & tapas", "includes": ["8 Portuguese tapas", "White, red, rosé wines", "3h service included"] },
-      "mesa": { "name": "Mesa Farta", "tagline": "Seated dinner", "includes": ["Starter, main, dessert", "Bacalhau or Suckling pig", "Wine pairing, Portuguese coffee"] },
-      "prestige": { "name": "Prestige", "tagline": "Chef's table", "includes": ["6-course signature menu", "Collection wines", "Sommelier & maître d'hôtel"] }
+      "convivio": {
+        "name": "Convívio",
+        "tagline": "Cocktail & tapas",
+        "includes": [
+          "8 Portuguese tapas",
+          "White, red, rosé wines",
+          "3h service included"
+        ]
+      },
+      "mesa": {
+        "name": "Mesa Farta",
+        "tagline": "Seated dinner",
+        "includes": [
+          "Starter, main, dessert",
+          "Bacalhau or Suckling pig",
+          "Wine pairing, Portuguese coffee"
+        ]
+      },
+      "prestige": {
+        "name": "Prestige",
+        "tagline": "Chef's table",
+        "includes": [
+          "6-course signature menu",
+          "Collection wines",
+          "Sommelier & maître d'hôtel"
+        ]
+      }
     },
     "request": {
       "eyebrow": "Request a quote",
@@ -276,18 +473,42 @@
     "free": "By invitation",
     "reserve": "Reserve",
     "list": {
-      "fri": { "title": "Fado Night", "date": "Friday, 8 August", "time": "7:00 — 11:00 PM", "desc": "Live Portuguese singing, tapas and Port — €45 pp, drinks included." },
-      "hh": { "title": "Golden Hour", "date": "Wednesday, 6 August", "time": "5:00 — 8:00 PM", "desc": "Welcome glass on us, sharing boards and Portuguese jazz — €24." },
-      "tast": { "title": "Douro Tasting", "date": "Saturday, 16 August", "time": "4:00 — 6:00 PM", "desc": "Six Douro wines, a guest winemaker — €65 pp." },
-      "chef": { "title": "Chef's Table", "date": "Thursday, 21 August", "time": "8:00 — 11:00 PM", "desc": "6-course signature menu with wine pairing — €120 pp, 12 seats." }
+      "fri": {
+        "title": "Fado Night",
+        "date": "Friday, 8 August",
+        "time": "7:00 — 11:00 PM",
+        "desc": "Live Portuguese singing, tapas and Port — €45 pp, drinks included."
+      },
+      "hh": {
+        "title": "Golden Hour",
+        "date": "Wednesday, 6 August",
+        "time": "5:00 — 8:00 PM",
+        "desc": "Welcome glass on us, sharing boards and Portuguese jazz — €24."
+      },
+      "tast": {
+        "title": "Douro Tasting",
+        "date": "Saturday, 16 August",
+        "time": "4:00 — 6:00 PM",
+        "desc": "Six Douro wines, a guest winemaker — €65 pp."
+      },
+      "chef": {
+        "title": "Chef's Table",
+        "date": "Thursday, 21 August",
+        "time": "8:00 — 11:00 PM",
+        "desc": "6-course signature menu with wine pairing — €120 pp, 12 seats."
+      }
     },
     "dialog": {
       "guests": "Number of guests",
-      "name": "Name", "namePh": "First & last name",
-      "phone": "Phone", "phonePh": "+352 …",
-      "comment": "Comments (optional)", "commentPh": "Allergies, occasion…",
+      "name": "Name",
+      "namePh": "First & last name",
+      "phone": "Phone",
+      "phonePh": "+352 …",
+      "comment": "Comments (optional)",
+      "commentPh": "Allergies, occasion…",
       "total": "Indicative total",
-      "submit": "Reserve", "sending": "Sending…",
+      "submit": "Reserve",
+      "sending": "Sending…",
       "toastTitle": "Request sent",
       "toastDesc": "{{title}} · {{count}} guests — we'll confirm shortly.",
       "doneTitle": "Request sent. We'll be in touch very soon."
@@ -308,26 +529,65 @@
     "regionsTitleA": "Six terroirs,",
     "regionsTitleB": "one identity.",
     "regions": {
-      "douro": { "name": "Douro", "desc": "Terraced vines, burning schists, powerful and mineral wines — the cradle of Port." },
-      "alentejo": { "name": "Alentejo", "desc": "Golden plains, olive trees, cork oaks. Generous reds, olive oil, bread and friendship." },
-      "minho": { "name": "Minho", "desc": "The green of the north, its light Vinhos Verdes, its gardens and granite barns." },
-      "dao": { "name": "Dão", "desc": "High-altitude vines, Touriga Nacional, elegance and freshness." },
-      "acores": { "name": "Azores", "desc": "Volcanic islands, DOP cheeses, Atlantic winds and lush pastures." },
-      "algarve": { "name": "Algarve", "desc": "Salt, fish, citrus. Southern light, the gold of sand and sea." }
+      "douro": {
+        "name": "Douro",
+        "desc": "Terraced vines, burning schists, powerful and mineral wines — the cradle of Port."
+      },
+      "alentejo": {
+        "name": "Alentejo",
+        "desc": "Golden plains, olive trees, cork oaks. Generous reds, olive oil, bread and friendship."
+      },
+      "minho": {
+        "name": "Minho",
+        "desc": "The green of the north, its light Vinhos Verdes, its gardens and granite barns."
+      },
+      "dao": {
+        "name": "Dão",
+        "desc": "High-altitude vines, Touriga Nacional, elegance and freshness."
+      },
+      "acores": {
+        "name": "Azores",
+        "desc": "Volcanic islands, DOP cheeses, Atlantic winds and lush pastures."
+      },
+      "algarve": {
+        "name": "Algarve",
+        "desc": "Salt, fish, citrus. Southern light, the gold of sand and sea."
+      }
     },
     "producersEyebrow": "Our producers",
     "producersTitleA": "Families,",
     "producersTitleB": "faces.",
     "since": "Since {{year}}",
     "producers": {
-      "vale": { "name": "Quinta do Vale Meão", "region": "Douro", "year": "1877" },
-      "grous": { "name": "Herdade dos Grous", "region": "Alentejo", "year": "2001" },
-      "sezim": { "name": "Casa de Sezim", "region": "Minho", "year": "1390" }
+      "vale": {
+        "name": "Quinta do Vale Meão",
+        "region": "Douro",
+        "year": "1877"
+      },
+      "grous": {
+        "name": "Herdade dos Grous",
+        "region": "Alentejo",
+        "year": "2001"
+      },
+      "sezim": {
+        "name": "Casa de Sezim",
+        "region": "Minho",
+        "year": "1390"
+      }
     },
     "values": [
-      { "t": "Choose", "d": "A wine only enters our house after a visit, a handshake, a shared story." },
-      { "t": "Host", "d": "Service is an art. It begins with a glance and ends in a silence." },
-      { "t": "Continue", "d": "A good moment never ends — it is told, replayed, passed on." }
+      {
+        "t": "Choose",
+        "d": "A wine only enters our house after a visit, a handshake, a shared story."
+      },
+      {
+        "t": "Host",
+        "d": "Service is an art. It begins with a glance and ends in a silence."
+      },
+      {
+        "t": "Continue",
+        "d": "A good moment never ends — it is told, replayed, passed on."
+      }
     ],
     "ctaEyebrow": "Come and see us",
     "ctaTitleA": "The door",
@@ -341,28 +601,66 @@
     "titleA": "Write to us,",
     "titleB": "come and see us.",
     "subtitle": "The House replies within 24h. For any question, reservation, or catering quote.",
-    "info": { "address": "Address", "phone": "Phone", "email": "Email", "hours": "Hours" },
+    "info": {
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "hours": "Hours"
+    },
     "hours": [
-      { "day": "Monday", "h": "10:00 — 18:00" },
-      { "day": "Tuesday", "h": "10:00 — 18:00" },
-      { "day": "Wednesday", "h": "10:00 — 18:00" },
-      { "day": "Thursday", "h": "10:00 — 18:00" },
-      { "day": "Friday", "h": "10:00 — 18:00" },
-      { "day": "Saturday", "h": "Closed" },
-      { "day": "Sunday", "h": "Closed" }
+      {
+        "day": "Monday",
+        "h": "10:00 — 18:00"
+      },
+      {
+        "day": "Tuesday",
+        "h": "10:00 — 18:00"
+      },
+      {
+        "day": "Wednesday",
+        "h": "10:00 — 18:00"
+      },
+      {
+        "day": "Thursday",
+        "h": "10:00 — 18:00"
+      },
+      {
+        "day": "Friday",
+        "h": "10:00 — 18:00"
+      },
+      {
+        "day": "Saturday",
+        "h": "Closed"
+      },
+      {
+        "day": "Sunday",
+        "h": "Closed"
+      }
     ],
     "form": {
       "eyebrow": "Form",
       "title": "Your message.",
       "subject": "Subject",
-      "subjects": { "boutique": "Shop", "traiteur": "Catering", "evenement": "Event", "autre": "Other" },
-      "name": "Name", "namePh": "First & last name",
-      "email": "Email", "emailPh": "you@example.com",
-      "phone": "Phone", "phonePh": "+352 …",
-      "message": "Message", "messagePh": "Tell us everything…",
-      "submit": "Send", "sending": "Sending…",
-      "toastTitle": "Message sent", "toastDesc": "We'll reply within 24h.",
-      "doneTitle": "Thank you {{name}}", "doneSubtitle": "Your message is well received. We'll reply within 24h."
+      "subjects": {
+        "boutique": "Shop",
+        "traiteur": "Catering",
+        "evenement": "Event",
+        "autre": "Other"
+      },
+      "name": "Name",
+      "namePh": "First & last name",
+      "email": "Email",
+      "emailPh": "you@example.com",
+      "phone": "Phone",
+      "phonePh": "+352 …",
+      "message": "Message",
+      "messagePh": "Tell us everything…",
+      "submit": "Send",
+      "sending": "Sending…",
+      "toastTitle": "Message sent",
+      "toastDesc": "We'll reply within 24h.",
+      "doneTitle": "Thank you {{name}}",
+      "doneSubtitle": "Your message is well received. We'll reply within 24h."
     },
     "mapCaption": "Find us in Luxembourg"
   },

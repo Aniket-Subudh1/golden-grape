@@ -8,7 +8,9 @@
     "contact": "Contacto",
     "account": "Minha conta",
     "search": "Pesquisar",
-    "bag": "Cesto"
+    "bag": "Cesto",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu"
   },
   "hero": {
     "eyebrow": "Desde 2019 · Luxemburgo",
@@ -18,25 +20,63 @@
     "cta": "Descobrir a casa",
     "secondaryCta": "Próxima Happy Hour",
     "scroll": "Descobrir",
-    "ticker": { "shop": "Loja", "snack": "Snack", "catering": "Catering", "events": "Eventos", "boutique": "Boutique" }
+    "ticker": {
+      "shop": "Loja",
+      "snack": "Snack",
+      "catering": "Catering",
+      "events": "Eventos",
+      "boutique": "Boutique"
+    }
   },
   "universes": {
     "eyebrow": "Quatro universos · Uma casa",
     "titleA": "Muito mais",
     "titleB": "do que uma garrafeira.",
-    "shop": { "title": "Loja", "tagline": "Vinhos & Mercearia", "desc": "Vinhos portugueses de exceção, Porto, queijos DOP, charcutaria e caixas de oferta.", "cta": "Entrar na loja" },
-    "snack": { "title": "Balcão", "tagline": "Para levar", "desc": "Bifana, Prego, Alheira, Pastel de Nata. A tradição portuguesa para levar.", "cta": "Ver a ementa" },
-    "catering": { "title": "Catering", "tagline": "Receções", "desc": "Três fórmulas para receber com alma portuguesa — do aperitivo ao jantar.", "cta": "As fórmulas" },
-    "events": { "title": "Eventos", "tagline": "Noites & Happy Hour", "desc": "Noites de Fado, provas guiadas, Happy Hour semanal, mesas do chef.", "cta": "A agenda" }
+    "shop": {
+      "title": "Loja",
+      "tagline": "Vinhos & Mercearia",
+      "desc": "Vinhos portugueses de exceção, Porto, queijos DOP, charcutaria e caixas de oferta.",
+      "cta": "Entrar na loja"
+    },
+    "snack": {
+      "title": "Balcão",
+      "tagline": "Para levar",
+      "desc": "Bifana, Prego, Alheira, Pastel de Nata. A tradição portuguesa para levar.",
+      "cta": "Ver a ementa"
+    },
+    "catering": {
+      "title": "Catering",
+      "tagline": "Receções",
+      "desc": "Três fórmulas para receber com alma portuguesa — do aperitivo ao jantar.",
+      "cta": "As fórmulas"
+    },
+    "events": {
+      "title": "Eventos",
+      "tagline": "Noites & Happy Hour",
+      "desc": "Noites de Fado, provas guiadas, Happy Hour semanal, mesas do chef.",
+      "cta": "A agenda"
+    }
   },
   "craft": {
     "eyebrow": "Objetos de artesãos",
     "titleA": "O gesto,",
     "titleB": "acima de tudo.",
     "body": "Cada produto é escolhido à mão, junto de famílias que guardam saberes ao longo de gerações.",
-    "port": { "label": "Vinho do Porto", "title": "Tawny 20 anos", "desc": "Notas de figo cristalizado, noz, caramelo dourado." },
-    "cheese": { "label": "Queijo DOP", "title": "São Jorge curado", "desc": "Pasta prensada dos Açores, 12 meses de cura." },
-    "pastel": { "label": "Pastelaria", "title": "Pastel de Nata", "desc": "Cozido de duas em duas horas, folhado dourado." }
+    "port": {
+      "label": "Vinho do Porto",
+      "title": "Tawny 20 anos",
+      "desc": "Notas de figo cristalizado, noz, caramelo dourado."
+    },
+    "cheese": {
+      "label": "Queijo DOP",
+      "title": "São Jorge curado",
+      "desc": "Pasta prensada dos Açores, 12 meses de cura."
+    },
+    "pastel": {
+      "label": "Pastelaria",
+      "title": "Pastel de Nata",
+      "desc": "Cozido de duas em duas horas, folhado dourado."
+    }
   },
   "hospitality": {
     "eyebrow": "A arte de receber",
@@ -70,7 +110,10 @@
     "titleA": "Próxima",
     "titleB": "Happy Hour.",
     "subtitle": "Três dias por semana servimos os <gold>copos a meio</gold> — e o coração inteiro.",
-    "days": "Dias", "hours": "Horas", "minutes": "Minutos", "seconds": "Segundos",
+    "days": "Dias",
+    "hours": "Horas",
+    "minutes": "Minutos",
+    "seconds": "Segundos",
     "nextPour": "Próximo serviço",
     "reserve": "Reservar mesa"
   },
@@ -81,9 +124,24 @@
     "fullCal": "Agenda completa",
     "reserve": "Reservar",
     "items": {
-      "friday": { "date": "Sexta à noite", "time": "19:00 — 23:00", "title": "Noite de Fado", "desc": "Canto ao vivo, petiscos e Porto — a alma de Lisboa no Luxemburgo." },
-      "golden": { "date": "Todas as quartas", "time": "17:00 — 20:00", "title": "Golden Hour", "desc": "Copo de boas-vindas por conta da casa, tábuas e jazz português." },
-      "tasting": { "date": "Um sábado por mês", "time": "16:00 — 18:00", "title": "Prova guiada", "desc": "Seis vinhos escolhidos, um produtor convidado — uma geografia do gosto." }
+      "friday": {
+        "date": "Sexta à noite",
+        "time": "19:00 — 23:00",
+        "title": "Noite de Fado",
+        "desc": "Canto ao vivo, petiscos e Porto — a alma de Lisboa no Luxemburgo."
+      },
+      "golden": {
+        "date": "Todas as quartas",
+        "time": "17:00 — 20:00",
+        "title": "Golden Hour",
+        "desc": "Copo de boas-vindas por conta da casa, tábuas e jazz português."
+      },
+      "tasting": {
+        "date": "Um sábado por mês",
+        "time": "16:00 — 18:00",
+        "title": "Prova guiada",
+        "desc": "Seis vinhos escolhidos, um produtor convidado — uma geografia do gosto."
+      }
     }
   },
   "socialProof": {
@@ -93,12 +151,35 @@
     "reviewsSuffix": " · 214 avaliações · ",
     "readAll": "Ler avaliações",
     "reviews": [
-      { "name": "Camille D.", "source": "Google", "text": "Uma casa à parte. O vinho, a charcutaria, o acolhimento do Ivo — tudo no lugar certo." },
-      { "name": "Marco L.", "source": "Google", "text": "Melhor Bifana do Luxemburgo, sem discussão. E o Porto é uma lição." },
-      { "name": "Ana P.", "source": "Instagram", "text": "Como chegar a casa — mas com melhor vinho à mesa." }
+      {
+        "name": "Camille D.",
+        "source": "Google",
+        "text": "Uma casa à parte. O vinho, a charcutaria, o acolhimento do Ivo — tudo no lugar certo."
+      },
+      {
+        "name": "Marco L.",
+        "source": "Google",
+        "text": "Melhor Bifana do Luxemburgo, sem discussão. E o Porto é uma lição."
+      },
+      {
+        "name": "Ana P.",
+        "source": "Instagram",
+        "text": "Como chegar a casa — mas com melhor vinho à mesa."
+      }
     ]
   },
-  "marquee": { "words": ["Vinho", "Convívio", "Saudade", "Bacalhau", "Fado", "Tinto", "Azeite", "Mesa"] },
+  "marquee": {
+    "words": [
+      "Vinho",
+      "Convívio",
+      "Saudade",
+      "Bacalhau",
+      "Fado",
+      "Tinto",
+      "Azeite",
+      "Mesa"
+    ]
+  },
   "footer": {
     "tagline": "Uma casa portuguesa no coração do Luxemburgo. Vinhos, mercearia, balcão, catering e noites.",
     "colMaison": "A Casa",
@@ -119,22 +200,39 @@
     "privacy": "Privacidade",
     "moderation": "O abuso do álcool é prejudicial à saúde."
   },
-  "floatingCart": { "label": "Cesto", "openAria": "Abrir cesto" },
+  "floatingCart": {
+    "label": "Cesto",
+    "openAria": "Abrir cesto"
+  },
   "cart": {
     "orderTitle": "A sua encomenda",
     "reservationTitle": "A sua reserva",
     "reservation": "Reserva",
     "panier": "Cesto",
-    "modes": { "pickup": "Levantar", "delivery": "Entrega", "table": "Mesa" },
+    "modes": {
+      "pickup": "Levantar",
+      "delivery": "Entrega",
+      "table": "Mesa"
+    },
     "hints": {
       "pickup": "Levante a encomenda na loja.",
       "delivery": "Entrega na cidade em 45 min.",
       "table": "Reserve mesa, com pré-encomenda opcional."
     },
-    "empty": { "title": "Cesto vazio", "subtitle": "Adicione algumas maravilhas do balcão ou da loja." },
+    "empty": {
+      "title": "Cesto vazio",
+      "subtitle": "Adicione algumas maravilhas do balcão ou da loja."
+    },
     "tableAwaitTitle": "Uma mesa à medida.",
     "tableAwaitSubtitle": "Indique os seus dados abaixo — confirmaremos em breve.",
-    "fields": { "name": "Nome", "phone": "Telefone", "address": "Morada de entrega", "date": "Data", "time": "Hora", "comment": "Comentário (opcional)" },
+    "fields": {
+      "name": "Nome",
+      "phone": "Telefone",
+      "address": "Morada de entrega",
+      "date": "Data",
+      "time": "Hora",
+      "comment": "Comentário (opcional)"
+    },
     "placeholders": {
       "name": "Nome e apelido",
       "phone": "+352 …",
@@ -161,7 +259,10 @@
     "successPickup": "Obrigado {{name}}, encomenda marcada para {{date}} às {{time}}.",
     "successDelivery": "Obrigado {{name}}, entrega prevista para {{date}} às {{time}}.",
     "successTable": "Pedido de reserva enviado. Confirmaremos em breve.",
-    "toast": { "orderTitle": "Encomenda enviada", "reservationTitle": "Pedido enviado" }
+    "toast": {
+      "orderTitle": "Encomenda enviada",
+      "reservationTitle": "Pedido enviado"
+    }
   },
   "shop": {
     "eyebrow": "Loja · Vinhos & Mercearia",
@@ -171,27 +272,95 @@
     "searchPh": "Procurar vinho, queijo…",
     "empty": "Nenhum produto corresponde.",
     "addAria": "Adicionar {{name}} ao cesto",
-    "categories": { "all": "Tudo", "wines": "Vinhos", "port": "Porto", "beers": "Cervejas", "cheese": "Queijos", "charcuterie": "Charcutaria", "grocery": "Mercearia", "gifts": "Caixas" },
-    "tags": { "signature": "Signature", "rare": "Raro", "dop": "DOP", "bestseller": "Mais vendido" },
+    "categories": {
+      "all": "Tudo",
+      "wines": "Vinhos",
+      "port": "Porto",
+      "beers": "Cervejas",
+      "cheese": "Queijos",
+      "charcuterie": "Charcutaria",
+      "grocery": "Mercearia",
+      "gifts": "Caixas"
+    },
+    "tags": {
+      "signature": "Signature",
+      "rare": "Raro",
+      "dop": "DOP",
+      "bestseller": "Mais vendido"
+    },
     "products": {
-      "douro-reserva": { "name": "Douro Reserva 2019", "region": "Douro" },
-      "alentejo-tinto": { "name": "Alentejo Tinto", "region": "Alentejo" },
-      "vinho-verde": { "name": "Vinho Verde", "region": "Minho" },
-      "dao-quinta": { "name": "Quinta do Dão", "region": "Dão" },
-      "port-tawny": { "name": "Porto Tawny 20 anos", "region": "Porto" },
-      "port-lbv": { "name": "Porto LBV 2017", "region": "Porto" },
-      "sagres": { "name": "Sagres · Pack 6", "region": "Cerveja" },
-      "super-bock": { "name": "Super Bock", "region": "Cerveja" },
-      "sao-jorge": { "name": "São Jorge, 12 meses", "region": "Açores" },
-      "serra": { "name": "Serra da Estrela", "region": "Beira" },
-      "chourico": { "name": "Chouriço fumado", "region": "Trás-os-Montes" },
-      "presunto": { "name": "Presunto Bísaro", "region": "Trás-os-Montes" },
-      "azeite": { "name": "Azeite virgem extra", "region": "Alentejo" },
-      "sardines": { "name": "Sardinhas em azeite", "region": "Conserva" },
-      "flor-sal": { "name": "Flor de sal do Algarve", "region": "Algarve" },
-      "box-descoberta": { "name": "Caixa Descoberta", "region": "Oferta" },
-      "box-prestige": { "name": "Caixa Prestige", "region": "Oferta" },
-      "box-porto": { "name": "Caixa Porto & Chocolate", "region": "Oferta" }
+      "douro-reserva": {
+        "name": "Douro Reserva 2019",
+        "region": "Douro"
+      },
+      "alentejo-tinto": {
+        "name": "Alentejo Tinto",
+        "region": "Alentejo"
+      },
+      "vinho-verde": {
+        "name": "Vinho Verde",
+        "region": "Minho"
+      },
+      "dao-quinta": {
+        "name": "Quinta do Dão",
+        "region": "Dão"
+      },
+      "port-tawny": {
+        "name": "Porto Tawny 20 anos",
+        "region": "Porto"
+      },
+      "port-lbv": {
+        "name": "Porto LBV 2017",
+        "region": "Porto"
+      },
+      "sagres": {
+        "name": "Sagres · Pack 6",
+        "region": "Cerveja"
+      },
+      "super-bock": {
+        "name": "Super Bock",
+        "region": "Cerveja"
+      },
+      "sao-jorge": {
+        "name": "São Jorge, 12 meses",
+        "region": "Açores"
+      },
+      "serra": {
+        "name": "Serra da Estrela",
+        "region": "Beira"
+      },
+      "chourico": {
+        "name": "Chouriço fumado",
+        "region": "Trás-os-Montes"
+      },
+      "presunto": {
+        "name": "Presunto Bísaro",
+        "region": "Trás-os-Montes"
+      },
+      "azeite": {
+        "name": "Azeite virgem extra",
+        "region": "Alentejo"
+      },
+      "sardines": {
+        "name": "Sardinhas em azeite",
+        "region": "Conserva"
+      },
+      "flor-sal": {
+        "name": "Flor de sal do Algarve",
+        "region": "Algarve"
+      },
+      "box-descoberta": {
+        "name": "Caixa Descoberta",
+        "region": "Oferta"
+      },
+      "box-prestige": {
+        "name": "Caixa Prestige",
+        "region": "Oferta"
+      },
+      "box-porto": {
+        "name": "Caixa Porto & Chocolate",
+        "region": "Oferta"
+      }
     }
   },
   "snackPage": {
@@ -199,16 +368,41 @@
     "titleA": "A tradição,",
     "titleB": "para levar.",
     "subtitle": "Escolha, ajuste, encomende — em menos de um minuto. Para levantar, entrega ou à mesa.",
-    "ctas": { "pickup": "Levantar", "delivery": "Entrega", "table": "Reservar mesa" },
-    "tags": { "signature": "Signature", "homemade": "Caseiro" },
+    "ctas": {
+      "pickup": "Levantar",
+      "delivery": "Entrega",
+      "table": "Reservar mesa"
+    },
+    "tags": {
+      "signature": "Signature",
+      "homemade": "Caseiro"
+    },
     "add": "Adicionar",
     "menu": {
-      "bifana": { "name": "Bifana", "desc": "Porco marinado à portuguesa, mostarda piri-piri, pão estaladiço." },
-      "prego": { "name": "Prego no Pão", "desc": "Bife suculento no papo-seco amanteigado." },
-      "alheira": { "name": "Alheira de Mirandela", "desc": "Enchido tradicional, ovo estrelado, batatas caseiras." },
-      "pastel": { "name": "Pastel de Nata", "desc": "Massa folhada estaladiça, creme dourado ao forno." },
-      "queijo": { "name": "Tábua de queijos", "desc": "São Jorge, Serra, Azeitão, doce, pão, azeitonas." },
-      "vinho": { "name": "Copo de vinho do dia", "desc": "Escolha do Ivo — tinto, branco ou rosé, ao copo." }
+      "bifana": {
+        "name": "Bifana",
+        "desc": "Porco marinado à portuguesa, mostarda piri-piri, pão estaladiço."
+      },
+      "prego": {
+        "name": "Prego no Pão",
+        "desc": "Bife suculento no papo-seco amanteigado."
+      },
+      "alheira": {
+        "name": "Alheira de Mirandela",
+        "desc": "Enchido tradicional, ovo estrelado, batatas caseiras."
+      },
+      "pastel": {
+        "name": "Pastel de Nata",
+        "desc": "Massa folhada estaladiça, creme dourado ao forno."
+      },
+      "queijo": {
+        "name": "Tábua de queijos",
+        "desc": "São Jorge, Serra, Azeitão, doce, pão, azeitonas."
+      },
+      "vinho": {
+        "name": "Copo de vinho do dia",
+        "desc": "Escolha do Ivo — tinto, branco ou rosé, ao copo."
+      }
     }
   },
   "cateringPage": {
@@ -218,9 +412,33 @@
     "subtitle": "Três fórmulas para o seu evento — cocktail, jantar ou mesa do chef. Confirmação em 24h.",
     "perGuest": "por pessoa",
     "packages": {
-      "convivio": { "name": "Convívio", "tagline": "Aperitivo & petiscos", "includes": ["8 petiscos portugueses", "Vinho branco, tinto, rosé", "Serviço 3h incluído"] },
-      "mesa": { "name": "Mesa Farta", "tagline": "Jantar sentado", "includes": ["Entrada, prato, sobremesa", "Bacalhau ou Leitão", "Harmonização, café português"] },
-      "prestige": { "name": "Prestige", "tagline": "Mesa do chef", "includes": ["Menu 6 tempos signature", "Vinhos de coleção", "Sommelier & maître"] }
+      "convivio": {
+        "name": "Convívio",
+        "tagline": "Aperitivo & petiscos",
+        "includes": [
+          "8 petiscos portugueses",
+          "Vinho branco, tinto, rosé",
+          "Serviço 3h incluído"
+        ]
+      },
+      "mesa": {
+        "name": "Mesa Farta",
+        "tagline": "Jantar sentado",
+        "includes": [
+          "Entrada, prato, sobremesa",
+          "Bacalhau ou Leitão",
+          "Harmonização, café português"
+        ]
+      },
+      "prestige": {
+        "name": "Prestige",
+        "tagline": "Mesa do chef",
+        "includes": [
+          "Menu 6 tempos signature",
+          "Vinhos de coleção",
+          "Sommelier & maître"
+        ]
+      }
     },
     "request": {
       "eyebrow": "Pedido de orçamento",
@@ -255,18 +473,42 @@
     "free": "Por convite",
     "reserve": "Reservar",
     "list": {
-      "fri": { "title": "Noite de Fado", "date": "Sexta, 8 de agosto", "time": "19:00 — 23:00", "desc": "Fado ao vivo, petiscos e Porto — 45€ p.p., bebidas incluídas." },
-      "hh": { "title": "Golden Hour", "date": "Quarta, 6 de agosto", "time": "17:00 — 20:00", "desc": "Copo de boas-vindas por conta da casa, tábuas e jazz — 24€." },
-      "tast": { "title": "Prova Douro", "date": "Sábado, 16 de agosto", "time": "16:00 — 18:00", "desc": "Seis vinhos do Douro, produtor convidado — 65€ p.p." },
-      "chef": { "title": "Mesa do Chef", "date": "Quinta, 21 de agosto", "time": "20:00 — 23:00", "desc": "Menu 6 tempos signature com harmonização — 120€ p.p., 12 lugares." }
+      "fri": {
+        "title": "Noite de Fado",
+        "date": "Sexta, 8 de agosto",
+        "time": "19:00 — 23:00",
+        "desc": "Fado ao vivo, petiscos e Porto — 45€ p.p., bebidas incluídas."
+      },
+      "hh": {
+        "title": "Golden Hour",
+        "date": "Quarta, 6 de agosto",
+        "time": "17:00 — 20:00",
+        "desc": "Copo de boas-vindas por conta da casa, tábuas e jazz — 24€."
+      },
+      "tast": {
+        "title": "Prova Douro",
+        "date": "Sábado, 16 de agosto",
+        "time": "16:00 — 18:00",
+        "desc": "Seis vinhos do Douro, produtor convidado — 65€ p.p."
+      },
+      "chef": {
+        "title": "Mesa do Chef",
+        "date": "Quinta, 21 de agosto",
+        "time": "20:00 — 23:00",
+        "desc": "Menu 6 tempos signature com harmonização — 120€ p.p., 12 lugares."
+      }
     },
     "dialog": {
       "guests": "Número de pessoas",
-      "name": "Nome", "namePh": "Nome e apelido",
-      "phone": "Telefone", "phonePh": "+352 …",
-      "comment": "Comentários (opcional)", "commentPh": "Alergias, ocasião…",
+      "name": "Nome",
+      "namePh": "Nome e apelido",
+      "phone": "Telefone",
+      "phonePh": "+352 …",
+      "comment": "Comentários (opcional)",
+      "commentPh": "Alergias, ocasião…",
       "total": "Total indicativo",
-      "submit": "Reservar", "sending": "A enviar…",
+      "submit": "Reservar",
+      "sending": "A enviar…",
       "toastTitle": "Pedido enviado",
       "toastDesc": "{{title}} · {{count}} pessoas — confirmaremos em breve.",
       "doneTitle": "Pedido enviado. Voltamos em breve."
@@ -287,26 +529,65 @@
     "regionsTitleA": "Seis terroirs,",
     "regionsTitleB": "uma identidade.",
     "regions": {
-      "douro": { "name": "Douro", "desc": "Socalcos, xisto ardente, vinhos poderosos e minerais — berço do Porto." },
-      "alentejo": { "name": "Alentejo", "desc": "Planícies douradas, oliveiras, sobreiros. Tintos generosos, azeite, pão e convívio." },
-      "minho": { "name": "Minho", "desc": "O verde do norte, os Vinhos Verdes leves, jardins e granitos." },
-      "dao": { "name": "Dão", "desc": "Vinhas de altitude, Touriga Nacional, elegância e frescura." },
-      "acores": { "name": "Açores", "desc": "Ilhas vulcânicas, queijos DOP, ventos atlânticos e pastagens." },
-      "algarve": { "name": "Algarve", "desc": "Sal, peixe, citrinos. A luz do sul, o ouro da areia e do mar." }
+      "douro": {
+        "name": "Douro",
+        "desc": "Socalcos, xisto ardente, vinhos poderosos e minerais — berço do Porto."
+      },
+      "alentejo": {
+        "name": "Alentejo",
+        "desc": "Planícies douradas, oliveiras, sobreiros. Tintos generosos, azeite, pão e convívio."
+      },
+      "minho": {
+        "name": "Minho",
+        "desc": "O verde do norte, os Vinhos Verdes leves, jardins e granitos."
+      },
+      "dao": {
+        "name": "Dão",
+        "desc": "Vinhas de altitude, Touriga Nacional, elegância e frescura."
+      },
+      "acores": {
+        "name": "Açores",
+        "desc": "Ilhas vulcânicas, queijos DOP, ventos atlânticos e pastagens."
+      },
+      "algarve": {
+        "name": "Algarve",
+        "desc": "Sal, peixe, citrinos. A luz do sul, o ouro da areia e do mar."
+      }
     },
     "producersEyebrow": "Os produtores",
     "producersTitleA": "Famílias,",
     "producersTitleB": "rostos.",
     "since": "Desde {{year}}",
     "producers": {
-      "vale": { "name": "Quinta do Vale Meão", "region": "Douro", "year": "1877" },
-      "grous": { "name": "Herdade dos Grous", "region": "Alentejo", "year": "2001" },
-      "sezim": { "name": "Casa de Sezim", "region": "Minho", "year": "1390" }
+      "vale": {
+        "name": "Quinta do Vale Meão",
+        "region": "Douro",
+        "year": "1877"
+      },
+      "grous": {
+        "name": "Herdade dos Grous",
+        "region": "Alentejo",
+        "year": "2001"
+      },
+      "sezim": {
+        "name": "Casa de Sezim",
+        "region": "Minho",
+        "year": "1390"
+      }
     },
     "values": [
-      { "t": "Escolher", "d": "Um vinho só entra em casa após uma visita, um aperto de mão, uma história partilhada." },
-      { "t": "Receber", "d": "O serviço é uma arte. Começa num olhar e prolonga-se num silêncio." },
-      { "t": "Prolongar", "d": "Um bom momento nunca termina — conta-se, repete-se, transmite-se." }
+      {
+        "t": "Escolher",
+        "d": "Um vinho só entra em casa após uma visita, um aperto de mão, uma história partilhada."
+      },
+      {
+        "t": "Receber",
+        "d": "O serviço é uma arte. Começa num olhar e prolonga-se num silêncio."
+      },
+      {
+        "t": "Prolongar",
+        "d": "Um bom momento nunca termina — conta-se, repete-se, transmite-se."
+      }
     ],
     "ctaEyebrow": "Venha ver-nos",
     "ctaTitleA": "A porta",
@@ -320,28 +601,66 @@
     "titleA": "Escreva-nos,",
     "titleB": "venha ver-nos.",
     "subtitle": "A Casa responde em 24h. Para qualquer questão, reserva ou pedido de catering.",
-    "info": { "address": "Morada", "phone": "Telefone", "email": "Email", "hours": "Horário" },
+    "info": {
+      "address": "Morada",
+      "phone": "Telefone",
+      "email": "Email",
+      "hours": "Horário"
+    },
     "hours": [
-      { "day": "Segunda", "h": "10:00 — 18:00" },
-      { "day": "Terça", "h": "10:00 — 18:00" },
-      { "day": "Quarta", "h": "10:00 — 18:00" },
-      { "day": "Quinta", "h": "10:00 — 18:00" },
-      { "day": "Sexta", "h": "10:00 — 18:00" },
-      { "day": "Sábado", "h": "Encerrado" },
-      { "day": "Domingo", "h": "Encerrado" }
+      {
+        "day": "Segunda",
+        "h": "10:00 — 18:00"
+      },
+      {
+        "day": "Terça",
+        "h": "10:00 — 18:00"
+      },
+      {
+        "day": "Quarta",
+        "h": "10:00 — 18:00"
+      },
+      {
+        "day": "Quinta",
+        "h": "10:00 — 18:00"
+      },
+      {
+        "day": "Sexta",
+        "h": "10:00 — 18:00"
+      },
+      {
+        "day": "Sábado",
+        "h": "Encerrado"
+      },
+      {
+        "day": "Domingo",
+        "h": "Encerrado"
+      }
     ],
     "form": {
       "eyebrow": "Formulário",
       "title": "A sua mensagem.",
       "subject": "Assunto",
-      "subjects": { "boutique": "Loja", "traiteur": "Catering", "evenement": "Evento", "autre": "Outro" },
-      "name": "Nome", "namePh": "Nome e apelido",
-      "email": "Email", "emailPh": "voce@exemplo.com",
-      "phone": "Telefone", "phonePh": "+352 …",
-      "message": "Mensagem", "messagePh": "Diga-nos tudo…",
-      "submit": "Enviar", "sending": "A enviar…",
-      "toastTitle": "Mensagem enviada", "toastDesc": "Respondemos em 24h.",
-      "doneTitle": "Obrigado {{name}}", "doneSubtitle": "A sua mensagem foi recebida. Respondemos em 24h."
+      "subjects": {
+        "boutique": "Loja",
+        "traiteur": "Catering",
+        "evenement": "Evento",
+        "autre": "Outro"
+      },
+      "name": "Nome",
+      "namePh": "Nome e apelido",
+      "email": "Email",
+      "emailPh": "voce@exemplo.com",
+      "phone": "Telefone",
+      "phonePh": "+352 …",
+      "message": "Mensagem",
+      "messagePh": "Diga-nos tudo…",
+      "submit": "Enviar",
+      "sending": "A enviar…",
+      "toastTitle": "Mensagem enviada",
+      "toastDesc": "Respondemos em 24h.",
+      "doneTitle": "Obrigado {{name}}",
+      "doneSubtitle": "A sua mensagem foi recebida. Respondemos em 24h."
     },
     "mapCaption": "Encontre-nos em Luxemburgo"
   },
