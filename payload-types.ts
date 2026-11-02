@@ -71,6 +71,9 @@ export interface Config {
     auditLogs: AuditLog;
     rateLimits: RateLimit;
     counters: Counter;
+    media: Media;
+    pages: Page;
+    legal: Legal;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,6 +85,9 @@ export interface Config {
     auditLogs: AuditLogsSelect<false> | AuditLogsSelect<true>;
     rateLimits: RateLimitsSelect<false> | RateLimitsSelect<true>;
     counters: CountersSelect<false> | CountersSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    legal: LegalSelect<false> | LegalSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -94,9 +100,15 @@ export interface Config {
     ('false' | 'none' | 'null') | false | null | ('fr' | 'en' | 'de' | 'pt') | ('fr' | 'en' | 'de' | 'pt')[];
   globals: {
     BusinessSettings: BusinessSetting;
+    Header: Header;
+    Footer: Footer;
+    HappyHour: HappyHour;
   };
   globalsSelect: {
     BusinessSettings: BusinessSettingsSelect<false> | BusinessSettingsSelect<true>;
+    Header: HeaderSelect<false> | HeaderSelect<true>;
+    Footer: FooterSelect<false> | FooterSelect<true>;
+    HappyHour: HappyHourSelect<false> | HappyHourSelect<true>;
   };
   locale: 'fr' | 'en' | 'de' | 'pt';
   widgets: {
@@ -209,6 +221,208 @@ export interface Counter {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: string;
+  /**
+   * Describes the image (accessibility, SEO).
+   */
+  alt: string;
+  caption?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumb?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: string;
+  title: string;
+  slug: string;
+  layout?:
+    | (
+        | {
+            eyebrow?: string | null;
+            titleA: string;
+            /**
+             * Shown in gold italics
+             */
+            titleB?: string | null;
+            subtitle?: string | null;
+            image?: (string | null) | Media;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            body: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            image: string | Media;
+            imagePosition: 'left' | 'right';
+            eyebrow?: string | null;
+            titleA: string;
+            /**
+             * Shown in gold italics
+             */
+            titleB?: string | null;
+            body?: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'mediaText';
+          }
+        | {
+            eyebrow?: string | null;
+            titleA: string;
+            /**
+             * Shown in gold italics
+             */
+            titleB?: string | null;
+            variant: 'hairline' | 'cards' | 'dark';
+            cards?:
+              | {
+                  image?: (string | null) | Media;
+                  eyebrow?: string | null;
+                  title: string;
+                  text?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cardGrid';
+          }
+        | {
+            eyebrow?: string | null;
+            titleA: string;
+            /**
+             * Shown in gold italics
+             */
+            titleB?: string | null;
+            subtitle?: string | null;
+            buttons?:
+              | {
+                  label: string;
+                  /**
+                   * Path without language, e.g. /contact
+                   */
+                  href: string;
+                  style: 'solid' | 'outline';
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cta';
+          }
+      )[]
+    | null;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    image?: (string | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal".
+ */
+export interface Legal {
+  id: string;
+  title: string;
+  slug: string;
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -246,6 +460,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'counters';
         value: string | Counter;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: string | Page;
+      } | null)
+    | ({
+        relationTo: 'legal';
+        value: string | Legal;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -347,6 +573,160 @@ export interface CountersSelect<T extends boolean = true> {
   series?: T;
   year?: T;
   last?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumb?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  layout?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              titleA?: T;
+              titleB?: T;
+              subtitle?: T;
+              image?: T;
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              body?: T;
+              id?: T;
+              blockName?: T;
+            };
+        mediaText?:
+          | T
+          | {
+              image?: T;
+              imagePosition?: T;
+              eyebrow?: T;
+              titleA?: T;
+              titleB?: T;
+              body?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cardGrid?:
+          | T
+          | {
+              eyebrow?: T;
+              titleA?: T;
+              titleB?: T;
+              variant?: T;
+              cards?:
+                | T
+                | {
+                    image?: T;
+                    eyebrow?: T;
+                    title?: T;
+                    text?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              eyebrow?: T;
+              titleA?: T;
+              titleB?: T;
+              subtitle?: T;
+              buttons?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    style?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal_select".
+ */
+export interface LegalSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  body?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -480,6 +860,82 @@ export interface BusinessSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Header".
+ */
+export interface Header {
+  id: string;
+  /**
+   * The first three sit left of the logo on desktop, the rest on the right.
+   */
+  navItems?:
+    | {
+        label: string;
+        /**
+         * Path without language, e.g. /maison. Leave empty to show plain text (page not online yet).
+         */
+        href?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Published legal pages are linked automatically.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Footer".
+ */
+export interface Footer {
+  id: string;
+  tagline?: string | null;
+  columns?:
+    | {
+        title: string;
+        links?:
+          | {
+              label: string;
+              /**
+               * Path without language, e.g. /maison. Leave empty to show plain text (page not online yet).
+               */
+              href?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HappyHour".
+ */
+export interface HappyHour {
+  id: string;
+  /**
+   * Hides the home-page section when off.
+   */
+  active?: boolean | null;
+  days: ('0' | '1' | '2' | '3' | '4' | '5' | '6')[];
+  from: string;
+  to: string;
+  titleA: string;
+  /**
+   * Shown in gold italics
+   */
+  titleB?: string | null;
+  /**
+   * Wrap words in <gold>…</gold> to colour them gold.
+   */
+  text?: string | null;
+  image?: (string | null) | Media;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "BusinessSettings_select".
  */
 export interface BusinessSettingsSelect<T extends boolean = true> {
@@ -560,6 +1016,62 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Header_select".
+ */
+export interface HeaderSelect<T extends boolean = true> {
+  navItems?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  tagline?: T;
+  columns?:
+    | T
+    | {
+        title?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HappyHour_select".
+ */
+export interface HappyHourSelect<T extends boolean = true> {
+  active?: T;
+  days?: T;
+  from?: T;
+  to?: T;
+  titleA?: T;
+  titleB?: T;
+  text?: T;
+  image?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

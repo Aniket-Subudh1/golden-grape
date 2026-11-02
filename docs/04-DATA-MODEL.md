@@ -23,7 +23,7 @@ These are all Payload collections and globals on MongoDB. Rules that apply to ev
 Access: read is Staff(any) for itself and admin/manager for everyone; create, update and delete are admin only. Field `roles` can only be updated by an admin, and an admin cannot remove their own `admin` role.
 
 ### `media` (upload)
-`alt` L (required, used for ALT text, V-SEO), `caption` L. Image sizes: `thumb` 400, `card` 800, `hero` 1920, all WebP. Storage is S3 (§2 of 02). Access: public read; create and update by Staff(admin, manager).
+`alt` L (required, used for ALT text, V-SEO), `caption` L. Image sizes: `thumb` 400, `card` 800, `hero` 1920, all WebP. Storage is a private S3 bucket (02 §7); files are served through Payload, local `./media` when S3 is not configured. Access: public read; create and update by Staff(admin, manager).
 
 ### `pages`
 `title` L, `slug` (unique, index), `layout` (blocks, see 05 §4: `hero`, `richText`, `mediaText`, `cardGrid`, `cta`, `faq`), `seo` group (`title` L, `description` L, `image`), `status` (draft/published, Payload drafts on). Access: published docs are public; Staff(admin, manager) otherwise.
@@ -52,7 +52,7 @@ Access: read is Staff(any) for itself and admin/manager for everyone; create, up
 Access: read is public **only through `getSettings()`, which strips the bank and internal fields**; update by Staff(admin, manager).
 
 ### `Header`, `Footer`, `HappyHour` (globals)
-`Header`: nav items (`label` L, `href`). `Footer`: columns, newsletter text L, legal links. `HappyHour`: `active`, `days`, `from`, `to`, `title` L, `text` L, `image`. These drive the prototype's `Nav`, `Footer` and `HappyHour` sections.
+`Header`: nav items (`label` L, `href` optional: empty = plain text until the page exists). `Footer`: `tagline` L, columns (title L, links); published `legal` pages are linked automatically (no newsletter field: there is no newsletter UI). `HappyHour`: `active`, `days`, `from`, `to`, `titleA` L, `titleB` L, `text` L (supports `<gold>…</gold>`), `image`. These drive the prototype's `Nav`, `Footer` and `HappyHour` sections.
 
 ### `counters`
 `series` (text), `year` (int), `last` (int). Unique index `{ series, year }`. Hidden in the admin. Written only by `nextNumber`.

@@ -43,3 +43,6 @@ next-env.d.ts
 
 # Lovable design prototype (reference only; contains .env secrets)
 /golden-grape-luxembourg/
+
+# Local media uploads (used when S3 is not configured)
+/media/

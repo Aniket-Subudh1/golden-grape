@@ -1,13 +1,12 @@
 import type { Field, GlobalConfig } from 'payload';
 import { hiddenUnless, isStaff } from '@/lib/access';
 import { revalidateTagHook } from '@/lib/revalidate';
+import { validateHHmm, WEEKDAY_OPTIONS } from '@/lib/time';
 
 export const MODULES = ['b2b', 'purchasing', 'promotions', 'loyalty', 'giftCards', 'reviews', 'attendance', 'pos'] as const;
 export type ModuleName = (typeof MODULES)[number];
 
-const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const hhmm = (value: unknown) => (typeof value === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(value)) || 'Use HH:mm, e.g. 09:30';
-const time = (name: string): Field => ({ name, type: 'text', required: true, validate: hhmm, admin: { width: '33%' } });
+const time = (name: string): Field => ({ name, type: 'text', required: true, validate: validateHHmm, admin: { width: '33%' } });
 
 export const businessSettings: GlobalConfig = {
   slug: 'BusinessSettings',
@@ -47,7 +46,7 @@ export const businessSettings: GlobalConfig = {
         {
           type: 'row',
           fields: [
-            { name: 'day', type: 'select', required: true, options: DAYS.map((label, i) => ({ label, value: String(i) })), admin: { width: '33%' } },
+            { name: 'day', type: 'select', required: true, options: WEEKDAY_OPTIONS, admin: { width: '33%' } },
             time('open'),
             time('close'),
           ],

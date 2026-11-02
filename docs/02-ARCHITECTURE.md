@@ -161,8 +161,8 @@ Every variable lives in `.env.example` and is parsed by `lib/env.ts`. The build 
 | `DATABASE_URL` | M1.1 | `mongodb://localhost:27017/golden_grape?replicaSet=rs0&directConnection=true` |
 | `PAYLOAD_SECRET` | M1.1 | 32+ random chars |
 | `APP_URL` | M1.1 | `http://localhost:3000`. Also needed **at build time** for the real site (prerendered pages bake absolute canonical/hreflang URLs; the build falls back to localhost when unset) |
-| `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_REGION`, `S3_PUBLIC_URL` | M1.3 | MinIO values |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_SECURE`, `MAIL_FROM`, `MAIL_STAFF_TO` | M1.3 | Mailpit `localhost:1025` |
+| `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_REGION` | M1.3 | Any S3-compatible bucket, kept **private**: media are served through the app at `/api/media/file/…` (no public URL). Unset → uploads stored in `./media` |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_SECURE`, `MAIL_FROM`, `MAIL_STAFF_TO` | M1.3 | Any SMTP (Mailpit `localhost:1025` locally). Unset `SMTP_HOST` → e-mails are logged, not sent |
 | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET` | M4.3 | Cloudflare test keys |
 | `ATTENDANCE_SECRET` | M3.3 | 32+ random chars |
 | `GOOGLE_PLACES_API_KEY`, `GOOGLE_PLACE_ID`, `GBP_ACCOUNT_ID`, `GBP_LOCATION_ID`, `GBP_OAUTH_*` | M3.3 | optional; the feature degrades without them |

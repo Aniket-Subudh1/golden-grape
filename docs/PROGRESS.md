@@ -53,6 +53,17 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-02 · M1.3 T3 · Media, pages, legal, globals
+- `modules/cms`:
+  - `media`: localized required `alt`, `caption`; WebP sizes thumb/card/hero; focal point. `s3Storage` is enabled only when S3 env is set; the bucket stays private and files go through Payload (decision); otherwise local `./media` (gitignored).
+  - `pages`: drafts; blocks hero, richText, mediaText, cardGrid (`variant` hairline | cards | dark: covers maison's regions, producers and values), cta. All text fields localized per field, so the block layout is shared and an EN edit never changes FR.
+  - `legal` with drafts.
+  - Globals `Header`, `Footer`, `HappyHour`. `04` §1 and `02` §7 updated (private bucket, no `S3_PUBLIC_URL`; Footer without a newsletter field and with automatic legal links; HappyHour title split A/B + `<gold>` support).
+- `faq` block deferred: no page uses it (law 3, `05` §4 "no block type for a single use").
+- `modules/cms/service.ts`: `getHeader/getFooter/getHappyHour/getPage/getLegal(locale)`, each `'use cache'` + tag. Pages and legal return **published** docs only. Revalidation per collection tag (`pages`, `legal`) instead of `page:<slug>`, simpler with a handful of pages.
+- `lib/time.ts` now also holds `WEEKDAY_OPTIONS` and `validateHHmm` (BusinessSettings hours and HappyHour).
+- Verified: `npm run check`, `npm run test:int` (Payload boots with all collections); admin import map regenerated; `/admin/collections/{media,pages}` and `/admin/globals/{BusinessSettings,HappyHour}` load. Upload checked in T7 through the seed (the local dev admin's password has changed since M1.1, so I did not use that account).
+
 ### 2026-11-02 · M1.3 T2 · Business settings, module switches, numbering
 - `BusinessSettings` global (`modules/settings/globals.ts`) with the groups for M1.3: business, hours (day + HH:mm validated) + closedDates, vat, numbering, alerts, modules, paymentTerms. `loyalty`, `reviews`, `pos` and `payments` are added by their own milestones. API read and update: admin/manager. Changes vs `04` §1 (doc updated): `address` split into street/postalCode/city/country (needed for e-mails and the map link); social links named `instagram`/`facebook`; `mapsUrl`; `numbering.cateringRequest`.
 - `getSettings()`: `'use cache'` + `cacheTag('settings')`, an allow-list of public fields (no IBAN/BIC/alerts/numbering). `getSettingsPrivate()` for documents and e-mails. `isModuleOn(name)`. Module gating in `admin.hidden` is not possible (it is synchronous and runs with the client user); the gated modules add their own checks.
