@@ -1,0 +1,361 @@
+{
+  "nav": {
+    "shop": "Shop",
+    "snack": "Theke",
+    "catering": "Catering",
+    "events": "Events",
+    "maison": "Haus",
+    "contact": "Kontakt",
+    "account": "Mein Konto",
+    "search": "Suchen",
+    "bag": "Warenkorb"
+  },
+  "hero": {
+    "eyebrow": "Seit 2019 · Luxemburg",
+    "titleA": "Die Seele Portugals,",
+    "titleB": "mit Hingabe serviert.",
+    "subtitle": "Ein Haus für Weine, Feinkost, Snacks, Catering und portugiesische Traditionen — im Herzen Luxemburgs.",
+    "cta": "Das Haus entdecken",
+    "secondaryCta": "Nächste Happy Hour",
+    "scroll": "Entdecken",
+    "ticker": { "shop": "Shop", "snack": "Snack", "catering": "Catering", "events": "Events", "boutique": "Boutique" }
+  },
+  "universes": {
+    "eyebrow": "Vier Welten · Ein Haus",
+    "titleA": "Viel mehr",
+    "titleB": "als ein Weinhandel.",
+    "shop": { "title": "Shop", "tagline": "Weine & Feinkost", "desc": "Ausgesuchte portugiesische Weine, Portwein, DOP-Käse, Charcuterie, Feinkost und Geschenkboxen.", "cta": "Zum Shop" },
+    "snack": { "title": "Theke", "tagline": "Zum Mitnehmen", "desc": "Bifana, Prego, Alheira, Pastel de Nata. Portugiesische Tradition zum Mitnehmen.", "cta": "Menü ansehen" },
+    "catering": { "title": "Catering", "tagline": "Empfänge", "desc": "Drei Formate, um mit portugiesischer Seele zu empfangen — von Aperitif bis Dinner.", "cta": "Unsere Formeln" },
+    "events": { "title": "Events", "tagline": "Abende & Happy Hour", "desc": "Fado-Abende, geführte Verkostungen, wöchentliche Happy Hour, Chef's Tables.", "cta": "Agenda" }
+  },
+  "craft": {
+    "eyebrow": "Werke der Handwerker",
+    "titleA": "Die Geste,",
+    "titleB": "vor allem.",
+    "body": "Jedes Produkt wird von Hand gewählt — bei Familien, die ihr Handwerk seit Generationen pflegen.",
+    "port": { "label": "Vinho do Porto", "title": "Tawny 20 Jahre", "desc": "Noten von kandierter Feige, Walnuss, goldenem Karamell." },
+    "cheese": { "label": "DOP-Käse", "title": "São Jorge, gereift", "desc": "Gepresste Paste von den Azoren, 12 Monate im Keller." },
+    "pastel": { "label": "Gebäck", "title": "Pastel de Nata", "desc": "Alle zwei Stunden frisch gebacken, goldene Blätterteigtaschen." }
+  },
+  "hospitality": {
+    "eyebrow": "Die Kunst des Empfangens",
+    "titleA": "Convívio.",
+    "titleB": "Portugiesische Seele.",
+    "body": "Bei Golden Grape servieren wir nicht nur Wein. Wir teilen einen Tisch, ein Lachen, eine Erinnerung. Portugal ist eine Lebenskunst — und eine Einladung.",
+    "bullets": [
+      "Herzliche Gastfreundschaft, ohne Protokoll",
+      "Familienküche, außergewöhnliche Produkte",
+      "Ein Ort zum Zusammenkommen, Feiern, Verweilen"
+    ]
+  },
+  "store": {
+    "eyebrow": "Die Boutique",
+    "titleA": "Öffnen Sie",
+    "titleB": "die Tür.",
+    "body": "Ein diskreter Ort im Herzen von Luxemburg-Stadt. Entdecken Sie unseren Keller, unsere Theke und unser Team.",
+    "addressLabel": "Adresse",
+    "addressValue": "25 Zac Klengbousbierg\nL-7795 Bissen, Luxemburg",
+    "hoursLabel": "Öffnungszeiten",
+    "hoursValue": "Montag — Freitag\n10:00 — 18:00",
+    "directions": "Wegbeschreibung",
+    "tasting": "Verkostung buchen"
+  },
+  "story": {
+    "eyebrow": "Unsere Philosophie",
+    "quote": "Wir glauben: Ein Wein, ein Gericht, ein geteilter Moment — sind drei Arten, dasselbe zu sagen: <gold>bem-vindo</gold>."
+  },
+  "happyHour": {
+    "eyebrow": "Ritual des Hauses",
+    "titleA": "Nächste",
+    "titleB": "Happy Hour.",
+    "subtitle": "Drei Tage die Woche schenken wir <gold>halb voll ein</gold> — und öffnen unser Herz weit.",
+    "days": "Tage",
+    "hours": "Stunden",
+    "minutes": "Minuten",
+    "seconds": "Sekunden",
+    "nextPour": "Nächster Ausschank",
+    "reserve": "Tisch reservieren"
+  },
+  "eventsHome": {
+    "eyebrow": "Agenda",
+    "titleA": "Jede Woche",
+    "titleB": "ein Rendezvous.",
+    "fullCal": "Vollständige Agenda",
+    "reserve": "Reservieren",
+    "items": {
+      "friday": { "date": "Freitagabend", "time": "19:00 — 23:00", "title": "Fado-Abend", "desc": "Portugiesischer Live-Gesang, Tapas und Port — die Seele Lissabons in Luxemburg." },
+      "golden": { "date": "Jeden Mittwoch", "time": "17:00 — 20:00", "title": "Golden Hour", "desc": "Willkommensglas geschenkt, Sharing-Boards und portugiesischer Jazz." },
+      "tasting": { "date": "Einmal im Monat samstags", "time": "16:00 — 18:00", "title": "Geführte Verkostung", "desc": "Sechs Weine, ein Winzer zu Gast, eine Geografie des Geschmacks." }
+    }
+  },
+  "socialProof": {
+    "eyebrow": "Man spricht über uns",
+    "titleA": "Gastfreundschaft,",
+    "titleB": "vor allem.",
+    "reviewsSuffix": " · 214 Bewertungen · ",
+    "readAll": "Bewertungen lesen",
+    "reviews": [
+      { "name": "Camille D.", "source": "Google", "text": "Eine besondere Adresse. Wein, Charcuterie, Ivos Herzlichkeit — alles an seinem Platz." },
+      { "name": "Marco L.", "source": "Google", "text": "Beste Bifana in Luxemburg, ohne Diskussion. Und der Port ist eine Lehrstunde." },
+      { "name": "Ana P.", "source": "Instagram", "text": "Wie nach Hause kommen — aber mit besserem Wein am Tisch." }
+    ]
+  },
+  "marquee": { "words": ["Vinho", "Convívio", "Saudade", "Bacalhau", "Fado", "Tinto", "Azeite", "Mesa"] },
+  "footer": {
+    "tagline": "Ein portugiesisches Haus im Herzen Luxemburgs. Weine, Feinkost, Theke, Catering und Abende.",
+    "colMaison": "Das Haus",
+    "colServices": "Leistungen",
+    "colContact": "Uns finden",
+    "links": {
+      "history": "Unsere Geschichte",
+      "shop": "Shop",
+      "counter": "Theke",
+      "contact": "Kontakt",
+      "catering": "Catering",
+      "events": "Events",
+      "happy": "Happy Hour",
+      "gifts": "Geschenkboxen"
+    },
+    "rights": "© {{year}} Golden Grape Luxembourg. Alle Rechte vorbehalten.",
+    "legal": "Impressum",
+    "privacy": "Datenschutz",
+    "moderation": "Bitte trinken Sie verantwortungsvoll."
+  },
+  "floatingCart": { "label": "Warenkorb", "openAria": "Warenkorb öffnen" },
+  "cart": {
+    "orderTitle": "Ihre Bestellung",
+    "reservationTitle": "Ihre Reservierung",
+    "reservation": "Reservierung",
+    "panier": "Warenkorb",
+    "modes": { "pickup": "Abholung", "delivery": "Lieferung", "table": "Tisch" },
+    "hints": {
+      "pickup": "Bestellung in der Boutique abholen.",
+      "delivery": "Lieferung in Luxemburg-Stadt innerhalb 45 Min.",
+      "table": "Tisch reservieren, gerne mit Vorbestellung."
+    },
+    "empty": { "title": "Warenkorb leer", "subtitle": "Fügen Sie ein paar Köstlichkeiten aus Theke oder Shop hinzu." },
+    "tableAwaitTitle": "Ein Tisch nach Maß.",
+    "tableAwaitSubtitle": "Bitte tragen Sie Ihre Angaben unten ein — wir bestätigen zeitnah.",
+    "fields": { "name": "Name", "phone": "Telefon", "address": "Lieferadresse", "date": "Datum", "time": "Uhrzeit", "comment": "Anmerkung (optional)" },
+    "placeholders": {
+      "name": "Vor- & Nachname",
+      "phone": "+352 …",
+      "address": "Straße, PLZ, Ort",
+      "comment": "Allergien, Wünsche…",
+      "commentTable": "Anlass, Allergien, Wünsche…"
+    },
+    "guests": "Anzahl der Gäste",
+    "preorderQ": "Möchten Sie vorbestellen?",
+    "preorderSub": "Fügen Sie Speisen und Getränke zur Reservierung hinzu.",
+    "preorderLabel": "Vorbestellung",
+    "needItems": "Bitte mindestens einen Artikel zur Vorbestellung wählen.",
+    "articles_one": "{{count}} Artikel",
+    "articles_other": "{{count}} Artikel",
+    "total": "Summe",
+    "confirm": "Bestellung bestätigen",
+    "sendRequest": "Anfrage senden",
+    "sending": "Wird gesendet…",
+    "remove": "Entfernen",
+    "minus": "Verringern",
+    "plus": "Erhöhen",
+    "tableFootnote": "Jede Reservierung wird vom Haus bestätigt.",
+    "doneTitle": "Danke!",
+    "successPickup": "Danke {{name}}, Ihre Bestellung ist für den {{date}} um {{time}} vermerkt.",
+    "successDelivery": "Danke {{name}}, Lieferung geplant am {{date}} um {{time}}.",
+    "successTable": "Reservierungsanfrage gesendet. Wir bestätigen Ihren Termin zeitnah.",
+    "toast": { "orderTitle": "Bestellung gesendet", "reservationTitle": "Anfrage gesendet" }
+  },
+  "shop": {
+    "eyebrow": "Shop · Weine & Feinkost",
+    "titleA": "Die Feinkost",
+    "titleB": "Portugals.",
+    "subtitle": "Ivos Auswahl — signature Weine, Portwein, DOP-Käse, Charcuterie und Geschenkboxen, geliefert in Luxemburg.",
+    "searchPh": "Wein, Käse suchen…",
+    "empty": "Kein Produkt passt.",
+    "addAria": "{{name}} zum Warenkorb hinzufügen",
+    "categories": { "all": "Alle", "wines": "Weine", "port": "Portwein", "beers": "Biere", "cheese": "Käse", "charcuterie": "Charcuterie", "grocery": "Feinkost", "gifts": "Geschenkboxen" },
+    "tags": { "signature": "Signature", "rare": "Selten", "dop": "DOP", "bestseller": "Bestseller" },
+    "products": {
+      "douro-reserva": { "name": "Douro Reserva 2019", "region": "Douro" },
+      "alentejo-tinto": { "name": "Alentejo Tinto", "region": "Alentejo" },
+      "vinho-verde": { "name": "Vinho Verde", "region": "Minho" },
+      "dao-quinta": { "name": "Quinta do Dão", "region": "Dão" },
+      "port-tawny": { "name": "Portwein Tawny 20 J.", "region": "Porto" },
+      "port-lbv": { "name": "Portwein LBV 2017", "region": "Porto" },
+      "sagres": { "name": "Sagres · 6er-Pack", "region": "Bier" },
+      "super-bock": { "name": "Super Bock", "region": "Bier" },
+      "sao-jorge": { "name": "São Jorge, 12 Monate", "region": "Azoren" },
+      "serra": { "name": "Serra da Estrela", "region": "Beira" },
+      "chourico": { "name": "Chouriço geräuchert", "region": "Trás-os-Montes" },
+      "presunto": { "name": "Presunto Bísaro", "region": "Trás-os-Montes" },
+      "azeite": { "name": "Natives Olivenöl extra", "region": "Alentejo" },
+      "sardines": { "name": "Sardinen in Öl", "region": "Konserve" },
+      "flor-sal": { "name": "Fleur de sel Algarve", "region": "Algarve" },
+      "box-descoberta": { "name": "Geschenkbox Descoberta", "region": "Geschenk" },
+      "box-prestige": { "name": "Geschenkbox Prestige", "region": "Geschenk" },
+      "box-porto": { "name": "Box Port & Schokolade", "region": "Geschenk" }
+    }
+  },
+  "snackPage": {
+    "eyebrow": "Die Theke",
+    "titleA": "Tradition,",
+    "titleB": "zum Mitnehmen.",
+    "subtitle": "Wählen, anpassen, bestellen — in weniger als einer Minute. Abholung, Lieferung oder am Tisch.",
+    "ctas": { "pickup": "Abholung", "delivery": "Lieferung", "table": "Tisch reservieren" },
+    "tags": { "signature": "Signature", "homemade": "Hausgemacht" },
+    "add": "Hinzufügen",
+    "menu": {
+      "bifana": { "name": "Bifana", "desc": "Mariniertes Schweinefleisch, Piri-Piri-Senf, knuspriges Brot." },
+      "prego": { "name": "Prego no Pão", "desc": "Saftiges Knoblauchsteak in goldener Butterbrötchen." },
+      "alheira": { "name": "Alheira de Mirandela", "desc": "Traditionelle Wurst, Spiegelei, hausgemachte Pommes." },
+      "pastel": { "name": "Pastel de Nata", "desc": "Knuspriger Blätterteig, goldene Vanillecreme." },
+      "queijo": { "name": "Käseplatte", "desc": "São Jorge, Serra, Azeitão, Konfitüre, Brot, Oliven." },
+      "vinho": { "name": "Wein des Tages", "desc": "Ivos Auswahl — Rot, Weiß oder Rosé, im Glas." }
+    }
+  },
+  "cateringPage": {
+    "eyebrow": "Catering",
+    "titleA": "Empfangen",
+    "titleB": "mit portugiesischer Seele.",
+    "subtitle": "Drei Formeln für Ihr Event — Cocktail, Dinner oder Chef's Table. Bestätigung binnen 24h.",
+    "perGuest": "pro Gast",
+    "packages": {
+      "convivio": { "name": "Convívio", "tagline": "Aperitif & Tapas", "includes": ["8 portugiesische Tapas", "Weiß-, Rot-, Roséweine", "Service 3h inklusive"] },
+      "mesa": { "name": "Mesa Farta", "tagline": "Sitzendes Dinner", "includes": ["Vorspeise, Hauptgang, Dessert", "Bacalhau oder Spanferkel", "Weinbegleitung, portugiesischer Kaffee"] },
+      "prestige": { "name": "Prestige", "tagline": "Chef's Table", "includes": ["6-Gänge-Menü Signature", "Kollektionsweine", "Sommelier & Maître d'hôtel"] }
+    },
+    "request": {
+      "eyebrow": "Angebot anfragen",
+      "title": "Erzählen Sie uns von Ihrem Event.",
+      "guests": "Gäste",
+      "location": "Ort",
+      "locationPh": "Stadt, Adresse, Location…",
+      "date": "Datum",
+      "time": "Uhrzeit",
+      "name": "Name",
+      "namePh": "Vor- & Nachname",
+      "phone": "Telefon",
+      "phonePh": "+352 …",
+      "comment": "Anmerkungen",
+      "commentPh": "Diät, Thema, Wünsche…",
+      "estimate": "Richtwert",
+      "packageHint": "{{name}} · {{count}} Gäste",
+      "selectHint": "Wählen Sie eine Formel, um den Richtwert zu sehen.",
+      "submit": "Anfrage senden",
+      "sending": "Wird gesendet…",
+      "toastTitle": "Anfrage gesendet",
+      "toastDesc": "Wir melden uns binnen 24h mit einem Angebot.",
+      "doneTitle": "Danke {{name}}",
+      "doneSubtitle": "Ihre Anfrage ist eingegangen. Wir melden uns binnen 24h."
+    }
+  },
+  "eventsPage": {
+    "eyebrow": "Events",
+    "titleA": "Jede Woche,",
+    "titleB": "ein Rendezvous.",
+    "subtitle": "Fado, Verkostungen, Happy Hour, Chef's Table — die Agenda des Hauses in Luxemburg.",
+    "free": "Auf Einladung",
+    "reserve": "Reservieren",
+    "list": {
+      "fri": { "title": "Fado-Abend", "date": "Freitag, 8. August", "time": "19:00 — 23:00", "desc": "Live-Fado, Tapas und Port — 45€ p.P., Getränke inklusive." },
+      "hh": { "title": "Golden Hour", "date": "Mittwoch, 6. August", "time": "17:00 — 20:00", "desc": "Willkommensglas geschenkt, Sharing-Boards und portugiesischer Jazz — 24€." },
+      "tast": { "title": "Douro Verkostung", "date": "Samstag, 16. August", "time": "16:00 — 18:00", "desc": "Sechs Douro-Weine, Winzer zu Gast — 65€ p.P." },
+      "chef": { "title": "Chef's Table", "date": "Donnerstag, 21. August", "time": "20:00 — 23:00", "desc": "6-Gang-Signature-Menü mit Weinbegleitung — 120€ p.P., 12 Plätze." }
+    },
+    "dialog": {
+      "guests": "Anzahl der Gäste",
+      "name": "Name", "namePh": "Vor- & Nachname",
+      "phone": "Telefon", "phonePh": "+352 …",
+      "comment": "Anmerkungen (optional)", "commentPh": "Allergien, Anlass…",
+      "total": "Richtwert",
+      "submit": "Reservieren", "sending": "Wird gesendet…",
+      "toastTitle": "Anfrage gesendet",
+      "toastDesc": "{{title}} · {{count}} Gäste — wir bestätigen zeitnah.",
+      "doneTitle": "Anfrage gesendet. Wir melden uns sehr bald."
+    }
+  },
+  "maisonPage": {
+    "eyebrow": "Das Haus",
+    "titleA": "Eine portugiesische",
+    "titleB": "Geschichte.",
+    "subtitle": "Golden Grape entstand aus einem einfachen Traum: in Luxemburg die Seele eines geliebten Portugals zu teilen, sorgfältig gewählt und erzählt.",
+    "founderEyebrow": "Der Gründer",
+    "founderTitleA": "Ivo,",
+    "founderTitleB": "der Gastgeber.",
+    "founderP1": "Im Norden Portugals geboren, wuchs Ivo zwischen den Reben seines Großvaters und der Küche seiner Mutter auf. Fünfzehn Jahre lang arbeitete er in der Gastronomie in Porto, Lissabon und Luxemburg.",
+    "founderP2": "2019 gründet er Golden Grape — ein Haus, das die Handwerker ehrt, die er beim Vornamen kennt, die Weine, die er liebt, die Gesten, die er nicht verschwinden sehen möchte.",
+    "founderQuote": "Mein Keller ist eine Karte Portugals — jede Flasche ein Dorf, jedes Dorf eine Familie.",
+    "regionsEyebrow": "Unsere Regionen",
+    "regionsTitleA": "Sechs Terroirs,",
+    "regionsTitleB": "eine Identität.",
+    "regions": {
+      "douro": { "name": "Douro", "desc": "Terrassenweinberge, glühender Schiefer, kraftvolle mineralische Weine — Wiege des Portweins." },
+      "alentejo": { "name": "Alentejo", "desc": "Goldene Ebenen, Oliven, Korkeichen. Großzügige Rote, Olivenöl, Brot und Geselligkeit." },
+      "minho": { "name": "Minho", "desc": "Grüner Norden, leichte Vinhos Verdes, Gärten und Granitscheunen." },
+      "dao": { "name": "Dão", "desc": "Höhenlagen, Touriga Nacional, Eleganz und Frische." },
+      "acores": { "name": "Azoren", "desc": "Vulkaninseln, DOP-Käse, atlantische Winde und üppige Weiden." },
+      "algarve": { "name": "Algarve", "desc": "Salz, Fisch, Zitrus. Südliches Licht, Gold von Sand und Meer." }
+    },
+    "producersEyebrow": "Unsere Erzeuger",
+    "producersTitleA": "Familien,",
+    "producersTitleB": "Gesichter.",
+    "since": "Seit {{year}}",
+    "producers": {
+      "vale": { "name": "Quinta do Vale Meão", "region": "Douro", "year": "1877" },
+      "grous": { "name": "Herdade dos Grous", "region": "Alentejo", "year": "2001" },
+      "sezim": { "name": "Casa de Sezim", "region": "Minho", "year": "1390" }
+    },
+    "values": [
+      { "t": "Wählen", "d": "Ein Wein kommt nur nach Besuch, Handschlag, gemeinsamer Geschichte ins Haus." },
+      { "t": "Empfangen", "d": "Service ist Kunst. Er beginnt mit einem Blick und endet in einer Stille." },
+      { "t": "Fortsetzen", "d": "Ein guter Moment endet nie — er wird erzählt, wiederholt, weitergegeben." }
+    ],
+    "ctaEyebrow": "Besuchen Sie uns",
+    "ctaTitleA": "Die Tür",
+    "ctaTitleB": "steht offen.",
+    "ctaSubtitle": "Eine Frage, ein Projekt, ein Wunsch? Schreiben Sie uns oder kommen Sie vorbei.",
+    "ctaContact": "Schreiben Sie uns",
+    "ctaShop": "Zum Shop"
+  },
+  "contactPage": {
+    "eyebrow": "Kontakt",
+    "titleA": "Schreiben Sie uns,",
+    "titleB": "besuchen Sie uns.",
+    "subtitle": "Das Haus antwortet binnen 24h. Für alle Fragen, Reservierungen oder Catering-Anfragen.",
+    "info": { "address": "Adresse", "phone": "Telefon", "email": "E-Mail", "hours": "Öffnungszeiten" },
+    "hours": [
+      { "day": "Montag", "h": "10:00 — 18:00" },
+      { "day": "Dienstag", "h": "10:00 — 18:00" },
+      { "day": "Mittwoch", "h": "10:00 — 18:00" },
+      { "day": "Donnerstag", "h": "10:00 — 18:00" },
+      { "day": "Freitag", "h": "10:00 — 18:00" },
+      { "day": "Samstag", "h": "Geschlossen" },
+      { "day": "Sonntag", "h": "Geschlossen" }
+    ],
+    "form": {
+      "eyebrow": "Formular",
+      "title": "Ihre Nachricht.",
+      "subject": "Betreff",
+      "subjects": { "boutique": "Shop", "traiteur": "Catering", "evenement": "Event", "autre": "Sonstiges" },
+      "name": "Name", "namePh": "Vor- & Nachname",
+      "email": "E-Mail", "emailPh": "sie@beispiel.com",
+      "phone": "Telefon", "phonePh": "+352 …",
+      "message": "Nachricht", "messagePh": "Erzählen Sie uns alles…",
+      "submit": "Senden", "sending": "Wird gesendet…",
+      "toastTitle": "Nachricht gesendet", "toastDesc": "Wir antworten binnen 24h.",
+      "doneTitle": "Danke {{name}}", "doneSubtitle": "Ihre Nachricht ist eingegangen. Wir antworten binnen 24h."
+    },
+    "mapCaption": "Uns in Luxemburg finden"
+  },
+  "auth": {
+    "title": "Kundenbereich",
+    "subtitle": "Bestellungen, Reservierungen und Lieblingsboxen verwalten.",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "signIn": "Anmelden",
+    "signUp": "Konto erstellen",
+    "switchToSignUp": "Noch kein Konto? Erstellen",
+    "switchToSignIn": "Bereits registriert? Anmelden"
+  }
+}

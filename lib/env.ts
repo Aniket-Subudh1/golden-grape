@@ -21,3 +21,6 @@ export const env = new Proxy({} as Env, {
 
 // `next build` evaluates payload.config.ts while collecting page data; it must not read env then.
 export const isBuildPhase = process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD;
+
+// Prerendered pages bake absolute canonical/hreflang URLs, so APP_URL is also read at build time.
+export const appUrl = () => (isBuildPhase ? (process.env.APP_URL ?? 'http://localhost:3000') : env.APP_URL);
