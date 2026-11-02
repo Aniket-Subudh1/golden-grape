@@ -6,7 +6,7 @@ Update this file at the end of every task (`00-START-HERE.md` §2). The newest l
 
 | ID | Sub-milestone | Payment | Target | Status | Accepted by APPLUX |
 |---|---|---|---|---|---|
-| M1.1 | Foundation | P1 $300 | Tue 3 Nov | In progress (all ACs pass locally; AC-05 waits for the first push) | — |
+| M1.1 | Foundation | P1 $300 | Tue 3 Nov | Done (staging deploy: Blocked: DEP-02) | — |
 | M1.2 | Design system + i18n shell | P1 | Wed 4 Nov | Done (agent checks; AC-03 side-by-side and the checklist are human) | — |
 | M1.3 | CMS, pages, settings, roles | P1 | Thu 5 Nov | In progress (all ACs pass except AC-04's real e-mail delivery, which waits for SMTP) | — |
 | M2.1 | Catalogue + inventory core | P2 $250 | Sat 7 Nov | Not started | — |
@@ -21,7 +21,7 @@ Update this file at the end of every task (`00-START-HERE.md` §2). The newest l
 
 | Payment | Amount | Release gate passed | Requested | Released |
 |---|---|---|---|---|
-| P1 | $300 (funded) | Partly: local gate passes; CI (not pushed), staging (DEP-02) and human checklists pending | — | — |
+| P1 | $300 (funded) | Partly: local gate and CI pass; staging (DEP-02), real e-mail delivery and human checklists pending | — | — |
 | P2 | $250 | — | — | — |
 | P3 | $250 | — | — | — |
 | P4 | $300 | — | — | — |
@@ -54,6 +54,9 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-11 | Catering packages have a minimum of 10 guests (the prototype set none) | M1.3 T7 seed | — |
 
 ## 4. Log
+
+### 2026-11-03 · M1.1 AC-05 closed
+- CI run on `6f89ff4` (push to main): completed, success (`check`, `test:int`, `build` with no env). AC-M1.1-05 passes, so M1.1 is Done. The e2e job runs on pull requests only and has not run in CI yet.
 
 ### 2026-11-03 · M1.3 · S3 upload check
 - Real upload through the app (`POST /api/media`, admin token) with the `.env` S3 settings, records in a throwaway local database. Original + `thumb` and `card` WebP sizes landed in S3 (`hero` is correctly skipped: the image is narrower than 1920 px). `/api/media/file/…` 200 with 52903 bytes; `next/image` optimizer 200.
