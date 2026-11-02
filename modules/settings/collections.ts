@@ -4,7 +4,7 @@ import { isStaff, none, ROLES } from '@/lib/access';
 const users: CollectionConfig = {
   slug: 'users',
   auth: true,
-  admin: { useAsTitle: 'email' },
+  admin: { useAsTitle: 'name' },
   fields: [
     { name: 'name', type: 'text', required: true },
     {
