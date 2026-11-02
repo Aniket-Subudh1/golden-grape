@@ -53,7 +53,7 @@ Do not invent colours, sizes or shadows. The palette is: ink text on bone, gold-
 | `Reveal` | `components/site/reveal.tsx` (`'use client'`) | `Reveal.tsx` + `use-reveal.ts`, merged into one file | `delay?`, `as?`, `className?`. Respect `prefers-reduced-motion` (show immediately). |
 | `Nav` | `components/site/nav.tsx` (`'use client'`) | `Nav.tsx` | transparent on home until `scrollY > 40`, otherwise solid; both logos; links from the `Header` global; locale-aware links |
 | `Footer` | `components/site/footer.tsx` (server) | `Footer.tsx` | data from the `Footer` global and settings |
-| `LanguageSwitcher` | `components/site/language-switcher.tsx` | `LanguageSwitcher.tsx` | swaps the `[locale]` segment and keeps the path; `tone: 'light' \| 'dark'` |
+| `LanguageSwitcher` | `components/site/language-switcher.tsx` | `LanguageSwitcher.tsx` (inline FR · EN · DE · PT row, replaced by a dropdown) | dropdown: current language + menu of the four; swaps the `[locale]` segment and keeps the path; `tone: 'light' \| 'dark'`, `placement: 'below-end' \| 'above-start'` |
 | `CartSheet`, `FloatingCart`, `CartProvider` | `components/site/cart-*.tsx`, `modules/webshop/cart.tsx` | `CartSheet.tsx`, `FloatingCart.tsx`, `lib/cart.tsx` | the cart stores `{ variant, unit?, qty }` only; names and prices are displayed from the server `quote` |
 | `ActionForm` | `components/ui/action-form.tsx` | every mocked `submit()` with `setTimeout` | wraps `useActionState`, shows pending state, success toast, field errors |
 | `Blocks` | `components/site/blocks.tsx` | renders `pages.layout` blocks | one switch over the block types in §4 |

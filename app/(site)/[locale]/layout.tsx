@@ -38,7 +38,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
         <Nav
           locale={locale}
           items={[shop, snack, catering, events, { label: t.nav.maison, href: href('/maison') }, { label: t.nav.contact, href: href('/contact') }]}
-          labels={{ openMenu: t.nav.openMenu, closeMenu: t.nav.closeMenu }}
+          labels={{ openMenu: t.nav.openMenu, closeMenu: t.nav.closeMenu, language: t.nav.language }}
         />
         <main>{children}</main>
         <Footer

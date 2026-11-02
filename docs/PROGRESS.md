@@ -53,10 +53,15 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-02 · M1.2 change · French first, dropdown switcher (requested by Aniket)
+- `proxy.ts`: an unprefixed URL now goes to the `NEXT_LOCALE` cookie's locale, otherwise **always `/fr`**. `Accept-Language` is no longer used. AC-M1.2-01, M1.2 T2, D-05 and `05` §3.2 updated.
+- `LanguageSwitcher` is now a dropdown: a "FR ▾" button opens a bone panel listing FR Français / EN English / DE Deutsch / PT Português, with the current one in gold and ticked. It closes on outside click and Escape and has `aria-expanded`/`aria-controls`. `placement` is `below-end` in the desktop nav and `above-start` in the mobile menu (so it does not run off the bottom). New key `nav.language` in all four dictionaries. No new package.
+- Verified: `npm run check`; curl redirects as above; Playwright with an English browser: `/` → `/fr`; dropdown opens (`aria-expanded=true`), Escape closes it, choosing Deutsch → `/de`, cookie `de`, `<html lang="de">`; at 360 px the panel stays on screen inside the mobile menu, 0 px overflow.
+
 ### 2026-11-02 · M1.2 report
 | AC | Result | How verified |
 |---|---|---|
-| AC-M1.2-01 [V-I18N] | Pass | `next start` + curl: `/` with `Accept-Language: de` → 307 `/de`; no header → 307 `/fr` |
+| AC-M1.2-01 [V-I18N] | Pass (AC revised, see the change entry) | curl: `/` with `Accept-Language: en-US` → 307 `/fr`; `/contact` with `de` → `/fr/contact`; cookie `pt` → `/pt` |
 | AC-M1.2-02 [V-I18N] | Pass | Playwright on `/pt`: click "English" → `/en`, cookie `NEXT_LOCALE=en`, `<html lang="en">`, visible `h1` English; key-parity unit test passes |
 | AC-M1.2-03 [V-DES] | Partly verified, side-by-side is human | Port screenshots at 1280/768/360: Cormorant/Inter computed, palette, header transparent on the hero and solid after scroll, 0 px horizontal overflow. The prototype was **not** run side by side (it is a read-only TanStack/Lovable app); differences on purpose: SocialProof hidden, placeholder links hidden, 768 px overflow fixed |
 | AC-M1.2-04 [V-SEO] | Pass | HTML of `/fr`: `<html lang="fr">`, canonical, 4 hreflang + x-default |

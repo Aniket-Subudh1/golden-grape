@@ -10,7 +10,7 @@ import { type Locale, localePath } from '@/lib/i18n';
 import { LanguageSwitcher } from './language-switcher';
 import { type NavItem, NavLink } from './nav-link';
 
-type Props = { locale: Locale; items: NavItem[]; labels: { openMenu: string; closeMenu: string } };
+type Props = { locale: Locale; items: NavItem[]; labels: { openMenu: string; closeMenu: string; language: string } };
 
 const LOGO_ALT = 'Golden Grape · Mäi Wäin';
 
@@ -81,7 +81,7 @@ export function Nav({ locale, items, labels }: Props) {
             <NavLink key={item.label} item={item} className={linkClass(item)} />
           ))}
           <span className="mx-1 h-3 w-px bg-current opacity-20" />
-          <LanguageSwitcher locale={locale} tone={solid ? 'dark' : 'light'} />
+          <LanguageSwitcher locale={locale} label={labels.language} tone={solid ? 'dark' : 'light'} />
         </nav>
 
         {/* Keeps the logo centred on mobile while the account and cart icons are hidden (until M2.2). */}
@@ -111,7 +111,7 @@ export function Nav({ locale, items, labels }: Props) {
             />
           ))}
           <div className="border-t border-bone/10 pt-8">
-            <LanguageSwitcher locale={locale} tone="light" />
+            <LanguageSwitcher locale={locale} label={labels.language} tone="light" placement="above-start" />
           </div>
         </div>
       </div>

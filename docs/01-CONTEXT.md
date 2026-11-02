@@ -103,7 +103,7 @@ If a dependency arrives late, the dependent date moves by the same number of day
 | D-02 | Next.js version: **keep 16.4.3**. Payload 3.92.1 peers are `next >=16.3.3 <17` and `react ^19.2.1`, so Next 16.4.3 / React 19.3.0 are in range. Payload also supports `cacheComponents` (its `withPayload` sets `PAYLOAD_CACHE_COMPONENTS_ENABLED`), so Cache Components stay on; the admin page opts out of instant-navigation validation and awaits `connection()`. Payload needs Node `^22.23.4 \|\| >=24.22.1`. | 2 Nov 2026 | Decided (M1.1 T1) |
 | D-03 | Phase 1 payment is the `manual` provider (pay on site, bank transfer, invoice). wallee becomes a second adapter in M4.1 behind the same interface. | 2 Nov 2026 | Decided |
 | D-04 | Prices and amounts are stored as integer **cents**, VAT-inclusive for B2C and VAT-exclusive for B2B price lists, and converted only in `modules/promotions/pricing.ts` | 2 Nov 2026 | Decided |
-| D-05 | French is the default locale. Every public URL is prefixed: `/fr/...`, `/en/...`, `/de/...`, `/pt/...`. | 2 Nov 2026 | Decided |
+| D-05 | French is the default locale. Every public URL is prefixed: `/fr/...`, `/en/...`, `/de/...`, `/pt/...`. An unprefixed URL always goes to French unless the visitor chose another language in the switcher (cookie); the browser language is not used. | 2 Nov 2026 | Decided |
 | D-06 | wallee client: official SDK or plain `fetch` (decided in M4.1 T1) | — | Open |
 | D-07 | A card payment confirmed after stock ran out → order confirmed + staff alert, not failed (M4.1 T2) | — | Proposed |
 
