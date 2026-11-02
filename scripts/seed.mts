@@ -10,7 +10,9 @@ import content from './seed-content.json';
 
 const LOCALES: Locale[] = ['fr', 'en', 'de', 'pt'];
 const OTHERS = LOCALES.slice(1);
-const context = { skipRevalidate: true }; // no Next.js runtime here
+// A fresh object per call: no Next.js runtime here (skipRevalidate), and the storage plugin marks the context
+// it is given as `skipCloudStorage` after an upload, so a shared object silently skips every later upload.
+const seedContext = () => ({ skipRevalidate: true });
 type Content = (typeof content)['fr'];
 const c = (l: Locale): Content => content[l];
 
@@ -99,18 +101,18 @@ const log = (message: string) => console.info(`[seed] ${message}`);
 async function upsert(collection: CollectionSlug, where: Record<string, unknown>, build: (l: Locale) => Record<string, unknown>, draft = false) {
   const found = await payload.find({ collection, where: where as never, locale: 'fr', limit: 1, depth: 0, draft, overrideAccess: true });
   let saved = found.docs[0]
-    ? await payload.update({ collection, id: found.docs[0].id, data: build('fr') as never, locale: 'fr', depth: 0, draft, overrideAccess: true, context })
-    : await payload.create({ collection, data: build('fr') as never, locale: 'fr', depth: 0, draft, overrideAccess: true, context });
+    ? await payload.update({ collection, id: found.docs[0].id, data: build('fr') as never, locale: 'fr', depth: 0, draft, overrideAccess: true, context: seedContext() })
+    : await payload.create({ collection, data: build('fr') as never, locale: 'fr', depth: 0, draft, overrideAccess: true, context: seedContext() });
   for (const l of OTHERS) {
-    saved = await payload.update({ collection, id: saved.id, data: withIds(build(l), saved) as never, locale: l, depth: 0, draft, overrideAccess: true, context });
+    saved = await payload.update({ collection, id: saved.id, data: withIds(build(l), saved) as never, locale: l, depth: 0, draft, overrideAccess: true, context: seedContext() });
   }
   return saved;
 }
 
 async function global(slug: 'BusinessSettings' | 'Header' | 'Footer' | 'HappyHour', build: (l: Locale) => Record<string, unknown>) {
-  let saved = await payload.updateGlobal({ slug, data: build('fr') as never, locale: 'fr', depth: 0, overrideAccess: true, context });
+  let saved = await payload.updateGlobal({ slug, data: build('fr') as never, locale: 'fr', depth: 0, overrideAccess: true, context: seedContext() });
   for (const l of OTHERS) {
-    saved = await payload.updateGlobal({ slug, data: withIds(build(l), saved) as never, locale: l, depth: 0, overrideAccess: true, context });
+    saved = await payload.updateGlobal({ slug, data: withIds(build(l), saved) as never, locale: l, depth: 0, overrideAccess: true, context: seedContext() });
   }
 }
 
@@ -120,7 +122,7 @@ if (args.email && args.password && args.name) {
   const existing = await payload.find({ collection: 'users', where: { email: { equals: args.email } }, limit: 1, overrideAccess: true });
   if (existing.docs.length) log(`admin ${args.email} already exists`);
   else {
-    await payload.create({ collection: 'users', data: { email: args.email, password: args.password, name: args.name, roles: ['admin'], active: true, locale: 'fr' }, overrideAccess: true, context });
+    await payload.create({ collection: 'users', data: { email: args.email, password: args.password, name: args.name, roles: ['admin'], active: true, locale: 'fr' }, overrideAccess: true, context: seedContext() });
     log(`admin ${args.email} created`);
   }
 } else if (admins.totalDocs === 0) {
@@ -134,10 +136,10 @@ for (const [name, alts] of Object.entries(ALTS)) {
   const found = await payload.find({ collection: 'media', where: { filename: { equals: filename } }, limit: 1, depth: 0, overrideAccess: true });
   let doc = found.docs[0];
   if (!doc) {
-    doc = await payload.create({ collection: 'media', data: { alt: alts.fr }, filePath: path.resolve('public/brand', filename), locale: 'fr', overrideAccess: true, context });
+    doc = await payload.create({ collection: 'media', data: { alt: alts.fr }, filePath: path.resolve('public/brand', filename), locale: 'fr', overrideAccess: true, context: seedContext() });
     log(`media ${filename} uploaded`);
   }
-  for (const l of LOCALES) await payload.update({ collection: 'media', id: doc.id, data: { alt: alts[l] }, locale: l, overrideAccess: true, context });
+  for (const l of LOCALES) await payload.update({ collection: 'media', id: doc.id, data: { alt: alts[l] }, locale: l, overrideAccess: true, context: seedContext() });
   media[name] = doc.id;
 }
 
