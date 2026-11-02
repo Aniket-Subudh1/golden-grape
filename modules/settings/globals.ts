@@ -14,7 +14,7 @@ const row = (...fields: Field[]): Field => ({ type: 'row', fields });
 export const businessSettings: GlobalConfig = {
   slug: 'BusinessSettings',
   label: 'Business settings',
-  admin: { group: 'Settings', hidden: hiddenUnless('manager') },
+  admin: { group: 'Settings', hidden: hiddenUnless('manager'), description: 'Contact details, opening hours, VAT, document numbers and alerts.' },
   // Public pages read it only through getSettings(), which strips bank and internal fields.
   access: { read: isStaff('manager'), update: isStaff('manager') },
   hooks: { afterChange: [revalidateTagHook('settings')] },

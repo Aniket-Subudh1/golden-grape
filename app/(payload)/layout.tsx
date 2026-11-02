@@ -5,6 +5,7 @@ import '@payloadcms/next/css'
 import type { ServerFunctionClient } from 'payload'
 import { handleServerFunctions, RootLayout } from '@payloadcms/next/layouts'
 import { Cormorant_Garamond, Inter } from 'next/font/google'
+import { connection } from 'next/server'
 import React from 'react'
 
 import { importMap } from './admin/importMap.js'
@@ -28,13 +29,20 @@ const serverFunction: ServerFunctionClient = async function (args) {
   })
 }
 
-const Layout = ({ children }: Args) => (
-  <RootLayout config={config} importMap={importMap} serverFunction={serverFunction}>
-    <style href="gg-admin-fonts" precedence="default">
-      {fontVars}
-    </style>
-    {children}
-  </RootLayout>
-)
+// The admin is per user and Payload's RootLayout reads the clock, so it renders at request time (Cache Components
+// would otherwise try to prerender it and report "new Date() while prerendering").
+export const instant = false
+
+const Layout = async ({ children }: Args) => {
+  await connection()
+  return (
+    <RootLayout config={config} importMap={importMap} serverFunction={serverFunction}>
+      <style href="gg-admin-fonts" precedence="default">
+        {fontVars}
+      </style>
+      {children}
+    </RootLayout>
+  )
+}
 
 export default Layout

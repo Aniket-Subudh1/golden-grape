@@ -507,7 +507,12 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   }
 }
 
+.tabs-field__tabs-wrap {
+  overflow: visible;
+}
+/* Tabs wrap onto a second line rather than scroll sideways. */
 .tabs-field__tabs {
+  flex-wrap: wrap;
   gap: 4px;
   border-bottom: 1px solid var(--gg-line);
 }
@@ -521,6 +526,116 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 .tabs-field__tab-button--active {
   color: var(--gg-primary);
   box-shadow: inset 0 -2px 0 var(--gg-primary);
+}
+
+/* ---- Settings pages (globals): one sticky header row (title and description left, Save right) over a centred
+   960 px column, the usual settings layout. Payload draws the title and the Save bar as two rows; the Save bar is
+   lifted into the title row, and the Edit/API tabs (developer tools) are hidden. ---------------------------------- */
+.template-default__wrap:has(> main[class*='global-edit--']) {
+  --gg-col: 960px;
+  --gg-bar: 84px;
+  --gg-pad: max(var(--gutter-h), calc((100% - var(--gg-col)) / 2));
+}
+.template-default__wrap:has(> main[class*='global-edit--']) > .doc-header .doc-tabs {
+  display: none;
+}
+.template-default__wrap:has(> main[class*='global-edit--']) > .doc-header > :not(.doc-header__header) {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--gg-text-2);
+}
+@media (min-width: 1025px) {
+  .template-default__wrap:has(> main[class*='global-edit--']) > .doc-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: var(--gg-bar);
+    margin: 0;
+    padding: 0 calc(var(--gg-pad) + 220px) 0 var(--gg-pad);
+    border-bottom: 1px solid var(--gg-line);
+    background: var(--gg-panel);
+  }
+  main[class*='global-edit--'] .doc-controls {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    height: var(--gg-bar);
+    margin-top: calc(-1 * var(--gg-bar) - 1px);
+    border: 0;
+    background: transparent;
+    pointer-events: none;
+  }
+  main[class*='global-edit--'] .doc-controls::before,
+  main[class*='global-edit--'] .doc-controls::after {
+    display: none;
+  }
+  main[class*='global-edit--'] .doc-controls__wrapper {
+    height: 100%;
+    padding-inline: var(--gg-pad) !important;
+  }
+  main[class*='global-edit--'] .doc-controls__controls-wrapper {
+    margin-left: auto;
+    pointer-events: auto;
+  }
+}
+main[class*='global-edit--'] .document-fields__fields {
+  max-width: var(--gg-col);
+  margin-inline: auto;
+}
+
+/* Side-by-side fields: Payload stacks them below 1025 px and drops the spacing between them. Tablets keep two columns;
+   phones stack them with the normal field spacing. */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .field-type.row .row__fields {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+@media (max-width: 768px) {
+  .field-type.row .row__fields {
+    display: grid;
+    row-gap: var(--spacing-field);
+  }
+}
+
+/* Repeating rows (menu links, footer columns, opening hours): compact, titled by their content, hairline cards. */
+.array-field__draggable-rows {
+  gap: 8px;
+}
+.collapsible {
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px var(--gg-line);
+}
+.collapsible__toggle-wrap {
+  padding: 4px 6px 4px 10px;
+  border-radius: 6px 6px 0 0;
+  background: var(--gg-accent);
+  font-weight: 500;
+}
+.collapsible--collapsed .collapsible__toggle-wrap {
+  border-radius: 6px;
+}
+.collapsible__content {
+  padding: 14px 16px 2px;
+  border-radius: 0 0 6px 6px;
+}
+.tabs-field__tabs::before,
+.tabs-field__tabs::after {
+  display: none;
+}
+/* Payload keeps an empty meta row above the Save button when a document has no status or dates (settings pages). */
+.doc-controls__content:has(> .doc-controls__meta:empty) {
+  display: none;
+}
+.doc-controls__content:has(> .doc-controls__meta:empty) + .doc-controls__controls-wrapper {
+  border-top: 0;
+}
+/* In a drawer the "ID" link would only reopen the same document. */
+.doc-drawer .id-label {
+  display: none;
 }
 
 /* Payload's document meta row (last modified / created) does not wrap on phones and widens the page. */

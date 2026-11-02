@@ -73,10 +73,12 @@ The admin copies the layout of the CUTM LMS dashboard in Golden Grape colours, w
 | Sidebar: brand block, grouped links with icon chips, account links; stays open on every desktop width | `components/admin/nav.tsx` (groups, filtered by the user's visible entities) + `nav-client.tsx` | `components.Nav` |
 | Home: greeting, quick actions, needs attention, upcoming events, recent requests, figures (by role); no navigation cards | `components/admin/dashboard.tsx` | `views.dashboard.Component` |
 | "New …" opens the form in a drawer over the list (also used by the home's quick actions) | `components/admin/create-button.tsx`, wired with `createInDrawer()` in `lib/admin.ts` | `views.list.actions` |
+| Opening a document (list row, home row, relationship cell) opens it in a drawer; Cmd/Ctrl-click still opens the page | `components/admin/drawer-links.tsx` | `providers` |
+| Repeating rows titled by their content ("Boutique", "La Maison") | `components/admin/row-label.tsx` | array `admin.components.RowLabel` |
 | Login: lockup top-left, heading and form, photo panel with notes | `components/admin/logo.tsx`, `login-brand.tsx` | `graphics.Logo`, `beforeLogin` |
 | Header icon | `components/admin/icon.tsx` | `graphics.Icon` |
 
-Forms sit in a white card at a readable width; long globals (Business settings) are split into tabs and two-column rows. Globals cannot open in a drawer (Payload's drawer is for collections), so they stay pages.
+Forms sit in a white card at a readable width; long globals (Business settings) are split into tabs and two-column rows. Globals cannot open in a drawer (Payload's drawer is for collections), so they stay pages, laid out as settings screens. From 1025 px there is one sticky header row (title and description on the left, Save on the right) over a centred 960 px column; the Edit/API tabs are hidden. Menu links are one row each (label | path), with the path help given once on the list.
 
 Payload sets the admin's root font size to 13 px, so `custom.css` uses px, not rem. The CSS relies on Payload's class names, which is safe while Payload stays pinned. Re-check the admin after any Payload upgrade.
 

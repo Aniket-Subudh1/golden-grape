@@ -55,6 +55,23 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-03 · Admin round 3: settings pages, edit in drawers, request-time admin (requested by Aniket)
+- **Settings pages** (Business settings, Happy Hour, Header, Footer):
+  - **Header row:** one sticky row with title, description and Save, replacing the title bar plus a separate Save bar. The developer-only Edit/API tabs are hidden.
+  - **Layout:** a centred 960 px column. The tabs wrap instead of scrolling, which removed the stray scrollbar.
+  - **Menus:** each link is one row (label | path), titled by its label, with the path help given once. Footer columns start collapsed. Two-column rows stay side by side on tablets.
+  - Data shape unchanged.
+- **Edit in drawers:**
+  - `drawer-links.tsx` opens any document link (list rows, home rows, relationship cells) in Payload's drawer; save or delete closes it and refreshes the list. Create was already in drawers.
+  - Globals stay pages: Payload's drawer supports collections only.
+- **Dev errors fixed:** "new Date() while prerendering" came from Payload's RootLayout and NotFoundPage reading the clock. The admin layout and not-found page now `await connection()`, and the layout sets `instant = false`, so the admin renders at request time.
+  - The "create-button module factory not available" error was a dev server left running across file adds and deletes. It does not occur on a fresh `npm run dev`.
+- Verified in an isolated dev server on a throwaway database:
+  - **Settings pages:** all four at 1440, 1024 and 390 px, with no inner scrollbars, 0 px overflow and no console errors (apart from media thumbnails, which fail because S3 was off).
+  - **Drawers:** a list row and a home row open in the drawer, and a save from the drawer reached the database.
+  - **Access:** a `stock` user still sees only the dashboard.
+  - **Checks:** `npm run check` (29) and `test:int` (20) pass.
+
 ### 2026-11-03 · Admin redesign, round 2: CUTM LMS layout (requested by Aniket)
 - Aniket's feedback on round 1: separate pages where a modal would do, fields stretched across the page, a weak sidebar, navigation cards on the dashboard, and a login logo you could not see. Rebuilt after the CUTM LMS dashboard; details in `05-UI-SYSTEM.md` §3.3.
   - **Sidebar:** our own `Nav` component with the brand block, Website / Requests / Settings groups with icon chips, and account links at the foot. Payload closes its sidebar on load on any window up to 1440 px (most laptops); ours stays open from 1025 px unless the user closed it.
