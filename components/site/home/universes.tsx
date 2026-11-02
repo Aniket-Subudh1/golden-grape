@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Container } from '@/components/site/container';
+import { Parallax } from '@/components/site/parallax';
 import { Reveal } from '@/components/site/reveal';
 import { universeCatering, universeEvents, universeShop, universeSnack } from '@/lib/brand';
 import { cn } from '@/lib/cn';
@@ -35,13 +36,15 @@ export function Universes({ t, hrefs }: { t: Dictionary['universes']; hrefs: Par
             const className = 'group relative block aspect-[4/5] overflow-hidden bg-ink';
             const body: ReactNode = (
               <>
-                <Image
-                  src={IMAGES[key]}
-                  alt={card.title}
-                  fill
-                  sizes="(min-width: 768px) 50vw, 100vw"
-                  className="object-cover opacity-80 transition-all duration-[1400ms] ease-out group-hover:scale-105 group-hover:opacity-95"
-                />
+                <Parallax amount={6}>
+                  <Image
+                    src={IMAGES[key]}
+                    alt={card.title}
+                    fill
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    className="object-cover opacity-80 transition-all duration-[1400ms] ease-out group-hover:scale-105 group-hover:opacity-95"
+                  />
+                </Parallax>
                 <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/30 to-transparent" />
                 <div className="absolute inset-0 ring-1 ring-gold/0 transition-all duration-700 ring-inset group-hover:ring-gold/40" />
                 <div className="absolute inset-0 flex flex-col justify-between p-8 text-bone md:p-12">

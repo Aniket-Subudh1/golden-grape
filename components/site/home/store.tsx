@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { Parallax } from '@/components/site/parallax';
 import { Reveal } from '@/components/site/reveal';
 import { useNow } from '@/components/site/use-now';
 import { Button } from '@/components/ui/button';
@@ -24,36 +24,13 @@ type Props = {
 export function Store({ t, address, hours, schedule, closedDates, directionsHref, tastingHref }: Props) {
   const now = useNow();
   const open = now === undefined ? undefined : isOpenNow(schedule, closedDates, new Date(now));
-  const ref = useRef<HTMLElement>(null);
-  const [offset, setOffset] = useState(0);
-
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const onScroll = () => {
-      const el = ref.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const progress = 1 - (rect.top + rect.height / 2) / (window.innerHeight + rect.height / 2);
-      setOffset(Math.max(-1, Math.min(1, progress)) * 40);
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   return (
-    <section ref={ref} className="relative overflow-hidden bg-ink text-bone">
+    <section className="relative overflow-hidden bg-ink text-bone">
       <div className="grid min-h-[100svh] grid-cols-1 md:grid-cols-12">
         <div className="relative aspect-[4/3] overflow-hidden md:col-span-7 md:aspect-auto">
-          <Image
-            src={storeInterior}
-            alt=""
-            width={1920}
-            height={1200}
-            sizes="(min-width: 768px) 58vw, 100vw"
-            className="absolute inset-0 h-[115%] w-full object-cover will-change-transform"
-            style={{ transform: `translate3d(0, ${offset}px, 0)` }}
-          />
+          <Parallax>
+            <Image src={storeInterior} alt="" fill sizes="(min-width: 768px) 58vw, 100vw" className="object-cover" />
+          </Parallax>
           <div className="absolute inset-0 bg-gradient-to-r from-transparent to-ink/70" />
         </div>
 

@@ -131,13 +131,21 @@
 @utility animate-slow-zoom {
   animation: gg-slow-zoom 20s ease-out forwards;
 }
-@keyframes gg-marquee {
+@keyframes gg-rise {
+  from {
+    transform: translateY(105%);
+  }
   to {
-    transform: translateX(-50%);
+    transform: translateY(0);
   }
 }
-@utility animate-marquee {
-  animation: gg-marquee 70s linear infinite;
+@utility animate-rise {
+  animation: gg-rise 1.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+/* The Portuguese tile motif; set the strength with opacity on the element. */
+@utility bg-azulejo {
+  background-image: url('/brand/azulejo.svg');
+  background-size: 96px 96px;
 }
 @utility animate-fade-up {
   animation: gg-fade-up 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -146,7 +154,7 @@
 /* 05 §7: honour reduced motion for the hero zoom and fade. */
 @media (prefers-reduced-motion: reduce) {
   .animate-slow-zoom,
-  .animate-marquee,
+  .animate-rise,
   .animate-fade-up {
     animation: none;
   }

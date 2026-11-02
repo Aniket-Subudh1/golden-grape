@@ -16,6 +16,7 @@
 | PDF | `@react-pdf/renderer` | Invoices, delivery notes, quotations, credit notes (M3.2) |
 | Scanning | `@zxing/browser` (camera); hardware scanners act as a keyboard | M3.1 |
 | QR | `qrcode` | Review QR, attendance QR, gift cards, payment links |
+| Motion | `gsap` 3.15.0 with ScrollTrigger (`lib/gsap.ts`): marquee, parallax, Story words. Scroll-linked only, always behind `prefers-reduced-motion` | Added at Aniket's request |
 | Tests | Vitest, `mongodb-memory-server` (replica set), Playwright | `06-TESTING.md` |
 | Runtime | Node `^22.23.4` or `>=24.22.1` (Payload engines), Docker image, any host (Hetzner, AWS, …) | Q§10 |
 

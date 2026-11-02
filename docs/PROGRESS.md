@@ -55,6 +55,17 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-03 · One logo, full footer, GSAP motion, personality (requested by Aniket)
+- **Logo:** the gold logo (`logo-light.png`) is the only one now, in header, mobile menu, footer and e-mails; `logo-dark.png` deleted. The solid header turned dark (`ink`) so it reads properly on every page.
+- **Navigation:** links stay left and right of the logo down to 768 px (was 1024 px). Below that there is no room for six links: full-screen menu, language dropdown in the header bar.
+- **GSAP** (`gsap` 3.15.0, `lib/gsap.ts`): marquee loops seamlessly, follows scroll speed and direction, nearly stops under the pointer. `Parallax` on the hero, Universes, Store and Happy Hour images (replaces Store's hand-written scroll code). Story quote lights up word by word on scroll. Everything is static under reduced motion. The hero title rise is CSS, so it does not wait for JavaScript.
+- **Footer completed:** tile band, "Bem-vindo." statement with the reserve button, Instagram, e-mail and phone circles, directions link, opening hours column, legal labels, back to top. No new customer copy except `footer.backToTop` (4 languages); "Bem-vindo" already closes the Story quote.
+- **Restored from the prototype:** the social band under the home events (Instagram, Facebook when set, Google link), without the reviews or rating.
+- **Instagram verified:** `instagram.com/goldengrape.lu` is titled "Golden Grape (@goldengrape.lu)". **Facebook not verified:** no URL could be confirmed, so `business.facebook` stays empty and its icon hidden until someone enters it in Business settings. The Google link opens a Maps search for the address until a real review link exists.
+- **Personality:** Portuguese azulejo tile motif (footer band, Story, inner page headers, contact map block, mobile menu), grape mark above the Story quote, gold diamond in the marquee (from the logo's "Mäi Wäin" line). Phone and Instagram icons in the header from 1280 px.
+- **Still hidden until M2.2:** account, search and cart icons (no such features yet).
+- Verified on a local production build: `npm run check` (29), `test:int` (20), Playwright (16 passed, 2 skipped); 0 px overflow and no failed requests at 1883/1024/768/360; marquee moving.
+
 ### 2026-11-03 · Redeploy on push
 - Requested by Aniket. Setup and paths are in `02-ARCHITECTURE.md` §9; server files in `scripts/server/`.
 - **Not active yet.** Two manual steps remain for Aniket: authorise the deploy key on the server (my attempt to add it to `authorized_keys` was stopped by the session's permission rules) and add the `DEPLOY_SSH_KEY` repository secret. The private key is in `~/.ssh/golden-grape-deploy` on Aniket's machine. The GitHub Actions path itself has never run; it runs for the first time on the next push to `main`.

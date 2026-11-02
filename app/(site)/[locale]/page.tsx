@@ -8,12 +8,13 @@ import { Hero } from '@/components/site/home/hero';
 import { Hospitality } from '@/components/site/home/hospitality';
 import { Marquee } from '@/components/site/home/marquee';
 import { Store } from '@/components/site/home/store';
+import { SocialBand } from '@/components/site/home/social-band';
 import { Story } from '@/components/site/home/story';
 import { Universes } from '@/components/site/home/universes';
 import { alternates, type Dictionary, getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { groupedHours } from '@/lib/time';
 import { getHappyHour, mediaOf } from '@/modules/cms/service';
-import { getSettings } from '@/modules/settings/service';
+import { directionsUrl, getSettings } from '@/modules/settings/service';
 
 export async function generateMetadata({ params }: PageProps<'/[locale]'>): Promise<Metadata> {
   const { locale } = await params;
@@ -34,7 +35,6 @@ async function StoreSection({ t, locale }: { t: Dictionary['store']; locale: Loc
   const { business: b, hours, closedDates } = await getSettings();
   if (!b?.street) return null; // BusinessSettings not filled in yet
   const address = [b.street, `L-${b.postalCode} ${b.city}${b.country ? `, ${b.country}` : ''}`];
-  const directions = b.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address.join(', '))}`;
   return (
     <Store
       t={t}
@@ -42,7 +42,7 @@ async function StoreSection({ t, locale }: { t: Dictionary['store']; locale: Loc
       hours={groupedHours(hours, locale)}
       schedule={hours}
       closedDates={closedDates}
-      directionsHref={directions}
+      directionsHref={directionsUrl(b)}
       tastingHref={localePath(locale, '/events')}
     />
   );
@@ -63,7 +63,13 @@ async function HappyHourSection({ t, locale }: { t: Dictionary['happyHour']; loc
   return <HappyHour t={t} locale={locale} content={content} reserveHref={localePath(locale, '/contact')} />;
 }
 
-// The social-proof section is not rendered: its reviews were hard-coded in the prototype and could not be
+async function SocialSection({ t }: { t: Dictionary['socialProof'] }) {
+  const { business: b } = await getSettings();
+  if (!b?.street) return null;
+  return <SocialBand t={t} instagram={b.instagram} facebook={b.facebook} googleHref={directionsUrl(b)} />;
+}
+
+// The social-proof section's reviews are not rendered: its reviews were hard-coded in the prototype and could not be
 // verified. Real Google reviews arrive with M3.3.
 export default async function HomePage({ params }: PageProps<'/[locale]'>) {
   const { locale } = await params;
@@ -84,6 +90,9 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
       </Suspense>
       <Story t={t.story} />
       <Events t={t.eventsHome} calendarHref={localePath(locale, '/events')} reserveHref={localePath(locale, '/contact')} />
+      <Suspense fallback={null}>
+        <SocialSection t={t.socialProof} />
+      </Suspense>
     </>
   );
 }

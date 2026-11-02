@@ -177,7 +177,8 @@
     "rights": "© {{year}} Golden Grape Luxembourg. Todos os direitos reservados.",
     "moderation": "O abuso do álcool é prejudicial à saúde.",
     "legal": "Menções legais",
-    "privacy": "Privacidade"
+    "privacy": "Privacidade",
+    "backToTop": "Voltar ao topo"
   },
   "floatingCart": {
     "label": "Cesto",

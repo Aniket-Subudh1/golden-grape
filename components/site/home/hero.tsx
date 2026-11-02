@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { Fragment } from 'react';
+import { Parallax } from '@/components/site/parallax';
 import { Button } from '@/components/ui/button';
 import { heroWine } from '@/lib/brand';
 import type { Dictionary } from '@/lib/i18n';
@@ -9,7 +10,9 @@ export function Hero({ t }: { t: Dictionary['hero'] }) {
   return (
     <section className="relative h-[100svh] min-h-[640px] w-full overflow-hidden bg-ink text-bone">
       <div className="absolute inset-0">
-        <Image src={heroWine} alt="" fill priority sizes="100vw" className="animate-slow-zoom object-cover" />
+        <Parallax>
+          <Image src={heroWine} alt="" fill priority sizes="100vw" className="animate-slow-zoom object-cover" />
+        </Parallax>
         <div className="absolute inset-0 bg-gradient-to-r from-ink/95 via-ink/65 to-ink/25" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-transparent to-ink/40" />
       </div>
@@ -21,9 +24,12 @@ export function Hero({ t }: { t: Dictionary['hero'] }) {
             <span className="eyebrow text-gold">{t.eyebrow}</span>
           </div>
           <h1 className="font-serif text-[clamp(2.25rem,6vw,5.5rem)] leading-[0.98] font-light">
-            {t.titleA}
-            <br />
-            <em className="text-gold-gradient font-normal not-italic">{t.titleB}</em>
+            <span className="block overflow-hidden pb-[0.1em]">
+              <span className="animate-rise block">{t.titleA}</span>
+            </span>
+            <span className="-mt-[0.1em] block overflow-hidden pb-[0.14em]">
+              <em className="animate-rise text-gold-gradient block font-normal not-italic [animation-delay:140ms]">{t.titleB}</em>
+            </span>
           </h1>
           <p className="mt-6 max-w-lg text-base leading-relaxed font-light text-bone/75 md:text-lg">{t.subtitle}</p>
           <div className="mt-8 flex flex-wrap items-center gap-6">

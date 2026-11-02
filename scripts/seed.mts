@@ -158,6 +158,7 @@ await global('BusinessSettings', () => ({
     country: 'Luxembourg',
     phone: '+352 691 855 844',
     email: 'hello@goldengrape.lu',
+    instagram: 'https://www.instagram.com/goldengrape.lu/',
   },
   hours: [1, 2, 3, 4, 5].map((day) => ({ day: String(day), open: '10:00', close: '18:00' })),
   vat: [

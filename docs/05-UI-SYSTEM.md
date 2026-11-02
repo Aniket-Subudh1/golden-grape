@@ -16,6 +16,8 @@ Fonts: **Cormorant Garamond** (serif and display) and **Inter** (sans), loaded w
 
 Do not invent colours, sizes or shadows. The palette is: ink text on bone, gold-deep accents, champagne fills, border hairlines.
 
+Brand motifs added for personality (Aniket's request): the azulejo tile (`bg-azulejo`, `public/brand/azulejo.svg`), always subtle, and the grape mark from the logo (`public/brand/mark.png`).
+
 ## 2. Recurring visual vocabulary (from the prototype)
 
 | Pattern | Exact classes in the prototype | Where |
@@ -51,8 +53,8 @@ Do not invent colours, sizes or shadows. The palette is: ink text on bone, gold-
 | `QtyStepper` | `components/site/qty-stepper.tsx` | snack MenuCard stepper, cart line stepper, events guests | `value`, `onChange`, `min?`, `max?`, `size?` |
 | `PriceTag` | inline `formatMoney` call; **no component** | `fmtEUR` | use `formatMoney(cents, locale)` from `lib/money.ts` |
 | `Reveal` | `components/site/reveal.tsx` (`'use client'`) | `Reveal.tsx` + `use-reveal.ts`, merged into one file | `delay?`, `as?`, `className?`. Respect `prefers-reduced-motion` (show immediately). |
-| `Nav` | `components/site/nav.tsx` (`'use client'`) | `Nav.tsx` | transparent on home until `scrollY > 40`, otherwise solid; both logos; links from the `Header` global; locale-aware links |
-| `Footer` | `components/site/footer.tsx` (server) | `Footer.tsx` | data from the `Footer` global and settings |
+| `Nav` | `components/site/nav.tsx` (`'use client'`) | `Nav.tsx` | transparent on home until `scrollY > 40`, otherwise solid dark (`ink`); **one logo everywhere: `logo-light.png`, the gold one** (Aniket's decision); links left and right of the logo from 768 px up, full-screen menu below; links from the `Header` global |
+| `Footer` | `components/site/footer.tsx` (server) | `Footer.tsx` | tile band, "Bem-vindo." statement + reserve CTA, logo + tagline + socials, CMS columns, contact + directions, hours, legal + back to top; data from the `Footer` global and settings |
 | `LanguageSwitcher` | `components/site/language-switcher.tsx` | `LanguageSwitcher.tsx` (inline FR · EN · DE · PT row, replaced by a dropdown) | dropdown: current language + menu of the four; swaps the `[locale]` segment and keeps the path; `tone: 'light' \| 'dark'`, `placement: 'below-end' \| 'above-start'` |
 | `CartSheet`, `FloatingCart`, `CartProvider` | `components/site/cart-*.tsx`, `modules/webshop/cart.tsx` | `CartSheet.tsx`, `FloatingCart.tsx`, `lib/cart.tsx` | the cart stores `{ variant, unit?, qty }` only; names and prices are displayed from the server `quote` |
 | `ActionForm` | `components/ui/action-form.tsx` | every mocked `submit()` with `setTimeout` | wraps `useActionState`, shows pending state, success toast, field errors |

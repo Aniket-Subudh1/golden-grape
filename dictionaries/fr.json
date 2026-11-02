@@ -177,7 +177,8 @@
     "rights": "© {{year}} Golden Grape Luxembourg. Tous droits réservés.",
     "moderation": "L'abus d'alcool est dangereux pour la santé.",
     "legal": "Mentions légales",
-    "privacy": "Confidentialité"
+    "privacy": "Confidentialité",
+    "backToTop": "Retour en haut"
   },
   "floatingCart": {
     "label": "Panier",

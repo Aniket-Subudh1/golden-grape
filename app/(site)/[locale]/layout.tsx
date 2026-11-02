@@ -9,8 +9,9 @@ import type { NavItem } from '@/components/site/nav-link';
 import { Toaster } from '@/components/ui/sonner';
 import { appUrl } from '@/lib/env';
 import { type Dictionary, getDictionary, isLocale, type Locale, LOCALES, localePath } from '@/lib/i18n';
+import { groupedHours } from '@/lib/time';
 import { getFooter, getHeader } from '@/modules/cms/service';
-import { getSettings } from '@/modules/settings/service';
+import { directionsUrl, getSettings } from '@/modules/settings/service';
 import '../../globals.css';
 
 const serif = Cormorant_Garamond({
@@ -32,26 +33,31 @@ const toItem = (locale: Locale) => (link: { label: string; href?: string | null 
   href: link.href ? localePath(locale, link.href) : undefined,
 });
 
-async function SiteNav({ locale, t }: { locale: Locale; t: Dictionary['nav'] }) {
-  const header = await getHeader(locale);
+async function SiteNav({ locale, t }: { locale: Locale; t: Dictionary }) {
+  const [header, { business }] = await Promise.all([getHeader(locale), getSettings()]);
   return (
     <Nav
       locale={locale}
       items={(header.navItems ?? []).map(toItem(locale))}
-      labels={{ openMenu: t.openMenu, closeMenu: t.closeMenu, language: t.language }}
+      labels={{ openMenu: t.nav.openMenu, closeMenu: t.nav.closeMenu, language: t.nav.language, phone: t.contactPage.info.phone }}
+      phone={business?.phone}
+      instagram={business?.instagram}
     />
   );
 }
 
 async function SiteFooter({ locale, t }: { locale: Locale; t: Dictionary }) {
-  const [footer, { business }] = await Promise.all([getFooter(locale), getSettings()]);
+  const [footer, { business, hours }] = await Promise.all([getFooter(locale), getSettings()]);
   return (
     <Footer
       t={t.footer}
       tagline={footer.tagline}
       columns={(footer.columns ?? []).map((col) => ({ title: col.title, items: (col.links ?? []).map(toItem(locale)) }))}
-      contactTitle={t.footer.colContact}
       business={business}
+      hours={groupedHours(hours, locale)}
+      hoursLabel={t.store.hoursLabel}
+      directions={{ label: t.store.directions, href: directionsUrl(business) }}
+      reserve={{ label: t.happyHour.reserve, href: localePath(locale, '/contact') }}
       // The prototype's two labels stay as plain text until the real legal pages are published (DEP-05).
       legal={
         footer.legal.length > 0
@@ -68,9 +74,9 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   const t = await getDictionary(locale);
   return (
     <html lang={locale} className={`${serif.variable} ${sans.variable}`}>
-      <body className="bg-bone text-ink">
+      <body id="top" className="bg-bone text-ink">
         <Suspense fallback={null}>
-          <SiteNav locale={locale} t={t.nav} />
+          <SiteNav locale={locale} t={t} />
         </Suspense>
         <main>{children}</main>
         <Suspense fallback={null}>

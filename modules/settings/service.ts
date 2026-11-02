@@ -38,3 +38,7 @@ export async function isModuleOn(name: ModuleName) {
   const { modules } = await getSettings();
   return modules?.[name] === true;
 }
+
+/** The configured Google Maps link, or a Maps search for the address. */
+export const directionsUrl = (b: { mapsUrl?: string | null; street: string; postalCode: string; city: string; country?: string | null }) =>
+  b.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${b.street}, ${b.postalCode} ${b.city}, ${b.country ?? 'Luxembourg'}`)}`;

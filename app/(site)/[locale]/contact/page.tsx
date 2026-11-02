@@ -10,7 +10,7 @@ import { storeInterior } from '@/lib/brand';
 import { alternates, type Dictionary, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { weekHours } from '@/lib/time';
 import { ContactForm } from '@/modules/cms/components/contact-form';
-import { getSettings } from '@/modules/settings/service';
+import { directionsUrl, getSettings } from '@/modules/settings/service';
 
 export async function generateMetadata({ params }: PageProps<'/[locale]/contact'>): Promise<Metadata> {
   const { locale } = await params;
@@ -93,10 +93,11 @@ async function MapBlock({ caption }: { caption: string }) {
   const { business: b } = await getSettings();
   if (!b?.street) return null;
   const address = `${b.street} · L-${b.postalCode} ${b.city}`;
-  const href = b.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${b.street}, ${b.postalCode} ${b.city}, Luxembourg`)}`;
+  const href = directionsUrl(b);
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className="group relative grid aspect-[21/9] place-items-center overflow-hidden border border-border bg-ink/90 text-center text-bone/80">
-      <div>
+      <div className="bg-azulejo pointer-events-none absolute inset-0 opacity-15" aria-hidden="true" />
+      <div className="relative">
         <MapPin className="mx-auto h-8 w-8 text-gold" />
         <p className="mt-3 font-serif text-2xl transition group-hover:text-gold">{address}</p>
         <p className="mt-2 text-[11px] tracking-[0.3em] text-bone/50 uppercase">{caption}</p>

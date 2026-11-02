@@ -31,7 +31,7 @@ export function MediaCard({ image, alt, ratio, tag, overlay, action, children, s
         {tag && <span className="eyebrow absolute top-3 left-3 bg-ink/70 px-2.5 py-1 text-bone backdrop-blur">{tag}</span>}
         {overlay && (
           <>
-            <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/40 via-35% to-transparent to-65%" />
             <div className="absolute right-0 bottom-0 left-0 p-6 text-bone">{overlay}</div>
           </>
         )}

@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { Parallax } from '@/components/site/parallax';
 import { Reveal } from '@/components/site/reveal';
 import { useNow } from '@/components/site/use-now';
 import { Button } from '@/components/ui/button';
@@ -33,7 +34,11 @@ export function HappyHour({ t, locale, content, reserveHref }: { t: Dictionary['
   return (
     <section id="happy-hour" className="relative overflow-hidden bg-ink text-bone">
       <div className="absolute inset-0">
-        {content.image && <Image src={content.image} alt="" fill sizes="100vw" className="object-cover opacity-40" />}
+        {content.image && (
+          <Parallax>
+            <Image src={content.image} alt="" fill sizes="100vw" className="object-cover opacity-40" />
+          </Parallax>
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-ink via-ink/80 to-ink" />
       </div>
 

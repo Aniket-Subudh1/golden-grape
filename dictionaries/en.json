@@ -177,7 +177,8 @@
     "rights": "© {{year}} Golden Grape Luxembourg. All rights reserved.",
     "moderation": "Please drink responsibly.",
     "legal": "Legal notice",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "backToTop": "Back to top"
   },
   "floatingCart": {
     "label": "Bag",

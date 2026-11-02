@@ -1,6 +1,6 @@
 'use client';
 
-import { Menu, X } from 'lucide-react';
+import { Menu, Phone, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -9,15 +9,20 @@ import { cn } from '@/lib/cn';
 import { type Locale, localePath } from '@/lib/i18n';
 import { LanguageSwitcher } from './language-switcher';
 import { type NavItem, NavLink } from './nav-link';
+import { InstagramIcon } from './social-icons';
 
-type Props = { locale: Locale; items: NavItem[]; labels: { openMenu: string; closeMenu: string; language: string } };
+type Props = {
+  locale: Locale;
+  items: NavItem[];
+  labels: { openMenu: string; closeMenu: string; language: string; phone: string };
+  phone?: string | null;
+  instagram?: string | null;
+};
 
 const LOGO_ALT = 'Golden Grape · Mäi Wäin';
-// Logo files are trimmed to the same 1085×859 box, so the two versions cross-fade exactly on top of each other.
-const LOGO = { width: 1085, height: 859, sizes: '(min-width: 768px) 122px, 90px' };
 
-/** Transparent and tall over the home hero; compact and solid after scrolling and on every other page. */
-export function Nav({ locale, items, labels }: Props) {
+/** Links either side of the logo. Transparent and tall over the home hero; compact and dark after scrolling and on other pages. */
+export function Nav({ locale, items, labels, phone, instagram }: Props) {
   const pathname = usePathname();
   const isHome = pathname === localePath(locale);
   const [scrolled, setScrolled] = useState(false);
@@ -42,66 +47,66 @@ export function Nav({ locale, items, labels }: Props) {
   const isActive = (item: NavItem) => !!item.href && (pathname === item.href || pathname.startsWith(`${item.href}/`));
   const linkClass = (item: NavItem) =>
     cn(
-      'relative py-1.5',
+      'relative py-1.5 whitespace-nowrap',
       item.href &&
         'transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-gold after:transition-transform after:duration-500 hover:text-gold hover:after:scale-x-100',
-      isActive(item) && 'text-gold-deep after:scale-x-100',
+      isActive(item) && 'text-gold after:scale-x-100',
     );
-  const linkRow = 'hidden items-center text-[11px] font-medium tracking-[0.28em] uppercase lg:flex';
+  const linkRow = 'hidden items-center gap-4 text-[10px] font-medium tracking-[0.14em] uppercase md:flex lg:gap-7 lg:text-[11px] lg:tracking-[0.24em] xl:gap-9 xl:tracking-[0.28em]';
+  const icon = 'hidden transition-colors hover:text-gold xl:block';
 
   return (
     <header
       className={cn(
-        'fixed inset-x-0 top-0 z-50 transition-all duration-500',
-        solid ? 'border-b border-border/60 bg-bone/90 text-ink backdrop-blur-xl' : 'bg-gradient-to-b from-ink/60 to-transparent text-bone',
+        'fixed inset-x-0 top-0 z-50 text-bone transition-all duration-500',
+        solid ? 'border-b border-gold/20 bg-ink/95 backdrop-blur-xl' : 'bg-gradient-to-b from-ink/60 to-transparent',
       )}
     >
       <div
         className={cn(
-          'mx-auto grid max-w-[1400px] grid-cols-[1fr_auto_1fr] items-center px-5 transition-all duration-500 md:px-10',
+          'mx-auto grid max-w-[1400px] grid-cols-[1fr_auto_1fr] items-center gap-3 px-5 transition-all duration-500 md:px-6 lg:gap-6 lg:px-10',
           solid ? 'h-20 md:h-24' : 'h-24 md:h-32',
         )}
       >
         <div className="flex items-center">
-          <button onClick={() => setOpen(true)} className="-ml-2 p-2 lg:hidden" aria-label={labels.openMenu}>
+          <button onClick={() => setOpen(true)} className="-ml-2 p-2 md:hidden" aria-label={labels.openMenu}>
             <Menu className="h-5 w-5" />
           </button>
-          <nav className={cn(linkRow, 'gap-9')}>
+          <nav className={linkRow}>
             {items.slice(0, 3).map((item) => (
               <NavLink key={item.label} item={item} className={linkClass(item)} aria-current={isActive(item) ? 'page' : undefined} />
             ))}
           </nav>
         </div>
 
-        <Link href={localePath(locale)} className="block" aria-label="Golden Grape">
+        <Link href={localePath(locale)} className="block" aria-label={LOGO_ALT}>
           <span className={cn('relative block aspect-[1085/859] transition-all duration-500', solid ? 'h-16 md:h-20' : 'h-20 md:h-28')}>
-            <Image
-              src="/brand/logo-light.png"
-              alt=""
-              aria-hidden="true"
-              priority
-              fill
-              sizes={LOGO.sizes}
-              className={cn('object-contain transition-opacity duration-500', solid ? 'opacity-0' : 'opacity-100')}
-            />
-            <Image
-              src="/brand/logo-dark.png"
-              alt={LOGO_ALT}
-              priority
-              fill
-              sizes={LOGO.sizes}
-              className={cn('object-contain transition-opacity duration-500', solid ? 'opacity-100' : 'opacity-0')}
-            />
+            <Image src="/brand/logo-light.png" alt={LOGO_ALT} priority fill sizes="(min-width: 768px) 142px, 102px" className="object-contain" />
           </span>
         </Link>
 
-        <nav className={cn(linkRow, 'justify-end gap-7')}>
-          {items.slice(3).map((item) => (
-            <NavLink key={item.label} item={item} className={linkClass(item)} aria-current={isActive(item) ? 'page' : undefined} />
-          ))}
-          <span className="mx-1 h-3 w-px bg-current opacity-20" />
-          <LanguageSwitcher locale={locale} label={labels.language} tone={solid ? 'dark' : 'light'} />
-        </nav>
+        <div className="flex items-center justify-end">
+          <nav className={linkRow}>
+            {items.slice(3).map((item) => (
+              <NavLink key={item.label} item={item} className={linkClass(item)} aria-current={isActive(item) ? 'page' : undefined} />
+            ))}
+            <span className="hidden h-3 w-px bg-current opacity-25 lg:block" />
+            <LanguageSwitcher locale={locale} label={labels.language} />
+            {phone && (
+              <a href={`tel:${phone.replace(/\s/g, '')}`} aria-label={labels.phone} className={icon}>
+                <Phone className="h-4 w-4" />
+              </a>
+            )}
+            {instagram && (
+              <a href={instagram} aria-label="Instagram" target="_blank" rel="noopener noreferrer" className={icon}>
+                <InstagramIcon className="h-4 w-4" />
+              </a>
+            )}
+          </nav>
+          <div className="md:hidden">
+            <LanguageSwitcher locale={locale} label={labels.language} />
+          </div>
+        </div>
       </div>
 
       <div
@@ -111,13 +116,14 @@ export function Nav({ locale, items, labels }: Props) {
         )}
         inert={!open}
       >
-        <div className="flex h-24 items-center justify-between px-5">
-          <Image src="/brand/logo-light.png" alt={LOGO_ALT} width={LOGO.width} height={LOGO.height} sizes="90px" className="h-20 w-auto" />
+        <div className="bg-azulejo pointer-events-none absolute inset-0 opacity-[0.06]" aria-hidden="true" />
+        <div className="relative flex h-24 items-center justify-between px-5">
+          <Image src="/brand/logo-light.png" alt={LOGO_ALT} width={1085} height={859} sizes="102px" className="h-20 w-auto" />
           <button onClick={() => setOpen(false)} aria-label={labels.closeMenu} className="-mr-2 p-2">
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="flex flex-col gap-6 px-8 pt-10 pb-10">
+        <div className="relative flex flex-col gap-6 px-8 pt-10 pb-10">
           {items.map((item) => (
             <NavLink
               key={item.label}
@@ -126,8 +132,18 @@ export function Nav({ locale, items, labels }: Props) {
               className={cn('font-serif text-4xl font-light tracking-tight sm:text-5xl', isActive(item) && 'text-gold')}
             />
           ))}
-          <div className="mt-2 border-t border-bone/10 pt-8">
-            <LanguageSwitcher locale={locale} label={labels.language} tone="light" placement="above-start" />
+          <div className="mt-2 flex items-center gap-6 border-t border-bone/10 pt-8">
+            {phone && (
+              <a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2 text-sm font-light text-bone/80">
+                <Phone className="h-4 w-4 text-gold" />
+                {phone}
+              </a>
+            )}
+            {instagram && (
+              <a href={instagram} aria-label="Instagram" target="_blank" rel="noopener noreferrer" className="text-bone/80">
+                <InstagramIcon className="h-5 w-5" />
+              </a>
+            )}
           </div>
         </div>
       </div>
