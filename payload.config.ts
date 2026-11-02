@@ -23,7 +23,19 @@ const from = () => {
 };
 
 export default buildConfig({
-  admin: { user: 'users', importMap: { baseDir: dirname } },
+  admin: {
+    user: 'users',
+    importMap: { baseDir: dirname },
+    // One light theme in Golden Grape colours (styles in app/(payload)/custom.css); no theme switcher.
+    theme: 'light',
+    meta: { titleSuffix: ' · Golden Grape', icons: [{ rel: 'icon', type: 'image/png', url: '/icon.png' }] },
+    components: {
+      graphics: { Logo: '@/components/admin/logo', Icon: '@/components/admin/icon' },
+      beforeLogin: ['@/components/admin/login-brand'],
+      beforeNavLinks: ['@/components/admin/nav-brand'],
+      beforeDashboard: ['@/components/admin/dashboard-home'],
+    },
+  },
   collections: [...settingsCollections, ...cmsCollections, events, cateringPackages, cateringRequests],
   globals: [businessSettings, ...cmsGlobals],
   db: mongooseAdapter({

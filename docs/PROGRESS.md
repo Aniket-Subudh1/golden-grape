@@ -55,6 +55,15 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-03 · Admin redesign (requested by Aniket)
+- Payload admin restyled after the PgMaster owner app, in Golden Grape colours (Aniket's choice); details in `05-UI-SYSTEM.md` §3.3.
+  - **Theme and login:** one light theme, so the theme switcher is gone. The login is split: a photo, tile and logo pane on the left, a "Welcome back" form card on the right, stacked on phones.
+  - **Shell:** a floating sidebar card with a brand header, rounded pill links and gold active state; a floating header; a warm canvas.
+  - **Look:** white cards and tables, ink pill buttons with a gold hover, Inter and Cormorant self-hosted.
+- **Dashboard home:** greeting with the Luxembourg date, counts (new catering requests, upcoming events, photos) and quick actions. Counts and editor shortcuts appear only for roles that may open them (checked with a `stock` user: greeting and "View the website" only).
+- Fixed on the way: Payload's document meta row widened the account page on phones; narrow admin screens now clip horizontal overflow.
+- Verified on a local production build (throwaway database): login, dashboard, list, edit and account screens at 1440 and 390 px, 0 px overflow, no console errors or failed requests, mobile menu opens; `npm run check` (29), `test:int` (20).
+
 ### 2026-11-03 · One logo, full footer, GSAP motion, personality (requested by Aniket)
 - **Logo:** the gold logo (`logo-light.png`) is the only one now, in header, mobile menu, footer and e-mails; `logo-dark.png` deleted. The solid header turned dark (`ink`) so it reads properly on every page.
 - **Navigation:** links stay left and right of the logo down to 768 px (was 1024 px). Below that there is no room for six links: full-screen menu, language dropdown in the header bar.

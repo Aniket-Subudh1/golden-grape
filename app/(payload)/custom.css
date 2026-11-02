@@ -1,0 +1,552 @@
+/*
+ * Golden Grape admin theme: PgMaster owner layout (floating cards on a soft canvas, split login)
+ * in Golden Grape colours. Only Payload's CSS variables and its stable BEM classes are touched
+ * (Payload is pinned to 3.92.1). One light theme: `admin.theme: 'light'` in payload.config.ts.
+ */
+
+/* ---- Tokens ---------------------------------------------------------------------------------- */
+:root {
+  --gg-ink: #14110d;
+  --gg-ink-2: #241f18;
+  --gg-bone: #f7f4ee;
+  --gg-canvas: #f1ede5;
+  --gg-gold: #c9a24a;
+  --gg-gold-deep: #96702a;
+  --gg-gold-tint: #f6ecd6;
+  --gg-line: #e6e0d4;
+  --gg-shadow-card: 0 1px 2px rgb(20 17 13 / 0.05), 0 0 0 1px rgb(20 17 13 / 0.03);
+  --gg-shadow-raised: 0 10px 30px -12px rgb(20 17 13 / 0.18);
+
+  /* Payload's neutral scale, warmed from white (0) to ink (1000). */
+  --color-base-0: #ffffff;
+  --color-base-50: #f8f6f1;
+  --color-base-100: #efebe3;
+  --color-base-150: #e6e0d4;
+  --color-base-200: #d9d1c2;
+  --color-base-250: #cbc2b1;
+  --color-base-300: #bab09d;
+  --color-base-350: #a89d89;
+  --color-base-400: #968b77;
+  --color-base-450: #847966;
+  --color-base-500: #726856;
+  --color-base-550: #625948;
+  --color-base-600: #534b3c;
+  --color-base-650: #453e31;
+  --color-base-700: #383227;
+  --color-base-750: #2d281f;
+  --color-base-800: #241f18;
+  --color-base-850: #1c1813;
+  --color-base-900: #16130f;
+  --color-base-950: #110e0b;
+  --color-base-1000: #0b0907;
+
+  /* "Success" drives links, selections and highlights in Payload: make it gold. */
+  --color-success-50: #fbf7ee;
+  --color-success-100: #f6ecd6;
+  --color-success-150: #efdfba;
+  --color-success-200: #e7d19d;
+  --color-success-250: #dfc381;
+  --color-success-300: #d6b567;
+  --color-success-350: #cfa956;
+  --color-success-400: #c9a24a;
+  --color-success-450: #b8913f;
+  --color-success-500: #a68137;
+  --color-success-550: #96702a;
+  --color-success-600: #855f22;
+  --color-success-650: #73511d;
+  --color-success-700: #624418;
+  --color-success-750: #523913;
+  --color-success-800: #412d0f;
+  --color-success-850: #33230c;
+  --color-success-900: #251908;
+  --color-success-950: #181005;
+
+  --style-radius-s: 8px;
+  --style-radius-m: 12px;
+  --style-radius-l: 16px;
+  --font-body: var(--gg-font-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: var(--gg-font-serif), Georgia, serif;
+}
+
+html[data-theme='light'] {
+  --theme-bg: var(--gg-canvas);
+  --theme-input-bg: #ffffff;
+  --theme-text: var(--gg-ink);
+}
+
+::selection {
+  background: var(--gg-gold);
+  color: var(--gg-ink);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--gg-gold-deep);
+  outline-offset: 2px;
+}
+
+/* Headings in the brand serif. */
+h1,
+h2,
+.render-title,
+.doc-header__title,
+.list-header h1 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* ---- Buttons --------------------------------------------------------------------------------- */
+.btn--style-primary {
+  --color: var(--gg-bone);
+  --bg-color: var(--gg-ink);
+  --hover-bg: var(--gg-gold-deep);
+  --hover-color: #ffffff;
+  border-radius: 999px;
+}
+.btn--style-secondary {
+  --hover-bg: var(--gg-gold-tint);
+  border-radius: 999px;
+}
+.btn--style-pill {
+  border-radius: 999px;
+}
+
+/* ---- Login and the other auth screens (PgMaster owner split layout) -------------------------- */
+.template-minimal {
+  min-height: 100dvh;
+  background:
+    radial-gradient(120% 70% at 50% 0%, rgb(201 162 74 / 0.12), transparent 70%),
+    var(--gg-bone);
+}
+.template-minimal__wrap {
+  width: 100%;
+  max-width: 400px;
+  margin-inline: auto;
+}
+.gg-admin-logo {
+  display: block;
+  width: auto;
+  height: 96px;
+  margin-inline: auto;
+}
+.login__brand {
+  margin-bottom: 1.5rem;
+}
+.template-minimal .form-submit .btn {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+.template-minimal input {
+  border-radius: 10px;
+}
+
+.gg-login-pane {
+  display: none;
+}
+.gg-login-head {
+  margin-bottom: 1.75rem;
+  text-align: center;
+}
+.gg-login-head h1 {
+  margin: 0;
+  font-size: 2.4rem;
+  line-height: 1.1;
+}
+.gg-login-head p {
+  margin: 0.4rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-base-500);
+}
+
+@media (min-width: 1024px) {
+  .template-minimal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0;
+    background: #ffffff;
+  }
+  /* The photo pane: the login screen fills it with its content, the other auth screens show the photo. */
+  .template-minimal::before {
+    content: '';
+    grid-column: 1;
+    grid-row: 1;
+    background:
+      linear-gradient(160deg, rgb(20 17 13 / 0.55), rgb(20 17 13 / 0.92)),
+      url('/brand/home-store/Home_9.jpg') center / cover;
+  }
+  .template-minimal__wrap {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    padding: 3rem 0;
+  }
+  .template-minimal:has(.gg-login-pane) .login__brand {
+    display: none;
+  }
+  .gg-login-head {
+    text-align: left;
+  }
+  .gg-login-pane {
+    position: fixed;
+    inset: 0 50% 0 0;
+    display: block;
+    overflow: hidden;
+    color: var(--gg-bone);
+    box-shadow: 12px 0 32px rgb(20 17 13 / 0.12);
+  }
+  .gg-login-pane__photo {
+    object-fit: cover;
+  }
+  .gg-login-pane__shade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(160deg, rgb(20 17 13 / 0.45), rgb(20 17 13 / 0.92)),
+      url('/brand/azulejo.svg') 0 0 / 96px 96px;
+    background-blend-mode: normal, soft-light;
+  }
+  .gg-login-pane__content {
+    position: relative;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3.5rem 4rem;
+  }
+  .gg-login-pane__logo {
+    width: 150px !important;
+    max-width: none;
+    height: auto !important;
+  }
+  .gg-login-pane__title {
+    margin: 0;
+    max-width: 26rem;
+    font-family: var(--font-serif);
+    font-size: clamp(2.25rem, 3.2vw, 3.25rem);
+    font-weight: 300;
+    line-height: 1.05;
+  }
+  .gg-login-pane__title em {
+    color: var(--gg-gold);
+  }
+  .gg-login-pane__text {
+    margin: 1rem 0 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgb(247 244 238 / 0.7);
+  }
+  .gg-login-pane__foot {
+    margin: 0;
+    font-size: 0.8rem;
+    color: rgb(247 244 238 / 0.55);
+  }
+}
+
+/* ---- App shell: floating sidebar and header cards on the canvas ----------------------------- */
+.template-default {
+  background: var(--gg-canvas);
+}
+
+@media (min-width: 1025px) {
+  .nav {
+    top: 12px;
+    height: calc(100vh - 24px);
+    margin: 12px 0 12px 12px;
+    border: 1px solid var(--gg-line) !important;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: var(--gg-shadow-raised);
+  }
+  .template-default__wrap {
+    padding: 12px 12px 12px 12px;
+  }
+  .app-header {
+    top: 12px;
+  }
+  .app-header__bg,
+  .app-header__wrapper {
+    border-radius: 16px;
+  }
+  .app-header__bg {
+    background: #ffffff;
+    box-shadow: var(--gg-shadow-card);
+  }
+}
+
+.nav__link {
+  border-radius: 10px;
+  padding-inline: 10px;
+  margin-inline: -10px;
+  font-size: 0.9rem;
+  line-height: 2rem;
+  color: var(--color-base-700);
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+.nav__link:hover {
+  background: var(--color-base-50);
+  color: var(--gg-ink);
+}
+.nav__link.active,
+.nav__link[aria-current='page'] {
+  background: var(--gg-gold-tint);
+  color: var(--gg-ink);
+  font-weight: 500;
+}
+.nav__link-indicator {
+  display: none;
+}
+.nav-group__toggle {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gg-gold-deep);
+}
+.gg-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 1.25rem;
+  padding: 0.25rem 0 1.25rem;
+  border-bottom: 1px solid var(--gg-line);
+  color: var(--gg-ink);
+  text-decoration: none;
+}
+.gg-nav-brand__mark {
+  width: auto;
+  height: 40px;
+}
+.gg-nav-brand__name {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+.gg-nav-brand__sub {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gg-gold-deep);
+}
+.nav-toggler,
+.nav__log-out {
+  border-radius: 10px;
+}
+/* Payload's document meta row (last modified / created) does not wrap on phones and widens the page. */
+@media (max-width: 768px) {
+  .doc-controls .doc-controls__meta {
+    flex-wrap: wrap;
+    row-gap: 0.25rem;
+    min-width: 0;
+  }
+  .doc-controls .doc-controls__value {
+    white-space: normal;
+  }
+  /* The closed mobile menu sits just off-screen on document screens; never let it widen the page. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+}
+.gg-admin-icon {
+  width: auto;
+  height: 28px;
+}
+
+/* ---- Content: lists, documents and cards ---------------------------------------------------- */
+.card {
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: var(--gg-shadow-card);
+  transition:
+    box-shadow 0.25s,
+    transform 0.25s;
+}
+.card--has-onclick:hover {
+  box-shadow:
+    var(--gg-shadow-raised),
+    0 0 0 1px var(--gg-gold);
+  transform: translateY(-2px);
+}
+.table table {
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--gg-shadow-card);
+}
+.table thead th {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-base-500);
+}
+.table tbody tr {
+  border-top: 1px solid var(--gg-line);
+}
+.table tbody tr:hover td {
+  background: var(--color-base-50);
+}
+.pill {
+  border-radius: 999px;
+}
+
+/* ---- Dashboard home (components/admin/dashboard-home.tsx) ----------------------------------- */
+.gg-dash {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 2.5rem;
+}
+.gg-dash__hero {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  overflow: hidden;
+  padding: 2rem 2.25rem;
+  border-radius: 20px;
+  color: var(--gg-bone);
+  background:
+    radial-gradient(90% 140% at 100% 0%, rgb(201 162 74 / 0.28), transparent 60%),
+    url('/brand/azulejo.svg') 0 0 / 96px 96px,
+    var(--gg-ink);
+  background-blend-mode: normal, soft-light, normal;
+  box-shadow: var(--gg-shadow-raised);
+}
+.gg-dash__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gg-gold);
+}
+.gg-dash__eyebrow svg {
+  width: 14px;
+  height: 14px;
+}
+.gg-dash__title {
+  margin: 0.75rem 0 0;
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  line-height: 1.05;
+  color: #ffffff;
+}
+.gg-dash__title em {
+  color: var(--gg-gold);
+}
+.gg-dash__lead {
+  margin: 0.75rem 0 0;
+  max-width: 34rem;
+  color: rgb(247 244 238 / 0.7);
+}
+.gg-dash__hero-mark {
+  flex-shrink: 0;
+  align-self: center;
+  width: auto;
+  height: 92px;
+  opacity: 0.9;
+}
+.gg-dash__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.gg-dash__stat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: 'icon value' 'label label' 'hint hint';
+  align-items: center;
+  gap: 0.25rem 0.9rem;
+  padding: 1.25rem 1.4rem;
+  border-radius: 16px;
+  background: #ffffff;
+  color: var(--gg-ink);
+  text-decoration: none;
+  box-shadow: var(--gg-shadow-card);
+  transition:
+    box-shadow 0.25s,
+    transform 0.25s;
+}
+.gg-dash__stat:hover {
+  box-shadow:
+    var(--gg-shadow-raised),
+    0 0 0 1px var(--gg-gold);
+  transform: translateY(-2px);
+}
+.gg-dash__stat-icon {
+  grid-area: icon;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--gg-gold-tint);
+  color: var(--gg-gold-deep);
+}
+.gg-dash__stat-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.gg-dash__stat-value {
+  grid-area: value;
+  justify-self: end;
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  line-height: 1;
+}
+.gg-dash__stat-label {
+  grid-area: label;
+  margin-top: 0.75rem;
+  font-weight: 500;
+}
+.gg-dash__stat-hint {
+  grid-area: hint;
+  font-size: 0.8rem;
+  color: var(--color-base-500);
+}
+.gg-dash__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.gg-dash__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--gg-line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--gg-ink);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+.gg-dash__action:hover {
+  border-color: var(--gg-gold);
+  background: var(--gg-gold-tint);
+}
+.gg-dash__action svg {
+  width: 16px;
+  height: 16px;
+  color: var(--gg-gold-deep);
+}
+
+@media (max-width: 640px) {
+  .gg-dash__hero {
+    padding: 1.5rem;
+  }
+  .gg-dash__hero-mark {
+    display: none;
+  }
+}

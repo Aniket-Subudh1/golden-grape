@@ -63,6 +63,20 @@ Brand motifs added for personality (Aniket's request): the azulejo tile (`bg-azu
 
 Before adding a component, check this table. If an existing one is 80 % right, add a prop or variant to it.
 
+### 3.3 Admin (Payload) theme
+
+The admin follows the layout of the PgMaster owner app (split login, floating sidebar and header cards on a soft canvas) in Golden Grape colours, with **one light theme** (`admin.theme: 'light'`, no switcher). Everything goes through Payload's supported hooks, so nothing in Payload is forked:
+
+| Piece | File | Payload option |
+|---|---|---|
+| Colours, radii, fonts, login split, floating shell, cards | `app/(payload)/custom.css` (fonts loaded in `app/(payload)/layout.tsx`) | its CSS variables and BEM classes |
+| Login logo / header icon | `components/admin/logo.tsx`, `icon.tsx` | `graphics.Logo`, `graphics.Icon` |
+| Login brand pane + "Welcome back" heading | `components/admin/login-brand.tsx` | `beforeLogin` |
+| Sidebar brand header | `components/admin/nav-brand.tsx` | `beforeNavLinks` |
+| Home: greeting, counts, quick actions (by role) | `components/admin/dashboard-home.tsx` | `beforeDashboard` |
+
+The CSS relies on Payload's class names, which is safe while Payload stays pinned. Re-check the admin after any Payload upgrade.
+
 ## 4. CMS blocks (`pages.layout`)
 
 `hero` (eyebrow, title A/B, subtitle, image, CTA) · `richText` · `mediaText` (image left or right, text, CTA) · `cardGrid` (cards: image, title, text, link) · `cta` (title, button) · `faq` (q/a list). The House (`maison.tsx`) and the legal pages are built from these. Do not add a block type for a single use; build that section as a component and allow it as a block only when the client must edit it.
