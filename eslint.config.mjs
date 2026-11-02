@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "golden-grape-luxembourg/**",
+    "payload-types.ts",
+    "app/(payload)/admin/importMap.js",
   ]),
 ]);
 

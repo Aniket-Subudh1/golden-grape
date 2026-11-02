@@ -1,0 +1,6 @@
+.next
+node_modules
+golden-grape-luxembourg
+payload-types.ts
+app/(payload)/admin/importMap.js
+package-lock.json

@@ -6,7 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck && vitest run --project unit",
+    "test:int": "vitest run --project int",
+    "test:e2e": "playwright test",
+    "gate": "npm run check && npm run test:int && npm run build && npm run test:e2e",
+    "seed": "node --import tsx --env-file-if-exists=.env scripts/seed.ts",
+    "generate:types": "node --import tsx ./node_modules/payload/bin.js generate:types --disable-transpile",
+    "generate:importmap": "node --import tsx ./node_modules/payload/bin.js generate:importmap --disable-transpile",
+    "payload": "node --import tsx ./node_modules/payload/bin.js"
   },
   "dependencies": {
     "@payloadcms/db-mongodb": "3.92.1",
@@ -21,13 +30,21 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "@tailwindcss/turbopack": "^4",
-    "@types/node": "^20",
+    "@types/node": "24.19.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
+    "mongodb-memory-server": "11.3.0",
+    "prettier": "3.9.10",
+    "prettier-plugin-tailwindcss": "0.8.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "5.0.5"
+  },
+  "engines": {
+    "node": "^22.23.4 || >=24.22.1"
   }
 }
