@@ -48,9 +48,23 @@ export default function PasswordToggle({ children }: { children?: ReactNode }) {
       wrap.appendChild(button);
     };
 
+    // Save lives in the bar above the form. When Cancel is on screen, put Save in that same row,
+    // and put it back when Cancel goes away.
+    const placeSave = () => {
+      const save = document.getElementById('action-save')?.closest('.form-submit');
+      const home = document.querySelector('.doc-controls__controls');
+      if (!save || !home) return;
+      const row = document.getElementById('cancel-change-password')?.closest('.auth-fields__controls');
+      const target = row ?? home;
+      if (target.contains(save)) return;
+      if (row) target.appendChild(save);
+      else home.prepend(save);
+    };
+
     const scan = () => {
       document.querySelectorAll<HTMLInputElement>('input[type="password"]').forEach(enhance);
       document.querySelectorAll<HTMLInputElement>('input[data-gg-reveal="1"]').forEach(enhance);
+      placeSave();
     };
     scan();
     document.querySelectorAll<HTMLButtonElement>('.gg-password__eye').forEach((button) => {

@@ -204,20 +204,24 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 .app-header {
   display: flex;
   align-items: center;
+  width: 100%;
+  min-width: 0;
   max-width: 100%;
 }
 .app-header__content {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   width: auto;
   min-width: 0;
+  overflow: hidden;
 }
 .app-header__wrapper,
 .app-header__controls-wrapper {
+  width: 100%;
   min-width: 0;
   gap: 8px;
 }
 .app-header__controls-wrapper > .app-header__step-nav-wrapper {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   width: auto;
   min-width: 0;
   overflow: hidden;
@@ -226,6 +230,19 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
+}
+.app-header .step-nav__home,
+.app-header .gg-admin-icon {
+  flex: none;
+}
+.app-header .gg-admin-icon {
+  width: 16px;
+  min-width: 16px;
+  height: 18px;
+}
+.app-header .step-nav__last {
+  min-width: 0;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 .app-header__actions,
@@ -245,12 +262,15 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   right: auto;
   flex: 0 1 auto;
   min-width: 0;
-  max-width: min(240px, 40vw);
+  max-width: min(240px, 42vw);
   margin-inline: 4px 12px;
   overflow: hidden;
   transform: none;
 }
-.localizer-button {
+.app-header__localizer.localizer .popup,
+.app-header__localizer.localizer .popup__trigger-wrap,
+.app-header__localizer.localizer .popup-button,
+.app-header__localizer.localizer .localizer-button {
   max-width: 100%;
   min-width: 0;
 }
@@ -400,7 +420,7 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   box-shadow: none;
 }
 /* Narrow header: keep the icon of Add and the language menus, and drop the long labels, so nothing overlaps. */
-@media (max-width: 1100px) {
+@media (max-width: 760px) {
   .app-header .gg-btn span,
   .app-header .gg-menu__button > span,
   .app-header .localizer-button__label {
@@ -464,7 +484,8 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   align-items: center;
   gap: 8px;
 }
-.auth-fields__controls .btn {
+.auth-fields__controls .btn,
+.auth-fields__controls .form-submit {
   margin: 0;
 }
 
