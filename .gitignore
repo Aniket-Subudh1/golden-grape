@@ -46,3 +46,7 @@ next-env.d.ts
 
 # Local media uploads (used when S3 is not configured)
 /media/
+
+# Playwright
+/test-results/
+/playwright-report/

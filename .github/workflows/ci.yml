@@ -41,4 +41,5 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run build
-      - run: npm run test:e2e -- --pass-with-no-tests
+      - run: npm run seed -- --email ci-admin@example.test --password ci-only-password-1 --name CI
+      - run: npm run test:e2e
