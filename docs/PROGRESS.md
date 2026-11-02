@@ -34,7 +34,7 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 |---|---|---|---|---|
 | Q-01 | Confirm D-01: MongoDB + Payload auth + S3 storage instead of Supabase PostgreSQL/Auth/Storage, to be written into the Rev 2.2 addendum | APPLUX | M1.1 (proceeding at risk) | Open |
 | Q-02 | Original brand photos (DEP-01): the prototype only has Lovable CDN pointers | APPLUX / Ivo | M1.2 T6 | Open |
-| Q-03 | Staging host and MongoDB Atlas project (DEP-02) | APPLUX | M1.1 T5 | Open |
+| Q-03 | Staging host and MongoDB Atlas project (DEP-02) | APPLUX | M1.1 T5 (staging deploy only: `Blocked: DEP-02`) | Open |
 | Q-04 | Promotions do not apply to B2B list prices (A-03)? | APPLUX | M3.2 T4 | Open |
 | Q-05 | Loyalty points earned on `completed`, reversed on refund (A-08)? | APPLUX | M3.2 T3 | Open |
 | Q-06 | Voucher VAT treatment and invoice legal mentions (DEP-07) | Golden Grape accountant | M3.2 T5 | Open |
@@ -52,6 +52,14 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-10 | Until a real sample: CashMag CSV columns are mapped through configurable settings | M3.3 | — |
 
 ## 4. Log
+
+### 2026-11-02 · M1.1 T5 · Health, CI, Docker, staging
+- `app/api/health/route.ts`: `await connection()` makes it request-time (build output shows `ƒ /api/health`). The 2 s timeout covers the ping only; Payload's one-time init is not counted (a cold dev start takes > 2 s and would report 503). The ping lives in `lib/tx.ts` (`ping()`), the only file that touches adapter internals.
+- `next.config.ts`: `output: 'standalone'`, `poweredByHeader: false`. `images.remotePatterns` is added with S3 in M1.3 (no S3 URL exists yet).
+- `Dockerfile` (node:24-alpine, standalone, non-root, HEALTHCHECK), `.dockerignore`. `public/` is copied once M1.2 creates it.
+- `.github/workflows/ci.yml`: push → `npm ci`, `check`, `test:int`, `build` with no env; PRs to main → e2e against a `mongo:8 --replSet rs0` container. E2E runs with `--pass-with-no-tests` until the first spec lands (M1.3 T8, then remove the flag).
+- Verified on the standalone build against a throwaway replica set (port 27018): `/api/health` 200, `/admin` 200, no `X-Powered-By`, TTL index on `rateLimits.expiresAt`; Mongo killed → **503 in 2.0 s**; Mongo restarted → 200 within ~1 s.
+- **Not performed:** `docker build` (no Docker on the dev machine). Staging deploy: **Blocked: DEP-02** (Q-03).
 
 ### 2026-11-02 · M1.1 T4 · Module skeleton and staff users
 - `modules/settings/collections.ts`: `users` (auth; `name`, `roles` select-many saved to the JWT, `active`; title = `name`), `auditLogs`, `rateLimits`. Field access and the `beforeLogin` active check stay in M1.3 T1.

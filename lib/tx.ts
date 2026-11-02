@@ -21,6 +21,10 @@ export type Tx = { req: PayloadRequest; session: Session; model: (slug: Collecti
 export const model = (payload: Payload, slug: CollectionSlug): Model =>
   (payload.db as unknown as MongooseAdapter).collections[slug];
 
+export const ping = async (payload: Payload) => {
+  await (payload.db as unknown as MongooseAdapter).connection.db?.admin().ping();
+};
+
 export async function withTx<T>(payload: Payload, fn: (tx: Tx) => Promise<T>): Promise<T> {
   const req = await createLocalReq({}, payload);
   await initTransaction(req);

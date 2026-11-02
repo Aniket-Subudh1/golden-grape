@@ -1,0 +1,10 @@
+.git
+.github
+.next
+node_modules
+golden-grape-luxembourg
+docs
+tests
+.env*
+!.env.example
+*.md

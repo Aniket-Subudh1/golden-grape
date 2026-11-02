@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run test:int
+      # No env vars on purpose: proves env is read lazily.
+      - run: npm run build
+
+  e2e:
+    if: github.event_name == 'pull_request'
+    needs: check
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: mongodb://localhost:27017/golden_grape_e2e?replicaSet=rs0&directConnection=true
+      PAYLOAD_SECRET: ci-only-secret-0123456789abcdef0123456789abcdef
+      APP_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      # Service containers cannot take a command, so the replica set is started by hand.
+      - run: |
+          docker run -d --name mongo -p 27017:27017 mongo:8 --replSet rs0 --bind_ip_all
+          until docker exec mongo mongosh --quiet --eval "try { rs.status() } catch (e) { rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'localhost:27017' }] }) }; quit(db.hello().isWritablePrimary ? 0 : 1)"; do sleep 2; done
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npm run test:e2e -- --pass-with-no-tests
