@@ -28,7 +28,10 @@ const users: CollectionConfig = {
       'Die Personen, die sich hier anmelden können, und was jede darf.',
       'As pessoas que podem entrar aqui e o que cada uma pode fazer.',
     ),
-    components: createInDrawer('users', l('Ajouter une personne', 'Add a person', 'Person hinzufügen', 'Adicionar uma pessoa')),
+    components: {
+      ...createInDrawer('users', l('Ajouter une personne', 'Add a person', 'Person hinzufügen', 'Adicionar uma pessoa')),
+      edit: { SaveButton: '@/components/admin/save-button' },
+    },
   },
   access: {
     // Every staff member reads and edits their own profile; admin/manager read everyone; only admin manages accounts.

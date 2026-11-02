@@ -74,6 +74,8 @@ The admin copies the layout of the CUTM LMS dashboard in Golden Grape colours, w
 | Home: greeting, quick actions, needs attention, upcoming events, recent requests, figures (by role); no navigation cards | `components/admin/dashboard.tsx` | `views.dashboard.Component` |
 | "Add …" opens a centred dialog over the list (also used by the home's quick actions) | `components/admin/create-button.tsx`, wired with `createInDrawer()` in `lib/admin.ts` | `views.list.actions` |
 | Opening a document (any part of a list row, a home row, a relationship cell) opens it in a centred dialog; Cmd/Ctrl-click still opens the page | `components/admin/drawer-links.tsx` | `providers` |
+| An eye button on every password field shows or hides what was typed | `components/admin/password-toggle.tsx` | `providers` |
+| On an account or team member, Save sits in the same row as Cancel | `components/admin/save-button.tsx` | `users` `admin.components.edit.SaveButton` |
 | Repeating rows titled by their content ("Boutique", "La Maison") | `components/admin/row-label.tsx` | array `admin.components.RowLabel` |
 | Login: lockup top-left, heading and form, photo panel with notes | `components/admin/logo.tsx`, `login-brand.tsx` | `graphics.Logo`, `beforeLogin` |
 | Header icon | `components/admin/icon.tsx` | `graphics.Icon` |

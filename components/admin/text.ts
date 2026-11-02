@@ -81,6 +81,8 @@ const fr = {
     note2Text: 'Ce que vous modifiez ici est en ligne immédiatement.',
   },
   language: 'Langue de l’espace gestion',
+  showPassword: 'Afficher le mot de passe',
+  hidePassword: 'Masquer le mot de passe',
 };
 
 type Text = typeof fr;
@@ -163,6 +165,8 @@ const en: Text = {
     note2Text: 'What you change here is on the website straight away.',
   },
   language: 'Language of the back office',
+  showPassword: 'Show password',
+  hidePassword: 'Hide password',
 };
 
 const de: Text = {
@@ -243,6 +247,8 @@ const de: Text = {
     note2Text: 'Was Sie hier ändern, ist sofort auf der Website.',
   },
   language: 'Sprache der Verwaltung',
+  showPassword: 'Passwort anzeigen',
+  hidePassword: 'Passwort verbergen',
 };
 
 const pt: Text = {
@@ -323,6 +329,8 @@ const pt: Text = {
     note2Text: 'O que muda aqui fica logo no site.',
   },
   language: 'Língua da gestão',
+  showPassword: 'Mostrar a palavra-passe',
+  hidePassword: 'Esconder a palavra-passe',
 };
 
 const TEXT = { fr, en, de, pt };

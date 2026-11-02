@@ -1,3 +1,4 @@
+import { default as default_a796cb25c6bc2ffa9d5afcf05b4d9b1b } from '@/components/admin/save-button'
 import { default as default_2d5f4fd041422560436061dbcc885ca0 } from '@/components/admin/create-button'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -31,12 +32,14 @@ import { default as default_334250e18ce0b45af3e0c04bb6fe8307 } from '@/component
 import { default as default_0ca957152163a45f9a7fa850958278d9 } from '@/components/admin/language-menu'
 import { default as default_003a18697aceb07c0741f5f3fa2a6be8 } from '@/components/admin/login-brand'
 import { default as default_bcc6bb8feea1eb978bfac9964732c34d } from '@/components/admin/drawer-links'
+import { default as default_6bcd1c2d18bda2e25f236d9cca5fccfd } from '@/components/admin/password-toggle'
 import { default as default_7215358aebef2f123662c81dc8a03dd2 } from '@/components/admin/dashboard'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "@/components/admin/save-button#default": default_a796cb25c6bc2ffa9d5afcf05b4d9b1b,
   "@/components/admin/create-button#default": default_2d5f4fd041422560436061dbcc885ca0,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -70,6 +73,7 @@ export const importMap = {
   "@/components/admin/language-menu#default": default_0ca957152163a45f9a7fa850958278d9,
   "@/components/admin/login-brand#default": default_003a18697aceb07c0741f5f3fa2a6be8,
   "@/components/admin/drawer-links#default": default_bcc6bb8feea1eb978bfac9964732c34d,
+  "@/components/admin/password-toggle#default": default_6bcd1c2d18bda2e25f236d9cca5fccfd,
   "@/components/admin/dashboard#default": default_7215358aebef2f123662c81dc8a03dd2,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24

@@ -16,11 +16,12 @@ export default function CreateButton({ collectionSlug, label, quiet }: { collect
   const { i18n } = useTranslation();
   const [Drawer, , { openDrawer, closeDrawer }] = useDocumentDrawer({ collectionSlug });
   if (!permissions?.collections?.[collectionSlug]?.create) return null;
+  const name = typeof label === 'string' ? label : (label[i18n.language as keyof Label] ?? label.fr);
   return (
     <>
-      <button type="button" className={quiet ? 'gg-btn' : 'gg-btn gg-btn--primary gg-create'} onClick={openDrawer}>
+      <button type="button" className={quiet ? 'gg-btn' : 'gg-btn gg-btn--primary gg-create'} title={name} onClick={openDrawer}>
         <Plus />
-        {typeof label === 'string' ? label : (label[i18n.language as keyof Label] ?? label.fr)}
+        <span>{name}</span>
       </button>
       <Drawer
         onSave={() => {

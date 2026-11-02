@@ -55,6 +55,11 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-03 · Admin header, password reveal, Save beside Cancel (requested by Aniket)
+- Every password field (login, account, team member, reset) has an eye button that shows or hides the password.
+- On the account and team-member forms, Save sits in the same row as Cancel.
+- The header no longer lays the breadcrumb, Add and the two language controls on top of each other. The title shrinks, and on a narrow window Add and the language menus keep their icons.
+
 ### 2026-11-03 · Admin dialogs: one click and an inner scrollbar (requested by Aniket)
 - A list row opened only when the title itself was clicked. Status, date and the rest of the row now open the same dialog on the first click. Checkboxes and other controls are unchanged. Cmd/Ctrl-click still opens the page.
 - The dialog was clipping the bottom of the form: the card had a maximum height, but the form inside it grew and was cut off, so there was nothing to scroll. The title and save row stay fixed; the fields scroll inside the card. On a phone or a short window the card keeps a margin, the save buttons wrap, and the text area stays tall enough to write in.

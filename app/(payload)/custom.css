@@ -201,9 +201,65 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 .app-header__bg {
   display: none;
 }
+.app-header {
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+}
+.app-header__content {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+.app-header__wrapper,
+.app-header__controls-wrapper {
+  min-width: 0;
+  gap: 8px;
+}
+.app-header__controls-wrapper > .app-header__step-nav-wrapper {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  overflow: hidden;
+}
+.app-header .step-nav {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 .app-header__actions,
 .app-header__actions-wrapper {
+  flex: 0 0 auto;
   max-width: none;
+  margin-right: 0;
+}
+/* The website-language control is positioned over the bar and collides with Add and the breadcrumb.
+   Keep it in the row, after the account, and let it shrink. */
+.app-header__localizer-spacing {
+  display: none;
+}
+.app-header__localizer.localizer {
+  position: relative;
+  top: auto;
+  right: auto;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: min(240px, 40vw);
+  margin-inline: 4px 12px;
+  overflow: hidden;
+  transform: none;
+}
+.localizer-button {
+  max-width: 100%;
+  min-width: 0;
+}
+.localizer-button__current,
+.localizer-button__current-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .step-nav {
   font-size: 14px;
@@ -343,13 +399,73 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   background: transparent;
   box-shadow: none;
 }
-/* Phones: the header's create button keeps only its icon so the account avatar fits. */
-@media (max-width: 768px) {
+/* Narrow header: keep the icon of Add and the language menus, and drop the long labels, so nothing overlaps. */
+@media (max-width: 1100px) {
+  .app-header .gg-btn span,
+  .app-header .gg-menu__button > span,
+  .app-header .localizer-button__label {
+    display: none;
+  }
   .app-header .gg-btn {
     gap: 0;
-    padding: 0 10px;
-    font-size: 0;
+    justify-content: center;
+    width: 40px;
+    padding: 0;
   }
+  .app-header .gg-menu__button {
+    gap: 0;
+    padding-inline: 10px;
+  }
+}
+
+/* Show or hide a password. The button sits inside the field, on the right. */
+.gg-password {
+  position: relative;
+}
+.gg-password > input {
+  padding-right: 40px;
+}
+.gg-password__eye {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--gg-text-2);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+.gg-password__eye:hover {
+  background: var(--gg-accent);
+  color: var(--gg-ink);
+}
+.gg-password__eye svg {
+  display: block;
+}
+.gg-password__eye svg:last-child,
+.gg-password__eye[aria-pressed='true'] svg:first-child {
+  display: none;
+}
+.gg-password__eye[aria-pressed='true'] svg:last-child {
+  display: block;
+}
+
+/* Account and team member: Save sits in the same row as Cancel. */
+.auth-fields__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.auth-fields__controls .btn {
+  margin: 0;
 }
 
 /* ---- Sidebar (components/admin/nav-client.tsx) ---------------------------------------------- */
