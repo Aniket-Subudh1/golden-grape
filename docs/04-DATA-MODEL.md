@@ -149,7 +149,7 @@ Indexes: `{ status, createdAt: -1 }`, `{ customer, createdAt: -1 }`, `{ channel,
 `event` (rel, index), `idempotencyKey` (unique), `customer?`, `contact`, `guests`, `status` (`pending`, `confirmed`, `cancelled`), `notes`, `locale`. Capacity check: `Σ guests of non-cancelled bookings + new ≤ capacity`, done inside a transaction that also `$inc`s `events.booked` with the condition `booked + guests ≤ capacity`. The same conditional-update pattern as stock is used, so two people cannot take the last seat.
 
 ### `cateringPackages` and `cateringRequests`
-Packages: `name` L, `tagline` L, `includes` L (array), `pricePerGuestCents`, `minGuests`, `image`, `order`. These are the prototype's `convivio`, `mesa` and `prestige`. Requests: `package` (rel), `guests`, `date`, `time`, `location`, `contact`, `notes`, `estimateCents` (server-computed), `status` (`new`, `quoted`, `accepted`, `declined`), `locale`.
+Packages: `name` L, `tagline` L, `includes` L (array), `pricePerGuestCents`, `minGuests`, `image`, `order`. These are the prototype's `convivio`, `mesa` and `prestige`. Requests: `number` (unique, `REQ-{YYYY}-{0000}` via `nextNumber`), `package` (rel), `guests`, `date`, `time`, `location`, `contact` {`name`, `email`, `phone`}, `notes`, `estimateCents` (server-computed), `status` (`new`, `quoted`, `accepted`, `declined`, index), `locale`. API create is closed: only the `requestCatering` service writes requests.
 
 ### `payments` (module `payments`)
 `order` (rel, index), `provider`, `kind` (`charge`, `refund`, `authorization`, `capture`, `void`), `amountCents`, `status`, `providerRef` (unique, sparse), `raw` (json, the webhook payload, M4.1). Append-only.

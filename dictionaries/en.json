@@ -465,7 +465,9 @@
       "toastTitle": "Request sent",
       "toastDesc": "We'll come back to you within 24h with a detailed proposal.",
       "doneTitle": "Thank you {{name}}",
-      "doneSubtitle": "Your request is well received. We'll reply within 24h."
+      "doneSubtitle": "Your request is well received. We'll reply within 24h.",
+      "email": "E-mail",
+      "emailPh": "you@example.lu"
     }
   },
   "eventsPage": {
@@ -698,6 +700,51 @@
     "catering": {
       "title": "Catering — Portuguese receptions · Golden Grape Luxembourg",
       "description": "Three Portuguese catering packages for your receptions in Luxembourg. Request in 30 seconds."
+    }
+  },
+  "form": {
+    "error": "Sending failed. Please try again in a moment.",
+    "RATE_LIMITED": "Too many attempts. Please try again in a few minutes.",
+    "fields": {
+      "required": "This field is required.",
+      "email": "Invalid e-mail address.",
+      "tooShort": "This text is too short.",
+      "tooLong": "This text is too long.",
+      "minGuests": "Fewer guests than this package’s minimum.",
+      "dateTooSoon": "Choose a date at least 2 days ahead.",
+      "invalid": "Invalid value."
+    }
+  },
+  "mail": {
+    "signature": "The Golden Grape team",
+    "greeting": "Hello {{name}},",
+    "contact": {
+      "staffSubject": "New message ({{subject}}) — {{name}}",
+      "confirmSubject": "We received your message",
+      "confirmBody": "Thank you for your message. We will reply as soon as possible, usually within one working day.",
+      "yourMessage": "Your message"
+    },
+    "catering": {
+      "staffSubject": "Catering request {{number}} — {{name}}",
+      "confirmSubject": "Your catering request {{number}}",
+      "confirmBody": "Thank you for your request. We will get back to you with a tailored quote very soon.",
+      "estimateNote": "Indicative estimate, excluding extra drinks and delivery. Our team will send you the final quote."
+    },
+    "labels": {
+      "name": "Name",
+      "email": "E-mail",
+      "phone": "Phone",
+      "subject": "Subject",
+      "message": "Message",
+      "package": "Package",
+      "guests": "Guests",
+      "date": "Date",
+      "time": "Time",
+      "location": "Location",
+      "notes": "Comments",
+      "estimate": "Estimate",
+      "number": "Reference",
+      "language": "Language"
     }
   }
 }

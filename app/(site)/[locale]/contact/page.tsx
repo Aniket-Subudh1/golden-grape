@@ -9,6 +9,7 @@ import { FacebookIcon, InstagramIcon } from '@/components/site/social-icons';
 import { storeInterior } from '@/lib/brand';
 import { alternates, type Dictionary, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { weekHours } from '@/lib/time';
+import { ContactForm } from '@/modules/cms/components/contact-form';
 import { getSettings } from '@/modules/settings/service';
 
 export async function generateMetadata({ params }: PageProps<'/[locale]/contact'>): Promise<Metadata> {
@@ -107,7 +108,7 @@ async function MapBlock({ caption }: { caption: string }) {
 export default async function ContactPage({ params }: PageProps<'/[locale]/contact'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const { contactPage: t } = await getDictionary(locale);
+  const { contactPage: t, form } = await getDictionary(locale);
   return (
     <>
       <PageHero eyebrow={t.eyebrow} title={[t.titleA, t.titleB]} subtitle={t.subtitle} />
@@ -120,6 +121,9 @@ export default async function ContactPage({ params }: PageProps<'/[locale]/conta
             <Suspense fallback={null}>
               <Info locale={locale} t={t} />
             </Suspense>
+          </div>
+          <div className="border border-border bg-champagne/40 p-8 md:p-12">
+            <ContactForm t={t.form} form={form} locale={locale} />
           </div>
         </Container>
       </section>

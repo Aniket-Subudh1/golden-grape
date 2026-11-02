@@ -465,7 +465,9 @@
       "toastTitle": "Anfrage gesendet",
       "toastDesc": "Wir melden uns binnen 24h mit einem Angebot.",
       "doneTitle": "Danke {{name}}",
-      "doneSubtitle": "Ihre Anfrage ist eingegangen. Wir melden uns binnen 24h."
+      "doneSubtitle": "Ihre Anfrage ist eingegangen. Wir melden uns binnen 24h.",
+      "email": "E-Mail",
+      "emailPh": "sie@beispiel.lu"
     }
   },
   "eventsPage": {
@@ -698,6 +700,51 @@
     "catering": {
       "title": "Catering — Portugiesische Empfänge · Golden Grape Luxembourg",
       "description": "Drei portugiesische Catering-Pakete für Ihre Empfänge in Luxemburg. Anfrage in 30 Sekunden."
+    }
+  },
+  "form": {
+    "error": "Senden fehlgeschlagen. Bitte versuchen Sie es gleich noch einmal.",
+    "RATE_LIMITED": "Zu viele Versuche. Bitte versuchen Sie es in einigen Minuten erneut.",
+    "fields": {
+      "required": "Dieses Feld ist erforderlich.",
+      "email": "Ungültige E-Mail-Adresse.",
+      "tooShort": "Dieser Text ist zu kurz.",
+      "tooLong": "Dieser Text ist zu lang.",
+      "minGuests": "Weniger Gäste als das Minimum dieses Pakets.",
+      "dateTooSoon": "Wählen Sie ein Datum mindestens 2 Tage im Voraus.",
+      "invalid": "Ungültiger Wert."
+    }
+  },
+  "mail": {
+    "signature": "Ihr Golden-Grape-Team",
+    "greeting": "Hallo {{name}},",
+    "contact": {
+      "staffSubject": "Neue Nachricht ({{subject}}) — {{name}}",
+      "confirmSubject": "Wir haben Ihre Nachricht erhalten",
+      "confirmBody": "Vielen Dank für Ihre Nachricht. Wir antworten so schnell wie möglich, in der Regel innerhalb eines Werktags.",
+      "yourMessage": "Ihre Nachricht"
+    },
+    "catering": {
+      "staffSubject": "Catering-Anfrage {{number}} — {{name}}",
+      "confirmSubject": "Ihre Catering-Anfrage {{number}}",
+      "confirmBody": "Vielen Dank für Ihre Anfrage. Wir melden uns in Kürze mit einem individuellen Angebot.",
+      "estimateNote": "Unverbindliche Schätzung, ohne zusätzliche Getränke und Lieferung. Das endgültige Angebot erhalten Sie von unserem Team."
+    },
+    "labels": {
+      "name": "Name",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "subject": "Betreff",
+      "message": "Nachricht",
+      "package": "Paket",
+      "guests": "Gäste",
+      "date": "Datum",
+      "time": "Uhrzeit",
+      "location": "Ort",
+      "notes": "Anmerkungen",
+      "estimate": "Schätzung",
+      "number": "Referenz",
+      "language": "Sprache"
     }
   }
 }

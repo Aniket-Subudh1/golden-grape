@@ -128,3 +128,9 @@ export function eventDate(startsAt: string, endsAt: string | null | undefined, l
     time: endsAt ? `${time.format(start)} — ${time.format(new Date(endsAt))}` : time.format(start),
   };
 }
+
+/** `addDays('2026-11-02', 2)` → `'2026-11-04'` (calendar arithmetic on a `YYYY-MM-DD` date). */
+export function addDays(date: string, days: number) {
+  const [y, m, d] = date.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
+}

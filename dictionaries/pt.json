@@ -465,7 +465,9 @@
       "toastTitle": "Pedido enviado",
       "toastDesc": "Voltamos em 24h com uma proposta detalhada.",
       "doneTitle": "Obrigado {{name}}",
-      "doneSubtitle": "Recebemos o seu pedido. Respondemos em 24h."
+      "doneSubtitle": "Recebemos o seu pedido. Respondemos em 24h.",
+      "email": "E-mail",
+      "emailPh": "voce@exemplo.lu"
     }
   },
   "eventsPage": {
@@ -698,6 +700,51 @@
     "catering": {
       "title": "Catering — Receções portuguesas · Golden Grape Luxembourg",
       "description": "Três propostas de catering portuguesas para as suas receções no Luxemburgo. Pedido em 30 segundos."
+    }
+  },
+  "form": {
+    "error": "O envio falhou. Tente novamente dentro de instantes.",
+    "RATE_LIMITED": "Demasiadas tentativas. Tente novamente dentro de alguns minutos.",
+    "fields": {
+      "required": "Este campo é obrigatório.",
+      "email": "Endereço de e-mail inválido.",
+      "tooShort": "Este texto é demasiado curto.",
+      "tooLong": "Este texto é demasiado longo.",
+      "minGuests": "Menos convidados do que o mínimo desta proposta.",
+      "dateTooSoon": "Escolha uma data com pelo menos 2 dias de antecedência.",
+      "invalid": "Valor inválido."
+    }
+  },
+  "mail": {
+    "signature": "A equipa Golden Grape",
+    "greeting": "Olá {{name}},",
+    "contact": {
+      "staffSubject": "Nova mensagem ({{subject}}) — {{name}}",
+      "confirmSubject": "Recebemos a sua mensagem",
+      "confirmBody": "Obrigado pela sua mensagem. Respondemos o mais depressa possível, normalmente num dia útil.",
+      "yourMessage": "A sua mensagem"
+    },
+    "catering": {
+      "staffSubject": "Pedido de catering {{number}} — {{name}}",
+      "confirmSubject": "O seu pedido de catering {{number}}",
+      "confirmBody": "Obrigado pelo seu pedido. Voltaremos ao seu contacto em breve com um orçamento à medida.",
+      "estimateNote": "Estimativa indicativa, sem bebidas adicionais nem entrega. A nossa equipa enviará o orçamento final."
+    },
+    "labels": {
+      "name": "Nome",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "subject": "Assunto",
+      "message": "Mensagem",
+      "package": "Proposta",
+      "guests": "Convidados",
+      "date": "Data",
+      "time": "Hora",
+      "location": "Local",
+      "notes": "Comentários",
+      "estimate": "Estimativa",
+      "number": "Referência",
+      "language": "Idioma"
     }
   }
 }

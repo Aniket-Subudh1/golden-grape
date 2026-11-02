@@ -15,9 +15,9 @@ const SIZES = {
 
 type Common = { label: string; name: string; size?: 'md' | 'lg' };
 type Props =
-  | (Common & { as?: 'input' } & ComponentProps<'input'>)
+  | (Common & { as?: 'input' } & Omit<ComponentProps<'input'>, 'size'>)
   | (Common & { as: 'textarea' } & ComponentProps<'textarea'>)
-  | (Common & { as: 'select' } & ComponentProps<'select'>);
+  | (Common & { as: 'select' } & Omit<ComponentProps<'select'>, 'size'>);
 
 /** Underline field with its label and the ActionForm error for `name`. */
 export function Field({ label, name, className, as = 'input', size = 'md', ...props }: Props) {

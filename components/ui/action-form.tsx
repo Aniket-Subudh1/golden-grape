@@ -1,40 +1,63 @@
 'use client';
 
-import { type ComponentProps, createContext, startTransition, useActionState, useContext, useEffect, useRef } from 'react';
+import { Check } from 'lucide-react';
+import {
+  type ComponentProps,
+  createContext,
+  type ReactNode,
+  startTransition,
+  useActionState,
+  useContext,
+  useEffect,
+  useRef,
+} from 'react';
 import { useFormStatus } from 'react-dom';
 import { toast } from 'sonner';
 import type { ActionResult } from '@/lib/action';
 import { Button } from './button';
 
 type FieldErrors = Record<string, string[] | undefined>;
-const FieldErrorsContext = createContext<FieldErrors>({});
+const FieldErrorsContext = createContext<{ errors: FieldErrors; texts: Record<string, string> }>({ errors: {}, texts: {} });
 
-/** The first error for a field of the enclosing ActionForm, if any. */
-export const useFieldError = (name: string) => useContext(FieldErrorsContext)[name]?.[0];
+/**
+ * The first error for a field of the enclosing ActionForm, translated. Schemas and services report message
+ * keys (`required`, `email`, `dateTooSoon`, …); anything else shows the generic `invalid` text.
+ */
+export function useFieldError(name: string) {
+  const { errors, texts } = useContext(FieldErrorsContext);
+  const key = errors[name]?.[0];
+  return key && (texts[key] ?? texts.invalid ?? key);
+}
 
 type Props<T> = Omit<ComponentProps<'form'>, 'action' | 'onSubmit'> & {
   action: (prev: ActionResult<T> | null, input: FormData) => Promise<ActionResult<T>>;
-  messages: { success: string; error: string };
+  /** `form` block of the dictionary: generic error, per-code errors (e.g. RATE_LIMITED) and field texts. */
+  messages: { success?: string; error: string; fields: Record<string, string> } & Record<string, unknown>;
+  /** Shown instead of the form after a successful submit. */
+  done?: (data: T) => ReactNode;
 };
 
 // Submits through the server action without React's automatic form reset, so a failed submit keeps
 // what the user typed; the form is reset only on success.
-export function ActionForm<T>({ action, messages, children, ...props }: Props<T>) {
+export function ActionForm<T>({ action, messages, done, children, ...props }: Props<T>) {
   const [state, formAction] = useActionState(action, null);
   const form = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if (!state) return;
     if (state.ok) {
-      toast.success(messages.success);
+      if (messages.success) toast.success(messages.success);
       form.current?.reset();
     } else if (!state.fieldErrors) {
-      toast.error(messages.error);
+      const byCode = messages[state.error];
+      toast.error(typeof byCode === 'string' ? byCode : messages.error);
     }
   }, [state, messages]);
 
+  if (state?.ok && done) return done(state.data);
+
   return (
-    <FieldErrorsContext value={(state && !state.ok && state.fieldErrors) || {}}>
+    <FieldErrorsContext value={{ errors: (state && !state.ok && state.fieldErrors) || {}, texts: messages.fields }}>
       <form
         ref={form}
         noValidate
@@ -58,5 +81,18 @@ export function SubmitButton({ label, pendingLabel, ...props }: ComponentProps<t
     <Button type="submit" disabled={pending} {...props}>
       {pending ? pendingLabel : label}
     </Button>
+  );
+}
+
+/** The "thank you" panel that replaces a submitted form (contact, catering). */
+export function FormDone({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div className="py-12 text-center">
+      <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-gold/20">
+        <Check className="h-8 w-8 text-gold-deep" />
+      </div>
+      <h2 className="mt-6 font-serif text-3xl md:text-4xl">{title}</h2>
+      <p className="mt-3 text-ink/60">{subtitle}</p>
+    </div>
   );
 }

@@ -75,6 +75,8 @@ export interface Config {
     pages: Page;
     legal: Legal;
     events: Event;
+    cateringPackages: CateringPackage;
+    cateringRequests: CateringRequest;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -90,6 +92,8 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     legal: LegalSelect<false> | LegalSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
+    cateringPackages: CateringPackagesSelect<false> | CateringPackagesSelect<true>;
+    cateringRequests: CateringRequestsSelect<false> | CateringRequestsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -451,6 +455,57 @@ export interface Event {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cateringPackages".
+ */
+export interface CateringPackage {
+  id: string;
+  name: string;
+  tagline?: string | null;
+  includes?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * In cents: 5500 = 55 €
+   */
+  pricePerGuestCents: number;
+  minGuests: number;
+  order?: number | null;
+  image?: (string | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cateringRequests".
+ */
+export interface CateringRequest {
+  id: string;
+  number: string;
+  status: 'new' | 'quoted' | 'accepted' | 'declined';
+  package: string | CateringPackage;
+  guests: number;
+  date: string;
+  time: string;
+  location: string;
+  contact: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  notes?: string | null;
+  /**
+   * Price per guest × guests, computed on the server.
+   */
+  estimateCents: number;
+  locale: 'fr' | 'en' | 'de' | 'pt';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -504,6 +559,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'events';
         value: string | Event;
+      } | null)
+    | ({
+        relationTo: 'cateringPackages';
+        value: string | CateringPackage;
+      } | null)
+    | ({
+        relationTo: 'cateringRequests';
+        value: string | CateringRequest;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -783,6 +846,51 @@ export interface EventsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cateringPackages_select".
+ */
+export interface CateringPackagesSelect<T extends boolean = true> {
+  name?: T;
+  tagline?: T;
+  includes?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  pricePerGuestCents?: T;
+  minGuests?: T;
+  order?: T;
+  image?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cateringRequests_select".
+ */
+export interface CateringRequestsSelect<T extends boolean = true> {
+  number?: T;
+  status?: T;
+  package?: T;
+  guests?: T;
+  date?: T;
+  time?: T;
+  location?: T;
+  contact?:
+    | T
+    | {
+        name?: T;
+        email?: T;
+        phone?: T;
+      };
+  notes?: T;
+  estimateCents?: T;
+  locale?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

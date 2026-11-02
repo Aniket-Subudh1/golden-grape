@@ -53,6 +53,19 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-02 · M1.3 T5 + T6 · Contact and catering requests, e-mail
+Committed together: the two actions send the e-mails, so neither task builds without the other.
+- **Validation messages are localized.** zod schemas and `AppError` report dictionary keys (`required`, `email`, `tooShort`, `minGuests`, `dateTooSoon`, …). `ActionForm` translates them from the new `form.fields` block, toasts `form.RATE_LIMITED` / `form.error` for non-field errors, and gained `done` (the prototype's thank-you panel, `FormDone`). New `form.*`, `mail.*`, `cateringPage.request.email/emailPh` keys in 4 languages (my translations; review with DEP-05).
+- `sendContact` (`modules/cms/actions.ts`): schema per the milestone; the subject chips post a hidden input. Honeypot `website`: if filled, it returns success and sends nothing (bots get no signal). `rateLimit('contact:'+ip, 5, 10 min)`; `clientIp()` added to `lib/action.ts`. Mails are sent in `after()`; failures are logged only. Nothing is stored.
+- Catering module:
+  - `cateringPackages` (localized name, tagline, includes; `pricePerGuestCents`, `minGuests`, `order`, image) and `cateringRequests` (API create closed). `04` updated: `number`, `contact.email`.
+  - The `requestCatering` service checks the package, guests ≥ `minGuests` and date ≥ `today()` + 2 (Luxembourg; new `lib/time.ts addDays`). It computes `estimateCents = mulQty(pricePerGuestCents, guests)` on the server (the schema has no estimate field) and creates the request with `nextNumber('cateringRequest')` + `formatNumber(settings.numbering.cateringRequest)` in `withTx`.
+  - The form gained an **e-mail** field (needed for the customer confirmation). The live estimate in the browser is display only.
+- E-mail (`lib/mail.ts`): lazy nodemailer transport; no SMTP → the mail is logged. `render()` loads `react-dom/server` lazily and also produces a plain-text version. This works in server actions/`after()`, so the T6 risk is cleared.
+  - Templates: shared `MailLayout` (logo, ink/bone/gold, business footer) + `Details` table; contact and catering staff/confirmation. Staff copy in French to `MAIL_STAFF_TO` (fallback: business e-mail, `replyTo` = customer); confirmation in the customer's language.
+  - Payload's own e-mails (password reset) use `@payloadcms/email-nodemailer` with the same SMTP.
+- Verified: `npm run check`, `npm run test:int`. Playwright on `/pt/contact`: an invalid submit shows "Endereço de e-mail inválido." / "Este texto é demasiado curto." and keeps the input; a valid submit shows "Obrigado Ana"; the dev log shows the PT confirmation rendered and not sent (SMTP unset). Catering is verified after the seed (T7) and in T8.
+
 ### 2026-11-02 · M1.3 T4 · Public pages from the CMS
 - **Rendering strategy (Cache Components with no database at build):**
   - The static shell (dictionary content: hero, universes, craft, story, page headers) prerenders at build.

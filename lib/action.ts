@@ -60,3 +60,9 @@ export const publicAction =
   ) =>
   async (_prev: unknown, input: Input<S>) =>
     run(schema, input, (data, payload, user) => fn(data, { payload, user }), () => true);
+
+/** Client IP for rate limits (first hop of X-Forwarded-For, set by the host's proxy). */
+export async function clientIp() {
+  const h = await headers();
+  return h.get('x-forwarded-for')?.split(',')[0]?.trim() || h.get('x-real-ip') || 'unknown';
+}

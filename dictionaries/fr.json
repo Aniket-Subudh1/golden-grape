@@ -465,7 +465,9 @@
       "toastTitle": "Demande envoyée",
       "toastDesc": "Nous revenons vers vous sous 24h avec une proposition détaillée.",
       "doneTitle": "Merci {{name}}",
-      "doneSubtitle": "Votre demande est bien reçue. Nous revenons vers vous sous 24h."
+      "doneSubtitle": "Votre demande est bien reçue. Nous revenons vers vous sous 24h.",
+      "email": "E-mail",
+      "emailPh": "vous@exemple.lu"
     }
   },
   "eventsPage": {
@@ -698,6 +700,51 @@
     "catering": {
       "title": "Traiteur — Réceptions portugaises · Golden Grape Luxembourg",
       "description": "Trois formules traiteur portugaises pour vos réceptions au Luxembourg. Demande en 30 secondes."
+    }
+  },
+  "form": {
+    "error": "L’envoi n’a pas abouti. Veuillez réessayer dans un instant.",
+    "RATE_LIMITED": "Trop de tentatives. Réessayez dans quelques minutes.",
+    "fields": {
+      "required": "Ce champ est obligatoire.",
+      "email": "Adresse e-mail invalide.",
+      "tooShort": "Ce texte est trop court.",
+      "tooLong": "Ce texte est trop long.",
+      "minGuests": "Nombre de convives inférieur au minimum de cette formule.",
+      "dateTooSoon": "Choisissez une date au moins 2 jours à l’avance.",
+      "invalid": "Valeur invalide."
+    }
+  },
+  "mail": {
+    "signature": "L’équipe Golden Grape",
+    "greeting": "Bonjour {{name}},",
+    "contact": {
+      "staffSubject": "Nouveau message ({{subject}}) — {{name}}",
+      "confirmSubject": "Nous avons bien reçu votre message",
+      "confirmBody": "Merci pour votre message. Nous vous répondons au plus vite, en général sous 24 heures ouvrées.",
+      "yourMessage": "Votre message"
+    },
+    "catering": {
+      "staffSubject": "Demande traiteur {{number}} — {{name}}",
+      "confirmSubject": "Votre demande traiteur {{number}}",
+      "confirmBody": "Merci pour votre demande. Nous revenons vers vous avec un devis personnalisé dans les plus brefs délais.",
+      "estimateNote": "Estimation indicative, hors boissons supplémentaires et livraison. Le devis définitif vous sera envoyé par notre équipe."
+    },
+    "labels": {
+      "name": "Nom",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "subject": "Objet",
+      "message": "Message",
+      "package": "Formule",
+      "guests": "Convives",
+      "date": "Date",
+      "time": "Heure",
+      "location": "Lieu",
+      "notes": "Commentaires",
+      "estimate": "Estimation",
+      "number": "Référence",
+      "language": "Langue"
     }
   }
 }
