@@ -10,7 +10,15 @@ export default defineConfig({
       { resolve: { alias }, test: { name: 'unit', include: ['**/*.test.ts'], exclude: [...exclude, '**/*.int.test.ts'] } },
       {
         resolve: { alias },
-        test: { name: 'int', include: ['**/*.int.test.ts'], exclude, testTimeout: 60_000, hookTimeout: 120_000, fileParallelism: false },
+        test: {
+          name: 'int',
+          include: ['**/*.int.test.ts'],
+          exclude,
+          setupFiles: ['tests/setup-int.ts'],
+          testTimeout: 60_000,
+          hookTimeout: 120_000,
+          fileParallelism: false,
+        },
       },
     ],
   },

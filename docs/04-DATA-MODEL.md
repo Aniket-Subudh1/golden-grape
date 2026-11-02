@@ -32,7 +32,7 @@ Access: read is Staff(any) for itself and admin/manager for everyone; create, up
 `title` L, `slug` (unique), `body` L (rich text). Seeded with `mentions-legales`, `cgv`, `confidentialite` and `cookies`.
 
 ### `auditLogs`
-`user` (rel users), `action` (text, index), `collection`, `docId` (index), `before` (json), `after` (json). Access: create through the server only (`() => false` for the API, with writes using `overrideAccess`); read by admin and manager; no update or delete.
+`user` (rel users), `action` (text, index), `targetCollection` (named so because `collection` is a reserved mongoose path), `docId` (index), `before` (json), `after` (json). Access: create through the server only (`() => false` for the API, with writes using `overrideAccess`); read by admin and manager; no update or delete.
 
 ### `BusinessSettings` (global)
 | Group | Fields |

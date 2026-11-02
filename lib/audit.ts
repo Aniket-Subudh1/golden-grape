@@ -14,7 +14,7 @@ export async function audit(
     data: {
       user: req.user?.collection === 'users' ? req.user.id : undefined,
       action,
-      collection: target.collection,
+      targetCollection: target.collection,
       docId: target.id,
       before,
       after,

@@ -157,7 +157,7 @@ export interface AuditLog {
   id: string;
   user?: (string | null) | User;
   action: string;
-  collection: string;
+  targetCollection: string;
   docId: string;
   before?:
     | {
@@ -301,7 +301,7 @@ export interface UsersSelect<T extends boolean = true> {
 export interface AuditLogsSelect<T extends boolean = true> {
   user?: T;
   action?: T;
-  collection?: T;
+  targetCollection?: T;
   docId?: T;
   before?: T;
   after?: T;

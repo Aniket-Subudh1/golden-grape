@@ -22,12 +22,12 @@ const users: CollectionConfig = {
 
 const auditLogs: CollectionConfig = {
   slug: 'auditLogs',
-  admin: { useAsTitle: 'action', defaultColumns: ['action', 'collection', 'docId', 'user', 'createdAt'] },
+  admin: { useAsTitle: 'action', defaultColumns: ['action', 'targetCollection', 'docId', 'user', 'createdAt'] },
   access: { read: isStaff('manager'), create: none, update: none, delete: none },
   fields: [
     { name: 'user', type: 'relationship', relationTo: 'users' },
     { name: 'action', type: 'text', required: true, index: true },
-    { name: 'collection', type: 'text', required: true },
+    { name: 'targetCollection', type: 'text', required: true },
     { name: 'docId', type: 'text', required: true, index: true },
     { name: 'before', type: 'json' },
     { name: 'after', type: 'json' },

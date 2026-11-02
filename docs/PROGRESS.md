@@ -6,7 +6,7 @@ Update this file at the end of every task (`00-START-HERE.md` §2). The newest l
 
 | ID | Sub-milestone | Payment | Target | Status | Accepted by APPLUX |
 |---|---|---|---|---|---|
-| M1.1 | Foundation | P1 $300 | Tue 3 Nov | In progress | — |
+| M1.1 | Foundation | P1 $300 | Tue 3 Nov | In progress (all ACs pass locally; AC-05 waits for the first push) | — |
 | M1.2 | Design system + i18n shell | P1 | Wed 4 Nov | Not started | — |
 | M1.3 | CMS, pages, settings, roles | P1 | Thu 5 Nov | Not started | — |
 | M2.1 | Catalogue + inventory core | P2 $250 | Sat 7 Nov | Not started | — |
@@ -52,6 +52,23 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-10 | Until a real sample: CashMag CSV columns are mapped through configurable settings | M3.3 | — |
 
 ## 4. Log
+
+### 2026-11-02 · M1.1 report
+| AC | Result | How verified |
+|---|---|---|
+| AC-M1.1-01 [R9] | Pass (local `mongod` rs0 instead of compose) | `npm run dev` → `/admin` 200, first user via `/api/users/first-register`, login OK, `/api/health` 200 |
+| AC-M1.1-02 [V-SEC] | Pass | `env -i PATH=… npx next build` with `.env` moved away |
+| AC-M1.1-03 [R9] | Pass | `lib/tx.int.test.ts` (Payload writes and raw session writes both rolled back; mutation check: committing instead of rolling back fails the test) |
+| AC-M1.1-04 [V-SEC] | Pass | `lib/rate-limit.int.test.ts` (3 allowed, 4th `RATE_LIMITED`, next window allowed; 10 parallel → exactly 3) |
+| AC-M1.1-05 | **Not performed** | Needs the first push to GitHub (commits are local only) |
+
+Validation checklist: `docker compose up` **not performed** (no Docker locally). Mongo stop → 503 in 2.0 s, start → 200: **performed** on the standalone build with a throwaway replica set. Staging: **Blocked: DEP-02**. Repository sharing with APPLUX: human.
+
+### 2026-11-02 · M1.1 T6 · Tests
+- `tests/setup-int.ts` (vitest `setupFiles` of the `int` project) starts a fresh `MongoMemoryReplSet` per file and sets env before anything imports `payload.config.ts`. `tests/helpers.ts` `getTestPayload()` waits for the models' index builds (a transaction racing one fails with "Unable to acquire IX lock").
+- `lib/money.test.ts` (12 vectors), `lib/tx.int.test.ts` (3), `lib/rate-limit.int.test.ts` (3).
+- `auditLogs.collection` renamed `targetCollection`: `collection` is a reserved mongoose path (warning at boot). `04-DATA-MODEL.md` updated.
+- Verified: `npm run check` and `npm run test:int` pass.
 
 ### 2026-11-02 · M1.1 T5 · Health, CI, Docker, staging
 - `app/api/health/route.ts`: `await connection()` makes it request-time (build output shows `ƒ /api/health`). The 2 s timeout covers the ping only; Payload's one-time init is not counted (a cold dev start takes > 2 s and would report 503). The ping lives in `lib/tx.ts` (`ping()`), the only file that touches adapter internals.
