@@ -7,7 +7,7 @@ Update this file at the end of every task (`00-START-HERE.md` §2). The newest l
 | ID | Sub-milestone | Payment | Target | Status | Accepted by APPLUX |
 |---|---|---|---|---|---|
 | M1.1 | Foundation | P1 $300 | Tue 3 Nov | In progress (all ACs pass locally; AC-05 waits for the first push) | — |
-| M1.2 | Design system + i18n shell | P1 | Wed 4 Nov | In progress (started at risk: AC-M1.1-05 waits for a push) | — |
+| M1.2 | Design system + i18n shell | P1 | Wed 4 Nov | Done (agent checks; AC-03 side-by-side and the checklist are human) | — |
 | M1.3 | CMS, pages, settings, roles | P1 | Thu 5 Nov | Not started | — |
 | M2.1 | Catalogue + inventory core | P2 $250 | Sat 7 Nov | Not started | — |
 | M2.2 | Shop, cart, accounts, SEO | P2 | Mon 9 Nov | Not started | — |
@@ -52,6 +52,23 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-10 | Until a real sample: CashMag CSV columns are mapped through configurable settings | M3.3 | — |
 
 ## 4. Log
+
+### 2026-11-02 · M1.2 report
+| AC | Result | How verified |
+|---|---|---|
+| AC-M1.2-01 [V-I18N] | Pass | `next start` + curl: `/` with `Accept-Language: de` → 307 `/de`; no header → 307 `/fr` |
+| AC-M1.2-02 [V-I18N] | Pass | Playwright on `/pt`: click "English" → `/en`, cookie `NEXT_LOCALE=en`, `<html lang="en">`, visible `h1` English; key-parity unit test passes |
+| AC-M1.2-03 [V-DES] | Partly verified, side-by-side is human | Port screenshots at 1280/768/360: Cormorant/Inter computed, palette, header transparent on the hero and solid after scroll, 0 px horizontal overflow. The prototype was **not** run side by side (it is a read-only TanStack/Lovable app); differences on purpose: SocialProof hidden, placeholder links hidden, 768 px overflow fixed |
+| AC-M1.2-04 [V-SEO] | Pass | HTML of `/fr`: `<html lang="fr">`, canonical, 4 hreflang + x-default |
+| AC-M1.2-05 [V-DES] | Pass | `grep -rn "rounded-full bg-ink text-bone" app components` → only `components/ui/button.tsx` |
+| AC-M1.2-06 [V-DES] | Pass | Home HTML: no `href` to /shop or /snack; no search, account or cart controls |
+
+Note for M1.3's locale e2e: with Cache Components, a soft navigation keeps the previous route mounted in a hidden React `<Activity>`. After switching PT → EN the Portuguese `h1` is still in the DOM, but not visible. The "no other-locale string" check must sample **visible** text (`filter({ visible: true })`).
+
+Validation checklist: real phone and desktop in 4 languages **not performed** (human). Header readability: checked in screenshots, human to confirm. Reduced motion: **performed** (Playwright `reducedMotion: 'reduce'` → reveal opacity 1, no hero zoom). DEP-01 missing-photo list: in the T6 entry, to be sent to APPLUX (human).
+
+### 2026-11-02 · M1.2 T7 · Tests
+- `lib/i18n.test.ts` (added in T2): `06` §3.1 vectors, `interpolate`/`rich`, and key parity for en/de/pt against fr (no missing or empty leaf). No component tests (`06` §1). `npm run check` (24 unit) and `npm run test:int` (6) pass.
 
 ### 2026-11-02 · M1.2 T6 · Images (DEP-01)
 - `public/brand/`: the 11 real jpgs from the prototype's `src/assets/` plus `logo-dark.png` and `logo-light.png`. `lib/brand.ts` exports the 11 slots the home page uses (`heroWine`, `universeShop|Snack|Catering|Events`, `craftCheese|Port|Pastel`, `happyHour`, `gourmetTable`, `storeInterior`). All images use `next/image` with `sizes`; the hero and the logos use `priority`.
