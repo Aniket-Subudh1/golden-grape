@@ -1,0 +1,181 @@
+# 02 · Architecture
+
+## 1. Stack
+
+| Layer | Choice | Notes |
+|---|---|---|
+| Framework | Next.js **16.4.x** (App Router), React 19.3, TypeScript 5 strict | Read `node_modules/next/dist/docs/` before writing routing, proxy, caching or metadata code |
+| Back office | **Payload CMS 3** running inside the same Next app (`@payloadcms/next`) | The admin UI covers every CRUD. Exact version is pinned in M1.1 T1 (D-02). |
+| Database | **MongoDB** via `@payloadcms/db-mongodb` (D-01) | Must be a replica set for transactions: Atlas, or local `mongo --replSet rs0` |
+| Auth | Payload auth: `users` (staff) and `customers` (shop accounts) are separate auth collections | Separate cookies, separate login pages |
+| Media | Payload upload collection + S3-compatible storage adapter (`@payloadcms/storage-s3`) | MinIO locally; R2, S3 or Hetzner in production |
+| Styling | Tailwind CSS 4 + tokens ported from the prototype (`05-UI-SYSTEM.md`) | No CSS-in-JS |
+| UI primitives | shadcn/ui (Radix), **only** the ones used (`05-UI-SYSTEM.md` §3.1) | `class-variance-authority`, `tailwind-merge`, `clsx`, `lucide-react`, `sonner` |
+| Validation | `zod` | One schema per action input |
+| E-mail | `nodemailer` (any SMTP) + templates written as plain TSX rendered to HTML with `react-dom/server` | Mailpit locally |
+| PDF | `@react-pdf/renderer` | Invoices, delivery notes, quotations, credit notes (M3.2) |
+| Scanning | `@zxing/browser` (camera); hardware scanners act as a keyboard | M3.1 |
+| QR | `qrcode` | Review QR, attendance QR, gift cards, payment links |
+| Tests | Vitest, `mongodb-memory-server` (replica set), Playwright | `06-TESTING.md` |
+| Runtime | Node ≥ 22, Docker image, any host (Hetzner, AWS, …) | Q§10 |
+
+Add a package only when a milestone lists it under **Packages added**. Install it with `npm install --save-exact` and record the version here.
+
+## 2. Folder layout
+
+```
+app/
+  (site)/[locale]/              public website and shop (FR/EN/DE/PT)
+    layout.tsx                  Nav + Footer + CartProvider + CartSheet + Toaster
+    page.tsx                    home
+    shop/, shop/[slug]/, snack/, catering/, events/, events/[slug]/, maison/, contact/,
+    legal/[slug]/, account/, auth/, checkout/, order/[id]/
+  (staff)/staff/                mobile back office (staff auth), see 05 §5
+  (payload)/admin/[[...segments]]/   Payload admin (generated)
+  (payload)/api/[...slug]/      Payload REST used by the admin (generated)
+  api/health/route.ts           health check
+  api/webhooks/[provider]/route.ts   payment / POS webhooks (M4)
+  api/cron/[job]/route.ts       scheduled jobs, protected by CRON_SECRET (M3.1+)
+  sitemap.ts, robots.ts
+components/
+  ui/                           shadcn primitives actually used
+  site/                         public-site components (ported from the prototype)
+  staff/                        mobile staff components
+lib/                            cross-cutting code with no business rules (see §3)
+modules/<module>/               business modules (see §4)
+payload.config.ts               composes every module's collections and globals
+proxy.ts                        locale redirect and staff guard (Next 16 "proxy", formerly middleware)
+dictionaries/{fr,en,de,pt}.json UI strings, copied from the prototype's src/locales/*.json
+scripts/                        import, seed, backup, restore
+tests/                          setup, helpers, e2e/
+docs/                           this specification
+```
+
+## 3. `lib/`: shared, rule-free building blocks
+
+| File | Purpose |
+|---|---|
+| `lib/env.ts` | zod-parsed `process.env`; the only reader of env vars |
+| `lib/payload.ts` | `getPayloadClient()`, a cached `getPayload({ config })` |
+| `lib/tx.ts` | `withTx(payload, fn)` opens a transaction, passes `req` (and the Mongo session for raw atomic ops), and commits or rolls back. **The only file that touches Payload transaction internals.** |
+| `lib/errors.ts` | `AppError(code, message, field?)`, with codes `VALIDATION`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, `OUT_OF_STOCK`, `RATE_LIMITED` |
+| `lib/action.ts` | `action(schema, { roles }, fn)` and `publicAction(schema, fn)`: the only way to write a server action (03 §4) |
+| `lib/access.ts` | Payload access functions: `isStaff(...roles)`, `isSelfCustomer`, `staffOrSelf`, `publicRead`, `published` |
+| `lib/money.ts` | Integer-cent arithmetic, `vatFromGross`, `netToGross`, `formatMoney(cents, locale)` |
+| `lib/time.ts` | `Europe/Luxembourg` helpers: `today()`, `toLocal()`, `startOfDay()`, `monthRange()` |
+| `lib/i18n.ts` | `LOCALES`, `isLocale`, `getDictionary(locale)`, `alternates(path)` for hreflang |
+| `lib/audit.ts` | `audit(req, action, target, before?, after?)` writes to `auditLogs` |
+| `lib/mail.ts` | `sendMail({ to, subject, html, text })` + `render(template, locale, data)` |
+| `lib/rate-limit.ts` | Fixed-window limiter stored in Mongo (`rateLimits` TTL collection); no Redis needed |
+| `lib/numbering.ts` | `nextNumber(tx, series, year)`: gapless document numbers (§5.3) |
+| `lib/cn.ts` | `cn()` = `twMerge(clsx())` |
+
+## 4. Modules
+
+Each business area is a folder. **Modules talk to each other only through the functions exported from `service.ts`.** No module imports another module's `collections.ts` or reads another module's collections directly with `payload.find`. Payload relationship fields between collections are allowed, because they are schema, not code coupling.
+
+```
+modules/<name>/
+  collections.ts     Payload CollectionConfig[] / GlobalConfig[] for this module
+  service.ts         the module's public functions (server-only)
+  actions.ts         server actions for this module's UI (thin: validate → service)
+  <pure>.ts          pure logic (no I/O), e.g. slots.ts, pricing.ts, packaging.ts
+  <pure>.test.ts     unit tests next to the logic
+  components/        UI used only by this module (optional)
+```
+
+| Module | Owns (collections/globals) | Public service functions (examples) | Built in |
+|---|---|---|---|
+| `settings` | `BusinessSettings` global, `counters` | `getSettings()`, `isModuleOn(name)` | M1.3 |
+| `cms` | `pages`, `media`, `legal`, `Header`/`Footer`/`HappyHour` globals | `getPage(slug, locale)` | M1.3 |
+| `catalogue` | `categories`, `brands`, `products`, `variants`, `packagingUnits` | `findSellable(ids)`, `findByBarcode(code)` | M2.1 |
+| `inventory` | `stockMovements`, `stockLevels`, `stockCounts` | **`postMovements(tx, lines)`**, `onHand(ids)`, `lowStock()` | M2.1 |
+| `customers` | `customers`, `customerGroups` | `getCustomer(id)` | M2.2 |
+| `sales` | `orders`, `reservations`, `deliveryZones`, `slotRules` | `placeOrder(input)`, `transition(orderId, to)` | M2.3 |
+| `payments` | `payments` | `provider(name)`, `startPayment(order)` | M2.3 (manual), M4.1 (wallee) |
+| `events` | `events`, `eventBookings` | `upcoming(locale)`, `book(input)` | M1.3 (content), M2.3 (booking) |
+| `catering` | `cateringPackages`, `cateringRequests` | `requestCatering(input)` | M1.3 |
+| `notifications` | none (e-mail templates only) | template components rendered by `lib/mail.ts` | M1.3 |
+| `purchasing` | `suppliers`, `supplierProducts`, `purchaseOrders` | `receive(poId, lines)`, `reorderList()` | M3.1 |
+| `promotions` | `priceLists`, `promotions`, `discountCodes`, `loyaltyLedger`, `giftCards`, `giftCardLedger` | **`quote(cart, customer, channel)`**, `redeem(tx, quote)` | M2.2 (v1), M3.2 (full) |
+| `documents` | `quotations`, `invoices`, `deliveryNotes`, `creditNotes` | `issueInvoice(orderId)`, `pdf(docId)` | M3.2 |
+| `reviews` | `ReviewsCache` global | `latestReviews()`, `refreshReviews()` | M3.3 |
+| `attendance` | `attendance`, `attendanceCorrections` | `checkInOut(userId, token)`, `monthlyReport(month)` | M3.3 |
+| `reporting` | none (read-only aggregations) | `salesSummary(range, groupBy)` | M3.3 |
+| `pos` | `outbox`, `integrationLogs`, `posImports` | `enqueue(event)`, `importCsv(file)`, `connector()` | M3.3, M4.2 |
+
+**Module switches:** `BusinessSettings.modules` (a checkbox per optional module: `b2b`, `purchasing`, `promotions`, `loyalty`, `giftCards`, `reviews`, `attendance`, `pos`). When a module is off, its staff routes return `notFound()`, its admin collections are hidden (`admin.hidden`), and its public UI is not rendered. Core modules (`settings`, `cms`, `catalogue`, `inventory`, `sales`) cannot be switched off.
+
+## 5. The three invariants
+
+### 5.1 Stock is never edited directly (R1, R2, R12)
+
+- `stockMovements` is append-only: there is no update or delete access for anyone. Each row has `variant`, `qty` (signed, **base units**), `type` (`sale`, `return`, `adjustment`, `count`, `receipt`, `pos_import`, `cancel`), `reason`, `user`, `ref` (order, PO, count or import id), `channel` and `createdAt`.
+- `stockLevels` holds one doc per variant with `onHand`, `lowStockThreshold` and `updatedAt`. It is a **denormalized cache** written only by `postMovements`.
+- `inventory.postMovements(tx, lines)`:
+  1. Converts each line from its packaging unit into base units with `qty × unit.factor` (`modules/catalogue/packaging.ts`, pure).
+  2. Merges lines by variant.
+  3. For each variant whose delta is negative and whose type is `sale`, runs an atomic conditional update `{ variant, onHand: { $gte: -delta } } → $inc onHand` in the transaction session. If nothing matches, it throws `AppError('OUT_OF_STOCK', …, variantId)` and the whole transaction rolls back.
+  4. For the other types it runs an unconditional `$inc` (upsert). Adjustments and counts may take stock to any value ≥ 0, and POS imports are facts that are recorded even when the result is negative, flagged for review.
+  5. Inserts the movement rows in the same transaction.
+- `scripts/rebuild-stock.ts` recomputes `onHand = Σ qty` from the ledger and reports any difference. It runs in tests and before handover, which proves the cache and the ledger agree.
+
+### 5.2 One pricing engine (R5, R7)
+
+`modules/promotions/pricing.ts` exports a **pure** `quote(input) → Quote`, where `input = { lines, customer?, channel, code?, loyaltyPoints?, giftCards?, now, catalogue, rules }`. The I/O wrapper in `service.ts` loads `catalogue` and `rules`, then calls it. The webshop cart, checkout, mobile sale, quotation and invoice all call the same function, and nothing else computes a price. The order of operations is fixed and documented in `04-DATA-MODEL.md` §6. Money is integer cents with half-up rounding per line.
+
+### 5.3 Gapless document numbers (R5)
+
+`lib/numbering.ts`'s `nextNumber(tx, series, year)` runs `findOneAndUpdate({ series, year }, { $inc: { last: 1 } }, { upsert: true, returnDocument: 'after', session })` on `counters` **inside the same transaction that inserts the document**. If the insert fails, the increment rolls back with it, so numbers stay gapless and never repeat. The format comes from `BusinessSettings.numbering[series]` (for example `INV-{YYYY}-{00000}`). An issued invoice or credit note has no update or delete access; corrections are made by credit note.
+
+## 6. Request flows
+
+**Webshop order (Phase 1):** the client cart (localStorage, as in the prototype) is submitted through the `placeOrder` action with an `idempotencyKey`. The action validates input with zod, then runs `withTx`:
+1. Check the idempotency key. If it already exists, return the existing order.
+2. Call `pricing.quote` with server prices (client prices are ignored).
+3. Check the slot capacity.
+4. Insert the order with status `pending`.
+5. Call `payments.provider('manual').start()`, which returns `{ status: 'awaiting_payment' | 'confirmed' }`.
+6. If the order is confirmed, call `postMovements(sale)` and enqueue the confirmation e-mail.
+
+After commit, the outbox (M3.3/M4.2) mirrors the order to the POS when the POS module is on. On cancel or refund, `transition()` posts `cancel` movements with the opposite sign in a transaction.
+
+**Reservation with pre-order:** created as `pending` with **no stock movement**. `accept` posts the sale movements (and, with wallee in M4.1, captures the payment). `reject` and `cancel` never post movements and, in M4.1, void the authorisation.
+
+**Mobile sale (M3.1):** the same `placeOrder` with `channel: 'mobile'`, a staff user and a customer, priced by `quote` with the customer's list. Payment is `manual` (on site or invoiced) in Phase 1, or a wallee link in M4.1.
+
+**POS sale import (M3.3):** CSV upload, parse, match by barcode or reference, show a preview with unmatched rows, then confirm. A transaction creates one `pos` order per receipt plus movements. The import's file hash is unique, so the same file cannot be imported twice.
+
+**Outbox (M3.3/M4.2):** domain code calls `pos.enqueue(tx, event)` inside its transaction. A scheduled job (`scripts/outbox.ts`, run by cron or the Payload jobs queue) sends pending rows through `connector()`, using backoff of 1 min, 5 min, 30 min, 2 h, then 12 h. It records the result in `integrationLogs` and alerts by e-mail after the last retry. The admin has a "Retry now" button.
+
+## 7. Environment variables
+
+Every variable lives in `.env.example` and is parsed by `lib/env.ts`. The build must succeed with **no** env vars set, so env is read lazily at runtime.
+
+| Variable | Added in | Example (local) |
+|---|---|---|
+| `DATABASE_URL` | M1.1 | `mongodb://localhost:27017/golden_grape?replicaSet=rs0&directConnection=true` |
+| `PAYLOAD_SECRET` | M1.1 | 32+ random chars |
+| `APP_URL` | M1.1 | `http://localhost:3000` |
+| `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_REGION`, `S3_PUBLIC_URL` | M1.3 | MinIO values |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_SECURE`, `MAIL_FROM`, `MAIL_STAFF_TO` | M1.3 | Mailpit `localhost:1025` |
+| `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET` | M4.3 | Cloudflare test keys |
+| `ATTENDANCE_SECRET` | M3.3 | 32+ random chars |
+| `GOOGLE_PLACES_API_KEY`, `GOOGLE_PLACE_ID`, `GBP_ACCOUNT_ID`, `GBP_LOCATION_ID`, `GBP_OAUTH_*` | M3.3 | optional; the feature degrades without them |
+| `WALLEE_SPACE_ID`, `WALLEE_USER_ID`, `WALLEE_API_SECRET`, `WALLEE_WEBHOOK_*` | M4.1 | test space |
+| `CASHMAG_*` | M4.2 | from the CashMag docs |
+| `CRON_SECRET` | M3.1 | protects scheduled-job routes |
+
+## 8. Local stack (`compose.yaml`)
+
+| Service | Image | Port | Purpose |
+|---|---|---|---|
+| `mongo` | `mongo:8` with `--replSet rs0` + an init healthcheck running `rs.initiate()` | 27017 | database with transactions |
+| `mailpit` | `axllent/mailpit` | 1025 SMTP, 8025 UI | e-mail capture |
+| `minio` | `minio/minio` | 9000 / 9001 | S3-compatible media |
+
+`npm run dev` runs Next with Payload. `npm run seed` creates the first admin plus demo catalogue data from the prototype's hard-coded arrays (the products, menu, packages and events in `golden-grape-luxembourg/src/routes/*.tsx`).
+
+## 9. Deployment shape
+
+There is one Docker image (`output: 'standalone'`) that serves the site, the admin and `/staff`. Scheduled jobs (low-stock digest, outbox, reviews refresh, backups) are HTTP routes protected by `CRON_SECRET` and called by the host's cron. This works on any provider with no extra worker process. Production deployment, DNS and live credentials belong to APPLUX (Q§12).
