@@ -40,6 +40,7 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | Q-06 | Voucher VAT treatment and invoice legal mentions (DEP-07) | Golden Grape accountant | M3.2 T5 | Open |
 | Q-07 | Sample CashMag daily sales export (CSV) | APPLUX | M3.3 T5 | Open |
 | Q-08 | Rev 2.2 addendum text: written confirmation of the 4-payment schedule and Phase 2 trigger | APPLUX | — | Open |
+| Q-09 | Which S3 bucket Golden Grape uses. The one in the local `.env` is shared with another project and is not private; the app expects a dedicated private bucket (`02` §7), preferably in an EU region for production | Aniket / APPLUX | M1.3 staging media | Open |
 
 ## 3. Assumptions in force
 
@@ -53,6 +54,11 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-11 | Catering packages have a minimum of 10 guests (the prototype set none) | M1.3 T7 seed | — |
 
 ## 4. Log
+
+### 2026-11-03 · M1.3 · S3 upload check
+- Real upload through the app (`POST /api/media`, admin token) with the `.env` S3 settings, records in a throwaway local database. Original + `thumb` and `card` WebP sizes landed in S3 (`hero` is correctly skipped: the image is narrower than 1920 px). `/api/media/file/…` 200 with 52903 bytes; `next/image` optimizer 200.
+- For AWS S3: `S3_ENDPOINT` stays empty and `S3_REGION` must be the bucket's real region; `auto` only works on R2.
+- The test bucket is not suitable as configured, see Q-09. Three test objects (`golden-grape-upload-test*`) remain in it until Aniket decides.
 
 ### 2026-11-03 · M1.3 report and P1 release gate
 | AC | Result | How verified |
