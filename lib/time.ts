@@ -77,3 +77,54 @@ export const WEEKDAY_OPTIONS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thu
 }));
 export const validateHHmm = (value: unknown) =>
   (typeof value === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(value)) || 'Use HH:mm, e.g. 09:30';
+
+type Slot = { day: string; open: string; close: string };
+
+const minutes = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
+const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+const MONDAY_FIRST = [1, 2, 3, 4, 5, 6, 0];
+
+/** Monday-first week: each day's name in `locale` and its slots ("10:00 — 18:00"); `slots` is '' when closed. */
+export function weekHours(hours: Slot[], locale: string) {
+  const name = new Intl.DateTimeFormat(locale, { weekday: 'long', timeZone: 'UTC' });
+  return MONDAY_FIRST.map((day) => ({
+    day: capitalize(name.format(new Date(Date.UTC(2024, 0, 7 + day)))), // 7 Jan 2024 is a Sunday
+    slots: hours
+      .filter((h) => Number(h.day) === day)
+      .sort((a, b) => minutes(a.open) - minutes(b.open))
+      .map((h) => `${h.open} — ${h.close}`)
+      .join(', '),
+  }));
+}
+
+/** Open days with consecutive equal slots merged: `[{ days: 'Lundi — Vendredi', slots: '10:00 — 18:00' }]`. */
+export function groupedHours(hours: Slot[], locale: string) {
+  const groups: { first: string; last: string; slots: string }[] = [];
+  for (const { day, slots } of weekHours(hours, locale)) {
+    const prev = groups.at(-1);
+    if (slots && prev?.slots === slots) prev.last = day;
+    else groups.push({ first: day, last: day, slots });
+  }
+  return groups
+    .filter((g) => g.slots)
+    .map((g) => ({ days: g.first === g.last ? g.first : `${g.first} — ${g.last}`, slots: g.slots }));
+}
+
+/** Whether the shop is open at `now` in Luxembourg. */
+export function isOpenNow(hours: Slot[], closedDates: { date: string }[], now: Date = new Date()) {
+  if (closedDates.some((c) => today(new Date(c.date)) === today(now))) return false;
+  const local = toLocal(now);
+  const current = local.hour * 60 + local.minute;
+  return hours.some((h) => Number(h.day) === local.weekday && minutes(h.open) <= current && current < minutes(h.close));
+}
+
+/** Event date and time range in Luxembourg: `{ date: 'Vendredi 8 août', time: '19:00 — 23:00' }`. */
+export function eventDate(startsAt: string, endsAt: string | null | undefined, locale: string) {
+  const date = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long', timeZone: TZ });
+  const time = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: TZ });
+  const start = new Date(startsAt);
+  return {
+    date: capitalize(date.format(start)),
+    time: endsAt ? `${time.format(start)} — ${time.format(new Date(endsAt))}` : time.format(start),
+  };
+}

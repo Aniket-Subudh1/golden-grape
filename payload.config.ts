@@ -8,6 +8,7 @@ import sharp from 'sharp';
 import { env, isBuildPhase, s3Configured } from '@/lib/env';
 import { cmsCollections } from '@/modules/cms/collections';
 import { cmsGlobals } from '@/modules/cms/globals';
+import { events } from '@/modules/events/collections';
 import { settingsCollections } from '@/modules/settings/collections';
 import { businessSettings } from '@/modules/settings/globals';
 
@@ -15,7 +16,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default buildConfig({
   admin: { user: 'users', importMap: { baseDir: dirname } },
-  collections: [...settingsCollections, ...cmsCollections],
+  collections: [...settingsCollections, ...cmsCollections, events],
   globals: [businessSettings, ...cmsGlobals],
   db: mongooseAdapter({
     url: isBuildPhase ? false : env.DATABASE_URL,

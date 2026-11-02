@@ -53,6 +53,22 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-02 · M1.3 T4 · Public pages from the CMS
+- **Rendering strategy (Cache Components with no database at build):**
+  - The static shell (dictionary content: hero, universes, craft, story, page headers) prerenders at build.
+  - Every region that reads Payload (nav, footer, store hours, Happy Hour, events, maison, legal, event detail, contact info) is a server component behind `<Suspense>` that streams at request time. The service reads go through `atRequest()` (`lib/payload.ts`: `await connection()` + the module's `'use cache'` read), so they never run during `next build`, yet are cached between requests and expired by the afterChange tags.
+  - `[slug]` pages pass the `params` promise into the suspended child (slug is request-time data).
+  - Consequence: an unknown slug renders the not-found UI with status 200 (+ Next's `noindex`), because the response has already started streaming.
+- New shared components with their first callers: `PageHero` (events, contact, legal, event detail), `MediaCard` + `MediaGrid` (events list, with a full-card link), `Blocks` + `Prose` (maison, legal), `Field size="lg"`, inline-SVG `InstagramIcon`/`FacebookIcon` (footer, contact). New `events` collection (content only: drafts, `startsAt` indexed, `priceCents`, `capacity`, read-only `booked`) + `modules/events/service.ts`.
+- `lib/time.ts`: `weekHours`, `groupedHours`, `isOpenNow`, `eventDate` (Luxembourg time; checked by hand: FR/DE grouping, PT weekdays, closed dates, event time). `components/site/use-now.ts`: the shared request-safe clock (Happy Hour countdown and Store "open now").
+- Pages:
+  - Layout: nav from `Header` (empty href → text), footer from `Footer` + settings (socials, address, phone, e-mail) + published legal pages.
+  - Home: Store (settings hours, open-now label, `mapsUrl` or a Google Maps search), HappyHour from the global (hidden when inactive or unset), Events from the next 3 published events (hidden when none).
+  - `/maison`, `/events`, `/events/[slug]`, `/legal/[slug]`, `/contact` (settings info, 7-day hours, socials, map link block replacing the prototype's broken Mapbox placeholder).
+  - Metadata: localized `meta.contact|events|catering` keys (4 languages, my translations; review with DEP-05) and CMS `seo`/title for maison, legal and events.
+- New keys: `store.openNow/closedNow`, `contactPage.closed`, `eventsPage.empty/back`, `meta.*`.
+- Verified: `npm run check`; **`env -i … next build` passes** (all locale routes ◐ partial prerender); fresh `next dev`: `/fr`, `/en/events`, `/de/contact`, `/pt/maison`, `/fr/legal/cgv` 200 with an **empty CMS** and no errors (guards for unsaved globals and settings). Content checks follow the seed (T7).
+
 ### 2026-11-02 · M1.3 T3 · Media, pages, legal, globals
 - `modules/cms`:
   - `media`: localized required `alt`, `caption`; WebP sizes thumb/card/hero; focal point. `s3Storage` is enabled only when S3 env is set; the bucket stays private and files go through Payload (decision); otherwise local `./media` (gitignored).

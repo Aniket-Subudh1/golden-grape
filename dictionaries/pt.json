@@ -100,7 +100,9 @@
     "hoursLabel": "Horário",
     "hoursValue": "Segunda — Sexta\n10:00 — 18:00",
     "directions": "Direções",
-    "tasting": "Reservar prova"
+    "tasting": "Reservar prova",
+    "openNow": "Aberto agora",
+    "closedNow": "Fechado neste momento"
   },
   "story": {
     "eyebrow": "A nossa filosofia",
@@ -513,7 +515,9 @@
       "toastTitle": "Pedido enviado",
       "toastDesc": "{{title}} · {{count}} pessoas — confirmaremos em breve.",
       "doneTitle": "Pedido enviado. Voltamos em breve."
-    }
+    },
+    "empty": "Sem eventos agendados de momento. Volte em breve — ou escreva-nos para ser o primeiro a saber.",
+    "back": "Todos os eventos"
   },
   "maisonPage": {
     "eyebrow": "A Casa",
@@ -663,7 +667,8 @@
       "doneTitle": "Obrigado {{name}}",
       "doneSubtitle": "A sua mensagem foi recebida. Respondemos em 24h."
     },
-    "mapCaption": "Encontre-nos em Luxemburgo"
+    "mapCaption": "Encontre-nos em Luxemburgo",
+    "closed": "Fechado"
   },
   "auth": {
     "title": "Área do cliente",
@@ -681,6 +686,18 @@
       "description": "A Golden Grape é a casa gourmet portuguesa do Luxemburgo — vinhos raros, petiscos artesanais, catering e provas à sexta-feira. Mäi Wäin.",
       "ogTitle": "Golden Grape · A casa portuguesa do Luxemburgo",
       "ogDescription": "Vinhos portugueses de excelência, mercearia fina, catering e eventos no coração do Luxemburgo."
+    },
+    "contact": {
+      "title": "Contacto — Golden Grape Luxembourg",
+      "description": "Loja, reservas e orçamentos de catering. Venha conhecer a Casa no coração do Luxemburgo."
+    },
+    "events": {
+      "title": "Eventos — Provas & serões · Golden Grape",
+      "description": "Fado, Happy Hour, provas guiadas e mesa do chef em Bissen."
+    },
+    "catering": {
+      "title": "Catering — Receções portuguesas · Golden Grape Luxembourg",
+      "description": "Três propostas de catering portuguesas para as suas receções no Luxemburgo. Pedido em 30 segundos."
     }
   }
 }

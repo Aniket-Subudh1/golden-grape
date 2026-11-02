@@ -100,7 +100,9 @@
     "hoursLabel": "Öffnungszeiten",
     "hoursValue": "Montag — Freitag\n10:00 — 18:00",
     "directions": "Wegbeschreibung",
-    "tasting": "Verkostung buchen"
+    "tasting": "Verkostung buchen",
+    "openNow": "Jetzt geöffnet",
+    "closedNow": "Gerade geschlossen"
   },
   "story": {
     "eyebrow": "Unsere Philosophie",
@@ -513,7 +515,9 @@
       "toastTitle": "Anfrage gesendet",
       "toastDesc": "{{title}} · {{count}} Gäste — wir bestätigen zeitnah.",
       "doneTitle": "Anfrage gesendet. Wir melden uns sehr bald."
-    }
+    },
+    "empty": "Derzeit keine anstehenden Veranstaltungen. Schauen Sie bald wieder vorbei — oder schreiben Sie uns, um als Erste informiert zu werden.",
+    "back": "Alle Events"
   },
   "maisonPage": {
     "eyebrow": "Das Haus",
@@ -663,7 +667,8 @@
       "doneTitle": "Danke {{name}}",
       "doneSubtitle": "Ihre Nachricht ist eingegangen. Wir antworten binnen 24h."
     },
-    "mapCaption": "Uns in Luxemburg finden"
+    "mapCaption": "Uns in Luxemburg finden",
+    "closed": "Geschlossen"
   },
   "auth": {
     "title": "Kundenbereich",
@@ -681,6 +686,18 @@
       "description": "Golden Grape ist Luxemburgs portugiesisches Feinkosthaus — seltene Weine, handgemachte Snacks, Catering und Verkostungen am Freitag. Mäi Wäin.",
       "ogTitle": "Golden Grape · Luxemburgs portugiesisches Haus",
       "ogDescription": "Erlesene portugiesische Weine, Feinkost, Catering und Events im Herzen Luxemburgs."
+    },
+    "contact": {
+      "title": "Kontakt — Golden Grape Luxembourg",
+      "description": "Laden, Reservierungen und Catering-Angebote. Besuchen Sie das Haus im Herzen Luxemburgs."
+    },
+    "events": {
+      "title": "Events — Verkostungen & Abende · Golden Grape",
+      "description": "Fado, Happy Hour, geführte Verkostungen und Chef’s Table in Bissen."
+    },
+    "catering": {
+      "title": "Catering — Portugiesische Empfänge · Golden Grape Luxembourg",
+      "description": "Drei portugiesische Catering-Pakete für Ihre Empfänge in Luxemburg. Anfrage in 30 Sekunden."
     }
   }
 }

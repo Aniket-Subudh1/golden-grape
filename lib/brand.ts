@@ -8,6 +8,5 @@ export const universeEvents = '/brand/universe-events.jpg';
 export const craftCheese = '/brand/craft-cheese.jpg';
 export const craftPort = '/brand/craft-port.jpg';
 export const craftPastel = '/brand/craft-pastel.jpg';
-export const happyHour = '/brand/happy-hour.jpg';
 export const gourmetTable = '/brand/gourmet-table.jpg';
 export const storeInterior = '/brand/store-interior.jpg';

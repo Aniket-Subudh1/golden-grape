@@ -100,7 +100,9 @@
     "hoursLabel": "Horaires",
     "hoursValue": "Lundi — Vendredi\n10:00 — 18:00",
     "directions": "Itinéraire",
-    "tasting": "Réserver une dégustation"
+    "tasting": "Réserver une dégustation",
+    "openNow": "Ouvert maintenant",
+    "closedNow": "Fermé en ce moment"
   },
   "story": {
     "eyebrow": "Notre philosophie",
@@ -513,7 +515,9 @@
       "toastTitle": "Demande envoyée",
       "toastDesc": "{{title}} · {{count}} pers. — nous confirmerons rapidement.",
       "doneTitle": "Demande envoyée. Nous revenons vers vous très vite."
-    }
+    },
+    "empty": "Aucun événement à venir pour le moment. Revenez bientôt — ou écrivez-nous pour être prévenu.",
+    "back": "Tous les événements"
   },
   "maisonPage": {
     "eyebrow": "La Maison",
@@ -663,7 +667,8 @@
       "doneTitle": "Merci {{name}}",
       "doneSubtitle": "Votre message est bien reçu. Nous revenons vers vous sous 24h."
     },
-    "mapCaption": "Nous trouver au Luxembourg"
+    "mapCaption": "Nous trouver au Luxembourg",
+    "closed": "Fermé"
   },
   "auth": {
     "title": "Espace client",
@@ -681,6 +686,18 @@
       "description": "Golden Grape, la maison gourmande portugaise de Luxembourg — vins rares, snacks artisanaux, traiteur et dégustations du vendredi. Mäi Wäin.",
       "ogTitle": "Golden Grape · La maison portugaise de Luxembourg",
       "ogDescription": "Vins portugais d’exception, épicerie fine, traiteur et événements au cœur du Luxembourg."
+    },
+    "contact": {
+      "title": "Contact — Golden Grape Luxembourg",
+      "description": "Boutique, réservations et devis traiteur. Venez rencontrer la Maison au cœur du Luxembourg."
+    },
+    "events": {
+      "title": "Événements — Dégustations & soirées · Golden Grape",
+      "description": "Fado, Happy Hour, dégustations guidées et table du chef à Bissen."
+    },
+    "catering": {
+      "title": "Traiteur — Réceptions portugaises · Golden Grape Luxembourg",
+      "description": "Trois formules traiteur portugaises pour vos réceptions au Luxembourg. Demande en 30 secondes."
     }
   }
 }

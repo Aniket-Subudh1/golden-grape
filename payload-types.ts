@@ -74,6 +74,7 @@ export interface Config {
     media: Media;
     pages: Page;
     legal: Legal;
+    events: Event;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +89,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     legal: LegalSelect<false> | LegalSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -341,7 +343,7 @@ export interface Page {
           }
         | {
             eyebrow?: string | null;
-            titleA: string;
+            titleA?: string | null;
             /**
              * Shown in gold italics
              */
@@ -423,6 +425,32 @@ export interface Legal {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: string;
+  title: string;
+  slug: string;
+  startsAt: string;
+  endsAt?: string | null;
+  image?: (string | null) | Media;
+  description?: string | null;
+  /**
+   * Per person, in cents: 4500 = 45 €. 0 = free.
+   */
+  priceCents: number;
+  capacity?: number | null;
+  booked?: number | null;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -472,6 +500,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'legal';
         value: string | Legal;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: string | Event;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -724,6 +756,30 @@ export interface LegalSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   body?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  startsAt?: T;
+  endsAt?: T;
+  image?: T;
+  description?: T;
+  priceCents?: T;
+  capacity?: T;
+  booked?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

@@ -1,5 +1,5 @@
 import { cacheTag } from 'next/cache';
-import { getPayloadClient } from '@/lib/payload';
+import { atRequest, getPayloadClient } from '@/lib/payload';
 import type { ModuleName } from './globals';
 
 /** Full settings, bank details included: for documents and e-mails only, never sent to a page. */
@@ -9,7 +9,7 @@ export async function getSettingsPrivate() {
 }
 
 /** Public projection for pages, cached until BusinessSettings changes. */
-export async function getSettings() {
+async function settingsCached() {
   'use cache';
   cacheTag('settings');
   const { business: b, hours, closedDates, modules } = await getSettingsPrivate();
@@ -31,6 +31,8 @@ export async function getSettings() {
   };
   return { business, hours: hours ?? [], closedDates: closedDates ?? [], modules };
 }
+
+export const getSettings = atRequest(settingsCached);
 
 export async function isModuleOn(name: ModuleName) {
   const { modules } = await getSettings();

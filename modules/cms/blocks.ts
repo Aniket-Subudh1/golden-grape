@@ -4,11 +4,15 @@ import type { Block, Field } from 'payload';
 // the four languages and an edit in EN never changes FR.
 const text = (name: string, required = false): Field => ({ name, type: 'text', localized: true, required });
 const image = (required = false): Field => ({ name: 'image', type: 'upload', relationTo: 'media', required });
-const heading: Field[] = [text('eyebrow'), text('titleA', true), { ...text('titleB'), admin: { description: 'Shown in gold italics' } } as Field];
+const heading = (required = true): Field[] => [
+  text('eyebrow'),
+  text('titleA', required),
+  { name: 'titleB', type: 'text', localized: true, admin: { description: 'Shown in gold italics' } },
+];
 
 export const hero: Block = {
   slug: 'hero',
-  fields: [...heading, { name: 'subtitle', type: 'textarea', localized: true }, image()],
+  fields: [...heading(), { name: 'subtitle', type: 'textarea', localized: true }, image()],
 };
 
 export const richText: Block = {
@@ -21,7 +25,7 @@ export const mediaText: Block = {
   fields: [
     image(true),
     { name: 'imagePosition', type: 'select', options: ['left', 'right'], defaultValue: 'left', required: true },
-    ...heading,
+    ...heading(),
     { name: 'body', type: 'richText', localized: true },
   ],
 };
@@ -29,7 +33,7 @@ export const mediaText: Block = {
 export const cardGrid: Block = {
   slug: 'cardGrid',
   fields: [
-    ...heading,
+    ...heading(false),
     {
       name: 'variant',
       type: 'select',
@@ -53,7 +57,7 @@ export const cardGrid: Block = {
 export const cta: Block = {
   slug: 'cta',
   fields: [
-    ...heading,
+    ...heading(),
     { name: 'subtitle', type: 'textarea', localized: true },
     {
       name: 'buttons',

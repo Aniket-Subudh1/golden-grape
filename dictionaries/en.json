@@ -100,7 +100,9 @@
     "hoursLabel": "Hours",
     "hoursValue": "Monday — Friday\n10:00 — 18:00",
     "directions": "Directions",
-    "tasting": "Book a tasting"
+    "tasting": "Book a tasting",
+    "openNow": "Open now",
+    "closedNow": "Closed right now"
   },
   "story": {
     "eyebrow": "Our philosophy",
@@ -513,7 +515,9 @@
       "toastTitle": "Request sent",
       "toastDesc": "{{title}} · {{count}} guests — we'll confirm shortly.",
       "doneTitle": "Request sent. We'll be in touch very soon."
-    }
+    },
+    "empty": "No upcoming events right now. Check back soon — or write to us to be told first.",
+    "back": "All events"
   },
   "maisonPage": {
     "eyebrow": "The House",
@@ -663,7 +667,8 @@
       "doneTitle": "Thank you {{name}}",
       "doneSubtitle": "Your message is well received. We'll reply within 24h."
     },
-    "mapCaption": "Find us in Luxembourg"
+    "mapCaption": "Find us in Luxembourg",
+    "closed": "Closed"
   },
   "auth": {
     "title": "Client area",
@@ -681,6 +686,18 @@
       "description": "Golden Grape is Luxembourg’s premium Portuguese gourmet house — rare wines, artisan snacks, catering and Friday tastings. Mäi Wäin.",
       "ogTitle": "Golden Grape · Luxembourg’s Portuguese House",
       "ogDescription": "Premium Portuguese wines, gourmet snacks, catering and events in the heart of Luxembourg."
+    },
+    "contact": {
+      "title": "Contact — Golden Grape Luxembourg",
+      "description": "Shop, reservations and catering quotes. Come and meet the House in the heart of Luxembourg."
+    },
+    "events": {
+      "title": "Events — Tastings & evenings · Golden Grape",
+      "description": "Fado, Happy Hour, guided tastings and the chef’s table in Bissen."
+    },
+    "catering": {
+      "title": "Catering — Portuguese receptions · Golden Grape Luxembourg",
+      "description": "Three Portuguese catering packages for your receptions in Luxembourg. Request in 30 seconds."
     }
   }
 }

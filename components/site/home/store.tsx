@@ -4,13 +4,26 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { Reveal } from '@/components/site/reveal';
+import { useNow } from '@/components/site/use-now';
 import { Button } from '@/components/ui/button';
 import { storeInterior } from '@/lib/brand';
 import type { Dictionary } from '@/lib/i18n';
+import { isOpenNow } from '@/lib/time';
 
-const DIRECTIONS = 'https://www.google.com/maps/search/?api=1&query=25+Zac+Klengbousbierg+7795+Bissen+Luxembourg';
+type Props = {
+  t: Dictionary['store'];
+  address: string[];
+  hours: { days: string; slots: string }[];
+  /** Raw BusinessSettings hours, for the "open now" label. */
+  schedule: { day: string; open: string; close: string }[];
+  closedDates: { date: string }[];
+  directionsHref: string;
+  tastingHref: string;
+};
 
-export function Store({ t, tastingHref }: { t: Dictionary['store']; tastingHref: string }) {
+export function Store({ t, address, hours, schedule, closedDates, directionsHref, tastingHref }: Props) {
+  const now = useNow();
+  const open = now === undefined ? undefined : isOpenNow(schedule, closedDates, new Date(now));
   const ref = useRef<HTMLElement>(null);
   const [offset, setOffset] = useState(0);
 
@@ -56,26 +69,35 @@ export function Store({ t, tastingHref }: { t: Dictionary['store']; tastingHref:
               <p className="mt-8 text-base leading-relaxed font-light text-bone/70">{t.body}</p>
 
               <dl className="mt-10 grid grid-cols-2 gap-x-6 gap-y-6 text-sm font-light">
-                {[
-                  [t.addressLabel, t.addressValue],
-                  [t.hoursLabel, t.hoursValue],
-                ].map(([label, value]) => (
-                  <div key={label}>
-                    <dt className="eyebrow text-bone/50">{label}</dt>
-                    <dd className="mt-2 text-bone">
-                      {value.split('\n').map((line) => (
-                        <span key={line} className="block">
-                          {line}
-                        </span>
-                      ))}
-                    </dd>
-                  </div>
-                ))}
+                <div>
+                  <dt className="eyebrow text-bone/50">{t.addressLabel}</dt>
+                  <dd className="mt-2 text-bone">
+                    {address.map((line) => (
+                      <span key={line} className="block">
+                        {line}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="eyebrow text-bone/50">{t.hoursLabel}</dt>
+                  <dd className="mt-2 space-y-2 text-bone">
+                    {hours.map((h) => (
+                      <span key={h.days} className="block">
+                        <span className="block">{h.days}</span>
+                        <span className="block">{h.slots}</span>
+                      </span>
+                    ))}
+                    {open !== undefined && (
+                      <span className={open ? 'block text-gold' : 'block text-bone/50'}>{open ? t.openNow : t.closedNow}</span>
+                    )}
+                  </dd>
+                </div>
               </dl>
 
               <div className="mt-10 flex flex-wrap items-center gap-6">
                 <Button asChild variant="goldGlass" size="md">
-                  <a href={DIRECTIONS} target="_blank" rel="noopener noreferrer">
+                  <a href={directionsHref} target="_blank" rel="noopener noreferrer">
                     {t.directions}
                     <span className="transition-transform group-hover:translate-x-1">→</span>
                   </a>

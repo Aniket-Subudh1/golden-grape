@@ -1,23 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { useSyncExternalStore } from 'react';
 import { Reveal } from '@/components/site/reveal';
-import { happyHour } from '@/lib/brand';
+import { useNow } from '@/components/site/use-now';
 import { type Dictionary, type Locale, rich } from '@/lib/i18n';
 import { nextWeekly, TZ } from '@/lib/time';
 
-// Wednesday to Friday from 17:00 until the HappyHour global replaces these in M1.3.
-const DAYS = [3, 4, 5];
-const START = '17:00';
-
-// A clock in whole seconds; undefined on the server, so the prerender never bakes in a stale time.
-const subscribe = (tick: () => void) => {
-  const id = setInterval(tick, 1000);
-  return () => clearInterval(id);
-};
-const nowSeconds = () => Math.floor(Date.now() / 1000) * 1000;
-const noTime = () => undefined;
 
 function Unit({ value, label }: { value: number | undefined; label: string }) {
   return (
@@ -30,10 +18,12 @@ function Unit({ value, label }: { value: number | undefined; label: string }) {
   );
 }
 
-export function HappyHour({ t, locale }: { t: Dictionary['happyHour']; locale: Locale }) {
-  const now = useSyncExternalStore(subscribe, nowSeconds, noTime);
+type Content = { titleA: string; titleB?: string | null; text?: string | null; image?: string | null; days: number[]; from: string };
 
-  const target = now === undefined ? undefined : nextWeekly(DAYS, START, new Date(now));
+export function HappyHour({ t, locale, content }: { t: Dictionary['happyHour']; locale: Locale; content: Content }) {
+  const now = useNow();
+
+  const target = now === undefined ? undefined : nextWeekly(content.days, content.from, new Date(now));
   const s = target && now !== undefined ? Math.max(0, Math.floor((target.getTime() - now) / 1000)) : undefined;
   const part = (fn: (s: number) => number) => (s === undefined ? undefined : fn(s));
   const dateLabel = target?.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long', timeZone: TZ });
@@ -41,7 +31,7 @@ export function HappyHour({ t, locale }: { t: Dictionary['happyHour']; locale: L
   return (
     <section id="happy-hour" className="relative overflow-hidden bg-ink text-bone">
       <div className="absolute inset-0">
-        <Image src={happyHour} alt="" fill sizes="100vw" className="object-cover opacity-40" />
+        {content.image && <Image src={content.image} alt="" fill sizes="100vw" className="object-cover opacity-40" />}
         <div className="absolute inset-0 bg-gradient-to-b from-ink via-ink/80 to-ink" />
       </div>
 
@@ -49,17 +39,23 @@ export function HappyHour({ t, locale }: { t: Dictionary['happyHour']; locale: L
         <Reveal>
           <span className="eyebrow text-gold">{t.eyebrow}</span>
           <h2 className="mt-6 font-serif text-4xl leading-[1.05] font-light md:text-6xl">
-            {t.titleA}
-            <br />
-            <span className="text-gold-gradient italic">{t.titleB}</span>
+            {content.titleA}
+            {content.titleB && (
+              <>
+                <br />
+                <span className="text-gold-gradient italic">{content.titleB}</span>
+              </>
+            )}
           </h2>
-          <p className="mx-auto mt-6 max-w-lg text-base font-light text-bone/70 md:text-lg">
-            {rich(t.subtitle, (chunk, key) => (
-              <span key={key} className="text-gold">
-                {chunk}
-              </span>
-            ))}
-          </p>
+          {content.text && (
+            <p className="mx-auto mt-6 max-w-lg text-base font-light text-bone/70 md:text-lg">
+              {rich(content.text, (chunk, key) => (
+                <span key={key} className="text-gold">
+                  {chunk}
+                </span>
+              ))}
+            </p>
+          )}
         </Reveal>
 
         <Reveal delay={200}>
@@ -72,7 +68,7 @@ export function HappyHour({ t, locale }: { t: Dictionary['happyHour']; locale: L
           {/* The reserve button returns with table reservations (M2.3). */}
           <div className="mt-10 flex flex-col items-center gap-6">
             <span className="min-h-5 text-sm font-light text-bone/60">
-              {dateLabel && `${t.nextPour} · ${dateLabel} · ${START}`}
+              {dateLabel && `${t.nextPour} · ${dateLabel} · ${content.from}`}
             </span>
           </div>
         </Reveal>

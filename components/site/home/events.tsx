@@ -2,10 +2,10 @@ import Link from 'next/link';
 import { Container } from '@/components/site/container';
 import type { Dictionary } from '@/lib/i18n';
 
-const KEYS = ['friday', 'golden', 'tasting'] as const;
+export type HomeEvent = { id: string; date: string; time: string; title: string; description?: string | null };
 
 // The per-event "Reserve" line is not rendered until event booking exists (M2.3).
-export function Events({ t, calendarHref }: { t: Dictionary['eventsHome']; calendarHref: string }) {
+export function Events({ t, events, calendarHref }: { t: Dictionary['eventsHome']; events: HomeEvent[]; calendarHref: string }) {
   return (
     <section id="events" className="relative bg-champagne py-24 md:py-40">
       <Container>
@@ -27,14 +27,14 @@ export function Events({ t, calendarHref }: { t: Dictionary['eventsHome']; calen
         </div>
 
         <div className="grid grid-cols-1 gap-px bg-border md:grid-cols-3">
-          {KEYS.map((k) => (
-            <article key={k} className="group bg-champagne p-8 transition-colors hover:bg-bone md:p-10">
+          {events.map((e) => (
+            <article key={e.id} className="group bg-champagne p-8 transition-colors hover:bg-bone md:p-10">
               <div className="flex items-baseline justify-between">
-                <span className="eyebrow text-gold-deep">{t.items[k].date}</span>
-                <span className="text-xs font-light text-muted-foreground">{t.items[k].time}</span>
+                <span className="eyebrow text-gold-deep">{e.date}</span>
+                <span className="text-xs font-light text-muted-foreground">{e.time}</span>
               </div>
-              <h3 className="mt-8 font-serif text-3xl font-light text-ink md:text-4xl">{t.items[k].title}</h3>
-              <p className="mt-4 text-sm leading-relaxed font-light text-muted-foreground">{t.items[k].desc}</p>
+              <h3 className="mt-8 font-serif text-3xl font-light text-ink md:text-4xl">{e.title}</h3>
+              {e.description && <p className="mt-4 text-sm leading-relaxed font-light text-muted-foreground">{e.description}</p>}
             </article>
           ))}
         </div>
