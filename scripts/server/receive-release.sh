@@ -27,9 +27,9 @@ rm -rf "$INCOMING/.next/cache"
 ln -s "$BASE/shared/next-cache" "$INCOMING/.next/cache"      # optimised images survive deployments
 
 RELEASE="$BASE/releases/$SHA"
+# Re-running a deployment of the same commit must not touch the release that is serving.
+[ -e "$RELEASE" ] && RELEASE="$RELEASE-$(date +%s)"
 PREVIOUS="$(readlink -f "$BASE/current" 2>/dev/null || true)"
-if [ "$PREVIOUS" = "$RELEASE" ]; then PREVIOUS=""; fi
-rm -rf "$RELEASE"
 mv "$INCOMING" "$RELEASE"
 
 switch_to() {

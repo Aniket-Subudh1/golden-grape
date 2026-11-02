@@ -57,7 +57,11 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ### 2026-11-03 · Redeploy on push
 - Requested by Aniket. Setup and paths are in `02-ARCHITECTURE.md` §9; server files in `scripts/server/`.
-- Needs one repository secret, `DEPLOY_SSH_KEY` (Aniket adds it in GitHub). The CI path itself runs for the first time on the first push.
+- **Not active yet.** Two manual steps remain for Aniket: authorise the deploy key on the server (my attempt to add it to `authorized_keys` was stopped by the session's permission rules) and add the `DEPLOY_SSH_KEY` repository secret. The private key is in `~/.ssh/golden-grape-deploy` on Aniket's machine. The GitHub Actions path itself has never run; it runs for the first time on the next push to `main`.
+- The server side is live: new layout, pm2 cluster mode, receive script, nginx with HTTP/2, gzip, security headers, and `/_next/static` served from disk. This commit's predecessor was deployed through the receive script.
+- Verified by test: redeploy under load, 0 of 24 requests failed, 4 s. A deliberately broken release: rejected (exit 1), rolled back automatically, site unaffected. Re-deploying the same commit no longer touches the serving release.
+- Measured on the server: `/fr` first byte 5–8 ms, complete 26–70 ms; repeat optimised image 2 ms. Server in Germany.
+- Production content reseeded with the real photos; the 11 old stand-ins were removed from the CMS and the bucket.
 
 ### 2026-11-03 · Prototype fidelity and visual polish (requested by Aniket)
 - **Real photos:** the originals behind the prototype's CDN pointers are downloadable from `golden-grape-luxembourg.lovable.app`. All 45 fetched, sizes verified against `.asset.json`; the 44 brand photos are in `public/brand/<group>/` (the unused alternative logo jpg is not copied). The stand-in jpgs are gone. `lib/brand.ts` and the seed use the prototype's exact slot → file mapping (home, maison, packages, events).
