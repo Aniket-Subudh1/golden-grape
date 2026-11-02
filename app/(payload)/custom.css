@@ -1,48 +1,53 @@
 /*
- * Golden Grape admin theme: PgMaster owner layout (floating cards on a soft canvas, split login)
- * in Golden Grape colours. Only Payload's CSS variables and its stable BEM classes are touched
- * (Payload is pinned to 3.92.1). One light theme: `admin.theme: 'light'` in payload.config.ts.
+ * Golden Grape admin, laid out like the CUTM LMS dashboard: a white frame (sidebar + header) around a grey content
+ * panel with a round top-left corner; crisp pages with hairline cards and small corners; Golden Grape colours.
+ * Only Payload's CSS variables and its stable BEM classes are touched (Payload is pinned to 3.92.1).
+ * The sidebar (components/admin/nav*.tsx) and the dashboard (components/admin/dashboard.tsx) are our own components.
  */
 
 /* ---- Tokens ---------------------------------------------------------------------------------- */
 :root {
-  --gg-ink: #14110d;
-  --gg-ink-2: #241f18;
-  --gg-bone: #f7f4ee;
-  --gg-canvas: #f1ede5;
+  --gg-ink: #1a1712;
+  --gg-text-2: #6b6457;
+  --gg-panel: #f4f2ee;
+  --gg-frame: #ffffff;
+  --gg-line: #e7e2d8;
+  --gg-line-2: #d9d2c4;
+  --gg-accent: #f6f3ec;
   --gg-gold: #c9a24a;
-  --gg-gold-deep: #96702a;
-  --gg-gold-tint: #f6ecd6;
-  --gg-line: #e6e0d4;
-  --gg-shadow-card: 0 1px 2px rgb(20 17 13 / 0.05), 0 0 0 1px rgb(20 17 13 / 0.03);
-  --gg-shadow-raised: 0 10px 30px -12px rgb(20 17 13 / 0.18);
+  --gg-primary: #8f6a24;
+  --gg-primary-tint: #f6eedb;
+  --gg-danger: #b3261e;
+  --gg-danger-tint: #fbeceb;
+  --gg-warning: #9a5b00;
+  --gg-warning-tint: #fdf2df;
 
-  /* Payload's neutral scale, warmed from white (0) to ink (1000). */
+  /* Payload's neutral scale, warm, from white (0) to ink (1000). */
   --color-base-0: #ffffff;
-  --color-base-50: #f8f6f1;
-  --color-base-100: #efebe3;
-  --color-base-150: #e6e0d4;
-  --color-base-200: #d9d1c2;
-  --color-base-250: #cbc2b1;
-  --color-base-300: #bab09d;
-  --color-base-350: #a89d89;
-  --color-base-400: #968b77;
-  --color-base-450: #847966;
-  --color-base-500: #726856;
-  --color-base-550: #625948;
-  --color-base-600: #534b3c;
-  --color-base-650: #453e31;
-  --color-base-700: #383227;
-  --color-base-750: #2d281f;
-  --color-base-800: #241f18;
-  --color-base-850: #1c1813;
-  --color-base-900: #16130f;
-  --color-base-950: #110e0b;
+  --color-base-50: #f8f6f2;
+  --color-base-100: #f0ece5;
+  --color-base-150: #e7e2d8;
+  --color-base-200: #d9d2c4;
+  --color-base-250: #cbc3b3;
+  --color-base-300: #bbb2a0;
+  --color-base-350: #aaa08d;
+  --color-base-400: #988e7b;
+  --color-base-450: #867c69;
+  --color-base-500: #746b59;
+  --color-base-550: #645b4a;
+  --color-base-600: #554d3e;
+  --color-base-650: #473f32;
+  --color-base-700: #3a3328;
+  --color-base-750: #2f2920;
+  --color-base-800: #26211a;
+  --color-base-850: #1e1a14;
+  --color-base-900: #1a1712;
+  --color-base-950: #120f0c;
   --color-base-1000: #0b0907;
 
-  /* "Success" drives links, selections and highlights in Payload: make it gold. */
+  /* "Success" drives links, selections and highlights in Payload: the brand gold. */
   --color-success-50: #fbf7ee;
-  --color-success-100: #f6ecd6;
+  --color-success-100: #f6eedb;
   --color-success-150: #efdfba;
   --color-success-200: #e7d19d;
   --color-success-250: #dfc381;
@@ -51,7 +56,7 @@
   --color-success-400: #c9a24a;
   --color-success-450: #b8913f;
   --color-success-500: #a68137;
-  --color-success-550: #96702a;
+  --color-success-550: #8f6a24;
   --color-success-600: #855f22;
   --color-success-650: #73511d;
   --color-success-700: #624418;
@@ -61,17 +66,29 @@
   --color-success-900: #251908;
   --color-success-950: #181005;
 
-  --style-radius-s: 8px;
-  --style-radius-m: 12px;
-  --style-radius-l: 16px;
-  --font-body: var(--gg-font-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-serif: var(--gg-font-serif), Georgia, serif;
+  --style-radius-s: 4px;
+  --style-radius-m: 6px;
+  --style-radius-l: 10px;
+  --font-body: var(--gg-font-sans), ui-sans-serif, system-ui, sans-serif;
+  --nav-width: 264px;
+  --app-header-height: 64px;
+}
+/* Phones: the menu covers the screen, as Payload intends. */
+@media (max-width: 768px) {
+  :root {
+    --nav-width: 100vw;
+  }
 }
 
 html[data-theme='light'] {
-  --theme-bg: var(--gg-canvas);
+  --theme-bg: var(--gg-panel);
   --theme-input-bg: #ffffff;
   --theme-text: var(--gg-ink);
+}
+
+html,
+body {
+  background: var(--gg-frame);
 }
 
 ::selection {
@@ -80,268 +97,437 @@ html[data-theme='light'] {
 }
 
 *:focus-visible {
-  outline: 2px solid var(--gg-gold-deep);
+  outline: 2px solid var(--gg-primary);
   outline-offset: 2px;
 }
 
-/* Headings in the brand serif. */
+/* Titles in the sans, semibold and tight, like the LMS. */
 h1,
 h2,
-.render-title,
+h3,
 .doc-header__title,
-.list-header h1 {
-  font-family: var(--font-serif);
-  font-weight: 500;
-  letter-spacing: -0.01em;
+.list-header__title {
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.doc-header__title,
+.list-header__title {
+  font-size: 22px;
+  line-height: 1.3;
 }
 
 /* ---- Buttons --------------------------------------------------------------------------------- */
 .btn--style-primary {
-  --color: var(--gg-bone);
+  --color: #ffffff;
   --bg-color: var(--gg-ink);
-  --hover-bg: var(--gg-gold-deep);
+  --hover-bg: var(--gg-primary);
   --hover-color: #ffffff;
-  border-radius: 999px;
 }
 .btn--style-secondary {
-  --hover-bg: var(--gg-gold-tint);
-  border-radius: 999px;
-}
-.btn--style-pill {
-  border-radius: 999px;
+  --hover-bg: var(--gg-accent);
 }
 
-/* ---- Login and the other auth screens (PgMaster owner split layout) -------------------------- */
-.template-minimal {
-  min-height: 100dvh;
-  background:
-    radial-gradient(120% 70% at 50% 0%, rgb(201 162 74 / 0.12), transparent 70%),
-    var(--gg-bone);
+.gg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--gg-line-2);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--gg-ink);
+  font: 500 13px/1 var(--font-body);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
 }
-.template-minimal__wrap {
-  width: 100%;
-  max-width: 400px;
-  margin-inline: auto;
+.gg-btn:hover {
+  background: var(--gg-accent);
+  border-color: var(--gg-gold);
 }
-.gg-admin-logo {
-  display: block;
-  width: auto;
-  height: 96px;
-  margin-inline: auto;
+.gg-btn svg {
+  width: 16px;
+  height: 16px;
+  color: var(--gg-primary);
 }
-.login__brand {
-  margin-bottom: 1.5rem;
+.gg-btn--primary {
+  border-color: var(--gg-ink);
+  background: var(--gg-ink);
+  color: #ffffff;
 }
-.template-minimal .form-submit .btn {
-  width: 100%;
-  margin-top: 0.5rem;
+.gg-btn--primary svg {
+  color: var(--gg-gold);
 }
-.template-minimal input {
-  border-radius: 10px;
+.gg-btn--primary:hover {
+  background: var(--gg-primary);
+  border-color: var(--gg-primary);
 }
-
-.gg-login-pane {
+/* List pages: our "Create" opens a drawer, so Payload's link to a separate page goes. */
+body:has(.gg-create) .list-create-new-doc__create-new-button {
   display: none;
 }
-.gg-login-head {
-  margin-bottom: 1.75rem;
-  text-align: center;
+
+/* ---- Frame: white sidebar and header, grey panel with a round corner ------------------------- */
+.template-default {
+  background: var(--gg-frame);
 }
-.gg-login-head h1 {
-  margin: 0;
-  font-size: 2.4rem;
-  line-height: 1.1;
-}
-.gg-login-head p {
-  margin: 0.4rem 0 0;
-  font-size: 0.875rem;
-  color: var(--color-base-500);
+.template-default__wrap {
+  min-height: 100vh;
+  background: var(--gg-panel);
 }
 
-@media (min-width: 1024px) {
-  .template-minimal {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0;
-    background: #ffffff;
-  }
-  /* The photo pane: the login screen fills it with its content, the other auth screens show the photo. */
-  .template-minimal::before {
+.app-header {
+  height: var(--app-header-height);
+  background: var(--gg-frame);
+}
+/* The panel's round top-left corner under the header. */
+@media (min-width: 769px) {
+  .app-header::after {
     content: '';
-    grid-column: 1;
-    grid-row: 1;
-    background:
-      linear-gradient(160deg, rgb(20 17 13 / 0.55), rgb(20 17 13 / 0.92)),
-      url('/brand/home-store/Home_9.jpg') center / cover;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 28px;
+    height: 28px;
+    background: radial-gradient(circle at 100% 100%, transparent 27.5px, var(--gg-frame) 28px);
+    pointer-events: none;
   }
-  .template-minimal__wrap {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: center;
-    padding: 3rem 0;
-  }
-  .template-minimal:has(.gg-login-pane) .login__brand {
+}
+.app-header__bg {
+  display: none;
+}
+.app-header__actions,
+.app-header__actions-wrapper {
+  max-width: none;
+}
+.step-nav {
+  font-size: 14px;
+  color: var(--gg-text-2);
+}
+.step-nav a {
+  color: var(--gg-text-2);
+  text-decoration: none;
+}
+.step-nav a:hover {
+  color: var(--gg-ink);
+}
+.localizer-button {
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--gg-line);
+  border-radius: 999px;
+  font-size: 13px;
+}
+.gg-admin-icon {
+  width: auto;
+  height: 22px;
+}
+
+/* The menu button: on desktops the sidebar stays open (nav-client.tsx), so there is none; below 1025 px the button in
+   the header opens it (Payload shows that one on phones only, and a floating one on tablets that covers the header). */
+@media (min-width: 1025px) {
+  .template-default__nav-toggler-wrapper {
     display: none;
   }
-  .gg-login-head {
-    text-align: left;
+}
+/* Below that, the floating one stays only as the keyboard entry (Payload's header button is not focusable), as Payload
+   itself does on phones. */
+@media (max-width: 1024px) {
+  .template-default__nav-toggler-wrapper .hamburger {
+    display: none;
   }
-  .gg-login-pane {
-    position: fixed;
-    inset: 0 50% 0 0;
-    display: block;
-    overflow: hidden;
-    color: var(--gg-bone);
-    box-shadow: 12px 0 32px rgb(20 17 13 / 0.12);
-  }
-  .gg-login-pane__photo {
-    object-fit: cover;
-  }
-  .gg-login-pane__shade {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(160deg, rgb(20 17 13 / 0.45), rgb(20 17 13 / 0.92)),
-      url('/brand/azulejo.svg') 0 0 / 96px 96px;
-    background-blend-mode: normal, soft-light;
-  }
-  .gg-login-pane__content {
-    position: relative;
+  .app-header__mobile-nav-toggler {
     display: flex;
-    height: 100%;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 3.5rem 4rem;
+    align-items: center;
   }
-  .gg-login-pane__logo {
-    width: 150px !important;
-    max-width: none;
-    height: auto !important;
-  }
-  .gg-login-pane__title {
-    margin: 0;
-    max-width: 26rem;
-    font-family: var(--font-serif);
-    font-size: clamp(2.25rem, 3.2vw, 3.25rem);
-    font-weight: 300;
-    line-height: 1.05;
-  }
-  .gg-login-pane__title em {
-    color: var(--gg-gold);
-  }
-  .gg-login-pane__text {
-    margin: 1rem 0 0;
-    font-size: 0.75rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: rgb(247 244 238 / 0.7);
-  }
-  .gg-login-pane__foot {
-    margin: 0;
-    font-size: 0.8rem;
-    color: rgb(247 244 238 / 0.55);
+}
+.app-header__mobile-nav-toggler {
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--gg-line);
+  background: #ffffff;
+}
+.app-header__mobile-nav-toggler .hamburger {
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+}
+/* Phones: the header's create button keeps only its icon so the account avatar fits. */
+@media (max-width: 768px) {
+  .app-header .gg-btn {
+    gap: 0;
+    padding: 0 10px;
+    font-size: 0;
   }
 }
 
-/* ---- App shell: floating sidebar and header cards on the canvas ----------------------------- */
-.template-default {
-  background: var(--gg-canvas);
+/* ---- Sidebar (components/admin/nav-client.tsx) ---------------------------------------------- */
+.gg-nav {
+  border: 0 !important;
+  background: var(--gg-frame);
 }
-
-@media (min-width: 1025px) {
-  .nav {
-    top: 12px;
-    height: calc(100vh - 24px);
-    margin: 12px 0 12px 12px;
-    border: 1px solid var(--gg-line) !important;
-    border-radius: 18px;
-    background: #ffffff;
-    box-shadow: var(--gg-shadow-raised);
-  }
-  .template-default__wrap {
-    padding: 12px 12px 12px 12px;
-  }
-  .app-header {
-    top: 12px;
-  }
-  .app-header__bg,
-  .app-header__wrapper {
-    border-radius: 16px;
-  }
-  .app-header__bg {
-    background: #ffffff;
-    box-shadow: var(--gg-shadow-card);
-  }
+.gg-nav__scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  height: 100%;
+  padding: 16px 12px 12px !important;
 }
-
-.nav__link {
-  border-radius: 10px;
-  padding-inline: 10px;
-  margin-inline: -10px;
-  font-size: 0.9rem;
-  line-height: 2rem;
-  color: var(--color-base-700);
-  transition:
-    background-color 0.2s,
-    color 0.2s;
-}
-.nav__link:hover {
-  background: var(--color-base-50);
-  color: var(--gg-ink);
-}
-.nav__link.active,
-.nav__link[aria-current='page'] {
-  background: var(--gg-gold-tint);
-  color: var(--gg-ink);
-  font-weight: 500;
-}
-.nav__link-indicator {
-  display: none;
-}
-.nav-group__toggle {
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--gg-gold-deep);
-}
-.gg-nav-brand {
+.gg-nav__top {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin: 0 0 1.25rem;
-  padding: 0.25rem 0 1.25rem;
-  border-bottom: 1px solid var(--gg-line);
+  gap: 8px;
+}
+.gg-nav__brand {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgb(201 162 74 / 0.05), rgb(201 162 74 / 0.16));
+  box-shadow: inset 0 0 0 1px rgb(201 162 74 / 0.22);
   color: var(--gg-ink);
   text-decoration: none;
 }
-.gg-nav-brand__mark {
-  width: auto;
-  height: 40px;
-}
-.gg-nav-brand__name {
-  display: block;
-  font-family: var(--font-serif);
-  font-size: 1.35rem;
-  line-height: 1;
-}
-.gg-nav-brand__sub {
-  display: block;
-  margin-top: 0.3rem;
-  font-size: 0.62rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--gg-gold-deep);
-}
-.nav-toggler,
-.nav__log-out {
+.gg-nav__brand-tile {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 40px;
+  height: 46px;
   border-radius: 10px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgb(201 162 74 / 0.22);
 }
+.gg-nav__brand-tile img {
+  width: auto;
+  height: 30px;
+}
+.gg-nav__brand-text {
+  display: grid;
+  gap: 2.4px;
+  min-width: 0;
+  line-height: 1.2;
+}
+.gg-nav__brand-name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.gg-nav__brand-name b {
+  color: var(--gg-primary);
+  font-weight: 700;
+}
+.gg-nav__brand-sub {
+  font-size: 12px;
+  color: var(--gg-text-2);
+}
+.gg-nav__close {
+  display: none;
+}
+.gg-nav__groups {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  padding: 16px 0 12px;
+}
+.gg-nav__group {
+  display: grid;
+  gap: 2px;
+  padding-top: 10px;
+}
+.gg-nav__group-label {
+  margin: 0 0 2px;
+  padding: 0 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgb(26 23 18 / 0.6);
+}
+.gg-nav__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 36px;
+  padding: 0 6px;
+  border-radius: 8px;
+  color: rgb(26 23 18 / 0.82);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+.gg-nav__item:hover {
+  background: var(--gg-accent);
+  color: var(--gg-ink);
+}
+.gg-nav__chip {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--gg-accent);
+  transition: background-color 0.15s;
+}
+.gg-nav__item:hover .gg-nav__chip {
+  background: var(--gg-line);
+}
+.gg-nav__chip svg {
+  width: 16px;
+  height: 16px;
+}
+.gg-nav__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gg-nav__item[data-active] {
+  color: var(--gg-primary);
+  font-weight: 600;
+}
+.gg-nav__item[data-active] .gg-nav__chip {
+  background: var(--gg-primary-tint);
+  box-shadow: inset 0 0 0 1px rgb(143 106 36 / 0.3);
+  color: var(--gg-primary);
+}
+.gg-nav__foot {
+  display: grid;
+  gap: 2px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--gg-line);
+}
+@media (max-width: 1024px) {
+  .gg-nav__close {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--gg-line);
+    cursor: pointer;
+  }
+  .gg-nav__close svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* ---- Lists ----------------------------------------------------------------------------------- */
+.collection-list__wrap {
+  padding-top: 28px !important;
+}
+.list-controls__wrap,
+.search-filter {
+  border-radius: 6px;
+}
+.table table {
+  overflow: hidden;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px var(--gg-line);
+}
+.table thead th {
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gg-text-2);
+}
+.table tbody tr {
+  border-top: 1px solid var(--gg-line);
+}
+.table tbody tr:nth-child(odd) td {
+  background: transparent;
+}
+.table tbody tr:hover td {
+  background: var(--gg-accent);
+}
+.table a {
+  color: var(--gg-ink);
+  font-weight: 500;
+  text-decoration: none;
+}
+.table a:hover {
+  color: var(--gg-primary);
+  text-decoration: underline;
+}
+
+/* ---- Documents: the form sits in a card at a readable width, the side fields in a second card ---- */
+.doc-controls {
+  background: var(--gg-panel);
+}
+.document-fields__fields,
+.document-fields__sidebar-fields > .render-fields:not(:empty) {
+  padding: 28px 32px;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px var(--gg-line);
+}
+.document-fields__fields {
+  max-width: 864px;
+}
+.document-fields__sidebar-fields > .render-fields:not(:empty) {
+  margin-top: calc(var(--base) * 1.5);
+  padding: 20px 24px;
+}
+.document-fields__sidebar-wrap,
+.document-fields__edit {
+  border: 0 !important;
+}
+/* Inside the card, Payload's full-bleed tabs and groups would run past its edges. */
+.document-fields__fields .tabs-field,
+.document-fields__fields .group-field--top-level {
+  margin-inline: 0;
+}
+.document-fields__fields .tabs-field__content-wrap,
+.document-fields__fields .group-field--top-level {
+  padding-inline: 0;
+}
+.document-fields--has-sidebar .document-fields__fields {
+  max-width: none;
+}
+@media (max-width: 768px) {
+  .document-fields__fields {
+    padding: 20px 16px;
+  }
+}
+
+.tabs-field__tabs {
+  gap: 4px;
+  border-bottom: 1px solid var(--gg-line);
+}
+.tabs-field__tab-button {
+  padding: 9.6px 14.4px;
+  border-radius: 6px 6px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gg-text-2);
+}
+.tabs-field__tab-button--active {
+  color: var(--gg-primary);
+  box-shadow: inset 0 -2px 0 var(--gg-primary);
+}
+
 /* Payload's document meta row (last modified / created) does not wrap on phones and widens the page. */
 @media (max-width: 768px) {
   .doc-controls .doc-controls__meta {
     flex-wrap: wrap;
-    row-gap: 0.25rem;
+    row-gap: 4px;
     min-width: 0;
   }
   .doc-controls .doc-controls__value {
@@ -353,200 +539,413 @@ h2,
     overflow-x: clip;
   }
 }
-.gg-admin-icon {
-  width: auto;
-  height: 28px;
-}
 
-/* ---- Content: lists, documents and cards ---------------------------------------------------- */
-.card {
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: var(--gg-shadow-card);
-  transition:
-    box-shadow 0.25s,
-    transform 0.25s;
+/* ---- Dashboard (components/admin/dashboard.tsx) ---------------------------------------------- */
+.gg-page {
+  padding: 28px var(--gutter-h) 48px;
 }
-.card--has-onclick:hover {
-  box-shadow:
-    var(--gg-shadow-raised),
-    0 0 0 1px var(--gg-gold);
-  transform: translateY(-2px);
-}
-.table table {
-  background: #ffffff;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: var(--gg-shadow-card);
-}
-.table thead th {
-  font-size: 0.7rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-base-500);
-}
-.table tbody tr {
-  border-top: 1px solid var(--gg-line);
-}
-.table tbody tr:hover td {
-  background: var(--color-base-50);
-}
-.pill {
-  border-radius: 999px;
-}
-
-/* ---- Dashboard home (components/admin/dashboard-home.tsx) ----------------------------------- */
-.gg-dash {
+.gg-home {
   display: grid;
-  gap: 16px;
-  margin-bottom: 2.5rem;
+  align-content: start;
+  gap: 20px;
 }
-.gg-dash__hero {
-  position: relative;
+.gg-home__title {
   display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 2rem;
-  overflow: hidden;
-  padding: 2rem 2.25rem;
-  border-radius: 20px;
-  color: var(--gg-bone);
-  background:
-    radial-gradient(90% 140% at 100% 0%, rgb(201 162 74 / 0.28), transparent 60%),
-    url('/brand/azulejo.svg') 0 0 / 96px 96px,
-    var(--gg-ink);
-  background-blend-mode: normal, soft-light, normal;
-  box-shadow: var(--gg-shadow-raised);
+  gap: 4px 16px;
 }
-.gg-dash__eyebrow {
+.gg-home__title h1 {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 10px;
   margin: 0;
-  font-size: 0.7rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--gg-gold);
+  font-size: 20px;
 }
-.gg-dash__eyebrow svg {
+.gg-home__title-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--gg-primary-tint);
+  color: var(--gg-primary);
+}
+.gg-home__title-icon svg {
+  width: 18px;
+  height: 18px;
+}
+.gg-home__title p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--gg-text-2);
+}
+.gg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.gg-home__grid {
+  display: grid;
+  align-items: start;
+  gap: 16px;
+}
+@media (min-width: 1100px) {
+  .gg-home__grid {
+    grid-template-columns: minmax(0, 1fr) 352px;
+  }
+}
+.gg-home__col {
+  display: grid;
+  min-width: 0;
+  gap: 16px;
+}
+
+.gg-card {
+  overflow: hidden;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px var(--gg-line);
+}
+.gg-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 12px;
+}
+.gg-card__head h2 {
+  margin: 0;
+  font-size: 15px;
+}
+.gg-card__head p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--gg-text-2);
+}
+.gg-card__more {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gg-text-2);
+  text-decoration: none;
+}
+.gg-card__more:hover {
+  color: var(--gg-ink);
+}
+.gg-card__more svg {
   width: 14px;
   height: 14px;
 }
-.gg-dash__title {
-  margin: 0.75rem 0 0;
-  font-family: var(--font-serif);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 300;
-  line-height: 1.05;
-  color: #ffffff;
-}
-.gg-dash__title em {
-  color: var(--gg-gold);
-}
-.gg-dash__lead {
-  margin: 0.75rem 0 0;
-  max-width: 34rem;
-  color: rgb(247 244 238 / 0.7);
-}
-.gg-dash__hero-mark {
-  flex-shrink: 0;
-  align-self: center;
-  width: auto;
-  height: 92px;
-  opacity: 0.9;
-}
-.gg-dash__stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-}
-.gg-dash__stat {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas: 'icon value' 'label label' 'hint hint';
-  align-items: center;
-  gap: 0.25rem 0.9rem;
-  padding: 1.25rem 1.4rem;
-  border-radius: 16px;
-  background: #ffffff;
-  color: var(--gg-ink);
-  text-decoration: none;
-  box-shadow: var(--gg-shadow-card);
-  transition:
-    box-shadow 0.25s,
-    transform 0.25s;
-}
-.gg-dash__stat:hover {
-  box-shadow:
-    var(--gg-shadow-raised),
-    0 0 0 1px var(--gg-gold);
-  transform: translateY(-2px);
-}
-.gg-dash__stat-icon {
-  grid-area: icon;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: var(--gg-gold-tint);
-  color: var(--gg-gold-deep);
-}
-.gg-dash__stat-icon svg {
-  width: 20px;
-  height: 20px;
-}
-.gg-dash__stat-value {
-  grid-area: value;
-  justify-self: end;
-  font-family: var(--font-serif);
-  font-size: 2.5rem;
-  line-height: 1;
-}
-.gg-dash__stat-label {
-  grid-area: label;
-  margin-top: 0.75rem;
-  font-weight: 500;
-}
-.gg-dash__stat-hint {
-  grid-area: hint;
-  font-size: 0.8rem;
-  color: var(--color-base-500);
-}
-.gg-dash__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.gg-dash__action {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.1rem;
-  border: 1px solid var(--gg-line);
-  border-radius: 999px;
-  background: #ffffff;
-  color: var(--gg-ink);
-  font-size: 0.85rem;
-  text-decoration: none;
-  transition:
-    border-color 0.2s,
-    background-color 0.2s;
-}
-.gg-dash__action:hover {
-  border-color: var(--gg-gold);
-  background: var(--gg-gold-tint);
-}
-.gg-dash__action svg {
-  width: 16px;
-  height: 16px;
-  color: var(--gg-gold-deep);
+.gg-card__empty {
+  margin: 0;
+  padding: 20px 16px 24px;
+  border-top: 1px solid var(--gg-line);
+  font-size: 13px;
+  color: var(--gg-text-2);
 }
 
-@media (max-width: 640px) {
-  .gg-dash__hero {
-    padding: 1.5rem;
-  }
-  .gg-dash__hero-mark {
+.gg-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.gg-list li {
+  border-top: 1px solid var(--gg-line);
+}
+.gg-list__row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  color: var(--gg-ink);
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+.gg-list__row:hover {
+  background: var(--gg-accent);
+}
+.gg-list__text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+}
+.gg-list__title {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gg-list__detail {
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--gg-text-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gg-list__meta {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.gg-date {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  padding: 4px 0;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px var(--gg-line);
+  line-height: 1.1;
+}
+.gg-date span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gg-primary);
+}
+.gg-date b {
+  font-size: 17px;
+}
+.gg-badge {
+  flex-shrink: 0;
+  padding: 3.2px 8.8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.gg-badge--danger {
+  background: var(--gg-danger-tint);
+  color: var(--gg-danger);
+}
+.gg-badge--warning {
+  background: var(--gg-warning-tint);
+  color: var(--gg-warning);
+}
+.gg-badge--neutral {
+  background: var(--gg-accent);
+  color: var(--gg-text-2);
+}
+
+.gg-facts {
+  display: grid;
+  margin: 0;
+}
+.gg-facts > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11.2px 16px;
+  border-top: 1px solid var(--gg-line);
+}
+.gg-facts dt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--gg-text-2);
+}
+.gg-facts dt svg {
+  width: 16px;
+  height: 16px;
+  color: var(--gg-primary);
+}
+.gg-facts dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Login and the other auth screens (CUTM LMS login layout) -------------------------------- */
+.template-minimal {
+  min-height: 100dvh;
+  background:
+    radial-gradient(70% 50% at 0% 100%, rgb(201 162 74 / 0.12), transparent 70%),
+    radial-gradient(60% 40% at 0% 0%, rgb(201 162 74 / 0.06), transparent 70%),
+    #fbfaf7;
+}
+.template-minimal__wrap {
+  width: 100%;
+  max-width: 400px;
+  margin-inline: auto;
+}
+.template-minimal .form-submit .btn {
+  width: 100%;
+  margin-top: 4px;
+  border-radius: 6px;
+}
+.template-minimal input {
+  border-radius: 6px;
+}
+.template-minimal .login__brand {
+  margin-bottom: 28px;
+}
+/* On phones the lockup above the form is the logo; the mark returns on wide screens. */
+@media (max-width: 1023px) {
+  .gg-login-head .gg-login-head__mark {
     display: none;
+  }
+}
+
+.gg-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+.gg-lockup__logo {
+  width: auto;
+  height: 44px;
+}
+.gg-lockup__text {
+  display: grid;
+  gap: 2.4px;
+  line-height: 1.2;
+}
+.gg-lockup__name {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--gg-ink);
+}
+.gg-lockup__name b {
+  color: var(--gg-primary);
+  font-weight: 700;
+}
+.gg-lockup__sub {
+  font-size: 14px;
+  color: var(--gg-text-2);
+}
+
+.gg-login-head {
+  margin-bottom: 32px;
+  text-align: center;
+}
+.gg-login-head__mark {
+  display: block;
+  width: auto;
+  height: 52px;
+  margin: 0 auto 20px;
+}
+.gg-login-head h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+}
+.gg-login-head p {
+  margin: 8px 0 0;
+  font-size: 15px;
+  color: var(--gg-text-2);
+}
+.gg-login-photo,
+.gg-login-foot {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .template-minimal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0;
+  }
+  .template-minimal__wrap {
+    grid-column: 1;
+    align-self: center;
+    padding: 96px 0;
+  }
+  /* The lockup sits top-left of the form half, like the LMS. */
+  .template-minimal .login__brand {
+    position: fixed;
+    justify-content: flex-start;
+    width: auto;
+    top: 36px;
+    left: 92px;
+    margin: 0;
+  }
+  .gg-login-foot {
+    position: fixed;
+    bottom: 36px;
+    left: 92px;
+    display: block;
+    margin: 0;
+    font-size: 13px;
+    color: var(--gg-text-2);
+  }
+  /* The other auth screens (forgot or reset password) show the same photo panel. */
+  .template-minimal::after {
+    content: '';
+    position: fixed;
+    inset: 12px 12px 12px calc(50% + 12px);
+    border-radius: 28px;
+    background: url('/brand/home-store/Home_9.jpg') center / cover;
+  }
+  .template-minimal:has(.gg-login-photo)::after {
+    display: none;
+  }
+  .gg-login-photo {
+    position: fixed;
+    inset: 12px 12px 12px calc(50% + 12px);
+    display: block;
+    overflow: hidden;
+    border-radius: 28px;
+  }
+  .gg-login-photo__img {
+    object-fit: cover;
+  }
+  .gg-login-note {
+    position: absolute;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    max-width: 304px;
+    padding: 16px 18px;
+    border-radius: 12px;
+    background: rgb(20 17 13 / 0.55);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
+    color: #ffffff;
+    backdrop-filter: blur(14px);
+  }
+  .gg-login-note--top {
+    top: 56px;
+    left: 48px;
+    background: rgb(143 106 36 / 0.88);
+  }
+  .gg-login-note--bottom {
+    right: 40px;
+    bottom: 56px;
+  }
+  .gg-login-note__icon {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgb(255 255 255 / 0.92);
+    color: var(--gg-primary);
+  }
+  .gg-login-note__icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  .gg-login-note b {
+    display: block;
+    font-size: 15px;
+  }
+  .gg-login-note span span {
+    display: block;
+    margin-top: 3.2px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: rgb(255 255 255 / 0.82);
   }
 }

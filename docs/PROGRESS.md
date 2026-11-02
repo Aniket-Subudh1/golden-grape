@@ -55,6 +55,18 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-03 · Admin redesign, round 2: CUTM LMS layout (requested by Aniket)
+- Aniket's feedback on round 1: separate pages where a modal would do, fields stretched across the page, a weak sidebar, navigation cards on the dashboard, and a login logo you could not see. Rebuilt after the CUTM LMS dashboard; details in `05-UI-SYSTEM.md` §3.3.
+  - **Sidebar:** our own `Nav` component with the brand block, Website / Requests / Settings groups with icon chips, and account links at the foot. Payload closes its sidebar on load on any window up to 1440 px (most laptops); ours stays open from 1025 px unless the user closed it.
+  - **Dashboard:** replaced. It has a title row, quick actions, and needs attention, upcoming events, recent requests and figures; no navigation cards.
+  - **Drawers:** "New event / package / page / legal page / user" and "Upload" open the form in a drawer over the list. Payload's separate-page "Create New" is hidden.
+  - **Forms:** a white card at a readable width. Business settings are split into 5 tabs with two-column rows; Happy Hour titles and times are side by side.
+  - **Login:** lockup top-left, mark + "Sign in to the back office", form, and a rounded photo panel with two notes. On phones the lockup sits above the form.
+- Verified on a local production build (throwaway database):
+  - Screens: login, dashboard, list, create drawer, event edit, Business settings, Happy Hour and account at 1440, 1024 and 390 px, plus the phone menu.
+  - Results: 0 px overflow and no failed requests apart from media thumbnails, which only failed because S3 was off for that run. A `stock` user sees only Dashboard and account links.
+  - Checks: `npm run check` (29) and `test:int` (20) pass.
+
 ### 2026-11-03 · Admin redesign (requested by Aniket)
 - Payload admin restyled after the PgMaster owner app, in Golden Grape colours (Aniket's choice); details in `05-UI-SYSTEM.md` §3.3.
   - **Theme and login:** one light theme, so the theme switcher is gone. The login is split: a photo, tile and logo pane on the left, a "Welcome back" form card on the right, stacked on phones.

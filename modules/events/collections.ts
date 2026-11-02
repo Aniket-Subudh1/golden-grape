@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload';
 import { hiddenUnless, isStaff, published } from '@/lib/access';
+import { createInDrawer } from '@/lib/admin';
 import { revalidateTagHook } from '@/lib/revalidate';
 
 const editors = isStaff('manager');
@@ -7,7 +8,13 @@ const editors = isStaff('manager');
 // Content only in M1.3; bookings (eventBookings, the `booked` counter) arrive in M2.3.
 export const events: CollectionConfig = {
   slug: 'events',
-  admin: { group: 'Content', useAsTitle: 'title', defaultColumns: ['title', 'startsAt', 'priceCents', '_status'], hidden: hiddenUnless('manager') },
+  admin: {
+    group: 'Content',
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'startsAt', 'priceCents', '_status'],
+    hidden: hiddenUnless('manager'),
+    components: createInDrawer('events', 'New event'),
+  },
   versions: { drafts: true },
   access: { read: published, create: editors, update: editors, delete: editors },
   hooks: { afterChange: [revalidateTagHook('events')], afterDelete: [revalidateTagHook('events')] },

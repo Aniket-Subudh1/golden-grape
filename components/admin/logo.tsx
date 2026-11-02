@@ -1,6 +1,16 @@
 import Image from 'next/image';
 
-/** Login card logo (Payload `admin.components.graphics.Logo`). On wide screens the brand pane shows it instead. */
+/** Brand lockup on the login screen (Payload `admin.components.graphics.Logo`): top-left on wide screens. */
 export default function AdminLogo() {
-  return <Image src="/brand/logo-light.png" alt="Golden Grape · Mäi Wäin" width={1085} height={859} priority className="gg-admin-logo" />;
+  return (
+    <span className="gg-lockup">
+      <Image src="/brand/mark.png" alt="" width={223} height={240} priority className="gg-lockup__logo" />
+      <span className="gg-lockup__text">
+        <span className="gg-lockup__name">
+          Golden <b>Grape</b>
+        </span>
+        <span className="gg-lockup__sub">Back office</span>
+      </span>
+    </span>
+  );
 }

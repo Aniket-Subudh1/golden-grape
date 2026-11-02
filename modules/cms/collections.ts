@@ -1,6 +1,7 @@
 import path from 'node:path';
 import type { CollectionConfig } from 'payload';
 import { hiddenUnless, isStaff, published, publicRead } from '@/lib/access';
+import { createInDrawer } from '@/lib/admin';
 import { revalidateTagHook } from '@/lib/revalidate';
 import { cardGrid, cta, hero, mediaText, richText } from './blocks';
 
@@ -10,7 +11,7 @@ const slugField = { name: 'slug', type: 'text', required: true, unique: true, in
 
 export const media: CollectionConfig = {
   slug: 'media',
-  admin: { group: 'Content', hidden: hiddenUnless('manager') },
+  admin: { group: 'Content', hidden: hiddenUnless('manager'), components: createInDrawer('media', 'Upload') },
   access: { read: publicRead, create: editors, update: editors, delete: editors },
   upload: {
     // Local fallback when S3 is not configured; with S3 the storage plugin takes over.
@@ -31,7 +32,13 @@ export const media: CollectionConfig = {
 
 export const pages: CollectionConfig = {
   slug: 'pages',
-  admin: { group: 'Content', useAsTitle: 'title', defaultColumns: ['title', 'slug', '_status'], hidden: hiddenUnless('manager') },
+  admin: {
+    group: 'Content',
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'slug', '_status'],
+    hidden: hiddenUnless('manager'),
+    components: createInDrawer('pages', 'New page'),
+  },
   versions: { drafts: true },
   access: { read: published, create: editors, update: editors, delete: editors },
   hooks: { afterChange: [revalidateTagHook('pages')], afterDelete: [revalidateTagHook('pages')] },
@@ -54,7 +61,13 @@ export const pages: CollectionConfig = {
 export const legal: CollectionConfig = {
   slug: 'legal',
   labels: { singular: 'Legal page', plural: 'Legal pages' },
-  admin: { group: 'Content', useAsTitle: 'title', defaultColumns: ['title', 'slug', '_status'], hidden: hiddenUnless('manager') },
+  admin: {
+    group: 'Content',
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'slug', '_status'],
+    hidden: hiddenUnless('manager'),
+    components: createInDrawer('legal', 'New legal page'),
+  },
   versions: { drafts: true },
   access: { read: published, create: editors, update: editors, delete: editors },
   hooks: { afterChange: [revalidateTagHook('legal')], afterDelete: [revalidateTagHook('legal')] },

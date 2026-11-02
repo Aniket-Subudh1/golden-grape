@@ -59,12 +59,17 @@ export const happyHour: GlobalConfig = {
     {
       type: 'row',
       fields: [
-        { name: 'from', type: 'text', required: true, validate: validateHHmm },
-        { name: 'to', type: 'text', required: true, validate: validateHHmm },
+        { name: 'from', type: 'text', required: true, validate: validateHHmm, admin: { width: '50%' } },
+        { name: 'to', type: 'text', required: true, validate: validateHHmm, admin: { width: '50%' } },
       ],
     },
-    { name: 'titleA', type: 'text', localized: true, required: true },
-    { name: 'titleB', type: 'text', localized: true, admin: { description: 'Shown in gold italics' } },
+    {
+      type: 'row',
+      fields: [
+        { name: 'titleA', type: 'text', localized: true, required: true, admin: { width: '50%' } },
+        { name: 'titleB', type: 'text', localized: true, admin: { width: '50%', description: 'Shown in gold italics' } },
+      ],
+    },
     { name: 'text', type: 'textarea', localized: true, admin: { description: 'Wrap words in <gold>…</gold> to colour them gold.' } },
     { name: 'image', type: 'upload', relationTo: 'media' },
   ],

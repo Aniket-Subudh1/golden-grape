@@ -65,17 +65,20 @@ Before adding a component, check this table. If an existing one is 80 % right, a
 
 ### 3.3 Admin (Payload) theme
 
-The admin follows the layout of the PgMaster owner app (split login, floating sidebar and header cards on a soft canvas) in Golden Grape colours, with **one light theme** (`admin.theme: 'light'`, no switcher). Everything goes through Payload's supported hooks, so nothing in Payload is forked:
+The admin copies the layout of the CUTM LMS dashboard in Golden Grape colours, with **one light theme** (`admin.theme: 'light'`, no switcher). The frame is a white sidebar and header around a grey content panel with a round top-left corner; pages hold crisp cards with hairlines and small corners. Everything goes through Payload's supported hooks, so nothing in Payload is forked:
 
 | Piece | File | Payload option |
 |---|---|---|
-| Colours, radii, fonts, login split, floating shell, cards | `app/(payload)/custom.css` (fonts loaded in `app/(payload)/layout.tsx`) | its CSS variables and BEM classes |
-| Login logo / header icon | `components/admin/logo.tsx`, `icon.tsx` | `graphics.Logo`, `graphics.Icon` |
-| Login brand pane + "Welcome back" heading | `components/admin/login-brand.tsx` | `beforeLogin` |
-| Sidebar brand header | `components/admin/nav-brand.tsx` | `beforeNavLinks` |
-| Home: greeting, counts, quick actions (by role) | `components/admin/dashboard-home.tsx` | `beforeDashboard` |
+| Colours, frame, cards, lists, form cards, tabs, login layout | `app/(payload)/custom.css` (fonts loaded in `app/(payload)/layout.tsx`) | its CSS variables and BEM classes |
+| Sidebar: brand block, grouped links with icon chips, account links; stays open on every desktop width | `components/admin/nav.tsx` (groups, filtered by the user's visible entities) + `nav-client.tsx` | `components.Nav` |
+| Home: greeting, quick actions, needs attention, upcoming events, recent requests, figures (by role); no navigation cards | `components/admin/dashboard.tsx` | `views.dashboard.Component` |
+| "New …" opens the form in a drawer over the list (also used by the home's quick actions) | `components/admin/create-button.tsx`, wired with `createInDrawer()` in `lib/admin.ts` | `views.list.actions` |
+| Login: lockup top-left, heading and form, photo panel with notes | `components/admin/logo.tsx`, `login-brand.tsx` | `graphics.Logo`, `beforeLogin` |
+| Header icon | `components/admin/icon.tsx` | `graphics.Icon` |
 
-The CSS relies on Payload's class names, which is safe while Payload stays pinned. Re-check the admin after any Payload upgrade.
+Forms sit in a white card at a readable width; long globals (Business settings) are split into tabs and two-column rows. Globals cannot open in a drawer (Payload's drawer is for collections), so they stay pages.
+
+Payload sets the admin's root font size to 13 px, so `custom.css` uses px, not rem. The CSS relies on Payload's class names, which is safe while Payload stays pinned. Re-check the admin after any Payload upgrade.
 
 ## 4. CMS blocks (`pages.layout`)
 

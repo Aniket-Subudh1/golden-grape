@@ -1,5 +1,6 @@
 import { APIError, type CollectionConfig, type FieldAccess } from 'payload';
 import { hasRole, hiddenUnless, isStaff, none, ROLES } from '@/lib/access';
+import { createInDrawer } from '@/lib/admin';
 import { LOCALES } from '@/lib/i18n';
 
 const adminOnly: FieldAccess = ({ req }) => hasRole(req.user, ['admin']);
@@ -7,7 +8,13 @@ const adminOnly: FieldAccess = ({ req }) => hasRole(req.user, ['admin']);
 const users: CollectionConfig = {
   slug: 'users',
   auth: true,
-  admin: { useAsTitle: 'name', group: 'People', defaultColumns: ['name', 'email', 'roles', 'active'], hidden: hiddenUnless('manager') },
+  admin: {
+    useAsTitle: 'name',
+    group: 'People',
+    defaultColumns: ['name', 'email', 'roles', 'active'],
+    hidden: hiddenUnless('manager'),
+    components: createInDrawer('users', 'New user'),
+  },
   access: {
     // Every staff member reads and edits their own profile; admin/manager read everyone; only admin manages accounts.
     read: ({ req: { user } }) => (hasRole(user, ['manager']) ? true : user?.collection === 'users' ? { id: { equals: user.id } } : false),

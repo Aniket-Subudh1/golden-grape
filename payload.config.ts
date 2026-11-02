@@ -32,8 +32,8 @@ export default buildConfig({
     components: {
       graphics: { Logo: '@/components/admin/logo', Icon: '@/components/admin/icon' },
       beforeLogin: ['@/components/admin/login-brand'],
-      beforeNavLinks: ['@/components/admin/nav-brand'],
-      beforeDashboard: ['@/components/admin/dashboard-home'],
+      Nav: '@/components/admin/nav',
+      views: { dashboard: { Component: '@/components/admin/dashboard' } },
     },
   },
   collections: [...settingsCollections, ...cmsCollections, events, cateringPackages, cateringRequests],

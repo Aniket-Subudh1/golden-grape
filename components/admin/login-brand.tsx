@@ -1,28 +1,42 @@
+import { CalendarDays, Languages } from 'lucide-react';
 import Image from 'next/image';
 
-/** Login screen (Payload `beforeLogin`): the left brand pane, shown from 1024 px wide like PgMaster's owner login, and
- * the heading above the form. */
+/**
+ * Login screen (Payload `beforeLogin`), in the CUTM LMS login layout: the heading above the form, and on wide screens a
+ * rounded photo panel on the right with two notes about what the back office does.
+ */
 export default function LoginBrand() {
   return (
     <>
-      <aside className="gg-login-pane" aria-hidden="true">
-        <Image src="/brand/home-store/Home_9.jpg" alt="" fill priority sizes="50vw" className="gg-login-pane__photo" />
-        <div className="gg-login-pane__shade" />
-        <div className="gg-login-pane__content">
-          <Image src="/brand/logo-light.png" alt="" width={1085} height={859} className="gg-login-pane__logo" />
-          <div>
-            <p className="gg-login-pane__title">
-              L&apos;âme du Portugal, <em>servie avec passion.</em>
-            </p>
-            <p className="gg-login-pane__text">Back office · Golden Grape Luxembourg</p>
-          </div>
-          <p className="gg-login-pane__foot">25 Zac Klengbousbierg · L-7795 Bissen</p>
+      <div className="gg-login-head">
+        <Image src="/brand/mark.png" alt="" width={223} height={240} className="gg-login-head__mark" />
+        <h1>Sign in to the back office</h1>
+        <p>Use the e-mail address of your Golden Grape account.</p>
+      </div>
+
+      <aside className="gg-login-photo" aria-hidden="true">
+        <Image src="/brand/home-store/Home_9.jpg" alt="" fill priority sizes="50vw" className="gg-login-photo__img" />
+        <div className="gg-login-note gg-login-note--top">
+          <span className="gg-login-note__icon">
+            <Languages />
+          </span>
+          <span>
+            <b>Every page, four languages</b>
+            <span>French, English, German and Portuguese, edited side by side.</span>
+          </span>
+        </div>
+        <div className="gg-login-note gg-login-note--bottom">
+          <span className="gg-login-note__icon">
+            <CalendarDays />
+          </span>
+          <span>
+            <b>Events, catering and Happy Hour</b>
+            <span>What you change here is on the website straight away.</span>
+          </span>
         </div>
       </aside>
-      <div className="gg-login-head">
-        <h1>Welcome back</h1>
-        <p>Sign in to manage the Golden Grape website.</p>
-      </div>
+
+      <p className="gg-login-foot">Golden Grape Luxembourg · 25 Zac Klengbousbierg, Bissen</p>
     </>
   );
 }

@@ -1,12 +1,19 @@
 import type { CollectionConfig } from 'payload';
 import { hiddenUnless, isStaff, none, publicRead } from '@/lib/access';
 import { LOCALES } from '@/lib/i18n';
+import { createInDrawer } from '@/lib/admin';
 import { revalidateTagHook } from '@/lib/revalidate';
 
 export const cateringPackages: CollectionConfig = {
   slug: 'cateringPackages',
   labels: { singular: 'Catering package', plural: 'Catering packages' },
-  admin: { group: 'Content', useAsTitle: 'name', defaultColumns: ['name', 'pricePerGuestCents', 'minGuests', 'order'], hidden: hiddenUnless('manager') },
+  admin: {
+    group: 'Content',
+    useAsTitle: 'name',
+    defaultColumns: ['name', 'pricePerGuestCents', 'minGuests', 'order'],
+    hidden: hiddenUnless('manager'),
+    components: createInDrawer('cateringPackages', 'New package'),
+  },
   access: { read: publicRead, create: isStaff('manager'), update: isStaff('manager'), delete: isStaff('manager') },
   hooks: { afterChange: [revalidateTagHook('catering')], afterDelete: [revalidateTagHook('catering')] },
   defaultSort: 'order',
