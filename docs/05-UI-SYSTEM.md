@@ -42,7 +42,7 @@ Do not invent colours, sizes or shadows. The palette is: ink text on bone, gold-
 
 | Component | File | Replaces / ports | Props (keep them minimal) |
 |---|---|---|---|
-| `Button` | `components/ui/button.tsx` (cva) | 15+ pill class strings | `variant`: `solid` \| `outline` \| `gold` \| `ghost` \| `chip` \| `icon`; `size`: `sm` (h-9) \| `md` (h-11) \| `lg` (h-12); `active` (chip); `asChild` |
+| `Button` | `components/ui/button.tsx` (cva) | 15+ pill class strings, plus the square translucent gold CTA of Hero, Store and Happy Hour | `variant`: `solid` \| `outline` \| `gold` \| `goldGlass` \| `ghost` \| `chip` \| `icon`; `size`: `sm` (h-9) \| `md` (h-11) \| `lg` (h-12); `active` (chip); `asChild` |
 | `Field` | `components/ui/field.tsx` | `F` in events.tsx, `Field` in catering.tsx and contact.tsx, cart inputs | `label`, `name`, `error?`, `as?: 'input' \| 'textarea' \| 'select'`, plus native props. Shows `fieldErrors[name]` from `useActionState`. |
 | `Container` | `components/site/container.tsx` | repeated `mx-auto max-w-[1400px] px-6 md:px-10` | `size?: 'md' \| 'lg'`, `as?` |
 | `PageHero` | `components/site/page-hero.tsx` | page headers in shop/snack/events/catering + `PageShell` | `eyebrow`, `title: [string, string?]` (second half rendered italic gold-deep), `subtitle?`, `children?` (CTAs) |
