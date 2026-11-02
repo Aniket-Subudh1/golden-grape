@@ -36,8 +36,8 @@ export function today(now: Date = new Date()) {
 }
 
 // Converts a Luxembourg wall-clock time to the instant it denotes (handles the DST offset).
-function fromLocal(year: number, month: number, day: number) {
-  const wall = Date.UTC(year, month - 1, day);
+function fromLocal(year: number, month: number, day: number, hour = 0, minute = 0) {
+  const wall = Date.UTC(year, month - 1, day, hour, minute);
   const offsetAt = (instant: number) => {
     const l = toLocal(new Date(instant));
     return Date.UTC(l.year, l.month - 1, l.day, l.hour, l.minute, l.second) - instant;
@@ -56,4 +56,16 @@ export function startOfDay(date: Date = new Date()) {
 export function monthRange(month: string) {
   const [y, m] = month.split('-').map(Number);
   return { start: fromLocal(y, m, 1), end: fromLocal(m === 12 ? y + 1 : y, m === 12 ? 1 : m + 1, 1) };
+}
+
+/** Next instant after `now` that falls on one of `weekdays` (0 = Sunday) at `time` (`HH:mm`) in Luxembourg. */
+export function nextWeekly(weekdays: number[], time: string, now: Date = new Date()) {
+  const [hour, minute] = time.split(':').map(Number);
+  const { year, month, day } = toLocal(now);
+  for (let i = 0; i < 8; i++) {
+    const date = new Date(Date.UTC(year, month - 1, day + i));
+    const candidate = fromLocal(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), hour, minute);
+    if (weekdays.includes(date.getUTCDay()) && candidate > now) return candidate;
+  }
+  throw new Error('nextWeekly: no weekday given');
 }

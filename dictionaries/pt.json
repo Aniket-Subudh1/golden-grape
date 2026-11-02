@@ -673,5 +673,13 @@
     "signUp": "Criar conta",
     "switchToSignUp": "Sem conta? Criar conta",
     "switchToSignIn": "Já tem conta? Entrar"
+  },
+  "meta": {
+    "home": {
+      "title": "Golden Grape Luxembourg — Vinhos portugueses, petiscos, catering e eventos",
+      "description": "A Golden Grape é a casa gourmet portuguesa do Luxemburgo — vinhos raros, petiscos artesanais, catering e provas à sexta-feira. Mäi Wäin.",
+      "ogTitle": "Golden Grape · A casa portuguesa do Luxemburgo",
+      "ogDescription": "Vinhos portugueses de excelência, mercearia fina, catering e eventos no coração do Luxemburgo."
+    }
   }
 }

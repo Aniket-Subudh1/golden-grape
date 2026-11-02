@@ -673,5 +673,13 @@
     "signUp": "Créer un compte",
     "switchToSignUp": "Pas encore de compte ? Créer un compte",
     "switchToSignIn": "Déjà inscrit ? Se connecter"
+  },
+  "meta": {
+    "home": {
+      "title": "Golden Grape Luxembourg — Vins portugais, comptoir, traiteur & événements",
+      "description": "Golden Grape, la maison gourmande portugaise de Luxembourg — vins rares, snacks artisanaux, traiteur et dégustations du vendredi. Mäi Wäin.",
+      "ogTitle": "Golden Grape · La maison portugaise de Luxembourg",
+      "ogDescription": "Vins portugais d’exception, épicerie fine, traiteur et événements au cœur du Luxembourg."
+    }
   }
 }

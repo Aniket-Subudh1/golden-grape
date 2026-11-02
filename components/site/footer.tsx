@@ -51,7 +51,7 @@ export async function Footer({ t, columns }: Props) {
 
           <div>
             <h4 className="eyebrow text-gold">{t.colContact}</h4>
-            <ul className="mt-6 space-y-3 text-sm font-light">
+            <ul className="mt-6 space-y-3 text-sm font-light break-words">
               <li>
                 <span className="inline-flex items-start gap-2">
                   <MapPin className="mt-1 h-3 w-3 shrink-0 text-gold/70" />

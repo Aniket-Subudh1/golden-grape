@@ -53,6 +53,19 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-02 · M1.2 T5 · Home page
+- `app/(site)/[locale]/page.tsx` with nine sections ported 1:1 in `components/site/home/`: hero, universes, marquee, hospitality, craft, store, happy-hour, story, events. Server components, except Store (parallax) and HappyHour (countdown). `generateMetadata`: new `meta.home.*` keys in all four dictionaries (the prototype's `head()` text was English-only; the FR/DE/PT translations are mine and should be reviewed with DEP-05), canonical + hreflang via `alternates`, OG and Twitter.
+- Prototype placeholders replaced or hidden:
+  - Store "directions" → Google Maps search for the address. "Tasting" → `/events`.
+  - Happy Hour "reserve" hidden until M2.3.
+  - Home events "reserve" line hidden until M2.3 (same rule as the events page in M1.3).
+  - Universes Shop/Snack cards are unlinked and have no CTA until M2.2.
+- **SocialProof is not rendered** (user decision): its "Google" reviews were hard-coded. It comes back with real reviews in M3.3.
+- Happy Hour countdown: the prototype computed it in the browser's timezone. It now uses `nextWeekly()` (new in `lib/time.ts`, Luxembourg time) and a `useSyncExternalStore` clock that is `undefined` on the server, so the prerender never bakes a stale time (it shows `--` until hydration). Days and time (Wed–Fri 17:00) are constants until the HappyHour global (M1.3).
+- Fixed two prototype layout bugs found at 768 px: Hospitality's 12-column grid with `md:gap-20` (11 × 80 px gaps) overflowed by 152 px, so it is now `lg:gap-20`; the footer email overflowed its column, so the list now uses `break-words`. 1280 px is unchanged.
+- Brand images (T6 files) were added in this commit because the sections import them.
+- Verified: `npm run check`; `env -i … next build` (the locale pages prerender); `/fr /en /de /pt` 200 with `<html lang>`, canonical, 4 hreflang + x-default. No `href` to /shop or /snack; no search, account or cart controls. Playwright at 1280/768/360: Cormorant on `h1`, Inter on body, header solid after scroll, **0 px horizontal overflow**, no console errors.
+
 ### 2026-11-02 · M1.2 T4 · Site components
 - `Container`, `Reveal` (merged with its hook; reduced motion is handled in CSS with `motion-reduce:*`, so there is no hidden-then-shown flash), `LanguageSwitcher` (real links with `hrefLang`, sets the `NEXT_LOCALE` cookie; each language is labelled by its own name), `Nav`, `Footer`, and `NavLink` (a link, or plain text when the page does not exist yet; used by Nav and Footer).
 - Nav: search, account and cart are hidden until M2.2, with a spacer so the mobile logo stays centred. The mobile menu is `inert` while closed. New keys `nav.openMenu`/`nav.closeMenu` in all four dictionaries (the prototype hard-coded English). The dictionaries were re-serialised with 2-space indentation by the script that added the keys.

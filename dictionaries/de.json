@@ -673,5 +673,13 @@
     "signUp": "Konto erstellen",
     "switchToSignUp": "Noch kein Konto? Erstellen",
     "switchToSignIn": "Bereits registriert? Anmelden"
+  },
+  "meta": {
+    "home": {
+      "title": "Golden Grape Luxembourg — Portugiesische Weine, Snacks, Catering & Events",
+      "description": "Golden Grape ist Luxemburgs portugiesisches Feinkosthaus — seltene Weine, handgemachte Snacks, Catering und Verkostungen am Freitag. Mäi Wäin.",
+      "ogTitle": "Golden Grape · Luxemburgs portugiesisches Haus",
+      "ogDescription": "Erlesene portugiesische Weine, Feinkost, Catering und Events im Herzen Luxemburgs."
+    }
   }
 }
