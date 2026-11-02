@@ -55,6 +55,10 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-03 · Redeploy on push
+- Requested by Aniket. Setup and paths are in `02-ARCHITECTURE.md` §9; server files in `scripts/server/`.
+- Needs one repository secret, `DEPLOY_SSH_KEY` (Aniket adds it in GitHub). The CI path itself runs for the first time on the first push.
+
 ### 2026-11-03 · Prototype fidelity and visual polish (requested by Aniket)
 - **Real photos:** the originals behind the prototype's CDN pointers are downloadable from `golden-grape-luxembourg.lovable.app`. All 45 fetched, sizes verified against `.asset.json`; the 44 brand photos are in `public/brand/<group>/` (the unused alternative logo jpg is not copied). The stand-in jpgs are gone. `lib/brand.ts` and the seed use the prototype's exact slot → file mapping (home, maison, packages, events).
 - **Exact text:** page-by-page diff of visible text against the published prototype (home, maison, events, catering, contact). Restored: Universes CTAs (Shop/Snack unlinked), "Réserver une table", home event cards (`eventsHome.items`, recurring wording, always from the dictionary now), events list + Reserve buttons (link to `/contact` until M2.3), Maison's shop button (unlinked), footer legal labels (plain text until legal pages are published), prices as `28 €` (`formatMoney(…, { compact: true })`). Remaining differences on purpose: reviews section hidden (Aniket's decision, unverifiable), event dates, language dropdown, cookie notice, catering e-mail field, search/account/cart icons (M2.2).

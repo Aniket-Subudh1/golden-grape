@@ -2,6 +2,8 @@ name: CI
 
 on:
   push:
+    # Documentation changes need neither tests nor a deployment.
+    paths-ignore: ['docs/**', '**.md']
   pull_request:
     branches: [main]
 
@@ -43,3 +45,64 @@ jobs:
       - run: npm run build
       - run: npm run seed -- --email ci-admin@example.test --password ci-only-password-1 --name CI
       - run: npm run test:e2e
+
+  # Built in parallel with `check` (a real public URL is needed at build time, see 02 §7).
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      APP_URL: https://goldengrape.devsomeware.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: next-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: next-${{ hashFiles('package-lock.json') }}-
+      - run: npm ci
+      - run: npm run build
+      - name: Package the standalone release
+        run: |
+          cp -r .next/static .next/standalone/.next/static
+          cp -r public .next/standalone/public
+          tar -C .next/standalone -czf release.tgz .
+          du -h release.tgz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: release.tgz
+          retention-days: 1
+          compression-level: 0
+
+  # Runs only if the tests and the build both passed. A newer push waits its turn and replaces any queued one;
+  # a deployment already running is never cancelled. The server rolls back by itself if the release is unhealthy.
+  deploy:
+    needs: [check, release]
+    runs-on: ubuntu-latest
+    concurrency:
+      group: production
+      cancel-in-progress: false
+    env:
+      HOST: goldengrape.devsomeware.com
+      KNOWN_HOST: goldengrape.devsomeware.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAP+cjPHCoFrD4HKp3kZuOse+xppar9+Wu61nmxPK/Xh
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release
+      - name: Send the release to the server
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          [ -n "$DEPLOY_SSH_KEY" ] || { echo "::error::Add the DEPLOY_SSH_KEY repository secret"; exit 1; }
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$KNOWN_HOST" > ~/.ssh/known_hosts
+          ssh -i ~/.ssh/deploy -o BatchMode=yes "root@$HOST" "$GITHUB_SHA" < release.tgz
+      - name: Check the public site
+        run: |
+          curl -fsS -m 30 "https://$HOST/api/health"
+          curl -fsS -m 30 -o /dev/null "https://$HOST/fr"
