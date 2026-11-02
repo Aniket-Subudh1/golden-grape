@@ -9,9 +9,16 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@payloadcms/db-mongodb": "3.92.1",
+    "@payloadcms/next": "3.92.1",
+    "@payloadcms/richtext-lexical": "3.92.1",
+    "graphql": "16.14.2",
     "next": "16.4.3",
+    "payload": "3.92.1",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "sharp": "0.35.5",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",

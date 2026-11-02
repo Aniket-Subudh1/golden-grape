@@ -6,7 +6,7 @@ Update this file at the end of every task (`00-START-HERE.md` §2). The newest l
 
 | ID | Sub-milestone | Payment | Target | Status | Accepted by APPLUX |
 |---|---|---|---|---|---|
-| M1.1 | Foundation | P1 $300 | Tue 3 Nov | Not started | — |
+| M1.1 | Foundation | P1 $300 | Tue 3 Nov | In progress | — |
 | M1.2 | Design system + i18n shell | P1 | Wed 4 Nov | Not started | — |
 | M1.3 | CMS, pages, settings, roles | P1 | Thu 5 Nov | Not started | — |
 | M2.1 | Catalogue + inventory core | P2 $250 | Sat 7 Nov | Not started | — |
@@ -52,6 +52,14 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-10 | Until a real sample: CashMag CSV columns are mapped through configurable settings | M3.3 | — |
 
 ## 4. Log
+
+### 2026-11-02 · M1.1 T1 · Payload + Next compatibility gate
+- Installed Payload 3.92.1 (exact). D-02 decided: keep Next 16.4.3 / React 19.3.0 (in Payload's peer range); Cache Components stay on.
+- `app/(payload)/` copied from `create-payload-app@3.92.1`'s template (GraphQL routes and the empty `custom.scss` left out; `graphQL.disable: true`). Admin page: `export const instant = false` + `await connection()` to silence two Cache Components dev errors caused by Payload's `RootPage`.
+- `lib/env.ts` written now (the config needs it) with `isBuildPhase`: during `next build` the config uses `url: false` and a dummy secret, so the build never reads env (Payload evaluates the config while collecting page data).
+- Scaffold removed (`app/page.tsx`, `app/layout.tsx`, `app/globals.css`, `app/favicon.ico`, `public/*.svg`). The app now uses multiple root layouts; `(site)/[locale]/layout.tsx` arrives in M1.2.
+- Verified: `env -i … next build` succeeds; `next dev` → `/admin` 200, first user registered, login OK, no dev errors.
+- Notes: local Node is 24.21.0, below Payload's `>=24.22.1` engine (warning only; Docker/CI use a supported version). Payload CLI must run through `node --import tsx … --disable-transpile` (see `02-ARCHITECTURE.md` §1).
 
 ### 2026-11-02 · Specification written
 - Contract accepted on Upwork (P1 $300 funded, due 5 Nov).
