@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     auditLogs: AuditLog;
     rateLimits: RateLimit;
+    counters: Counter;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,6 +81,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     auditLogs: AuditLogsSelect<false> | AuditLogsSelect<true>;
     rateLimits: RateLimitsSelect<false> | RateLimitsSelect<true>;
+    counters: CountersSelect<false> | CountersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -90,8 +92,12 @@ export interface Config {
   };
   fallbackLocale:
     ('false' | 'none' | 'null') | false | null | ('fr' | 'en' | 'de' | 'pt') | ('fr' | 'en' | 'de' | 'pt')[];
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    BusinessSettings: BusinessSetting;
+  };
+  globalsSelect: {
+    BusinessSettings: BusinessSettingsSelect<false> | BusinessSettingsSelect<true>;
+  };
   locale: 'fr' | 'en' | 'de' | 'pt';
   widgets: {
     collections: CollectionsWidget;
@@ -193,6 +199,16 @@ export interface RateLimit {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "counters".
+ */
+export interface Counter {
+  id: string;
+  series: string;
+  year: number;
+  last: number;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -226,6 +242,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'rateLimits';
         value: string | RateLimit;
+      } | null)
+    | ({
+        relationTo: 'counters';
+        value: string | Counter;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -321,6 +341,15 @@ export interface RateLimitsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "counters_select".
+ */
+export interface CountersSelect<T extends boolean = true> {
+  series?: T;
+  year?: T;
+  last?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -358,6 +387,182 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BusinessSettings".
+ */
+export interface BusinessSetting {
+  id: string;
+  business: {
+    name: string;
+    legalName?: string | null;
+    street: string;
+    postalCode: string;
+    city: string;
+    country?: string | null;
+    phone?: string | null;
+    email?: string | null;
+    vatNumber?: string | null;
+    rcs?: string | null;
+    iban?: string | null;
+    bic?: string | null;
+    mapsUrl?: string | null;
+    instagram?: string | null;
+    facebook?: string | null;
+  };
+  /**
+   * One row per open day (a day may have two rows). Days without a row are closed.
+   */
+  hours?:
+    | {
+        day: '0' | '1' | '2' | '3' | '4' | '5' | '6';
+        open: string;
+        close: string;
+        id?: string | null;
+      }[]
+    | null;
+  closedDates?:
+    | {
+        date: string;
+        id?: string | null;
+      }[]
+    | null;
+  vat?:
+    | {
+        key: 'standard' | 'intermediate' | 'reduced' | 'superReduced';
+        /**
+         * Basis points: 1700 = 17 %
+         */
+        rateBp: number;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * {YYYY} = year, {0000} = zero-padded number.
+   */
+  numbering?: {
+    invoice?: string | null;
+    creditNote?: string | null;
+    quotation?: string | null;
+    deliveryNote?: string | null;
+    order?: string | null;
+    cateringRequest?: string | null;
+  };
+  alerts?: {
+    defaultLowStock?: number | null;
+    lowStockEmail?: string | null;
+    outboxAlertEmail?: string | null;
+  };
+  /**
+   * Optional modules. Core modules cannot be switched off.
+   */
+  modules?: {
+    b2b?: boolean | null;
+    purchasing?: boolean | null;
+    promotions?: boolean | null;
+    loyalty?: boolean | null;
+    giftCards?: boolean | null;
+    reviews?: boolean | null;
+    attendance?: boolean | null;
+    pos?: boolean | null;
+  };
+  paymentTerms?:
+    | {
+        key: string;
+        days: number;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BusinessSettings_select".
+ */
+export interface BusinessSettingsSelect<T extends boolean = true> {
+  business?:
+    | T
+    | {
+        name?: T;
+        legalName?: T;
+        street?: T;
+        postalCode?: T;
+        city?: T;
+        country?: T;
+        phone?: T;
+        email?: T;
+        vatNumber?: T;
+        rcs?: T;
+        iban?: T;
+        bic?: T;
+        mapsUrl?: T;
+        instagram?: T;
+        facebook?: T;
+      };
+  hours?:
+    | T
+    | {
+        day?: T;
+        open?: T;
+        close?: T;
+        id?: T;
+      };
+  closedDates?:
+    | T
+    | {
+        date?: T;
+        id?: T;
+      };
+  vat?:
+    | T
+    | {
+        key?: T;
+        rateBp?: T;
+        id?: T;
+      };
+  numbering?:
+    | T
+    | {
+        invoice?: T;
+        creditNote?: T;
+        quotation?: T;
+        deliveryNote?: T;
+        order?: T;
+        cateringRequest?: T;
+      };
+  alerts?:
+    | T
+    | {
+        defaultLowStock?: T;
+        lowStockEmail?: T;
+        outboxAlertEmail?: T;
+      };
+  modules?:
+    | T
+    | {
+        b2b?: T;
+        purchasing?: T;
+        promotions?: T;
+        loyalty?: T;
+        giftCards?: T;
+        reviews?: T;
+        attendance?: T;
+        pos?: T;
+      };
+  paymentTerms?:
+    | T
+    | {
+        key?: T;
+        days?: T;
+        label?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

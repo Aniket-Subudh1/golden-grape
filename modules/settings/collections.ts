@@ -86,4 +86,18 @@ const rateLimits: CollectionConfig = {
   ],
 };
 
-export const settingsCollections: CollectionConfig[] = [users, auditLogs, rateLimits];
+// Written only by lib/numbering.ts (nextNumber), inside the transaction that inserts the numbered document.
+const counters: CollectionConfig = {
+  slug: 'counters',
+  admin: { hidden: true },
+  access: { read: none, create: none, update: none, delete: none },
+  indexes: [{ fields: ['series', 'year'], unique: true }],
+  timestamps: false,
+  fields: [
+    { name: 'series', type: 'text', required: true },
+    { name: 'year', type: 'number', required: true },
+    { name: 'last', type: 'number', required: true },
+  ],
+};
+
+export const settingsCollections: CollectionConfig[] = [users, auditLogs, rateLimits, counters];

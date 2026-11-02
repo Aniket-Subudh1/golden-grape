@@ -37,10 +37,10 @@ Access: read is Staff(any) for itself and admin/manager for everyone; create, up
 ### `BusinessSettings` (global)
 | Group | Fields |
 |---|---|
-| `business` | `name`, `legalName`, `address`, `phone`, `email`, `vatNumber`, `rcs`, `iban`, `bic`, social links |
+| `business` | `name`, `legalName`, `street`, `postalCode`, `city`, `country`, `phone`, `email`, `vatNumber`, `rcs`, `iban`, `bic`, `mapsUrl`, `instagram`, `facebook` |
 | `hours` | array `{ day 0–6, open "HH:mm", close "HH:mm" }` + `closedDates` array of dates |
 | `vat` | array `{ key: 'standard' \| 'intermediate' \| 'reduced' \| 'superReduced', rateBp }`; default LU 1700/1400/800/300, confirmed by the accountant (DEP-07) |
-| `numbering` | `{ invoice, creditNote, quotation, deliveryNote, order }` format strings, e.g. `INV-{YYYY}-{00000}` |
+| `numbering` | `{ invoice, creditNote, quotation, deliveryNote, order, cateringRequest }` format strings, e.g. `INV-{YYYY}-{00000}`, `REQ-{YYYY}-{0000}` |
 | `alerts` | `defaultLowStock` (int), `lowStockEmail` (email), `outboxAlertEmail` |
 | `modules` | checkbox per switchable module (02 §4) |
 | `paymentTerms` | array `{ key, days, label L }` |

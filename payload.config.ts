@@ -6,12 +6,14 @@ import { buildConfig } from 'payload';
 import sharp from 'sharp';
 import { env, isBuildPhase } from '@/lib/env';
 import { settingsCollections } from '@/modules/settings/collections';
+import { businessSettings } from '@/modules/settings/globals';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default buildConfig({
   admin: { user: 'users', importMap: { baseDir: dirname } },
   collections: [...settingsCollections],
+  globals: [businessSettings],
   db: mongooseAdapter({
     url: isBuildPhase ? false : env.DATABASE_URL,
     transactionOptions: {},

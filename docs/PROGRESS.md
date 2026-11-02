@@ -53,6 +53,13 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-02 · M1.3 T2 · Business settings, module switches, numbering
+- `BusinessSettings` global (`modules/settings/globals.ts`) with the groups for M1.3: business, hours (day + HH:mm validated) + closedDates, vat, numbering, alerts, modules, paymentTerms. `loyalty`, `reviews`, `pos` and `payments` are added by their own milestones. API read and update: admin/manager. Changes vs `04` §1 (doc updated): `address` split into street/postalCode/city/country (needed for e-mails and the map link); social links named `instagram`/`facebook`; `mapsUrl`; `numbering.cateringRequest`.
+- `getSettings()`: `'use cache'` + `cacheTag('settings')`, an allow-list of public fields (no IBAN/BIC/alerts/numbering). `getSettingsPrivate()` for documents and e-mails. `isModuleOn(name)`. Module gating in `admin.hidden` is not possible (it is synchronous and runs with the client user); the gated modules add their own checks.
+- `counters` (hidden, unique `{series, year}`) + `lib/numbering.ts`: `nextNumber(tx, series, year)` (atomic `$inc` upsert in the caller's session) and pure `formatNumber()` with unit vectors.
+- `lib/revalidate.ts`: `revalidateTagHook(tag)` with `revalidateTag(tag, { expire: 0 })`. The docs' choice for invalidations from outside a server action, and the next reload shows the edit (AC-02). Skipped when `req.context.skipRevalidate` is set (seed, tests).
+- Verified: `npm run check` (28 unit), `npm run test:int` (6).
+
 ### 2026-11-02 · M1.3 T1 · Staff users and roles
 - Packages (exact): @payloadcms/storage-s3 3.92.1, **@payloadcms/email-nodemailer 3.92.1** (added at Aniket's request for staff password-reset e-mails; not in the milestone list), nodemailer 10.3.1 (same major as the adapter's dependency, deduped), @types/nodemailer 8.0.2.
 - Env: `S3_*`, `SMTP_*`, `MAIL_FROM`, `MAIL_STAFF_TO` in `.env.example` and `lib/env.ts`, all optional. Empty values count as unset. S3 unset → uploads in `./media`; SMTP unset → e-mails logged. Aniket fills in the real values. `S3_PUBLIC_URL` is dropped: media are served through the app (decision, see T3).
