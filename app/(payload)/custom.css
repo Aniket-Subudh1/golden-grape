@@ -533,6 +533,9 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 .table tbody tr {
   border-top: 1px solid var(--gg-line);
 }
+.table tbody tr:has(a[href*='/admin/collections/']) {
+  cursor: pointer;
+}
 .table tbody tr:nth-child(odd) td {
   background: transparent;
 }
@@ -737,15 +740,17 @@ main[class*='global-edit--'] .document-fields__fields {
   border-top: 0;
 }
 /*
- * Collection create/edit screens are centred dialogs, not side panels. The form chooses a useful maximum width:
- * compact records stay compact, while pages with blocks can use the wider size. On a phone it becomes a safe
- * full-screen sheet. Payload still owns focus trapping, Escape, scrolling and nested relationship dialogs.
+ * Collection create/edit screens are centred dialogs. Compact records stay narrow; pages with blocks can be wider.
+ * The card never grows past the viewport: the title and save row stay put, and the fields scroll inside the card.
+ * `transform: none` once open keeps menus on the page. The loading veil stays inside the card, so it cannot cover the screen and swallow clicks.
+ * Payload still owns focus trapping, Escape and nested relationship dialogs.
  */
 .doc-drawer.drawer {
+  --gg-dialog-pad: 32px;
   inset: 0;
   align-items: center;
   justify-content: center;
-  padding: 32px;
+  padding: var(--gg-dialog-pad);
 }
 .doc-drawer .drawer__blur-bg {
   background: transparent;
@@ -759,8 +764,13 @@ main[class*='global-edit--'] .document-fields__fields {
   background: transparent;
 }
 .doc-drawer > .drawer__content {
-  width: min(760px, calc(100vw - 64px)) !important;
-  max-height: calc(100dvh - 64px);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  width: min(760px, calc(100vw - (var(--gg-dialog-pad) * 2))) !important;
+  max-height: calc(100dvh - (var(--gg-dialog-pad) * 2));
+  overflow: hidden;
+  min-height: min(240px, calc(100dvh - (var(--gg-dialog-pad) * 2)));
   border: 1px solid var(--gg-line);
   border-radius: 10px;
   background: var(--gg-panel);
@@ -768,33 +778,91 @@ main[class*='global-edit--'] .document-fields__fields {
   transform: translateY(16px) scale(0.985);
 }
 .doc-drawer.drawer--is-open > .drawer__content {
-  transform: translateY(0) scale(1);
+  transform: none;
 }
 .doc-drawer:has(main[class*='collection-edit--media']) > .drawer__content,
 .doc-drawer:has(main[class*='collection-edit--users']) > .drawer__content,
 .doc-drawer:has(main[class*='collection-edit--cateringPackages']) > .drawer__content {
-  width: min(640px, calc(100vw - 64px)) !important;
+  width: min(640px, calc(100vw - (var(--gg-dialog-pad) * 2))) !important;
 }
 .doc-drawer:has(main[class*='collection-edit--pages']) > .drawer__content {
-  width: min(960px, calc(100vw - 64px)) !important;
+  width: min(960px, calc(100vw - (var(--gg-dialog-pad) * 2))) !important;
+}
+.doc-drawer .drawer__content-children,
+.doc-drawer .collection-edit,
+.doc-drawer .collection-edit__form {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
 }
 .doc-drawer .drawer__content-children {
+  height: auto !important;
+}
+/* Payload's loading veil is position:fixed and, without a transformed parent, covers the whole window and blocks every click. */
+.doc-drawer .loading-overlay {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+}
+.doc-drawer .doc-drawer__header,
+.doc-drawer .doc-controls {
+  flex: 0 0 auto;
+}
+.doc-drawer .doc-drawer__header-content,
+.doc-drawer .doc-controls__wrapper,
+.doc-drawer .doc-controls__content,
+.doc-drawer .doc-controls__controls-wrapper {
+  min-width: 0;
+  max-width: 100%;
+}
+.doc-drawer .doc-controls__meta,
+.doc-drawer .doc-controls__controls {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+.doc-drawer .doc-controls__value,
+.doc-drawer .render-title {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.doc-drawer .collection-edit__main-wrapper {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
   overscroll-behavior: contain;
+}
+.doc-drawer .document-fields,
+.doc-drawer .document-fields__fields,
+.doc-drawer .rich-text-lexical,
+.doc-drawer .editor-scroller {
+  max-width: 100%;
+  min-width: 0;
+}
+.doc-drawer .ContentEditable__root {
+  min-height: 8em;
 }
 /* In a dialog the "ID" link would only reopen the same document. */
 .doc-drawer .id-label {
   display: none;
 }
-@media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 720px) {
   .doc-drawer.drawer {
+    --gg-dialog-pad: 12px;
     align-items: center;
-    padding: 12px;
   }
   .doc-drawer > .drawer__content {
+    width: min(760px, calc(100vw - 24px)) !important;
+  }
+  .doc-drawer:has(main[class*='collection-edit--pages']) > .drawer__content {
     width: calc(100vw - 24px) !important;
-    max-height: calc(100dvh - 24px);
-    border: 1px solid var(--gg-line);
-    border-radius: 10px;
+  }
+  .doc-drawer .document-fields__fields,
+  .doc-drawer .document-fields__sidebar-fields > .render-fields:not(:empty) {
+    padding: 16px;
   }
 }
 

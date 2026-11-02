@@ -55,6 +55,11 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-03 · Admin dialogs: one click and an inner scrollbar (requested by Aniket)
+- A list row opened only when the title itself was clicked. Status, date and the rest of the row now open the same dialog on the first click. Checkboxes and other controls are unchanged. Cmd/Ctrl-click still opens the page.
+- The dialog was clipping the bottom of the form: the card had a maximum height, but the form inside it grew and was cut off, so there was nothing to scroll. The title and save row stay fixed; the fields scroll inside the card. On a phone or a short window the card keeps a margin, the save buttons wrap, and the text area stays tall enough to write in.
+- Verified in the admin: one click on a row's date cell opens the dialog and stays on the list, a checkbox click does not, and a tall form scrolls inside the card at desktop and phone width while the title and save row stay put. No record was saved.
+
 ### 2026-11-03 · Admin round 4: centred dialogs and plain-language CMS (requested by Aniket)
 - Continued the interrupted Claude session and completed its usability pass:
   - every collection Add action and ordinary document link now opens a centred, focus-trapped dialog; compact forms use 640 px, normal forms 760 px and block pages 960 px; phones retain visible margins, and the page behind remains visible through blur without a dark overlay;

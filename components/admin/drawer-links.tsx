@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { type ReactNode, useEffect, useState } from 'react';
 
 // Every link to a document (`/admin/collections/{slug}/{id}`: list rows, dashboard rows, relationship cells) opens
-// the document in a drawer over the current screen instead of a separate page. Cmd/Ctrl/middle-click still open the
-// page. Mounted once for the whole admin (Payload `admin.components.providers`). "Create" uses create-button.tsx.
+// the document in a drawer over the current screen instead of a separate page. A click anywhere on the row does
+// the same, except on a checkbox or another control. Cmd/Ctrl/middle-click still open the page. Mounted once for
+// the whole admin (Payload `admin.components.providers`). "Create" uses create-button.tsx.
 
 const DOC_PATH = /^\/admin\/collections\/([^/]+)\/([^/]+)\/?$/;
 
@@ -38,9 +39,25 @@ export default function DrawerLinks({ children }: { children?: ReactNode }) {
     // ignores defaultPrevented) from navigating.
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      const a = (e.target as Element | null)?.closest?.('a[href]');
-      if (!(a instanceof HTMLAnchorElement) || a.target === '_blank' || a.origin !== window.location.origin) return;
-      const m = DOC_PATH.exec(a.pathname);
+      const el = e.target instanceof Element ? e.target : null;
+      if (!el) return;
+      // A control in the row (checkbox, menu, another button) keeps its own click.
+      if (el.closest('button, input, textarea, select, label, [role="menuitem"]')) return;
+      const clicked = el.closest('a[href]');
+      const cell = el.closest('td');
+      // The checkbox column selects the row; the rest of the row opens the document.
+      if (!(clicked instanceof HTMLAnchorElement) && cell?.querySelector('input[type="checkbox"]')) return;
+      const row = el.closest('tbody tr');
+      const link =
+        clicked instanceof HTMLAnchorElement
+          ? clicked
+          : [...(row?.querySelectorAll('a[href]') ?? [])].find(
+              (candidate): candidate is HTMLAnchorElement =>
+                candidate instanceof HTMLAnchorElement && DOC_PATH.test(candidate.pathname),
+            );
+      if (!(link instanceof HTMLAnchorElement) || link.target === '_blank' || link.origin !== window.location.origin)
+        return;
+      const m = DOC_PATH.exec(link.pathname);
       if (!m || m[2] === 'create' || m[2] === 'trash') return;
       e.preventDefault();
       e.stopPropagation();
