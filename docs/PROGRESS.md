@@ -68,6 +68,7 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ### 2026-11-03 · Redeploy on push
 - Requested by Aniket, who asked for a simple script and no further manual steps. `scripts/server/deploy.sh` is installed as `gg-deploy` on the server; `npm run deploy` runs it remotely; a one-minute cron deploys new commits once CI passed. Details in `02-ARCHITECTURE.md` §9.
+- Local `.env`: `DATABASE_URL` now names `/golden_grape` (Aniket's earlier decision). It had no database name, so localhost read the empty `test` database and showed no nav, store or Happy Hour, which is why the changes did not appear there. Localhost and the live site now share this database, S3 bucket and SMTP: edits made on localhost affect the live site, and forms send real e-mail.
 - Replaces the first design (GitHub Actions sending the build over a locked SSH key): adding the key to `authorized_keys` was stopped by the session's permission rules, and it would have needed manual steps. Builds now happen on the server.
 - The server side: new layout, pm2 cluster mode, receive script, nginx with HTTP/2, gzip, security headers, and `/_next/static` served from disk.
 - Verified by test: redeploy under load, 0 of 24 requests failed, 4 s. A deliberately broken release: rejected (exit 1), rolled back automatically, site unaffected. Re-deploying the same commit no longer touches the serving release.

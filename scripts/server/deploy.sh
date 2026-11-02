@@ -2,6 +2,7 @@
 # Builds `main` from GitHub on this server and releases it. Installed as /usr/local/bin/gg-deploy.
 #   gg-deploy         deploy now (from your machine: npm run deploy)
 #   gg-deploy --auto  run every minute by /etc/cron.d/golden-grape: deploys a new commit once its CI run passed
+# Log of automatic deployments: /var/log/gg-deploy.log
 export HOME=/root NVM_DIR=/root/.nvm
 # shellcheck disable=SC1091
 . "$NVM_DIR/nvm.sh" >/dev/null 2>&1
