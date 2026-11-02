@@ -1,0 +1,136 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-cormorant), ui-serif, Georgia, serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-ink: var(--ink);
+  --color-bone: var(--bone);
+  --color-champagne: var(--champagne);
+  --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
+  --color-gold-soft: var(--gold-soft);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--gold);
+  --color-primary-foreground: var(--ink);
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+}
+
+:root {
+  /* Golden Grape palette */
+  --ink: oklch(0.14 0.01 60); /* near-black warm */
+  --bone: oklch(0.97 0.008 85); /* warm bone white */
+  --champagne: oklch(0.93 0.03 85); /* champagne */
+  --gold: oklch(0.72 0.13 82); /* signature gold */
+  --gold-deep: oklch(0.58 0.12 70); /* deep antique gold */
+  --gold-soft: oklch(0.85 0.06 85); /* soft light gold */
+
+  --background: var(--bone);
+  --foreground: var(--ink);
+  --muted: oklch(0.94 0.01 85);
+  --muted-foreground: oklch(0.45 0.02 70);
+  --border: oklch(0.88 0.02 80);
+
+  --gradient-gold: linear-gradient(135deg, var(--gold-soft), var(--gold), var(--gold-deep));
+  --shadow-luxe: 0 30px 80px -20px oklch(0.14 0.01 60 / 0.35);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  :focus-visible {
+    outline-color: var(--gold-deep);
+  }
+}
+
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--gold-deep);
+}
+
+@utility hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold) 50%, transparent);
+}
+
+@utility text-gold-gradient {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes gg-slow-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+@keyframes gg-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes gg-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@utility animate-slow-zoom {
+  animation: gg-slow-zoom 20s ease-out forwards;
+}
+@utility animate-fade-up {
+  animation: gg-fade-up 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* 05 §7: honour reduced motion for the hero zoom and fade. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-slow-zoom,
+  .animate-fade-up {
+    animation: none;
+  }
+}

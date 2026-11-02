@@ -7,7 +7,7 @@ Update this file at the end of every task (`00-START-HERE.md` §2). The newest l
 | ID | Sub-milestone | Payment | Target | Status | Accepted by APPLUX |
 |---|---|---|---|---|---|
 | M1.1 | Foundation | P1 $300 | Tue 3 Nov | In progress (all ACs pass locally; AC-05 waits for the first push) | — |
-| M1.2 | Design system + i18n shell | P1 | Wed 4 Nov | Not started | — |
+| M1.2 | Design system + i18n shell | P1 | Wed 4 Nov | In progress (started at risk: AC-M1.1-05 waits for a push) | — |
 | M1.3 | CMS, pages, settings, roles | P1 | Thu 5 Nov | Not started | — |
 | M2.1 | Catalogue + inventory core | P2 $250 | Sat 7 Nov | Not started | — |
 | M2.2 | Shop, cart, accounts, SEO | P2 | Mon 9 Nov | Not started | — |
@@ -52,6 +52,11 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-10 | Until a real sample: CashMag CSV columns are mapped through configurable settings | M3.3 | — |
 
 ## 4. Log
+
+### 2026-11-02 · M1.2 T1 · Tokens
+- `tw-animate-css` 1.4.0. `app/globals.css` ported from the prototype's `styles.css`. Dropped: the `dark` custom variant (no dark mode) and `source(none)` + `@source "../src"` (Tailwind's default detection already skips the gitignored prototype). Added a visible gold focus colour and a reduced-motion rule for `animate-slow-zoom`/`animate-fade-up` (`05` §7). Font variables point to the `next/font` variables wired in T2's layout.
+- Found: `animate-marquee` (used by `Marquee.tsx`) is defined neither in the prototype CSS nor in `tw-animate-css`, so the prototype marquee is static. It is ported static.
+- Verification (Cormorant/Inter, colours) is done with the home page in T5.
 
 ### 2026-11-02 · M1.1 report
 | AC | Result | How verified |
