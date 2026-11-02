@@ -33,7 +33,7 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | ID | Question | Owner | Blocks | Status |
 |---|---|---|---|---|
 | Q-01 | Confirm D-01: MongoDB + Payload auth + S3 storage instead of Supabase PostgreSQL/Auth/Storage, to be written into the Rev 2.2 addendum | APPLUX | M1.1 (proceeding at risk) | Open |
-| Q-02 | Original brand photos (DEP-01): the prototype only has Lovable CDN pointers | APPLUX / Ivo | M1.2 T6 | Open |
+| Q-02 | Original brand photos (DEP-01): the prototype only has Lovable CDN pointers. Missing files listed in the M1.2 T6 log entry | APPLUX / Ivo | M1.2 T6 (home covered by stand-ins) | Open |
 | Q-03 | Staging host and MongoDB Atlas project (DEP-02) | APPLUX | M1.1 T5 (staging deploy only: `Blocked: DEP-02`) | Open |
 | Q-04 | Promotions do not apply to B2B list prices (A-03)? | APPLUX | M3.2 T4 | Open |
 | Q-05 | Loyalty points earned on `completed`, reversed on refund (A-08)? | APPLUX | M3.2 T3 | Open |
@@ -52,6 +52,19 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-10 | Until a real sample: CashMag CSV columns are mapped through configurable settings | M3.3 | — |
 
 ## 4. Log
+
+### 2026-11-02 · M1.2 T6 · Images (DEP-01)
+- `public/brand/`: the 11 real jpgs from the prototype's `src/assets/` plus `logo-dark.png` and `logo-light.png`. `lib/brand.ts` exports the 11 slots the home page uses (`heroWine`, `universeShop|Snack|Catering|Events`, `craftCheese|Port|Pastel`, `happyHour`, `gourmetTable`, `storeInterior`). All images use `next/image` with `sizes`; the hero and the logos use `priority`.
+- **Still missing (DEP-01, send to APPLUX):** the client's original photos behind the Lovable CDN pointers in `src/assets/brand/`:
+  - home-store: Home_0, 2, 3, 4, 8, 9, 10, 11, 18, 21
+  - owners-team: Owners_2, 3, 4, 5, 7, 8, 9
+  - shop-wines-gourmet: Shop_5, 6, 8, 9, 14, 16, 37
+  - snack-menu: Snack_1–7
+  - catering-events: Catering_1, 4, 6–12
+  - the logo jpg (`golden-grape-logo.asset.json`)
+
+  In the prototype, the home slots pointed at these originals (e.g. hero = Home_9, store = Home_0). The stand-in jpgs are the older assets. The named slot groups (`home.*`, `owners.*`, …) are not exported until their files exist (maison/shop/snack/catering pages use them from M1.3).
+- Dockerfile copies `public/` and takes `APP_URL` as a build arg.
 
 ### 2026-11-02 · M1.2 T5 · Home page
 - `app/(site)/[locale]/page.tsx` with nine sections ported 1:1 in `components/site/home/`: hero, universes, marquee, hospitality, craft, store, happy-hour, story, events. Server components, except Store (parallax) and HappyHour (countdown). `generateMetadata`: new `meta.home.*` keys in all four dictionaries (the prototype's `head()` text was English-only; the FR/DE/PT translations are mine and should be reviewed with DEP-05), canonical + hreflang via `alternates`, OG and Twitter.
