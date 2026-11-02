@@ -4,6 +4,8 @@ import type fr from '@/dictionaries/fr.json';
 export const LOCALES = ['fr', 'en', 'de', 'pt'] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = 'fr';
+/** Each language's name, written in that language (switchers and the admin show them as they are). */
+export const LOCALE_NAMES: Record<Locale, string> = { fr: 'Français', en: 'English', de: 'Deutsch', pt: 'Português' };
 export type Dictionary = typeof fr;
 
 export const isLocale = (value: string | undefined): value is Locale =>

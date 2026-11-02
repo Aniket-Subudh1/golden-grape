@@ -5,9 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useId, useRef, useState } from 'react';
 import { cn } from '@/lib/cn';
-import { type Locale, LOCALES } from '@/lib/i18n';
-
-const NAMES: Record<Locale, string> = { fr: 'Français', en: 'English', de: 'Deutsch', pt: 'Português' };
+import { type Locale, LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 
 type Props = { locale: Locale; label: string };
 
@@ -35,7 +33,7 @@ export function LanguageSwitcher({ locale, label }: Props) {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        aria-label={`${label}: ${NAMES[locale]}`}
+        aria-label={`${label}: ${LOCALE_NAMES[locale]}`}
         aria-haspopup="true"
         aria-expanded={open}
         aria-controls={menuId}
@@ -68,7 +66,7 @@ export function LanguageSwitcher({ locale, label }: Props) {
             >
               <span>
                 <span className="mr-3 text-[10px] tracking-[0.3em] uppercase opacity-60">{l}</span>
-                {NAMES[l]}
+                {LOCALE_NAMES[l]}
               </span>
               {l === locale && <Check className="h-3.5 w-3.5" />}
             </Link>

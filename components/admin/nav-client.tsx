@@ -7,6 +7,7 @@ import {
   ClipboardList,
   ExternalLink,
   FileText,
+  House,
   Images,
   LayoutDashboard,
   LogOut,
@@ -28,9 +29,11 @@ import { useEffect } from 'react';
 
 export type NavItem = { label: string; icon: string; href: string };
 export type NavGroup = { label: string; items: NavItem[] };
+type Text = Record<'main' | 'dashboard' | 'viewSite' | 'account' | 'signOut' | 'closeMenu' | 'brandSub', string>;
 
 const ICONS = {
   dashboard: LayoutDashboard,
+  home: House,
   pages: FileText,
   events: CalendarDays,
   catering: UtensilsCrossed,
@@ -67,7 +70,7 @@ function Item({ item, active, external }: { item: NavItem; active: boolean; exte
   );
 }
 
-export function NavClient({ groups }: { groups: NavGroup[] }) {
+export function NavClient({ groups, text }: { groups: NavGroup[]; text: Text }) {
   const pathname = usePathname();
   const { hydrated, navOpen, navRef, setNavOpen, shouldAnimate } = useNav();
   const { getPreference } = usePreferences();
@@ -93,16 +96,16 @@ export function NavClient({ groups }: { groups: NavGroup[] }) {
               <span className="gg-nav__brand-name">
                 Golden <b>Grape</b>
               </span>
-              <span className="gg-nav__brand-sub">Back office</span>
+              <span className="gg-nav__brand-sub">{text.brandSub}</span>
             </span>
           </Link>
-          <button type="button" className="gg-nav__close" aria-label="Close menu" onClick={() => setNavOpen(false)}>
+          <button type="button" className="gg-nav__close" aria-label={text.closeMenu} onClick={() => setNavOpen(false)}>
             <X />
           </button>
         </div>
 
-        <nav className="gg-nav__groups" aria-label="Main">
-          <Item item={{ label: 'Dashboard', icon: 'dashboard', href: '/admin' }} active={pathname === '/admin'} />
+        <nav className="gg-nav__groups" aria-label={text.main}>
+          <Item item={{ label: text.dashboard, icon: 'dashboard', href: '/admin' }} active={pathname === '/admin'} />
           {groups.map((group) => (
             <div key={group.label} className="gg-nav__group">
               <p className="gg-nav__group-label">{group.label}</p>
@@ -114,9 +117,9 @@ export function NavClient({ groups }: { groups: NavGroup[] }) {
         </nav>
 
         <div className="gg-nav__foot">
-          <Item item={{ label: 'View the website', icon: 'site', href: '/fr' }} active={false} external />
-          <Item item={{ label: 'My account', icon: 'account', href: '/admin/account' }} active={isActive('/admin/account')} />
-          <Item item={{ label: 'Sign out', icon: 'logout', href: '/admin/logout' }} active={false} />
+          <Item item={{ label: text.viewSite, icon: 'site', href: '/fr' }} active={false} external />
+          <Item item={{ label: text.account, icon: 'account', href: '/admin/account' }} active={isActive('/admin/account')} />
+          <Item item={{ label: text.signOut, icon: 'logout', href: '/admin/logout' }} active={false} />
         </div>
       </div>
     </aside>

@@ -1,17 +1,25 @@
 import { CalendarDays, Languages } from 'lucide-react';
 import Image from 'next/image';
+import type { I18nClient } from '@payloadcms/translations';
+import LanguageMenu from './language-menu';
+import { adminText } from './text';
 
 /**
- * Login screen (Payload `beforeLogin`), in the CUTM LMS login layout: the heading above the form, and on wide screens a
- * rounded photo panel on the right with two notes about what the back office does.
+ * Login screen (Payload `beforeLogin`), in the CUTM LMS login layout: the heading above the form, the admin
+ * language menu top-right, and on wide screens a rounded photo panel with two notes about the back office.
  */
-export default function LoginBrand() {
+export default function LoginBrand({ i18n }: { i18n: I18nClient }) {
+  const t = adminText(i18n.language).login;
   return (
     <>
+      <div className="gg-login-lang">
+        <LanguageMenu />
+      </div>
+
       <div className="gg-login-head">
         <Image src="/brand/mark.png" alt="" width={223} height={240} className="gg-login-head__mark" />
-        <h1>Sign in to the back office</h1>
-        <p>Use the e-mail address of your Golden Grape account.</p>
+        <h1>{t.title}</h1>
+        <p>{t.text}</p>
       </div>
 
       <aside className="gg-login-photo" aria-hidden="true">
@@ -21,8 +29,8 @@ export default function LoginBrand() {
             <Languages />
           </span>
           <span>
-            <b>Every page, four languages</b>
-            <span>French, English, German and Portuguese, edited side by side.</span>
+            <b>{t.note1}</b>
+            <span>{t.note1Text}</span>
           </span>
         </div>
         <div className="gg-login-note gg-login-note--bottom">
@@ -30,8 +38,8 @@ export default function LoginBrand() {
             <CalendarDays />
           </span>
           <span>
-            <b>Events, catering and Happy Hour</b>
-            <span>What you change here is on the website straight away.</span>
+            <b>{t.note2}</b>
+            <span>{t.note2Text}</span>
           </span>
         </div>
       </aside>

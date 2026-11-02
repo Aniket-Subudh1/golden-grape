@@ -70,13 +70,6 @@ export function nextWeekly(weekdays: number[], time: string, now: Date = new Dat
   throw new Error('nextWeekly: no weekday given');
 }
 
-/** Payload field helpers shared by BusinessSettings hours and the HappyHour global. */
-export const WEEKDAY_OPTIONS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((label, i) => ({
-  label,
-  value: String(i),
-}));
-export const validateHHmm = (value: unknown) =>
-  (typeof value === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(value)) || 'Use HH:mm, e.g. 09:30';
 
 type Slot = { day: string; open: string; close: string };
 

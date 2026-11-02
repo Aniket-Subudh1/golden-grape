@@ -3,10 +3,15 @@ import { fileURLToPath } from 'node:url';
 import { mongooseAdapter } from '@payloadcms/db-mongodb';
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
+import { de } from '@payloadcms/translations/languages/de';
+import { en } from '@payloadcms/translations/languages/en';
+import { fr } from '@payloadcms/translations/languages/fr';
+import { pt } from '@payloadcms/translations/languages/pt';
 import { s3Storage } from '@payloadcms/storage-s3';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
 import { env, isBuildPhase, s3Configured, smtpConfigured } from '@/lib/env';
+import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { cmsCollections } from '@/modules/cms/collections';
 import { cmsGlobals } from '@/modules/cms/globals';
 import { cateringPackages, cateringRequests } from '@/modules/catering/collections';
@@ -33,6 +38,7 @@ export default buildConfig({
       graphics: { Logo: '@/components/admin/logo', Icon: '@/components/admin/icon' },
       beforeLogin: ['@/components/admin/login-brand'],
       Nav: '@/components/admin/nav',
+      actions: ['@/components/admin/language-menu'],
       providers: ['@/components/admin/drawer-links'],
       views: { dashboard: { Component: '@/components/admin/dashboard' } },
     },
@@ -69,7 +75,76 @@ export default buildConfig({
   secret: isBuildPhase ? 'build-phase-no-secret' : env.PAYLOAD_SECRET,
   sharp,
   graphQL: { disable: true },
-  localization: { locales: ['fr', 'en', 'de', 'pt'], defaultLocale: 'fr', fallback: true },
+  // The language of the website text being edited, shown by name ("Texte du site : Português").
+  localization: {
+    locales: LOCALES.map((code) => ({ code, label: LOCALE_NAMES[code] })),
+    defaultLocale: 'fr',
+    fallback: true,
+  },
+  // The language of the admin itself, chosen on the login page or in the header (French until chosen: proxy.ts).
+  // A few of Payload's words are replaced by everyday ones for non-technical staff (docs/03-CODING-LAWS.md).
+  i18n: {
+    supportedLanguages: { fr, en, de, pt },
+    fallbackLanguage: 'fr',
+    translations: {
+      fr: {
+        general: {
+          locale: 'Texte du site',
+          createNew: 'Ajouter',
+          updatedSuccessfully: 'Enregistré. Le site est à jour.',
+          successfullyCreated: 'Ajouté. Le site est à jour.',
+        },
+        version: {
+          saveDraft: 'Enregistrer sans publier',
+          publishChanges: 'Enregistrer et mettre en ligne',
+          draftSavedSuccessfully: 'Enregistré, pas encore en ligne.',
+          preview: 'Voir sur le site',
+        },
+      },
+      en: {
+        general: {
+          locale: 'Website text',
+          createNew: 'Add',
+          updatedSuccessfully: 'Saved. The website is up to date.',
+          successfullyCreated: 'Added. The website is up to date.',
+        },
+        version: {
+          saveDraft: 'Save without publishing',
+          publishChanges: 'Save and show on website',
+          draftSavedSuccessfully: 'Saved, not online yet.',
+          preview: 'See it on the website',
+        },
+      },
+      de: {
+        general: {
+          locale: 'Websitetext',
+          createNew: 'Hinzufügen',
+          updatedSuccessfully: 'Gespeichert. Die Website ist aktuell.',
+          successfullyCreated: 'Hinzugefügt. Die Website ist aktuell.',
+        },
+        version: {
+          saveDraft: 'Speichern, nicht veröffentlichen',
+          publishChanges: 'Speichern und online stellen',
+          draftSavedSuccessfully: 'Gespeichert, noch nicht online.',
+          preview: 'Auf der Website ansehen',
+        },
+      },
+      pt: {
+        general: {
+          locale: 'Texto do site',
+          createNew: 'Adicionar',
+          updatedSuccessfully: 'Guardado. O site está atualizado.',
+          successfullyCreated: 'Adicionado. O site está atualizado.',
+        },
+        version: {
+          saveDraft: 'Guardar sem publicar',
+          publishChanges: 'Guardar e mostrar no site',
+          draftSavedSuccessfully: 'Guardado, ainda não está online.',
+          preview: 'Ver no site',
+        },
+      },
+    },
+  },
   plugins: [
     // Private bucket: files are served through Payload at /api/media/file/… (access control kept).
     s3Storage({

@@ -55,6 +55,20 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-03 · Admin round 4: centred dialogs and plain-language CMS (requested by Aniket)
+- Continued the interrupted Claude session and completed its usability pass:
+  - every collection Add action and ordinary document link now opens a centred, focus-trapped dialog; compact forms use 640 px, normal forms 760 px and block pages 960 px; phones retain visible margins, and the page behind remains visible through blur without a dark overlay;
+  - globals remain dedicated settings pages because Payload's document drawer supports collections only;
+  - prices and percentages are entered and listed as human values (`45,50 €`, `17 %`) while the database still stores integer cents/basis points;
+  - slugs are generated from titles and hidden; link destinations, weekdays and quarter-hour times are selected from named lists; optional SEO is collapsed;
+  - collection, global, field, role and status names use everyday wording in French, English, German and Portuguese.
+- Added a separate back-office language selector. French is the first-visit default; it does not change the website-content language selector. The custom sidebar, dashboard, login and quick actions follow the chosen language.
+- The simplification follows the usability principles Aniket asked to research: match the user's words, prevent invalid input, show only relevant choices, use progressive disclosure, and keep short focused tasks in a modal without losing list context.
+- Verified:
+  - `npm run check` passes (44 unit tests);
+  - browser at phone and desktop widths: French login/dashboard, English switch, create-event dialog, existing-event edit dialog, URL stays `/admin`, and 0 px horizontal overflow;
+  - no database record was created or changed during the browser check.
+
 ### 2026-11-03 · Admin round 3: settings pages, edit in drawers, request-time admin (requested by Aniket)
 - **Settings pages** (Business settings, Happy Hour, Header, Footer):
   - **Header row:** one sticky row with title, description and Save, replacing the title bar plus a separate Save bar. The developer-only Edit/API tabs are hidden.

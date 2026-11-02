@@ -23,9 +23,12 @@ import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997e
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { default as default_fe401d340ce00cc899cf727d6137f487 } from '@/components/admin/row-label'
+import { NumberCell as NumberCell_f2a5de4e6cd5b225ec768dfc00185072 } from '@/components/admin/number-field'
+import { default as default_f2a5de4e6cd5b225ec768dfc00185072 } from '@/components/admin/number-field'
 import { default as default_a2f0eccb7507197ce791108816851322 } from '@/components/admin/nav'
 import { default as default_0430f5fb3b8132a602107d7535a2a344 } from '@/components/admin/icon'
 import { default as default_334250e18ce0b45af3e0c04bb6fe8307 } from '@/components/admin/logo'
+import { default as default_0ca957152163a45f9a7fa850958278d9 } from '@/components/admin/language-menu'
 import { default as default_003a18697aceb07c0741f5f3fa2a6be8 } from '@/components/admin/login-brand'
 import { default as default_bcc6bb8feea1eb978bfac9964732c34d } from '@/components/admin/drawer-links'
 import { default as default_7215358aebef2f123662c81dc8a03dd2 } from '@/components/admin/dashboard'
@@ -59,9 +62,12 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/components/admin/row-label#default": default_fe401d340ce00cc899cf727d6137f487,
+  "@/components/admin/number-field#NumberCell": NumberCell_f2a5de4e6cd5b225ec768dfc00185072,
+  "@/components/admin/number-field#default": default_f2a5de4e6cd5b225ec768dfc00185072,
   "@/components/admin/nav#default": default_a2f0eccb7507197ce791108816851322,
   "@/components/admin/icon#default": default_0430f5fb3b8132a602107d7535a2a344,
   "@/components/admin/logo#default": default_334250e18ce0b45af3e0c04bb6fe8307,
+  "@/components/admin/language-menu#default": default_0ca957152163a45f9a7fa850958278d9,
   "@/components/admin/login-brand#default": default_003a18697aceb07c0741f5f3fa2a6be8,
   "@/components/admin/drawer-links#default": default_bcc6bb8feea1eb978bfac9964732c34d,
   "@/components/admin/dashboard#default": default_7215358aebef2f123662c81dc8a03dd2,

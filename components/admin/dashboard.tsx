@@ -13,7 +13,9 @@ import type { AdminViewServerProps } from 'payload';
 import type { ReactNode } from 'react';
 import { hasRole } from '@/lib/access';
 import { formatMoney } from '@/lib/money';
+import { REQUEST_STATUS } from '@/modules/catering/collections';
 import CreateButton from './create-button';
+import { adminText, type AdminLanguage } from './text';
 import { eventDate, toLocal, TZ } from '@/lib/time';
 
 // The admin home (Payload `admin.components.views.dashboard`), in the CUTM LMS home layout: title row, quick actions,
@@ -22,11 +24,9 @@ import { eventDate, toLocal, TZ } from '@/lib/time';
 
 type Attention = { key: string; href: string; title: string; detail: string; badge: string; tone: 'danger' | 'warning' };
 
-const greeting = (hour: number) => (hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening');
-const dateFmt = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: TZ });
-const shortFmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: TZ });
+const LANGUAGE_TAGS: Record<AdminLanguage, string> = { fr: 'fr-FR', en: 'en-GB', de: 'de-DE', pt: 'pt-PT' };
 
-function Section({ title, description, href, children }: { title: string; description: string; href?: string; children: ReactNode }) {
+function Section({ title, description, href, moreLabel, children }: { title: string; description: string; href?: string; moreLabel?: string; children: ReactNode }) {
   return (
     <section className="gg-card" aria-label={title}>
       <header className="gg-card__head">
@@ -36,7 +36,7 @@ function Section({ title, description, href, children }: { title: string; descri
         </div>
         {href && (
           <a href={href} className="gg-card__more">
-            View all <ChevronRight />
+            {moreLabel} <ChevronRight />
           </a>
         )}
       </header>
@@ -54,10 +54,16 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
   const { payload, user } = req;
   if (user?.collection !== 'users') return null;
 
+  const language = (req.i18n.language in LANGUAGE_TAGS ? req.i18n.language : 'fr') as AdminLanguage;
+  const locale = LANGUAGE_TAGS[language];
+  const t = adminText(language);
+  const dateFmt = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: TZ });
+  const shortFmt = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', timeZone: TZ });
   const now = new Date();
   const editor = hasRole(user, ['manager']);
   const sales = hasRole(user, ['sales']);
   const firstName = (user.name ?? '').split(' ')[0];
+  const greeting = t.home.greeting[toLocal(now).hour < 12 ? 0 : toLocal(now).hour < 18 ? 1 : 2];
 
   const [requests, newCount, upcoming, drafts, legalDrafts, media, settings] = await Promise.all([
     sales ? payload.find({ collection: 'cateringRequests', sort: '-createdAt', limit: 5, depth: 1, overrideAccess: true }) : null,
@@ -84,31 +90,32 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
       .map((r) => ({
         key: r.id,
         href: `/admin/collections/cateringRequests/${r.id}`,
-        title: `Catering request ${r.number}`,
-        detail: `${r.contact.name} · ${r.guests} guests · ${shortFmt.format(new Date(r.date))}`,
-        badge: 'New',
+        title: t.home.requestTitle(r.number),
+        detail: `${r.contact.name} · ${r.guests} ${t.home.guests} · ${shortFmt.format(new Date(r.date))}`,
+        badge: t.home.newBadge,
         tone: 'danger' as const,
       })),
     ...(upcoming && upcoming.totalDocs === 0
-      ? [{ key: 'no-events', href: '/admin/collections/events', title: 'No upcoming event is published', detail: 'The events page shows "no upcoming events" until one is dated and published.', badge: 'Website', tone: 'warning' as const }]
+      ? [{ key: 'no-events', href: '/admin/collections/events', title: t.home.noEventTitle, detail: t.home.noEventText, badge: t.home.websiteBadge, tone: 'warning' as const }]
       : []),
     ...(legalDrafts?.totalDocs
-      ? [{ key: 'legal', href: '/admin/collections/legal', title: `${legalDrafts.totalDocs} legal pages are still drafts`, detail: 'Publish them once the final texts are in, then they appear in the footer.', badge: 'Draft', tone: 'warning' as const }]
+      ? [{ key: 'legal', href: '/admin/collections/legal', title: t.home.legalTitle(legalDrafts.totalDocs), detail: t.home.legalText, badge: t.home.draftBadge, tone: 'warning' as const }]
       : []),
     ...(settings && !settings.business.facebook
-      ? [{ key: 'facebook', href: '/admin/globals/BusinessSettings', title: 'Facebook page link is missing', detail: 'Add it in Business settings to show the icon on the website.', badge: 'Settings', tone: 'warning' as const }]
+      ? [{ key: 'facebook', href: '/admin/globals/BusinessSettings', title: t.home.facebookTitle, detail: t.home.facebookText, badge: t.home.settingsBadge, tone: 'warning' as const }]
       : []),
   ];
 
   const actions: { label: string; href: string; icon: ReactNode; external?: boolean }[] = [
     ...(editor
       ? [
-          { label: 'Happy Hour', href: '/admin/globals/HappyHour', icon: <Wine /> },
-          { label: 'Business settings', href: '/admin/globals/BusinessSettings', icon: <Settings /> },
+          { label: t.home.changeHome, href: '/admin/globals/HomePage', icon: <LayoutDashboard /> },
+          { label: t.home.changeHappyHour, href: '/admin/globals/HappyHour', icon: <Wine /> },
+          { label: t.home.changeHours, href: '/admin/globals/BusinessSettings', icon: <Settings /> },
         ]
       : []),
-    ...(sales ? [{ label: 'Catering requests', href: '/admin/collections/cateringRequests', icon: <ClipboardList /> }] : []),
-    { label: 'View the website', href: '/fr', icon: <ExternalLink />, external: true },
+    ...(sales ? [{ label: t.home.seeRequests, href: '/admin/collections/cateringRequests', icon: <ClipboardList /> }] : []),
+    { label: t.nav.viewSite, href: '/fr', icon: <ExternalLink />, external: true },
   ];
 
   return (
@@ -118,17 +125,16 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
           <span className="gg-home__title-icon">
             <LayoutDashboard />
           </span>
-          {greeting(toLocal(now).hour)}
-          {firstName && `, ${firstName}`}
+          {firstName ? `${greeting}, ${firstName}` : greeting}
         </h1>
         <p>{dateFmt.format(now)}</p>
       </div>
 
-      <nav aria-label="Quick actions" className="gg-actions">
+      <nav aria-label={t.home.quickActions} className="gg-actions">
         {editor && (
           <>
-            <CreateButton collectionSlug="events" label="New event" />
-            <CreateButton collectionSlug="media" label="Upload photos" quiet />
+            <CreateButton collectionSlug="events" label={t.home.addEvent} />
+            <CreateButton collectionSlug="media" label={t.home.uploadPhotos} quiet />
           </>
         )}
         {actions.map((a) => (
@@ -142,14 +148,14 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
       <div className="gg-home__grid">
         <div className="gg-home__col">
           {!editor && !sales && (
-            <Section title="Nothing to manage yet" description="Your sections appear in the menu as they are switched on.">
-              <Empty>Ask the owner if you expected to see events, catering or settings here.</Empty>
+            <Section title={t.home.emptyTitle} description={t.home.emptyText}>
+              <Empty>{t.home.emptyBody}</Empty>
             </Section>
           )}
           {(editor || sales) && (
-            <Section title="Needs your attention" description="Things to do first, most urgent at the top.">
+            <Section title={t.home.attention} description={t.home.attentionText}>
               {attention.length === 0 ? (
-                <Empty>Nothing waiting. Everything is up to date.</Empty>
+                <Empty>{t.home.nothingWaiting}</Empty>
               ) : (
                 <ul className="gg-list">
                   {attention.map((a) => (
@@ -169,20 +175,20 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
           )}
 
           {upcoming && (
-            <Section title="Upcoming events" description="Published events, soonest first." href="/admin/collections/events">
+            <Section title={t.home.upcoming} description={t.home.upcomingText} href="/admin/collections/events" moreLabel={t.home.viewAll}>
               {upcoming.docs.length === 0 ? (
-                <Empty>No upcoming event. Add a date to an event and publish it.</Empty>
+                <Empty>{t.home.noUpcoming}</Empty>
               ) : (
                 <ul className="gg-list">
                   {upcoming.docs.map((e) => {
-                    const d = eventDate(e.startsAt, e.endsAt, 'en-GB');
+                    const d = eventDate(e.startsAt, e.endsAt, locale);
                     const start = new Date(e.startsAt);
                     return (
                       <li key={e.id}>
                         <a href={`/admin/collections/events/${e.id}`} className="gg-list__row">
                           <span className="gg-date">
-                            <span>{new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: TZ }).format(start)}</span>
-                            <b>{new Intl.DateTimeFormat('en-GB', { day: 'numeric', timeZone: TZ }).format(start)}</b>
+                            <span>{new Intl.DateTimeFormat(locale, { month: 'short', timeZone: TZ }).format(start)}</span>
+                            <b>{new Intl.DateTimeFormat(locale, { day: 'numeric', timeZone: TZ }).format(start)}</b>
                           </span>
                           <span className="gg-list__text">
                             <span className="gg-list__title">{e.title}</span>
@@ -190,7 +196,7 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
                               {d.date} · {d.time}
                             </span>
                           </span>
-                          <span className="gg-list__meta">{e.priceCents ? formatMoney(e.priceCents, 'fr', { compact: true }) : 'Free'}</span>
+                          <span className="gg-list__meta">{e.priceCents ? formatMoney(e.priceCents, locale, { compact: true }) : t.home.free}</span>
                         </a>
                       </li>
                     );
@@ -203,9 +209,9 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
 
         <div className="gg-home__col">
           {requests && (
-            <Section title="Recent catering requests" description="The last five, newest first." href="/admin/collections/cateringRequests">
+            <Section title={t.home.recentRequests} description={t.home.recentRequestsText} href="/admin/collections/cateringRequests" moreLabel={t.home.viewAll}>
               {requests.docs.length === 0 ? (
-                <Empty>No catering request yet.</Empty>
+                <Empty>{t.home.noRequests}</Empty>
               ) : (
                 <ul className="gg-list">
                   {requests.docs.map((r) => (
@@ -214,10 +220,12 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
                         <span className="gg-list__text">
                           <span className="gg-list__title">{r.contact.name}</span>
                           <span className="gg-list__detail">
-                            {r.number} · {r.guests} guests · {formatMoney(r.estimateCents, 'fr', { compact: true })}
+                            {r.number} · {r.guests} {t.home.guests} · {formatMoney(r.estimateCents, locale, { compact: true })}
                           </span>
                         </span>
-                        <span className={`gg-badge gg-badge--${r.status === 'new' ? 'danger' : 'neutral'}`}>{r.status}</span>
+                        <span className={`gg-badge gg-badge--${r.status === 'new' ? 'danger' : 'neutral'}`}>
+                          {REQUEST_STATUS.find((status) => status.value === r.status)?.label[language] ?? r.status}
+                        </span>
                       </a>
                     </li>
                   ))}
@@ -227,35 +235,35 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
           )}
 
           {editor && (
-            <Section title="At a glance" description="What the website holds today.">
+            <Section title={t.home.glance} description={t.home.glanceText}>
               <dl className="gg-facts">
                 <div>
                   <dt>
-                    <CalendarDays /> Upcoming events
+                    <CalendarDays /> {t.home.upcomingCount}
                   </dt>
                   <dd>{upcoming?.totalDocs ?? 0}</dd>
                 </div>
                 <div>
                   <dt>
-                    <CalendarDays /> Event drafts
+                    <CalendarDays /> {t.home.eventDrafts}
                   </dt>
                   <dd>{drafts?.totalDocs ?? 0}</dd>
                 </div>
                 <div>
                   <dt>
-                    <ClipboardList /> New requests
+                    <ClipboardList /> {t.home.newRequests}
                   </dt>
                   <dd>{newCount?.totalDocs ?? 0}</dd>
                 </div>
                 <div>
                   <dt>
-                    <ImagePlus /> Photos
+                    <ImagePlus /> {t.home.photos}
                   </dt>
                   <dd>{media?.totalDocs ?? 0}</dd>
                 </div>
                 <div>
                   <dt>
-                    <Scale /> Legal drafts
+                    <Scale /> {t.home.legalDrafts}
                   </dt>
                   <dd>{legalDrafts?.totalDocs ?? 0}</dd>
                 </div>

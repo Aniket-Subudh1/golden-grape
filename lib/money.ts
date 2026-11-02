@@ -20,3 +20,17 @@ export const formatMoney = (cents: number, locale: string, { compact = false } =
     currency: 'EUR',
     ...(compact && cents % 100 === 0 ? { minimumFractionDigits: 0, maximumFractionDigits: 0 } : {}),
   }).format(cents / 100);
+
+/**
+ * An amount typed by a person ("45", "45,5", "45.50 €", "17 %") → integer units × `scale` (cents for €, basis points
+ * for %), rounded half away from zero on the next digit. `NaN` when it is empty or not a number.
+ */
+export function parseDecimal(input: string, scale = 100): number {
+  const s = input.replace(/[\s€%]/g, '').replace(',', '.');
+  const m = /^(-?)(\d*)(?:\.(\d*))?$/.exec(s);
+  if (!m || (m[2] === '' && !m[3])) return NaN;
+  const digits = Math.round(Math.log10(scale));
+  const frac = `${m[3] ?? ''}${'0'.repeat(digits + 1)}`;
+  const units = Number(m[2] || '0') * scale + Number(frac.slice(0, digits) || '0') + (Number(frac[digits]) >= 5 ? 1 : 0);
+  return m[1] ? -units : units;
+}

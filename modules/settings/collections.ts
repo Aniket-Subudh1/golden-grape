@@ -1,19 +1,34 @@
 import { APIError, type CollectionConfig, type FieldAccess } from 'payload';
 import { hasRole, hiddenUnless, isStaff, none, ROLES } from '@/lib/access';
-import { createInDrawer } from '@/lib/admin';
-import { LOCALES } from '@/lib/i18n';
+import { createInDrawer, l } from '@/lib/admin';
+import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 
 const adminOnly: FieldAccess = ({ req }) => hasRole(req.user, ['admin']);
 
+// What each role may do, in everyday words (the values stay the role codes of lib/access.ts).
+const ROLE_LABELS: Record<(typeof ROLES)[number], ReturnType<typeof l>> = {
+  admin: l('Propriétaire : tout', 'Owner: everything', 'Inhaber: alles', 'Proprietário: tudo'),
+  manager: l('Gérant : site et réglages', 'Manager: website and settings', 'Leitung: Website und Einstellungen', 'Gerente: site e definições'),
+  sales: l('Ventes : demandes traiteur', 'Sales: catering requests', 'Verkauf: Catering-Anfragen', 'Vendas: pedidos de catering'),
+  stock: l('Stock : boutique (bientôt)', 'Stock: shop (coming soon)', 'Lager: Shop (demnächst)', 'Stock: loja (em breve)'),
+  attendance: l('Pointage (bientôt)', 'Time clock (coming soon)', 'Zeiterfassung (demnächst)', 'Ponto (em breve)'),
+};
+
 const users: CollectionConfig = {
   slug: 'users',
+  labels: { singular: l('Membre de l’équipe', 'Team member', 'Teammitglied', 'Membro da equipa'), plural: l('Équipe', 'Team', 'Team', 'Equipa') },
   auth: true,
   admin: {
     useAsTitle: 'name',
-    group: 'People',
     defaultColumns: ['name', 'email', 'roles', 'active'],
     hidden: hiddenUnless('manager'),
-    components: createInDrawer('users', 'New user'),
+    description: l(
+      'Les personnes qui peuvent se connecter ici, et ce que chacune peut faire.',
+      'The people who can sign in here, and what each one may do.',
+      'Die Personen, die sich hier anmelden können, und was jede darf.',
+      'As pessoas que podem entrar aqui e o que cada uma pode fazer.',
+    ),
+    components: createInDrawer('users', l('Ajouter une personne', 'Add a person', 'Person hinzufügen', 'Adicionar uma pessoa')),
   },
   access: {
     // Every staff member reads and edits their own profile; admin/manager read everyone; only admin manages accounts.
@@ -44,37 +59,64 @@ const users: CollectionConfig = {
     ],
   },
   fields: [
-    { name: 'name', type: 'text', required: true },
+    { name: 'name', type: 'text', required: true, label: l('Nom', 'Name', 'Name', 'Nome') },
     {
       name: 'roles',
       type: 'select',
       hasMany: true,
       required: true,
       saveToJWT: true,
-      options: [...ROLES],
+      label: l('Peut gérer', 'May manage', 'Darf verwalten', 'Pode gerir'),
+      options: ROLES.map((value) => ({ value, label: ROLE_LABELS[value] })),
       access: { create: adminOnly, update: adminOnly },
     },
-    { name: 'active', type: 'checkbox', defaultValue: true, access: { create: adminOnly, update: adminOnly } },
-    { name: 'locale', type: 'select', options: [...LOCALES], defaultValue: 'fr', required: true },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'active',
+          type: 'checkbox',
+          defaultValue: true,
+          label: l('Peut se connecter', 'May sign in', 'Darf sich anmelden', 'Pode entrar'),
+          access: { create: adminOnly, update: adminOnly },
+          admin: { width: '50%' },
+        },
+        {
+          name: 'locale',
+          type: 'select',
+          options: LOCALES.map((value) => ({ value, label: LOCALE_NAMES[value] })),
+          defaultValue: 'fr',
+          required: true,
+          label: l('Langue des e-mails', 'Language of e-mails', 'Sprache der E-Mails', 'Língua dos e-mails'),
+          admin: { width: '50%', isClearable: false },
+        },
+      ],
+    },
   ],
 };
 
 const auditLogs: CollectionConfig = {
   slug: 'auditLogs',
+  labels: { singular: l('Action', 'Action', 'Aktion', 'Ação'), plural: l('Historique', 'Activity history', 'Verlauf', 'Histórico') },
   admin: {
     useAsTitle: 'action',
-    group: 'Settings',
-    defaultColumns: ['action', 'targetCollection', 'docId', 'user', 'createdAt'],
-    hidden: hiddenUnless('manager'),
+    defaultColumns: ['createdAt', 'user', 'action', 'targetCollection'],
+    hidden: hiddenUnless('admin'),
+    description: l(
+      'Qui a changé quoi et quand. Lecture seule.',
+      'Who changed what, and when. Read only.',
+      'Wer was wann geändert hat. Nur lesen.',
+      'Quem mudou o quê e quando. Só leitura.',
+    ),
   },
-  access: { read: isStaff('manager'), create: none, update: none, delete: none },
+  access: { read: isStaff('admin'), create: none, update: none, delete: none },
   fields: [
-    { name: 'user', type: 'relationship', relationTo: 'users' },
-    { name: 'action', type: 'text', required: true, index: true },
-    { name: 'targetCollection', type: 'text', required: true },
-    { name: 'docId', type: 'text', required: true, index: true },
-    { name: 'before', type: 'json' },
-    { name: 'after', type: 'json' },
+    { name: 'user', type: 'relationship', relationTo: 'users', label: l('Personne', 'Person', 'Person', 'Pessoa') },
+    { name: 'action', type: 'text', required: true, index: true, label: l('Action', 'Action', 'Aktion', 'Ação') },
+    { name: 'targetCollection', type: 'text', required: true, label: l('Où', 'Where', 'Wo', 'Onde') },
+    { name: 'docId', type: 'text', required: true, index: true, admin: { hidden: true } },
+    { name: 'before', type: 'json', label: l('Avant', 'Before', 'Vorher', 'Antes') },
+    { name: 'after', type: 'json', label: l('Après', 'After', 'Nachher', 'Depois') },
   ],
 };
 

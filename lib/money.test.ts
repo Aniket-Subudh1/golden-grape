@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { add, formatMoney, mulQty, netToGross, pct, vatFromGross } from './money';
+import { add, formatMoney, mulQty, netToGross, parseDecimal, pct, vatFromGross } from './money';
 
 describe('money', () => {
   it.each([
@@ -25,5 +25,25 @@ describe('money', () => {
 
   it('formats French euros with a narrow no-break space group and a no-break space before €', () => {
     expect(formatMoney(123456, 'fr')).toBe('1 234,56 €');
+  });
+
+  // What staff type in the admin's € and % fields becomes integer cents / basis points.
+  it.each([
+    ['45', 100, 4500],
+    ['45,5', 100, 4550],
+    ['45.50 €', 100, 4550],
+    ['0,005', 100, 1],
+    ['0,004', 100, 0],
+    ['1 234,56', 100, 123456],
+    [',5', 100, 50],
+    ['17 %', 100, 1700],
+    ['8,25', 100, 825],
+    ['-3,5', 100, -350],
+  ])('parseDecimal(%j, %i) = %i', (input, scale, expected) => {
+    expect(parseDecimal(input, scale)).toBe(expected);
+  });
+
+  it.each(['', 'abc', '4,5,6', '12a', '-'])('parseDecimal(%j) is NaN', (input) => {
+    expect(parseDecimal(input)).toBeNaN();
   });
 });

@@ -228,6 +228,88 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   height: 22px;
 }
 
+/* Back-office language (separate from the website-content language selector). */
+.gg-menu {
+  position: relative;
+}
+.gg-menu__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 11px;
+  border: 1px solid var(--gg-line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--gg-ink);
+  font: 500 13px/1 var(--font-body);
+  cursor: pointer;
+}
+.gg-menu__button:hover {
+  border-color: var(--gg-gold);
+  background: var(--gg-accent);
+}
+.gg-menu__button svg {
+  width: 15px;
+  height: 15px;
+  color: var(--gg-primary);
+}
+.gg-menu__chevron {
+  width: 12px !important;
+  color: var(--gg-text-2) !important;
+}
+.gg-menu__list {
+  position: absolute;
+  z-index: 120;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 220px;
+  padding: 6px;
+  border: 1px solid var(--gg-line);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 16px 44px rgb(26 23 18 / 0.16);
+}
+.gg-menu__title {
+  margin: 0;
+  padding: 8px 10px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gg-text-2);
+}
+.gg-menu__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--gg-ink);
+  font: 500 13px/1 var(--font-body);
+  text-align: left;
+  cursor: pointer;
+}
+.gg-menu__item:hover,
+.gg-menu__item[aria-checked='true'] {
+  background: var(--gg-primary-tint);
+  color: var(--gg-primary);
+}
+.gg-menu__item svg {
+  width: 15px;
+  height: 15px;
+}
+.gg-login-lang {
+  position: fixed;
+  z-index: 5;
+  top: 28px;
+  right: 28px;
+}
+
 /* The menu button: on desktops the sidebar stays open (nav-client.tsx), so there is none; below 1025 px the button in
    the header opens it (Payload shows that one on phones only, and a floating one on tablets that covers the header). */
 @media (min-width: 1025px) {
@@ -501,6 +583,27 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 .document-fields--has-sidebar .document-fields__fields {
   max-width: none;
 }
+.gg-number__box {
+  position: relative;
+}
+.gg-number__box input {
+  width: 100%;
+  padding-right: 42px;
+}
+.gg-number__suffix {
+  position: absolute;
+  top: 50%;
+  right: 13px;
+  color: var(--gg-text-2);
+  font-size: 13px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+.gg-number__hint {
+  margin: 5px 0 0;
+  color: var(--gg-danger);
+  font-size: 12px;
+}
 @media (max-width: 768px) {
   .document-fields__fields {
     padding: 20px 16px;
@@ -633,9 +736,66 @@ main[class*='global-edit--'] .document-fields__fields {
 .doc-controls__content:has(> .doc-controls__meta:empty) + .doc-controls__controls-wrapper {
   border-top: 0;
 }
-/* In a drawer the "ID" link would only reopen the same document. */
+/*
+ * Collection create/edit screens are centred dialogs, not side panels. The form chooses a useful maximum width:
+ * compact records stay compact, while pages with blocks can use the wider size. On a phone it becomes a safe
+ * full-screen sheet. Payload still owns focus trapping, Escape, scrolling and nested relationship dialogs.
+ */
+.doc-drawer.drawer {
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+.doc-drawer .drawer__blur-bg {
+  background: transparent;
+  backdrop-filter: blur(8px);
+}
+.doc-drawer > .drawer__close {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  background: transparent;
+}
+.doc-drawer > .drawer__content {
+  width: min(760px, calc(100vw - 64px)) !important;
+  max-height: calc(100dvh - 64px);
+  border: 1px solid var(--gg-line);
+  border-radius: 10px;
+  background: var(--gg-panel);
+  box-shadow: 0 24px 80px rgb(26 23 18 / 0.24);
+  transform: translateY(16px) scale(0.985);
+}
+.doc-drawer.drawer--is-open > .drawer__content {
+  transform: translateY(0) scale(1);
+}
+.doc-drawer:has(main[class*='collection-edit--media']) > .drawer__content,
+.doc-drawer:has(main[class*='collection-edit--users']) > .drawer__content,
+.doc-drawer:has(main[class*='collection-edit--cateringPackages']) > .drawer__content {
+  width: min(640px, calc(100vw - 64px)) !important;
+}
+.doc-drawer:has(main[class*='collection-edit--pages']) > .drawer__content {
+  width: min(960px, calc(100vw - 64px)) !important;
+}
+.doc-drawer .drawer__content-children {
+  overscroll-behavior: contain;
+}
+/* In a dialog the "ID" link would only reopen the same document. */
 .doc-drawer .id-label {
   display: none;
+}
+@media (max-width: 768px) {
+  .doc-drawer.drawer {
+    align-items: center;
+    padding: 12px;
+  }
+  .doc-drawer > .drawer__content {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100dvh - 24px);
+    border: 1px solid var(--gg-line);
+    border-radius: 10px;
+  }
 }
 
 /* Payload's document meta row (last modified / created) does not wrap on phones and widens the page. */
