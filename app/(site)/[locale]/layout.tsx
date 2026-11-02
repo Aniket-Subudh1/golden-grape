@@ -52,7 +52,12 @@ async function SiteFooter({ locale, t }: { locale: Locale; t: Dictionary }) {
       columns={(footer.columns ?? []).map((col) => ({ title: col.title, items: (col.links ?? []).map(toItem(locale)) }))}
       contactTitle={t.footer.colContact}
       business={business}
-      legal={footer.legal.map((doc) => ({ label: doc.title, href: localePath(locale, `/legal/${doc.slug}`) }))}
+      // The prototype's two labels stay as plain text until the real legal pages are published (DEP-05).
+      legal={
+        footer.legal.length > 0
+          ? footer.legal.map((doc) => ({ label: doc.title, href: localePath(locale, `/legal/${doc.slug}`) }))
+          : [{ label: t.footer.legal }, { label: t.footer.privacy }]
+      }
     />
   );
 }

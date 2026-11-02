@@ -114,7 +114,27 @@
     "titleA": "Jede Woche",
     "titleB": "ein Rendezvous.",
     "fullCal": "Vollständige Agenda",
-    "reserve": "Reservieren"
+    "reserve": "Reservieren",
+    "items": {
+      "friday": {
+        "date": "Freitagabend",
+        "time": "19:00 — 23:00",
+        "title": "Fado-Abend",
+        "desc": "Portugiesischer Live-Gesang, Tapas und Port — die Seele Lissabons in Luxemburg."
+      },
+      "golden": {
+        "date": "Jeden Mittwoch",
+        "time": "17:00 — 20:00",
+        "title": "Golden Hour",
+        "desc": "Willkommensglas geschenkt, Sharing-Boards und portugiesischer Jazz."
+      },
+      "tasting": {
+        "date": "Einmal im Monat samstags",
+        "time": "16:00 — 18:00",
+        "title": "Geführte Verkostung",
+        "desc": "Sechs Weine, ein Winzer zu Gast, eine Geografie des Geschmacks."
+      }
+    }
   },
   "socialProof": {
     "eyebrow": "Man spricht über uns",
@@ -155,7 +175,9 @@
   "footer": {
     "colContact": "Uns finden",
     "rights": "© {{year}} Golden Grape Luxembourg. Alle Rechte vorbehalten.",
-    "moderation": "Bitte trinken Sie verantwortungsvoll."
+    "moderation": "Bitte trinken Sie verantwortungsvoll.",
+    "legal": "Impressum",
+    "privacy": "Datenschutz"
   },
   "floatingCart": {
     "label": "Warenkorb",

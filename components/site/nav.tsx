@@ -13,10 +13,13 @@ import { type NavItem, NavLink } from './nav-link';
 type Props = { locale: Locale; items: NavItem[]; labels: { openMenu: string; closeMenu: string; language: string } };
 
 const LOGO_ALT = 'Golden Grape · Mäi Wäin';
+// Logo files are trimmed to the same 1085×859 box, so the two versions cross-fade exactly on top of each other.
+const LOGO = { width: 1085, height: 859, sizes: '(min-width: 768px) 122px, 90px' };
 
-/** Transparent over the home hero until the page scrolls; solid everywhere else. */
+/** Transparent and tall over the home hero; compact and solid after scrolling and on every other page. */
 export function Nav({ locale, items, labels }: Props) {
-  const isHome = usePathname() === localePath(locale);
+  const pathname = usePathname();
+  const isHome = pathname === localePath(locale);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -28,89 +31,102 @@ export function Nav({ locale, items, labels }: Props) {
     return () => window.removeEventListener('scroll', onScroll);
   }, [isHome]);
 
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
   const solid = !isHome || scrolled;
-  const linkClass = (item: NavItem) => (item.href ? 'transition-colors hover:text-gold' : undefined);
+  const isActive = (item: NavItem) => !!item.href && (pathname === item.href || pathname.startsWith(`${item.href}/`));
+  const linkClass = (item: NavItem) =>
+    cn(
+      'relative py-1.5',
+      item.href &&
+        'transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-gold after:transition-transform after:duration-500 hover:text-gold hover:after:scale-x-100',
+      isActive(item) && 'text-gold-deep after:scale-x-100',
+    );
+  const linkRow = 'hidden items-center text-[11px] font-medium tracking-[0.28em] uppercase lg:flex';
 
   return (
     <header
       className={cn(
         'fixed inset-x-0 top-0 z-50 transition-all duration-500',
-        solid ? 'border-b border-border/60 bg-bone/85 text-ink backdrop-blur-xl' : 'bg-transparent text-bone',
+        solid ? 'border-b border-border/60 bg-bone/90 text-ink backdrop-blur-xl' : 'bg-gradient-to-b from-ink/60 to-transparent text-bone',
       )}
     >
-      <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-5 md:h-20 md:px-10">
-        <button onClick={() => setOpen(true)} className="-ml-2 p-2 lg:hidden" aria-label={labels.openMenu}>
-          <Menu className="h-5 w-5" />
-        </button>
+      <div
+        className={cn(
+          'mx-auto grid max-w-[1400px] grid-cols-[1fr_auto_1fr] items-center px-5 transition-all duration-500 md:px-10',
+          solid ? 'h-20 md:h-24' : 'h-24 md:h-32',
+        )}
+      >
+        <div className="flex items-center">
+          <button onClick={() => setOpen(true)} className="-ml-2 p-2 lg:hidden" aria-label={labels.openMenu}>
+            <Menu className="h-5 w-5" />
+          </button>
+          <nav className={cn(linkRow, 'gap-9')}>
+            {items.slice(0, 3).map((item) => (
+              <NavLink key={item.label} item={item} className={linkClass(item)} aria-current={isActive(item) ? 'page' : undefined} />
+            ))}
+          </nav>
+        </div>
 
-        <nav className="hidden items-center gap-9 text-[11px] font-medium tracking-[0.28em] uppercase lg:flex">
-          {items.slice(0, 3).map((item) => (
-            <NavLink key={item.label} item={item} className={linkClass(item)} />
-          ))}
-        </nav>
-
-        <Link href={localePath(locale)} className="group flex items-center gap-3" aria-label="Golden Grape">
-          <span className="relative block h-10 w-auto md:h-14">
+        <Link href={localePath(locale)} className="block" aria-label="Golden Grape">
+          <span className={cn('relative block aspect-[1085/859] transition-all duration-500', solid ? 'h-16 md:h-20' : 'h-20 md:h-28')}>
             <Image
               src="/brand/logo-light.png"
               alt=""
               aria-hidden="true"
-              width={1200}
-              height={1200}
               priority
-              sizes="56px"
-              className={cn('h-full w-auto object-contain transition-opacity duration-500', solid ? 'opacity-0' : 'opacity-100')}
+              fill
+              sizes={LOGO.sizes}
+              className={cn('object-contain transition-opacity duration-500', solid ? 'opacity-0' : 'opacity-100')}
             />
             <Image
               src="/brand/logo-dark.png"
               alt={LOGO_ALT}
-              width={1200}
-              height={1200}
               priority
-              sizes="56px"
-              className={cn(
-                'absolute inset-0 h-full w-auto object-contain transition-opacity duration-500',
-                solid ? 'opacity-100' : 'opacity-0',
-              )}
+              fill
+              sizes={LOGO.sizes}
+              className={cn('object-contain transition-opacity duration-500', solid ? 'opacity-100' : 'opacity-0')}
             />
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-7 text-[11px] font-medium tracking-[0.28em] uppercase lg:flex">
+        <nav className={cn(linkRow, 'justify-end gap-7')}>
           {items.slice(3).map((item) => (
-            <NavLink key={item.label} item={item} className={linkClass(item)} />
+            <NavLink key={item.label} item={item} className={linkClass(item)} aria-current={isActive(item) ? 'page' : undefined} />
           ))}
           <span className="mx-1 h-3 w-px bg-current opacity-20" />
           <LanguageSwitcher locale={locale} label={labels.language} tone={solid ? 'dark' : 'light'} />
         </nav>
-
-        {/* Keeps the logo centred on mobile while the account and cart icons are hidden (until M2.2). */}
-        <span className="w-9 lg:hidden" aria-hidden="true" />
       </div>
 
       <div
         className={cn(
-          'fixed inset-0 z-50 bg-ink text-bone transition-opacity duration-500',
+          'fixed inset-0 z-50 h-dvh overflow-y-auto bg-ink text-bone transition-opacity duration-500',
           open ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0',
         )}
         inert={!open}
       >
-        <div className="flex h-16 items-center justify-between px-5">
-          <span className="eyebrow text-gold">Golden Grape</span>
-          <button onClick={() => setOpen(false)} aria-label={labels.closeMenu}>
+        <div className="flex h-24 items-center justify-between px-5">
+          <Image src="/brand/logo-light.png" alt={LOGO_ALT} width={LOGO.width} height={LOGO.height} sizes="90px" className="h-20 w-auto" />
+          <button onClick={() => setOpen(false)} aria-label={labels.closeMenu} className="-mr-2 p-2">
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="flex flex-col gap-8 px-8 pt-16">
+        <div className="flex flex-col gap-6 px-8 pt-10 pb-10">
           {items.map((item) => (
             <NavLink
               key={item.label}
               item={item}
               onClick={() => setOpen(false)}
-              className="font-serif text-5xl tracking-tight"
+              className={cn('font-serif text-4xl font-light tracking-tight sm:text-5xl', isActive(item) && 'text-gold')}
             />
           ))}
-          <div className="border-t border-bone/10 pt-8">
+          <div className="mt-2 border-t border-bone/10 pt-8">
             <LanguageSwitcher locale={locale} label={labels.language} tone="light" placement="above-start" />
           </div>
         </div>

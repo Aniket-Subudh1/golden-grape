@@ -89,7 +89,10 @@ export function Store({ t, address, hours, schedule, closedDates, directionsHref
                       </span>
                     ))}
                     {open !== undefined && (
-                      <span className={open ? 'block text-gold' : 'block text-bone/50'}>{open ? t.openNow : t.closedNow}</span>
+                      <span className={open ? 'flex items-center gap-2 text-gold' : 'flex items-center gap-2 text-bone/50'}>
+                        <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+                        {open ? t.openNow : t.closedNow}
+                      </span>
                     )}
                   </dd>
                 </div>

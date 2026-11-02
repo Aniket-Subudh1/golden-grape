@@ -6,6 +6,7 @@ import { Container } from '@/components/site/container';
 import { MediaCard } from '@/components/site/media-card';
 import { MediaGrid } from '@/components/site/media-grid';
 import { PageHero } from '@/components/site/page-hero';
+import { Button } from '@/components/ui/button';
 import { alternates, type Dictionary, getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { eventDate } from '@/lib/time';
@@ -47,7 +48,13 @@ async function EventList({ locale, t }: { locale: Locale; t: Dictionary['eventsP
           >
             <div className="flex flex-1 flex-col p-6">
               <p className="flex-1 text-sm font-light text-ink/60">{e.description}</p>
-              <span className="mt-5 font-serif text-xl">{e.priceCents ? formatMoney(e.priceCents, locale) : t.free}</span>
+              <div className="relative z-10 mt-5 flex items-center justify-between">
+                <span className="font-serif text-xl">{e.priceCents ? formatMoney(e.priceCents, locale, { compact: true }) : t.free}</span>
+                {/* Online booking arrives in M2.3; until then a request goes through the contact form. */}
+                <Button asChild className="h-10 text-[10px]">
+                  <Link href={localePath(locale, '/contact')}>{t.reserve}</Link>
+                </Button>
+              </div>
             </div>
           </MediaCard>
         );

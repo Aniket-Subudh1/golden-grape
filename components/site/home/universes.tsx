@@ -52,12 +52,10 @@ export function Universes({ t, hrefs }: { t: Dictionary['universes']; hrefs: Par
                   <div>
                     <h3 className="font-serif text-5xl leading-none font-light md:text-7xl">{card.title}</h3>
                     <p className="mt-5 max-w-md text-sm leading-relaxed font-light text-bone/75 md:text-base">{card.desc}</p>
-                    {href && (
-                      <div className="mt-8 inline-flex items-center gap-3 text-[11px] tracking-[0.3em] text-gold uppercase">
-                        {card.cta}
-                        <span className="h-px w-8 bg-gold transition-all duration-500 group-hover:w-16" />
-                      </div>
-                    )}
+                    <div className="mt-8 inline-flex items-center gap-3 text-[11px] tracking-[0.3em] text-gold uppercase">
+                      {card.cta}
+                      <span className="h-px w-8 bg-gold transition-all duration-500 group-hover:w-16" />
+                    </div>
                   </div>
                 </div>
               </>

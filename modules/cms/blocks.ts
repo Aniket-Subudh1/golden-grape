@@ -65,7 +65,7 @@ export const cta: Block = {
       maxRows: 2,
       fields: [
         text('label', true),
-        { name: 'href', type: 'text', required: true, admin: { description: 'Path without language, e.g. /contact' } },
+        { name: 'href', type: 'text', admin: { description: 'Path without language, e.g. /contact. Empty: not clickable (page not online yet).' } },
         { name: 'style', type: 'select', options: ['solid', 'outline'], defaultValue: 'solid', required: true },
       ],
     },

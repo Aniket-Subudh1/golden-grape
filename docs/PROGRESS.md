@@ -33,7 +33,7 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | ID | Question | Owner | Blocks | Status |
 |---|---|---|---|---|
 | Q-01 | Confirm D-01: MongoDB + Payload auth + S3 storage instead of Supabase PostgreSQL/Auth/Storage, to be written into the Rev 2.2 addendum | APPLUX | M1.1 (proceeding at risk) | Open |
-| Q-02 | Original brand photos (DEP-01): the prototype only has Lovable CDN pointers. Missing files listed in the M1.2 T6 log entry | APPLUX / Ivo | M1.2 T6 (home covered by stand-ins) | Open |
+| Q-02 | Original brand photos (DEP-01): **recovered** from the published Lovable app (45 files, sizes match the repo's records) and now in `public/brand/`. Still to confirm with Ivo that these are the final photos | APPLUX / Ivo | — | Answered, confirm |
 | Q-03 | Staging host and MongoDB Atlas project (DEP-02). An Atlas cluster now exists in `.env`; use a dedicated `golden_grape` database (the cluster is shared with other projects) | APPLUX | M1.1 T5 (staging deploy only: `Blocked: DEP-02`) | Open |
 | Q-04 | Promotions do not apply to B2B list prices (A-03)? | APPLUX | M3.2 T4 | Open |
 | Q-05 | Loyalty points earned on `completed`, reversed on refund (A-08)? | APPLUX | M3.2 T3 | Open |
@@ -54,6 +54,14 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-11 | Catering packages have a minimum of 10 guests (the prototype set none) | M1.3 T7 seed | — |
 
 ## 4. Log
+
+### 2026-11-03 · Prototype fidelity and visual polish (requested by Aniket)
+- **Real photos:** the originals behind the prototype's CDN pointers are downloadable from `golden-grape-luxembourg.lovable.app`. All 45 fetched, sizes verified against `.asset.json`; the 44 brand photos are in `public/brand/<group>/` (the unused alternative logo jpg is not copied). The stand-in jpgs are gone. `lib/brand.ts` and the seed use the prototype's exact slot → file mapping (home, maison, packages, events).
+- **Exact text:** page-by-page diff of visible text against the published prototype (home, maison, events, catering, contact). Restored: Universes CTAs (Shop/Snack unlinked), "Réserver une table", home event cards (`eventsHome.items`, recurring wording, always from the dictionary now), events list + Reserve buttons (link to `/contact` until M2.3), Maison's shop button (unlinked), footer legal labels (plain text until legal pages are published), prices as `28 €` (`formatMoney(…, { compact: true })`). Remaining differences on purpose: reviews section hidden (Aniket's decision, unverifiable), event dates, language dropdown, cookie notice, catering e-mail field, search/account/cart icons (M2.2).
+- **Events:** published on the next matching weekday (Aniket's decision). These dates are **not confirmed by the client** and pass within a week; `/events` then empties until real dates are set.
+- **Logo:** files trimmed of their empty margins (shared 1085×859 box so the cross-fade aligns), header taller (h-24/h-32 over the hero, h-20/h-24 solid) with a logo up to 112 px high. Favicon from the grape mark (`app/icon.png`).
+- **Polish, same palette and fonts:** nav hover underline and active page state; hero gradient reads over the real photo, ticker on one line, scroll cue moved so it no longer collides; marquee actually moves (the prototype's class was undefined), paused on hover and under reduced motion; cookie notice is a compact card, bottom-right on desktop; `text-wrap: balance` on headings; gold text selection; mobile menu shows the logo and locks page scroll; footer address and bottom row no longer wrap awkwardly; "open now" dot.
+- Verified: `npm run check` (29 unit), `npm run test:int` (20), `npx playwright test` (16 passed, 2 skipped); 0 px overflow at 1440/768/360; no failed requests.
 
 ### 2026-11-03 · Deployment to goldengrape.devsomeware.com
 - Requested by Aniket: remove the repos from the server and deploy this one.

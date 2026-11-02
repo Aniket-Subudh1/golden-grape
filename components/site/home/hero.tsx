@@ -10,8 +10,8 @@ export function Hero({ t }: { t: Dictionary['hero'] }) {
     <section className="relative h-[100svh] min-h-[640px] w-full overflow-hidden bg-ink text-bone">
       <div className="absolute inset-0">
         <Image src={heroWine} alt="" fill priority sizes="100vw" className="animate-slow-zoom object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/45 to-ink/70" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink/95 via-ink/65 to-ink/25" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-transparent to-ink/40" />
       </div>
 
       <div className="relative z-10 mx-auto flex h-full max-w-[1400px] flex-col justify-end px-5 pt-28 pb-16 md:px-10 md:pt-36 md:pb-24">
@@ -41,7 +41,7 @@ export function Hero({ t }: { t: Dictionary['hero'] }) {
             </a>
           </div>
 
-          <div className="mt-10 hidden items-center gap-6 text-[10px] tracking-[0.35em] text-bone/50 uppercase md:flex">
+          <div className="mt-10 hidden w-max items-center gap-5 text-[10px] tracking-[0.3em] whitespace-nowrap text-bone/60 uppercase lg:flex">
             {ticker.map((word, i) => (
               <Fragment key={word}>
                 {i > 0 && <span className="text-gold">·</span>}
@@ -52,8 +52,8 @@ export function Hero({ t }: { t: Dictionary['hero'] }) {
         </div>
       </div>
 
-      <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-3 text-bone/60">
-        <span className="text-[10px] tracking-[0.4em] uppercase">{t.scroll}</span>
+      <div className="absolute right-10 bottom-10 z-10 hidden flex-col items-center gap-3 text-bone/60 lg:flex">
+        <span className="text-[10px] tracking-[0.4em] uppercase [writing-mode:vertical-rl]">{t.scroll}</span>
         <span className="h-10 w-px bg-gradient-to-b from-gold to-transparent" />
       </div>
     </section>

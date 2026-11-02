@@ -66,6 +66,14 @@
     font-family: var(--font-serif);
     font-weight: 400;
     letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  ::selection {
+    background-color: var(--gold);
+    color: var(--ink);
   }
   :focus-visible {
     outline-color: var(--gold-deep);
@@ -123,6 +131,14 @@
 @utility animate-slow-zoom {
   animation: gg-slow-zoom 20s ease-out forwards;
 }
+@keyframes gg-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@utility animate-marquee {
+  animation: gg-marquee 70s linear infinite;
+}
 @utility animate-fade-up {
   animation: gg-fade-up 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
@@ -130,6 +146,7 @@
 /* 05 §7: honour reduced motion for the hero zoom and fade. */
 @media (prefers-reduced-motion: reduce) {
   .animate-slow-zoom,
+  .animate-marquee,
   .animate-fade-up {
     animation: none;
   }

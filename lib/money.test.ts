@@ -18,6 +18,11 @@ describe('money', () => {
     expect(actual).toBe(expected);
   });
 
+  it('compact format drops ,00 on whole euros only', () => {
+    expect(formatMoney(2800, 'fr', { compact: true })).toBe('28\u00a0€');
+    expect(formatMoney(2850, 'fr', { compact: true })).toBe('28,50\u00a0€');
+  });
+
   it('formats French euros with a narrow no-break space group and a no-break space before €', () => {
     expect(formatMoney(123456, 'fr')).toBe('1 234,56 €');
   });

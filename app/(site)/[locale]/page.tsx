@@ -11,9 +11,8 @@ import { Store } from '@/components/site/home/store';
 import { Story } from '@/components/site/home/story';
 import { Universes } from '@/components/site/home/universes';
 import { alternates, type Dictionary, getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
-import { eventDate, groupedHours } from '@/lib/time';
+import { groupedHours } from '@/lib/time';
 import { getHappyHour, mediaOf } from '@/modules/cms/service';
-import { upcomingEvents } from '@/modules/events/service';
 import { getSettings } from '@/modules/settings/service';
 
 export async function generateMetadata({ params }: PageProps<'/[locale]'>): Promise<Metadata> {
@@ -61,18 +60,11 @@ async function HappyHourSection({ t, locale }: { t: Dictionary['happyHour']; loc
     days: hh.days.map(Number),
     from: hh.from,
   };
-  return <HappyHour t={t} locale={locale} content={content} />;
+  return <HappyHour t={t} locale={locale} content={content} reserveHref={localePath(locale, '/contact')} />;
 }
 
-async function EventsSection({ t, locale }: { t: Dictionary['eventsHome']; locale: Locale }) {
-  const events = await upcomingEvents(locale, 3);
-  if (events.length === 0) return null;
-  const items = events.map((e) => ({ id: e.id, title: e.title, description: e.description, ...eventDate(e.startsAt, e.endsAt, locale) }));
-  return <Events t={t} events={items} calendarHref={localePath(locale, '/events')} />;
-}
-
-// The social-proof section is not rendered: its reviews were hard-coded in the prototype.
-// Real Google reviews arrive with M3.3.
+// The social-proof section is not rendered: its reviews were hard-coded in the prototype and could not be
+// verified. Real Google reviews arrive with M3.3.
 export default async function HomePage({ params }: PageProps<'/[locale]'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
@@ -91,9 +83,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
         <HappyHourSection t={t.happyHour} locale={locale} />
       </Suspense>
       <Story t={t.story} />
-      <Suspense fallback={null}>
-        <EventsSection t={t.eventsHome} locale={locale} />
-      </Suspense>
+      <Events t={t.eventsHome} calendarHref={localePath(locale, '/events')} reserveHref={localePath(locale, '/contact')} />
     </>
   );
 }

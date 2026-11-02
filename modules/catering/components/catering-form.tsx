@@ -72,7 +72,7 @@ export function CateringForm({ t, form, locale, packages, minDate }: Props) {
                     )}
                   </div>
                   <p className="mt-6 font-serif text-2xl">
-                    {formatMoney(p.pricePerGuestCents, locale)} <span className="font-sans text-sm text-ink/50">{t.perGuest}</span>
+                    {formatMoney(p.pricePerGuestCents, locale, { compact: true })} <span className="font-sans text-sm text-ink/50">{t.perGuest}</span>
                   </p>
                   <ul className="mt-4 space-y-1.5 text-sm font-light text-ink/70">
                     {p.includes.map((item) => (
@@ -124,7 +124,7 @@ export function CateringForm({ t, form, locale, packages, minDate }: Props) {
             <div>
               <p className="eyebrow mb-1 text-ink/50">{r.estimate}</p>
               {/* Display only: the stored estimate is recomputed on the server. */}
-              <p className="font-serif text-4xl tabular-nums">{pkg ? formatMoney(mulQty(pkg.pricePerGuestCents, guests), locale) : '—'}</p>
+              <p className="font-serif text-4xl tabular-nums">{pkg ? formatMoney(mulQty(pkg.pricePerGuestCents, guests), locale, { compact: true }) : '—'}</p>
               <p className="mt-1 text-xs text-ink/50">{pkg ? interpolate(r.packageHint, { name: pkg.name, count: guests }) : r.selectHint}</p>
             </div>
             <SubmitButton label={r.submit} pendingLabel={r.sending} size="lg" className="px-10" />

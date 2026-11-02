@@ -1,8 +1,10 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { Reveal } from '@/components/site/reveal';
 import { useNow } from '@/components/site/use-now';
+import { Button } from '@/components/ui/button';
 import { type Dictionary, type Locale, rich } from '@/lib/i18n';
 import { nextWeekly, TZ } from '@/lib/time';
 
@@ -20,7 +22,7 @@ function Unit({ value, label }: { value: number | undefined; label: string }) {
 
 type Content = { titleA: string; titleB?: string | null; text?: string | null; image?: string | null; days: number[]; from: string };
 
-export function HappyHour({ t, locale, content }: { t: Dictionary['happyHour']; locale: Locale; content: Content }) {
+export function HappyHour({ t, locale, content, reserveHref }: { t: Dictionary['happyHour']; locale: Locale; content: Content; reserveHref: string }) {
   const now = useNow();
 
   const target = now === undefined ? undefined : nextWeekly(content.days, content.from, new Date(now));
@@ -65,11 +67,17 @@ export function HappyHour({ t, locale, content }: { t: Dictionary['happyHour']; 
             <Unit value={part((v) => Math.floor((v % 3600) / 60))} label={t.minutes} />
             <Unit value={part((v) => v % 60)} label={t.seconds} />
           </div>
-          {/* The reserve button returns with table reservations (M2.3). */}
           <div className="mt-10 flex flex-col items-center gap-6">
             <span className="min-h-5 text-sm font-light text-bone/60">
               {dateLabel && `${t.nextPour} · ${dateLabel} · ${content.from}`}
             </span>
+            {/* Table reservations arrive in M2.3; until then a request goes through the contact form. */}
+            <Button asChild variant="goldGlass" size="lg">
+              <Link href={reserveHref}>
+                {t.reserve}
+                <span className="transition-transform group-hover:translate-x-1">→</span>
+              </Link>
+            </Button>
           </div>
         </Reveal>
       </div>

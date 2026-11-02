@@ -49,10 +49,10 @@ export async function Footer({ t, tagline, columns, contactTitle, business, lega
             <Image
               src="/brand/logo-light.png"
               alt="Golden Grape · Mäi Wäin"
-              width={1200}
-              height={1200}
-              sizes="112px"
-              className="h-24 w-auto md:h-28"
+              width={1085}
+              height={859}
+              sizes="162px"
+              className="h-24 w-auto md:h-32"
             />
             {tagline && <p className="mt-6 max-w-xs text-sm leading-relaxed font-light">{tagline}</p>}
             {socials.length > 0 && (
@@ -94,7 +94,10 @@ export async function Footer({ t, tagline, columns, contactTitle, business, lega
                   <span className="inline-flex items-start gap-2">
                     <MapPin className="text-gold/70 mt-1 h-3 w-3 shrink-0" />
                     <span>
-                      {business.street} · L-{business.postalCode} {business.city}
+                      <span className="block">{business.street}</span>
+                      <span className="block whitespace-nowrap">
+                        L-{business.postalCode} {business.city}
+                      </span>
                     </span>
                   </span>
                 </li>
@@ -117,9 +120,9 @@ export async function Footer({ t, tagline, columns, contactTitle, business, lega
           </div>
         </div>
 
-        <div className="text-bone/40 flex flex-col items-center justify-between gap-4 pt-8 text-[11px] tracking-[0.25em] uppercase md:flex-row">
+        <div className="text-bone/40 flex flex-col items-center justify-between gap-4 pt-8 text-center text-[10px] tracking-[0.2em] uppercase lg:flex-row lg:text-left">
           <span>{interpolate(t.rights, { year })}</span>
-          <div className="flex flex-wrap items-center justify-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             {legal.map((item) => (
               <NavLink key={item.label} item={item} className="hover:text-gold transition" />
             ))}

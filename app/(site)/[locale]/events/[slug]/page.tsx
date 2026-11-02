@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { Container } from '@/components/site/container';
 import { PageHero } from '@/components/site/page-hero';
+import { Button } from '@/components/ui/button';
 import { alternates, getDictionary, isLocale, localePath } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { eventDate } from '@/lib/time';
@@ -34,7 +35,12 @@ async function EventDetail({ params }: Pick<Props, 'params'>) {
   return (
     <>
       <PageHero eyebrow={`${date} · ${time}`} title={[event.title]} subtitle={event.description}>
-        <p className="mt-8 font-serif text-3xl">{event.priceCents ? formatMoney(event.priceCents, locale) : t.free}</p>
+        <div className="mt-8 flex flex-wrap items-center gap-8">
+          <p className="font-serif text-3xl">{event.priceCents ? formatMoney(event.priceCents, locale, { compact: true }) : t.free}</p>
+          <Button asChild>
+            <Link href={localePath(locale, '/contact')}>{t.reserve}</Link>
+          </Button>
+        </div>
       </PageHero>
       <section className="pb-32">
         <Container className="px-6">

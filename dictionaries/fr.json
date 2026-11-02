@@ -114,7 +114,27 @@
     "titleA": "Chaque semaine,",
     "titleB": "un rendez-vous.",
     "fullCal": "Agenda complet",
-    "reserve": "Réserver"
+    "reserve": "Réserver",
+    "items": {
+      "friday": {
+        "date": "Vendredi soir",
+        "time": "19:00 — 23:00",
+        "title": "Soirée Fado",
+        "desc": "Chants portugais, tapas et Porto — l'âme de Lisbonne, à Luxembourg."
+      },
+      "golden": {
+        "date": "Chaque mercredi",
+        "time": "17:00 — 20:00",
+        "title": "Golden Hour",
+        "desc": "Le verre de bienvenue offert, planches de partage et jazz portugais."
+      },
+      "tasting": {
+        "date": "Un samedi par mois",
+        "time": "16:00 — 18:00",
+        "title": "Dégustation guidée",
+        "desc": "Six vins choisis, un vigneron invité, une géographie du goût."
+      }
+    }
   },
   "socialProof": {
     "eyebrow": "Ils en parlent",
@@ -155,7 +175,9 @@
   "footer": {
     "colContact": "Nous trouver",
     "rights": "© {{year}} Golden Grape Luxembourg. Tous droits réservés.",
-    "moderation": "L'abus d'alcool est dangereux pour la santé."
+    "moderation": "L'abus d'alcool est dangereux pour la santé.",
+    "legal": "Mentions légales",
+    "privacy": "Confidentialité"
   },
   "floatingCart": {
     "label": "Panier",

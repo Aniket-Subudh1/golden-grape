@@ -114,7 +114,27 @@
     "titleA": "Todas as semanas,",
     "titleB": "um encontro.",
     "fullCal": "Agenda completa",
-    "reserve": "Reservar"
+    "reserve": "Reservar",
+    "items": {
+      "friday": {
+        "date": "Sexta à noite",
+        "time": "19:00 — 23:00",
+        "title": "Noite de Fado",
+        "desc": "Canto ao vivo, petiscos e Porto — a alma de Lisboa no Luxemburgo."
+      },
+      "golden": {
+        "date": "Todas as quartas",
+        "time": "17:00 — 20:00",
+        "title": "Golden Hour",
+        "desc": "Copo de boas-vindas por conta da casa, tábuas e jazz português."
+      },
+      "tasting": {
+        "date": "Um sábado por mês",
+        "time": "16:00 — 18:00",
+        "title": "Prova guiada",
+        "desc": "Seis vinhos escolhidos, um produtor convidado — uma geografia do gosto."
+      }
+    }
   },
   "socialProof": {
     "eyebrow": "Falam de nós",
@@ -155,7 +175,9 @@
   "footer": {
     "colContact": "Encontrar-nos",
     "rights": "© {{year}} Golden Grape Luxembourg. Todos os direitos reservados.",
-    "moderation": "O abuso do álcool é prejudicial à saúde."
+    "moderation": "O abuso do álcool é prejudicial à saúde.",
+    "legal": "Menções legais",
+    "privacy": "Privacidade"
   },
   "floatingCart": {
     "label": "Cesto",

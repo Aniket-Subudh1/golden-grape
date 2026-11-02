@@ -46,7 +46,7 @@ function BlockView({ block, locale, first }: { block: Block; locale: Locale; fir
     case 'hero': {
       const image = mediaOf(block.image);
       return (
-        <section className="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-32">
+        <section className="relative overflow-hidden pt-36 pb-20 md:pt-48 md:pb-32">
           {image && (
             <div className="absolute inset-0">
               <Image src={image.src} alt="" fill priority={first} sizes="100vw" className="object-cover opacity-30" />
@@ -162,7 +162,7 @@ function BlockView({ block, locale, first }: { block: Block; locale: Locale; fir
               <div className="mt-10 flex flex-wrap justify-center gap-3">
                 {block.buttons.map((b, i) => (
                   <Button key={b.id ?? i} asChild size="lg" variant={b.style === 'outline' ? 'outline' : 'solid'}>
-                    <Link href={localePath(locale, b.href)}>{b.label}</Link>
+                    {b.href ? <Link href={localePath(locale, b.href)}>{b.label}</Link> : <span>{b.label}</span>}
                   </Button>
                 ))}
               </div>

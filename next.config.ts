@@ -4,6 +4,7 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   output: 'standalone',
   poweredByHeader: false,
+  images: { minimumCacheTTL: 60 * 60 * 24 * 7 },
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

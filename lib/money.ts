@@ -13,5 +13,10 @@ export const vatFromGross = (grossCents: number, bp: number) => divRound(grossCe
 
 export const netToGross = (netCents: number, bp: number) => netCents + pct(netCents, bp);
 
-export const formatMoney = (cents: number, locale: string) =>
-  new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' }).format(cents / 100);
+/** `compact` drops `,00` on whole euros (menu and price-list style); documents keep the full format. */
+export const formatMoney = (cents: number, locale: string, { compact = false } = {}) =>
+  new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'EUR',
+    ...(compact && cents % 100 === 0 ? { minimumFractionDigits: 0, maximumFractionDigits: 0 } : {}),
+  }).format(cents / 100);

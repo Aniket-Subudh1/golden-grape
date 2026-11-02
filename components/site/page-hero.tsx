@@ -7,7 +7,7 @@ type Props = { eyebrow?: string | null; title: [string, string?]; subtitle?: str
 /** Page header of the inner pages: eyebrow, serif title with a gold italic second half, subtitle. */
 export function PageHero({ eyebrow, title: [a, b], subtitle, children, className }: Props) {
   return (
-    <section className={cn('pt-32 pb-14 md:pt-40', className)}>
+    <section className={cn('pt-36 pb-14 md:pt-48', className)}>
       <Container className="px-6">
         {eyebrow && <p className="eyebrow mb-6 text-gold-deep">{eyebrow}</p>}
         <h1 className="max-w-4xl font-serif text-5xl leading-[0.95] tracking-tight md:text-7xl">
