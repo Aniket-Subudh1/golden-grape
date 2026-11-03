@@ -202,17 +202,26 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   display: none;
 }
 .app-header {
+  /* Above the page, so the language menu paints over the dashboard instead of under it. */
+  z-index: var(--z-modal);
   display: flex;
   align-items: center;
   width: 100%;
   min-width: 0;
   max-width: 100%;
+  overflow: visible;
+}
+.app-header__content,
+.app-header__wrapper,
+.app-header__controls-wrapper,
+.app-header__actions,
+.app-header__actions-wrapper {
+  overflow: visible;
 }
 .app-header__content {
   flex: 1 1 0;
   width: auto;
   min-width: 0;
-  overflow: hidden;
 }
 .app-header__wrapper,
 .app-header__controls-wrapper {
@@ -307,6 +316,7 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 /* Back-office language (separate from the website-content language selector). */
 .gg-menu {
   position: relative;
+  z-index: 2;
 }
 .gg-menu__button {
   display: inline-flex;

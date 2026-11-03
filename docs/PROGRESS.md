@@ -55,6 +55,9 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-03 · Admin language menu paints over the dashboard (requested by Aniket)
+- The Français menu opened underneath the dashboard panel because the header row clipped it. The breadcrumb still clips in its own wrapper; the language menu now drops over the page.
+
 ### 2026-11-03 · Admin header, password reveal, Save beside Cancel (requested by Aniket)
 - Every password field (login, account, team member, reset) has an eye button that shows or hides the password.
 - On the account and team-member forms, Save sits in the same row as Cancel.
