@@ -44,7 +44,7 @@ import { default as default_0430f5fb3b8132a602107d7535a2a344 } from '@/component
 import { default as default_334250e18ce0b45af3e0c04bb6fe8307 } from '@/components/admin/logo'
 import { default as default_0ca957152163a45f9a7fa850958278d9 } from '@/components/admin/language-menu'
 import { default as default_003a18697aceb07c0741f5f3fa2a6be8 } from '@/components/admin/login-brand'
-import { default as default_bcc6bb8feea1eb978bfac9964732c34d } from '@/components/admin/drawer-links'
+import { default as default_53edbba2deecf14dde23d037e9db9140 } from '@/components/admin/row-links'
 import { default as default_6bcd1c2d18bda2e25f236d9cca5fccfd } from '@/components/admin/password-toggle'
 import { default as default_7215358aebef2f123662c81dc8a03dd2 } from '@/components/admin/dashboard'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -98,7 +98,7 @@ export const importMap = {
   "@/components/admin/logo#default": default_334250e18ce0b45af3e0c04bb6fe8307,
   "@/components/admin/language-menu#default": default_0ca957152163a45f9a7fa850958278d9,
   "@/components/admin/login-brand#default": default_003a18697aceb07c0741f5f3fa2a6be8,
-  "@/components/admin/drawer-links#default": default_bcc6bb8feea1eb978bfac9964732c34d,
+  "@/components/admin/row-links#default": default_53edbba2deecf14dde23d037e9db9140,
   "@/components/admin/password-toggle#default": default_6bcd1c2d18bda2e25f236d9cca5fccfd,
   "@/components/admin/dashboard#default": default_7215358aebef2f123662c81dc8a03dd2,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,

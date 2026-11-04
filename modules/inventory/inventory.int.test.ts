@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { model, withTx } from '@/lib/tx';
 import { importCatalogue, parseCatalogueCsv, TEMPLATE_COLUMNS } from '@/modules/catalogue/import';
-import { findByBarcode } from '@/modules/catalogue/service';
+import { findByBarcode, findSellable, listProducts } from '@/modules/catalogue/service';
 import { getTestPayload, makeStaff, makeVariant, parallel } from '@/tests/helpers';
 import { adjust, availability, onHand, postCount, postMovements, rebuildStock, setLowStockThreshold } from './service';
 
@@ -78,6 +78,27 @@ describe('catalogue', () => {
   it('a packaging factor below 2 is rejected', async () => {
     const { variant } = await makeVariant(payload);
     await expect(payload.create({ collection: 'packagingUnits', data: { variant: variant.id, factor: 1, label: 'Single' }, overrideAccess: true })).rejects.toThrow();
+  });
+});
+
+describe('catalogue service (used by the shop in M2.2)', () => {
+  it('findSellable keeps only active sizes of active products sold on the channel, with their boxes', async () => {
+    const a = await makeVariant(payload, { packaging: [6] });
+    const b = await makeVariant(payload);
+    const c = await makeVariant(payload);
+    await payload.update({ collection: 'variants', id: b.variant.id, data: { channels: ['pos'] }, overrideAccess: true });
+    await payload.update({ collection: 'products', id: c.product.id, data: { status: 'draft' }, overrideAccess: true });
+    const sellable = await findSellable(payload, [a.variant.id, b.variant.id, c.variant.id], 'webshop');
+    expect(sellable.map((v) => v.id)).toEqual([a.variant.id]);
+    expect(sellable[0].units.map((u) => u.factor)).toEqual([6]);
+  });
+
+  it('listProducts finds active products by words of their name in any language (text index)', async () => {
+    const { product } = await makeVariant(payload);
+    await payload.update({ collection: 'products', id: product.id, locale: 'en', data: { name: 'Golden harvest port' }, overrideAccess: true });
+    const hits = await listProducts(payload, { locale: 'en', q: 'harvest' });
+    expect(hits.docs.map((d) => d.id)).toEqual([product.id]);
+    expect((await listProducts(payload, { locale: 'fr', q: 'zzzz' })).totalDocs).toBe(0);
   });
 });
 

@@ -1,6 +1,6 @@
 import { APIError, type CollectionConfig, type Field, type PayloadRequest, type Validate } from 'payload';
 import { hiddenUnless, isStaff } from '@/lib/access';
-import { autoSlug, badgeCell, createInDrawer, emptyList, type Label, l, openAsPage, pageLinkCell, scaledNumber, seoSection } from '@/lib/admin';
+import { autoSlug, badgeCell, addButton, emptyList, type Label, l, pageLinkCell, scaledNumber, seoSection } from '@/lib/admin';
 import { validateFactor } from './packaging';
 
 // The catalogue (04-DATA-MODEL §2). Staff-only through the API: the website reads it through service.ts.
@@ -97,7 +97,6 @@ export const categories: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'kind', 'order'],
-    custom: openAsPage,
     hidden: hiddenUnless('manager'),
     description: l(
       'Les rayons de la boutique (Vins, Porto…) et du comptoir, dans l’ordre choisi.',
@@ -106,7 +105,7 @@ export const categories: CollectionConfig = {
       'As secções da loja (Vinhos, Porto…) e do balcão, pela ordem escolhida.',
     ),
     components: {
-      ...createInDrawer('categories', l('Ajouter une catégorie', 'Add a category', 'Kategorie hinzufügen', 'Adicionar uma categoria')),
+      ...addButton('categories', l('Ajouter une catégorie', 'Add a category', 'Kategorie hinzufügen', 'Adicionar uma categoria')),
       ...emptyList({
         icon: 'categories',
         title: l('Aucune catégorie pour l’instant', 'No categories yet', 'Noch keine Kategorien', 'Ainda sem categorias'),
@@ -164,7 +163,6 @@ export const brands: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'origin'],
-    custom: openAsPage,
     hidden: hiddenUnless('manager'),
     description: l(
       'Les domaines et maisons dont vous vendez les produits. Ils s’ajoutent aussi depuis la fiche produit ou l’import.',
@@ -173,7 +171,7 @@ export const brands: CollectionConfig = {
       'As quintas e casas cujos produtos vende. Também se adicionam a partir do produto ou da importação.',
     ),
     components: {
-      ...createInDrawer('brands', l('Ajouter un producteur', 'Add a producer', 'Erzeuger hinzufügen', 'Adicionar um produtor')),
+      ...addButton('brands', l('Ajouter un producteur', 'Add a producer', 'Erzeuger hinzufügen', 'Adicionar um produtor')),
       ...emptyList({
         icon: 'producers',
         title: l('Aucun producteur pour l’instant', 'No producers yet', 'Noch keine Erzeuger', 'Ainda sem produtores'),
@@ -258,7 +256,6 @@ export const products: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['images', 'name', 'category', 'offer', 'status'],
-    custom: openAsPage,
     listSearchableFields: ['name'],
     hidden: hiddenUnless('manager', 'stock'),
     description: l(
@@ -268,7 +265,7 @@ export const products: CollectionConfig = {
       'Os vinhos, a mercearia e o menu do balcão. O preço e o código de barras estão em cada formato (garrafa, magnum…).',
     ),
     components: {
-      ...createInDrawer('products', l('Ajouter un produit', 'Add a product', 'Produkt hinzufügen', 'Adicionar um produto')),
+      ...addButton('products', l('Ajouter un produit', 'Add a product', 'Produkt hinzufügen', 'Adicionar um produto')),
       ...emptyList({
         icon: 'products',
         title: l('Aucun produit pour l’instant', 'No products yet', 'Noch keine Produkte', 'Ainda sem produtos'),
@@ -527,7 +524,6 @@ export const variants: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'sku', 'barcode', 'priceCents', 'active'],
-    custom: openAsPage,
     listSearchableFields: ['title', 'sku', 'barcode'],
     hidden: hiddenUnless('manager', 'stock'),
   },
@@ -634,6 +630,7 @@ export const variants: CollectionConfig = {
               on: 'variant',
               label: l('Cartons et lots', 'Boxes and packs', 'Kartons und Packungen', 'Caixas e packs'),
               admin: {
+                disableListColumn: true,
                 condition: (_, __, { operation }) => operation === 'update',
                 defaultColumns: ['label', 'factor', 'barcode', 'priceCents'],
                 description: l(
@@ -654,6 +651,7 @@ export const variants: CollectionConfig = {
               name: 'stockPanel',
               type: 'ui',
               admin: {
+                disableListColumn: true,
                 condition: (data, _, { operation }) => operation === 'update' && data?.trackStock !== false,
                 components: { Field: '@/modules/inventory/admin/stock-panel' },
               },
@@ -675,7 +673,6 @@ export const packagingUnits: CollectionConfig = {
   admin: {
     useAsTitle: 'label',
     defaultColumns: ['label', 'variant', 'factor', 'barcode', 'priceCents'],
-    custom: openAsPage,
     hidden: hiddenUnless('manager', 'stock'),
   },
   access: { read: isStaff(), create: editors, update: editors, delete: editors },

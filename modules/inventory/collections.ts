@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 import { hasRole, hiddenUnless, isStaff, none } from '@/lib/access';
-import { badgeCell, createInDrawer, emptyList, l, openAsPage, signedCell } from '@/lib/admin';
+import { badgeCell, addButton, emptyList, l, signedCell } from '@/lib/admin';
 import { TYPE_LABELS } from './labels';
 
 // The stock ledger (02 §5.1). Levels and movements have no write access through the API: only postMovements
@@ -18,7 +18,6 @@ export const stockLevels: CollectionConfig = {
   labels: { singular: l('Niveau de stock', 'Stock level', 'Lagerbestand', 'Nível de stock'), plural: l('État du stock', 'Stock levels', 'Lagerbestand', 'Níveis de stock') },
   admin: {
     defaultColumns: ['variant', 'onHand', 'lowStockThreshold', 'updatedAt'],
-    custom: openAsPage,
     hidden: hiddenUnless('manager', 'stock'),
     description: l(
       'Les quantités en stock, calculées à partir de l’historique. Pour corriger un stock, ouvrez le format et utilisez « Corriger le stock ».',
@@ -69,7 +68,6 @@ export const stockMovements: CollectionConfig = {
   labels: { singular: l('Mouvement de stock', 'Stock movement', 'Lagerbewegung', 'Movimento de stock'), plural: l('Mouvements de stock', 'Stock movements', 'Lagerbewegungen', 'Movimentos de stock') },
   admin: {
     defaultColumns: ['createdAt', 'variant', 'type', 'qty', 'reason', 'user'],
-    custom: openAsPage,
     hidden: hiddenUnless('manager', 'stock'),
     description: l(
       'Chaque entrée et sortie de stock, avec qui et pourquoi. Rien ne peut y être modifié ni supprimé.',
@@ -135,7 +133,6 @@ export const stockCounts: CollectionConfig = {
   labels: { singular: l('Inventaire', 'Stock count', 'Inventur', 'Inventário'), plural: l('Inventaires', 'Stock counts', 'Inventuren', 'Inventários') },
   admin: {
     useAsTitle: 'note',
-    custom: openAsPage,
     defaultColumns: ['note', 'createdAt', 'lines', 'status', 'user', 'postedAt'],
     hidden: hiddenUnless('manager', 'stock'),
     description: l(
@@ -145,7 +142,7 @@ export const stockCounts: CollectionConfig = {
       'Conte as garrafas na prateleira, introduza as quantidades e valide: o stock passa a ser o contado.',
     ),
     components: {
-      ...createInDrawer('stockCounts', l('Nouvel inventaire', 'New stock count', 'Neue Inventur', 'Novo inventário')),
+      ...addButton('stockCounts', l('Nouvel inventaire', 'New stock count', 'Neue Inventur', 'Novo inventário')),
       ...emptyList({
         icon: 'counts',
         title: l('Aucun inventaire pour l’instant', 'No stock counts yet', 'Noch keine Inventuren', 'Ainda sem inventários'),

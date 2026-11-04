@@ -44,7 +44,7 @@ export default buildConfig({
       beforeLogin: ['@/components/admin/login-brand'],
       Nav: '@/components/admin/nav',
       actions: ['@/components/admin/language-menu'],
-      providers: ['@/components/admin/drawer-links', '@/components/admin/password-toggle'],
+      providers: ['@/components/admin/row-links', '@/components/admin/password-toggle'],
       views: { dashboard: { Component: '@/components/admin/dashboard' } },
     },
   },

@@ -1,7 +1,7 @@
 import path from 'node:path';
 import type { CollectionConfig } from 'payload';
 import { hiddenUnless, isStaff, published, publicRead } from '@/lib/access';
-import { autoSlug, createInDrawer, l, seoSection } from '@/lib/admin';
+import { autoSlug, addButton, l, seoSection } from '@/lib/admin';
 import { revalidateTagHook } from '@/lib/revalidate';
 import { cardGrid, cta, hero, mediaText, richText } from './blocks';
 
@@ -20,7 +20,7 @@ export const media: CollectionConfig = {
       'Alle Fotos der Website. Hier hinzufügen oder direkt in einer Veranstaltung.',
       'Todas as fotos do site. Adicione-as aqui ou diretamente num evento.',
     ),
-    components: createInDrawer('media', l('Ajouter des photos', 'Upload photos', 'Fotos hochladen', 'Carregar fotos')),
+    components: addButton('media', l('Ajouter des photos', 'Upload photos', 'Fotos hochladen', 'Carregar fotos')),
   },
   access: { read: publicRead, create: editors, update: editors, delete: editors },
   upload: {
@@ -110,7 +110,7 @@ export const legal: CollectionConfig = {
       'Impressum, Datenschutz, AGB. Eine Seite, die online ist, erscheint in der Fußzeile.',
       'Aviso legal, privacidade, condições. Uma página online aparece no rodapé.',
     ),
-    components: createInDrawer('legal', l('Ajouter une page légale', 'Add a legal page', 'Rechtliche Seite hinzufügen', 'Adicionar uma página legal')),
+    components: addButton('legal', l('Ajouter une page légale', 'Add a legal page', 'Rechtliche Seite hinzufügen', 'Adicionar uma página legal')),
     preview: (doc, { locale }) => (doc.slug ? `/${locale}/legal/${doc.slug}` : null),
   },
   versions: { drafts: true },

@@ -8,8 +8,8 @@ export type Label = { fr: string; en: string; de: string; pt: string };
 /** A label in the four admin languages, in the order fr, en, de, pt (Payload picks the user's language). */
 export const l = (fr: string, en: string, de: string, pt: string): Label => ({ fr, en, de, pt });
 
-/** A list page whose "Add" opens a centred modal over the list (components/admin/create-button.tsx). */
-export const createInDrawer = (collectionSlug: string, label: Label) => ({
+/** The list page's "Add …" button, opening the create page (components/admin/create-button.tsx). */
+export const addButton = (collectionSlug: string, label: Label) => ({
   views: { list: { actions: [{ path: '@/components/admin/create-button', clientProps: { collectionSlug, label } }] } },
 });
 
@@ -110,11 +110,7 @@ type Tone = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
 /** A select shown as a coloured badge in list columns (components/admin/cells.tsx). */
 export const badgeCell = (tones: Record<string, Tone>) => ({ Cell: { path: '@/components/admin/cells#BadgeCell', clientProps: { tones } } });
 
-/** Shop and stock forms open as full pages laid out like the settings pages, not as dialogs (create-button.tsx,
- * drawer-links.tsx, custom.css). */
-export const openAsPage = { openAsPage: true };
-
-/** A join-table title that opens the row's full page. */
+/** A join-table title that opens the row's full page (Payload's join tables otherwise open a dialog). */
 export const pageLinkCell = { Cell: '@/components/admin/cells#PageLinkCell' };
 
 /** A signed quantity in list columns: +12 green, −3 red. */

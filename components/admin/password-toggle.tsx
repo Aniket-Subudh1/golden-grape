@@ -21,7 +21,12 @@ export default function PasswordToggle({ children }: { children?: ReactNode }) {
       if (input.dataset.ggReveal === '1' && input.type !== 'text') input.type = 'text';
     };
 
+    // On a server-rendered page (team member, account) the field must be React's before its HTML is touched, or
+    // hydration fails: React marks the elements it owns with a `__reactFiber$…` key.
+    const hydrated = (el: Element) => Object.keys(el).some((key) => key.startsWith('__reactFiber$'));
+
     const enhance = (input: HTMLInputElement) => {
+      if (!hydrated(input)) return;
       apply(input);
       const wrap = input.parentElement;
       if (!wrap || wrap.querySelector(':scope > .gg-password__eye')) return;
@@ -74,7 +79,12 @@ export default function PasswordToggle({ children }: { children?: ReactNode }) {
     });
     const observer = new MutationObserver(scan);
     observer.observe(document.body, { childList: true, subtree: true });
-    return () => observer.disconnect();
+    // Hydration changes no nodes, so look again shortly after for fields that were not React's yet.
+    const retries = [300, 1500].map((ms) => window.setTimeout(scan, ms));
+    return () => {
+      observer.disconnect();
+      retries.forEach((id) => window.clearTimeout(id));
+    };
   }, [text.showPassword, text.hidePassword]);
 
   return children;

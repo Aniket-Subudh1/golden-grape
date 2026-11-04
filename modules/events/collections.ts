@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 import { hiddenUnless, isStaff, published } from '@/lib/access';
-import { autoSlug, createInDrawer, l, scaledNumber, seoSection } from '@/lib/admin';
+import { autoSlug, addButton, l, scaledNumber, seoSection } from '@/lib/admin';
 import { revalidateTagHook } from '@/lib/revalidate';
 
 const editors = isStaff('manager');
@@ -22,7 +22,7 @@ export const events: CollectionConfig = {
       'Abende und Verkostungen auf der Veranstaltungsseite und der Startseite.',
       'As noites e provas mostradas na página Eventos e na página inicial.',
     ),
-    components: createInDrawer('events', l('Ajouter un événement', 'Add an event', 'Veranstaltung hinzufügen', 'Adicionar um evento')),
+    components: addButton('events', l('Ajouter un événement', 'Add an event', 'Veranstaltung hinzufügen', 'Adicionar um evento')),
     preview: (doc, { locale }) => (doc.slug ? `/${locale}/events/${doc.slug}` : null),
   },
   versions: { drafts: true },

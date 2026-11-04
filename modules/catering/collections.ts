@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 import { hiddenUnless, isStaff, none, publicRead } from '@/lib/access';
-import { createInDrawer, l, scaledNumber } from '@/lib/admin';
+import { addButton, l, scaledNumber } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { revalidateTagHook } from '@/lib/revalidate';
 
@@ -28,7 +28,7 @@ export const cateringPackages: CollectionConfig = {
       'Die Menüs der Catering-Seite, in Ihrer Reihenfolge.',
       'Os menus da página Catering, pela ordem escolhida.',
     ),
-    components: createInDrawer('cateringPackages', l('Ajouter un menu', 'Add a menu', 'Menü hinzufügen', 'Adicionar um menu')),
+    components: addButton('cateringPackages', l('Ajouter un menu', 'Add a menu', 'Menü hinzufügen', 'Adicionar um menu')),
     preview: (_, { locale }) => `/${locale}/catering`,
   },
   access: { read: publicRead, create: isStaff('manager'), update: isStaff('manager'), delete: isStaff('manager') },

@@ -9,7 +9,7 @@ Update this file at the end of every task (`00-START-HERE.md` §2). The newest l
 | M1.1 | Foundation | P1 $300 | Tue 3 Nov | Done (staging deploy: Blocked: DEP-02) | — |
 | M1.2 | Design system + i18n shell | P1 | Wed 4 Nov | Done (agent checks; AC-03 side-by-side and the checklist are human) | — |
 | M1.3 | CMS, pages, settings, roles | P1 | Thu 5 Nov | In progress (all ACs pass except AC-04's real e-mail delivery, which waits for SMTP) | — |
-| M2.1 | Catalogue + inventory core | P2 $250 | Sat 7 Nov | Done (all 7 ACs pass; human checklist and the client's spreadsheet DEP-04 pending) | — |
+| M2.1 | Catalogue + inventory core | P2 $250 | Sat 7 Nov | Done (all 7 ACs pass; checklist walked in the browser; the client's spreadsheet DEP-04 pending) | — |
 | M2.2 | Shop, cart, accounts, SEO | P2 | Mon 9 Nov | Not started | — |
 | M2.3 | Checkout, orders, reservations | P2 | Tue 10 Nov | Not started | — |
 | M3.1 | Mobile back office + purchasing | P3 $250 | Thu 12 Nov | Not started | — |
@@ -55,6 +55,30 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-12 | Until DEP-07, the seeded catalogue's VAT classes: wines intermediate (14 %); port, beer, gift boxes and the glass of wine standard (17 %); cheese, charcuterie, groceries and counter dishes super-reduced (3 %). The client's spreadsheet sets each product's class | M2.1 T6 seed | — |
 
 ## 4. Log
+
+### 2026-11-04 · One page layout for the whole admin, M2.1 audit (requested by Aniket)
+- **Uniform admin:**
+  - Every "Ajouter" and every list row (events, catering menus and requests, pages, legal pages, photos, team, activity, plus shop and stock) now opens a full page in the settings layout, instead of a dialog. No logic changed.
+  - The sign-in block of a team member and the photo drop zone sit in the same centred card as the other fields.
+  - The columns picker inside product and size tables uses the same chips.
+- **Kept:** Payload's own small dialogs for adding a size or box from inside a product or size, and "+" next to a relationship, because they pre-fill the parent. Checked that they still work and look right.
+- **Bug fixed:** the password eye button rewrote the team-member form before React took it over, which crashed hydration on the new full page. It now waits until the field is React's.
+- **Renamed:** `createInDrawer` → `addButton`, `drawer-links.tsx` → `row-links.tsx`, because they no longer open dialogs.
+- **M2.1 completeness audit, against the milestone:**
+  - T1–T7 all built and tested.
+  - Added the two missing tests: `findSellable` keeps only active sizes of active products on the channel, and `listProducts` finds by name through the text index.
+  - Human checklist walked in the browser on a throwaway database:
+    - a product created in French with box 6 and box 12, then its English name;
+    - −2 "Casse" shown in the history under the user's name;
+    - a 3-line count posted with the right variances;
+    - 5 seeded products spot-checked.
+  - The import of the client's real spreadsheet waits for DEP-04.
+- **Release gate (P2 part for M2.1):**
+  - `npm run check` (64) and `npm run test:int` (40) pass.
+  - `next build` with no env vars passes.
+  - `npm run test:e2e` against a production build on a throwaway database: 16 passed, 2 skipped.
+  - `rebuild-stock --check`: 0 differences.
+- **To watch at DEP-04:** the seed's demo products (references `GG-…`) and the client's real ones can share a name ("Douro Reserva 2019"), which the pickers cannot tell apart. Archive the demo products when the real catalogue is imported.
 
 ### 2026-11-04 · Shop and stock forms as pages, columns picker (requested by Aniket)
 - **Full pages instead of dialogs:**

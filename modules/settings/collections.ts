@@ -1,6 +1,6 @@
 import { APIError, type CollectionConfig, type FieldAccess } from 'payload';
 import { hasRole, hiddenUnless, isStaff, none, ROLES } from '@/lib/access';
-import { createInDrawer, l } from '@/lib/admin';
+import { addButton, l } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 
 const adminOnly: FieldAccess = ({ req }) => hasRole(req.user, ['admin']);
@@ -29,7 +29,7 @@ const users: CollectionConfig = {
       'As pessoas que podem entrar aqui e o que cada uma pode fazer.',
     ),
     components: {
-      ...createInDrawer('users', l('Ajouter une personne', 'Add a person', 'Person hinzufügen', 'Adicionar uma pessoa')),
+      ...addButton('users', l('Ajouter une personne', 'Add a person', 'Person hinzufügen', 'Adicionar uma pessoa')),
       edit: { SaveButton: '@/components/admin/save-button' },
     },
   },
