@@ -666,6 +666,8 @@
       "vatNumber": "Invalid VAT number (e.g. LU12345678).",
       "mismatch": "The two passwords do not match.",
       "signedOut": "Your session expired. Please sign in again."
-    }
+    },
+    "expiredTitle": "Session expired.",
+    "signIn": "Sign in"
   }
 }

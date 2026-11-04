@@ -13,9 +13,11 @@ type Props = {
   action?: ReactNode;
   children?: ReactNode;
   sizes?: string;
+  /** The first cards of a page: loaded at once (they are the largest image on screen). */
+  priority?: boolean;
 };
 
-export function MediaCard({ image, alt, ratio, tag, overlay, action, children, sizes = '(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw' }: Props) {
+export function MediaCard({ image, alt, ratio, tag, overlay, action, children, sizes = '(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw', priority }: Props) {
   return (
     <article className="group relative flex flex-col bg-bone">
       <div className={cn('relative overflow-hidden bg-ink', ratio === '4/5' ? 'aspect-[4/5]' : 'aspect-[4/3]')}>
@@ -25,6 +27,8 @@ export function MediaCard({ image, alt, ratio, tag, overlay, action, children, s
             alt={alt}
             fill
             sizes={sizes}
+            loading={priority ? 'eager' : 'lazy'}
+            fetchPriority={priority ? 'high' : 'auto'}
             className="object-cover transition-transform duration-[1400ms] group-hover:scale-105"
           />
         )}

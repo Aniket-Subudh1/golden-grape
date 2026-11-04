@@ -5,10 +5,10 @@ import { formatMoney } from '@/lib/money';
 import type { ProductCardData } from '@/modules/webshop/service';
 import { AddButton } from './add-button';
 
-type Props = { product: ProductCardData; locale: Locale; t: Dictionary['shop']; sizes?: string };
+type Props = { product: ProductCardData; locale: Locale; t: Dictionary['shop']; sizes?: string; priority?: boolean };
 
 /** A shop product (prototype ProductCard): photo 4/5, label, "+" to add one bottle, region, name, price. */
-export function ProductCard({ product: p, locale, t, sizes }: Props) {
+export function ProductCard({ product: p, locale, t, sizes, priority }: Props) {
   const tag = p.badge ? (t.tags as Record<string, string>)[p.badge] : undefined;
   return (
     <MediaCard
@@ -17,6 +17,7 @@ export function ProductCard({ product: p, locale, t, sizes }: Props) {
       ratio="4/5"
       tag={tag}
       sizes={sizes ?? '(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw'}
+      priority={priority}
       action={p.variant && <AddButton variant={p.variant} label={interpolate(t.addAria, { name: p.name })} disabled={!p.inStock} />}
     >
       <div className="p-4 md:p-5">

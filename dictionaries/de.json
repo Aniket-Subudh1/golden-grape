@@ -666,6 +666,8 @@
       "vatNumber": "Ungültige USt-IdNr. (z. B. LU12345678).",
       "mismatch": "Die beiden Passwörter stimmen nicht überein.",
       "signedOut": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."
-    }
+    },
+    "expiredTitle": "Sitzung abgelaufen.",
+    "signIn": "Anmelden"
   }
 }

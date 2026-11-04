@@ -666,6 +666,8 @@
       "vatNumber": "Numéro de TVA invalide (ex. LU12345678).",
       "mismatch": "Les deux mots de passe ne correspondent pas.",
       "signedOut": "Votre session a expiré. Reconnectez-vous."
-    }
+    },
+    "expiredTitle": "Session expirée.",
+    "signIn": "Se connecter"
   }
 }

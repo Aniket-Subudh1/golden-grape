@@ -7,10 +7,10 @@ import { Container } from '@/components/site/container';
 import { JsonLd } from '@/components/site/json-ld';
 import { PageHero } from '@/components/site/page-hero';
 import { FacebookIcon, InstagramIcon } from '@/components/site/social-icons';
-import { storeInterior } from '@/lib/brand';
 import { alternates, type Dictionary, getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { weekHours } from '@/lib/time';
 import { ContactForm } from '@/modules/cms/components/contact-form';
+import { getHomePage, mediaOf } from '@/modules/cms/service';
 import { localBusinessJsonLd } from '@/modules/settings/seo';
 import { directionsUrl, getSettings } from '@/modules/settings/service';
 
@@ -19,6 +19,12 @@ export async function generateMetadata({ params }: PageProps<'/[locale]/contact'
   if (!isLocale(locale)) notFound();
   const { meta } = await getDictionary(locale);
   return { ...meta.contact, alternates: alternates('/contact', locale) };
+}
+
+/** The shop interior from the Home page settings (shared with the home page's "Store" section). */
+async function ShopPhoto({ locale }: { locale: Locale }) {
+  const photo = mediaOf((await getHomePage(locale)).photos?.interior);
+  return photo ? <Image src={photo.src} alt={photo.alt} fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" /> : null;
 }
 
 function InfoRow({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
@@ -120,8 +126,10 @@ export default async function ContactPage({ params }: PageProps<'/[locale]/conta
       <section className="pb-24 md:pb-32">
         <Container className="grid gap-10 px-6 md:gap-16 lg:grid-cols-2">
           <div className="space-y-8">
-            <div className="relative aspect-[4/3] overflow-hidden">
-              <Image src={storeInterior} alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+            <div className="relative aspect-[4/3] overflow-hidden bg-ink">
+              <Suspense fallback={null}>
+                <ShopPhoto locale={locale} />
+              </Suspense>
             </div>
             <Suspense fallback={null}>
               <Info locale={locale} t={t} />

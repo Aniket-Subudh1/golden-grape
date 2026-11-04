@@ -23,7 +23,7 @@ export default function LoginBrand({ i18n }: { i18n: I18nClient }) {
       </div>
 
       <aside className="gg-login-photo" aria-hidden="true">
-        <Image src="/brand/home-store/Home_9.jpg" alt="" fill priority sizes="50vw" className="gg-login-photo__img" />
+        <Image src="/brand/home-store/Home_9.jpg" alt="" fill loading="eager" fetchPriority="high" sizes="50vw" className="gg-login-photo__img" />
         <div className="gg-login-note gg-login-note--top">
           <span className="gg-login-note__icon">
             <Languages />

@@ -2,16 +2,19 @@ import Image from 'next/image';
 import { Fragment } from 'react';
 import { Parallax } from '@/components/site/parallax';
 import { Button } from '@/components/ui/button';
-import { heroWine } from '@/lib/brand';
 import type { Dictionary } from '@/lib/i18n';
 
-export function Hero({ t }: { t: Dictionary['hero'] }) {
+type Content = { eyebrow?: string | null; titleA?: string | null; titleB?: string | null; subtitle?: string | null };
+
+/** The home hero. Title texts come from the Home page settings, each falling back to the dictionary when empty. */
+export function Hero({ t: dict, content = {}, image }: { t: Dictionary['hero']; content?: Content; image?: string | null }) {
+  const t = { ...dict, eyebrow: content.eyebrow || dict.eyebrow, titleA: content.titleA || dict.titleA, titleB: content.titleB || dict.titleB, subtitle: content.subtitle || dict.subtitle };
   const ticker = [t.ticker.shop, t.ticker.snack, t.ticker.catering, t.ticker.events, t.ticker.boutique];
   return (
     <section className="relative h-[100svh] min-h-[640px] w-full overflow-hidden bg-ink text-bone">
       <div className="absolute inset-0">
         <Parallax>
-          <Image src={heroWine} alt="" fill priority sizes="100vw" className="animate-slow-zoom object-cover" />
+          {image && <Image src={image} alt="" fill loading="eager" fetchPriority="high" sizes="100vw" className="animate-slow-zoom object-cover" />}
         </Parallax>
         <div className="absolute inset-0 bg-gradient-to-r from-ink/95 via-ink/65 to-ink/25" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-transparent to-ink/40" />

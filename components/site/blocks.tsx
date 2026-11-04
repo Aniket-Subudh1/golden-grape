@@ -49,7 +49,7 @@ function BlockView({ block, locale, first }: { block: Block; locale: Locale; fir
         <section className="relative overflow-hidden pt-36 pb-20 md:pt-48 md:pb-32">
           {image && (
             <div className="absolute inset-0">
-              <Image src={image.src} alt="" fill priority={first} sizes="100vw" className="object-cover opacity-30" />
+              <Image src={image.src} alt="" fill loading={first ? 'eager' : 'lazy'} fetchPriority={first ? 'high' : 'auto'} sizes="100vw" className="object-cover opacity-30" />
               <div className="absolute inset-0 bg-gradient-to-b from-bone via-bone/70 to-bone" />
             </div>
           )}

@@ -69,6 +69,9 @@ const PHOTOS: Record<string, { file: string; alt: Record<Locale, string> }> = {
   risotto: { file: 'catering-events/Catering_8.jpg', alt: { fr: 'Assiette de risotto servie à table', en: 'A plate of risotto served at the table', de: 'Ein Teller Risotto am Tisch serviert', pt: 'Prato de risoto servido à mesa' } },
   grazing: { file: 'catering-events/Catering_9.jpg', alt: { fr: 'Longue table traiteur garnie de fromages et de pains', en: 'Long catering table laden with cheese and bread', de: 'Lange Catering-Tafel mit Käse und Brot', pt: 'Longa mesa de catering com queijos e pão' } },
   ivoTable: { file: 'catering-events/Catering_11.jpg', alt: { fr: 'Une grande table traiteur dressée dans la boutique', en: 'A large catering table laid out in the shop', de: 'Eine große Catering-Tafel im Laden', pt: 'Uma grande mesa de catering na loja' } },
+  // Home page photos (the prototype's lib/brand.ts slots that had no CMS photo yet).
+  hero: { file: 'home-store/Home_9.jpg', alt: { fr: 'Le salon de la boutique : fauteuils, table basse et mur de bouteilles', en: 'The shop’s lounge: armchairs, low table and a wall of bottles', de: 'Die Lounge des Ladens: Sessel, Couchtisch und eine Wand voller Flaschen', pt: 'O salão da loja: cadeirões, mesa baixa e uma parede de garrafas' } },
+  sandwiches: { file: 'catering-events/Catering_7.jpg', alt: { fr: 'Petits pains garnis servis sur une salade de tomates cerises', en: 'Filled bread rolls served on a cherry-tomato salad', de: 'Belegte Brötchen auf einem Kirschtomatensalat', pt: 'Pãezinhos recheados servidos sobre salada de tomate-cereja' } },
   // Product photos: the prototype's choice per product (its routes/shop.tsx and snack.tsx), several reused as stand-ins.
   wines: { file: 'home-store/Home_2.jpg', alt: { fr: 'Bouteilles de vins portugais alignées devant les étagères de la boutique', en: 'Portuguese wine bottles lined up in front of the shop’s shelves', de: 'Portugiesische Weinflaschen vor den Regalen des Ladens', pt: 'Garrafas de vinho português alinhadas diante das prateleiras da loja' } },
   board: { file: 'shop-wines-gourmet/Shop_5.jpg', alt: { fr: 'Une bouteille de rouge du Douro sur une planche avec raisins et jambon', en: 'A bottle of Douro red on a board with grapes and cured ham', de: 'Eine Flasche Douro-Rotwein auf einem Brett mit Trauben und Schinken', pt: 'Uma garrafa de tinto do Douro numa tábua com uvas e presunto' } },
@@ -169,7 +172,7 @@ async function upsert(collection: CollectionSlug, where: Record<string, unknown>
   return saved;
 }
 
-async function global(slug: 'BusinessSettings' | 'Header' | 'Footer' | 'HappyHour', build: (l: Locale) => Record<string, unknown>) {
+async function global(slug: 'BusinessSettings' | 'Header' | 'Footer' | 'HappyHour' | 'HomePage', build: (l: Locale) => Record<string, unknown>) {
   let saved = await payload.updateGlobal({ slug, data: build('fr') as never, locale: 'fr', depth: 0, overrideAccess: true, context: seedContext() });
   for (const l of OTHERS) {
     saved = await payload.updateGlobal({ slug, data: withIds(build(l), saved) as never, locale: l, depth: 0, overrideAccess: true, context: seedContext() });
@@ -251,6 +254,23 @@ await global('Footer', (l) => {
 });
 await global('HappyHour', (l) => ({ active: true, days: ['3', '4', '5'], from: '17:00', to: '20:00', ...c(l).happyHour, image: media.table }));
 log('Header, Footer, HappyHour saved');
+
+// The home page's photos (titles stay as edited; empty ones fall back to the dictionary on the site).
+await global('HomePage', () => ({
+  hero: { image: media.hero },
+  photos: {
+    shop: media.giftBasket,
+    snack: media.bifana,
+    catering: media.grazing,
+    events: media.piano,
+    port: media.aguardente,
+    cheese: media.platter,
+    pastel: media.dessert,
+    table: media.sandwiches,
+    interior: media.interior,
+  },
+}));
+log('HomePage photos saved');
 
 // 5. The Maison page, rebuilt from the prototype's sections as blocks
 await upsert('pages', { slug: { equals: 'maison' } }, (l) => {

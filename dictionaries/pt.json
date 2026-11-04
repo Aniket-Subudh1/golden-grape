@@ -666,6 +666,8 @@
       "vatNumber": "N.º de IVA inválido (ex. LU12345678).",
       "mismatch": "As duas palavras-passe não coincidem.",
       "signedOut": "A sua sessão expirou. Entre de novo."
-    }
+    },
+    "expiredTitle": "Sessão expirada.",
+    "signIn": "Entrar"
   }
 }

@@ -1,10 +1,9 @@
 import Image from 'next/image';
 import { Container } from '@/components/site/container';
 import { Reveal } from '@/components/site/reveal';
-import { gourmetTable } from '@/lib/brand';
 import type { Dictionary } from '@/lib/i18n';
 
-export function Hospitality({ t }: { t: Dictionary['hospitality'] }) {
+export function Hospitality({ t, image }: { t: Dictionary['hospitality']; image?: string | null }) {
   return (
     <section className="relative bg-bone">
       <Container className="py-24 md:py-36">
@@ -29,7 +28,7 @@ export function Hospitality({ t }: { t: Dictionary['hospitality'] }) {
 
           <Reveal delay={150} className="order-1 md:order-2 md:col-span-6">
             <div className="relative aspect-[4/5] overflow-hidden bg-ink">
-              <Image src={gourmetTable} alt="" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
+              {image && <Image src={image} alt="" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />}
               <div className="absolute inset-0 ring-1 ring-gold/20 ring-inset" />
             </div>
           </Reveal>

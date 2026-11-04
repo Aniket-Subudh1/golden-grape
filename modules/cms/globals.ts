@@ -15,7 +15,14 @@ const link: Field[] = [
   {
     type: 'row',
     fields: [
-      { name: 'label', type: 'text', localized: true, required: true, label: l('Texte du lien', 'Link text', 'Linktext', 'Texto da ligação'), admin: { width: '50%' } },
+      {
+        name: 'label',
+        type: 'text',
+        localized: true,
+        required: true,
+        label: l('Texte du lien', 'Link text', 'Linktext', 'Texto da ligação'),
+        admin: { width: '50%' },
+      },
       linkTo('50%'),
     ],
   },
@@ -74,17 +81,38 @@ export const footer: GlobalConfig = {
   access: editable,
   hooks: { afterChange: [revalidateTagHook('footer')] },
   fields: [
-    { name: 'tagline', type: 'textarea', localized: true, label: l('Phrase sous le logo', 'Line under the logo', 'Satz unter dem Logo', 'Frase por baixo do logótipo') },
+    {
+      name: 'tagline',
+      type: 'textarea',
+      localized: true,
+      label: l('Phrase sous le logo', 'Line under the logo', 'Satz unter dem Logo', 'Frase por baixo do logótipo'),
+    },
     {
       name: 'columns',
       label: l('Colonnes de liens', 'Link columns', 'Linkspalten', 'Colunas de ligações'),
-      labels: { singular: l('Colonne', 'Column', 'Spalte', 'Coluna'), plural: l('Colonnes', 'Columns', 'Spalten', 'Colunas') },
+      labels: {
+        singular: l('Colonne', 'Column', 'Spalte', 'Coluna'),
+        plural: l('Colonnes', 'Columns', 'Spalten', 'Colunas'),
+      },
       type: 'array',
       maxRows: 3,
       admin: { initCollapsed: true, ...rowLabel },
       fields: [
-        { name: 'title', type: 'text', localized: true, required: true, label: l('Titre de la colonne', 'Column title', 'Spaltentitel', 'Título da coluna') },
-        { name: 'links', label: l('Liens', 'Links', 'Links', 'Ligações'), labels: linkLabels, type: 'array', admin: rowLabel, fields: link },
+        {
+          name: 'title',
+          type: 'text',
+          localized: true,
+          required: true,
+          label: l('Titre de la colonne', 'Column title', 'Spaltentitel', 'Título da coluna'),
+        },
+        {
+          name: 'links',
+          label: l('Liens', 'Links', 'Links', 'Ligações'),
+          labels: linkLabels,
+          type: 'array',
+          admin: rowLabel,
+          fields: link,
+        },
       ],
     },
   ],
@@ -112,20 +140,50 @@ export const happyHour: GlobalConfig = {
       defaultValue: true,
       label: l('Afficher sur le site', 'Show on the website', 'Auf der Website zeigen', 'Mostrar no site'),
       admin: {
-        description: l('Décochez pour cacher la section.', 'Untick to hide the section.', 'Abwählen, um den Bereich auszublenden.', 'Desmarque para esconder a secção.'),
+        description: l(
+          'Décochez pour cacher la section.',
+          'Untick to hide the section.',
+          'Abwählen, um den Bereich auszublenden.',
+          'Desmarque para esconder a secção.',
+        ),
       },
     },
-    { name: 'days', type: 'select', hasMany: true, required: true, options: WEEKDAYS, label: l('Jours', 'Days', 'Tage', 'Dias') },
-    { type: 'row', fields: [timeOfDay('from', l('De', 'From', 'Von', 'Das'), '50%'), timeOfDay('to', l('À', 'To', 'Bis', 'Às'), '50%')] },
+    {
+      name: 'days',
+      type: 'select',
+      hasMany: true,
+      required: true,
+      options: WEEKDAYS,
+      label: l('Jours', 'Days', 'Tage', 'Dias'),
+    },
     {
       type: 'row',
       fields: [
-        { name: 'titleA', type: 'text', localized: true, required: true, label: l('Titre', 'Title', 'Titel', 'Título'), admin: { width: '50%' } },
+        timeOfDay('from', l('De', 'From', 'Von', 'Das'), '50%'),
+        timeOfDay('to', l('À', 'To', 'Bis', 'Às'), '50%'),
+      ],
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'titleA',
+          type: 'text',
+          localized: true,
+          required: true,
+          label: l('Titre', 'Title', 'Titel', 'Título'),
+          admin: { width: '50%' },
+        },
         {
           name: 'titleB',
           type: 'text',
           localized: true,
-          label: l('Suite du titre, en or', 'Rest of the title, in gold', 'Rest des Titels, in Gold', 'Resto do título, a dourado'),
+          label: l(
+            'Suite du titre, en or',
+            'Rest of the title, in gold',
+            'Rest des Titels, in Gold',
+            'Resto do título, a dourado',
+          ),
           admin: { width: '50%' },
         },
       ],
@@ -162,10 +220,10 @@ export const homePage: GlobalConfig = {
   admin: {
     hidden: hiddenUnless('manager'),
     description: l(
-      'Le grand titre et la photo en haut de la page d’accueil. Les événements à venir s’y affichent tout seuls.',
-      'The big title and photo at the top of the home page. Upcoming events appear there by themselves.',
-      'Der große Titel und das Foto oben auf der Startseite. Kommende Veranstaltungen erscheinen dort von selbst.',
-      'O título grande e a foto no topo da página inicial. Os próximos eventos aparecem lá sozinhos.',
+      'Le grand titre et les photos de la page d’accueil. Les événements à venir s’y affichent tout seuls.',
+      'The big title and the photos of the home page. Upcoming events appear there by themselves.',
+      'Der große Titel und die Fotos der Startseite. Kommende Veranstaltungen erscheinen dort von selbst.',
+      'O título grande e as fotos da página inicial. Os próximos eventos aparecem lá sozinhos.',
     ),
     preview: (_, { locale }) => `/${locale}`,
   },
@@ -173,45 +231,190 @@ export const homePage: GlobalConfig = {
   hooks: { afterChange: [revalidateTagHook('home')] },
   fields: [
     {
-      name: 'hero',
-      type: 'group',
-      label: false,
-      fields: [
+      // Unnamed tabs only group the form; the stored data keeps its shape.
+      type: 'tabs',
+      tabs: [
         {
-          name: 'eyebrow',
-          type: 'text',
-          localized: true,
-          defaultValue: heroDefault('eyebrow'),
-          label: l('Petite ligne au-dessus', 'Small line above', 'Kleine Zeile darüber', 'Linha pequena por cima'),
-        },
-        {
-          type: 'row',
+          label: l('Grand titre', 'Big title', 'Großer Titel', 'Título grande'),
           fields: [
-            { name: 'titleA', type: 'text', localized: true, defaultValue: heroDefault('titleA'), label: l('Titre', 'Title', 'Titel', 'Título'), admin: { width: '50%' } },
             {
-              name: 'titleB',
-              type: 'text',
-              localized: true,
-              defaultValue: heroDefault('titleB'),
-              label: l('Suite du titre, en or', 'Rest of the title, in gold', 'Rest des Titels, in Gold', 'Resto do título, a dourado'),
-              admin: { width: '50%' },
+              name: 'hero',
+              type: 'group',
+              label: false,
+              fields: [
+                {
+                  name: 'eyebrow',
+                  type: 'text',
+                  localized: true,
+                  defaultValue: heroDefault('eyebrow'),
+                  label: l(
+                    'Petite ligne au-dessus',
+                    'Small line above',
+                    'Kleine Zeile darüber',
+                    'Linha pequena por cima',
+                  ),
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'titleA',
+                      type: 'text',
+                      localized: true,
+                      defaultValue: heroDefault('titleA'),
+                      label: l('Titre', 'Title', 'Titel', 'Título'),
+                      admin: { width: '50%' },
+                    },
+                    {
+                      name: 'titleB',
+                      type: 'text',
+                      localized: true,
+                      defaultValue: heroDefault('titleB'),
+                      label: l(
+                        'Suite du titre, en or',
+                        'Rest of the title, in gold',
+                        'Rest des Titels, in Gold',
+                        'Resto do título, a dourado',
+                      ),
+                      admin: { width: '50%' },
+                    },
+                  ],
+                },
+                {
+                  name: 'subtitle',
+                  type: 'textarea',
+                  localized: true,
+                  defaultValue: heroDefault('subtitle'),
+                  label: l('Sous-titre', 'Subtitle', 'Untertitel', 'Subtítulo'),
+                },
+                {
+                  name: 'image',
+                  type: 'upload',
+                  relationTo: 'media',
+                  label: l('Photo de fond', 'Background photo', 'Hintergrundfoto', 'Foto de fundo'),
+                  admin: {
+                    description: l(
+                      'Vide : la photo actuelle du verre de vin.',
+                      'Empty: the current wine-glass photo.',
+                      'Leer: das aktuelle Weinglas-Foto.',
+                      'Vazio: a foto atual do copo de vinho.',
+                    ),
+                  },
+                },
+              ],
             },
           ],
         },
-        { name: 'subtitle', type: 'textarea', localized: true, defaultValue: heroDefault('subtitle'), label: l('Sous-titre', 'Subtitle', 'Untertitel', 'Subtítulo') },
         {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
-          label: l('Photo de fond', 'Background photo', 'Hintergrundfoto', 'Foto de fundo'),
-          admin: {
-            description: l(
-              'Vide : la photo actuelle du verre de vin.',
-              'Empty: the current wine-glass photo.',
-              'Leer: das aktuelle Weinglas-Foto.',
-              'Vazio: a foto atual do copo de vinho.',
-            ),
-          },
+          label: l('Photos', 'Photos', 'Fotos', 'Fotos'),
+          description: l(
+            'Les photos des sections de la page d’accueil. « Intérieur de la boutique » sert aussi sur la page Contact.',
+            'The photos of the home page sections. “Shop interior” is also used on the Contact page.',
+            'Die Fotos der Abschnitte der Startseite. „Ladeninneres“ wird auch auf der Kontaktseite verwendet.',
+            'As fotos das secções da página inicial. «Interior da loja» também é usada na página Contacto.',
+          ),
+          fields: [
+            {
+              name: 'photos',
+              type: 'group',
+              label: false,
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'shop',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: l('Univers : Boutique', 'Universe: Shop', 'Bereich: Shop', 'Universo: Loja'),
+                      admin: { width: '50%' },
+                    },
+                    {
+                      name: 'snack',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: l('Univers : Comptoir', 'Universe: Counter', 'Bereich: Theke', 'Universo: Balcão'),
+                      admin: { width: '50%' },
+                    },
+                    {
+                      name: 'catering',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: l('Univers : Traiteur', 'Universe: Catering', 'Bereich: Catering', 'Universo: Catering'),
+                      admin: { width: '50%' },
+                    },
+                    {
+                      name: 'events',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: l(
+                        'Univers : Événements',
+                        'Universe: Events',
+                        'Bereich: Veranstaltungen',
+                        'Universo: Eventos',
+                      ),
+                      admin: { width: '50%' },
+                    },
+                  ],
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'port',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: l('Savoir-faire : Porto', 'Craft: Port', 'Handwerk: Portwein', 'Saber-fazer: Porto'),
+                      admin: { width: '33%' },
+                    },
+                    {
+                      name: 'cheese',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: l('Savoir-faire : Fromages', 'Craft: Cheese', 'Handwerk: Käse', 'Saber-fazer: Queijos'),
+                      admin: { width: '33%' },
+                    },
+                    {
+                      name: 'pastel',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: l(
+                        'Savoir-faire : Pastel de nata',
+                        'Craft: Pastel de nata',
+                        'Handwerk: Pastel de nata',
+                        'Saber-fazer: Pastel de nata',
+                      ),
+                      admin: { width: '33%' },
+                    },
+                  ],
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'table',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: l(
+                        'Hospitalité : la table',
+                        'Hospitality: the table',
+                        'Gastfreundschaft: der Tisch',
+                        'Hospitalidade: a mesa',
+                      ),
+                      admin: { width: '50%' },
+                    },
+                    {
+                      name: 'interior',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: l('Intérieur de la boutique', 'Shop interior', 'Ladeninneres', 'Interior da loja'),
+                      admin: { width: '50%' },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         },
       ],
     },

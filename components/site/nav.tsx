@@ -92,7 +92,7 @@ export function Nav({ locale, items, labels, phone, instagram }: Props) {
 
         <Link href={localePath(locale)} className="block" aria-label={LOGO_ALT}>
           <span className={cn('relative block aspect-[1085/859] transition-all duration-500', solid ? 'h-16 md:h-20' : 'h-20 md:h-28')}>
-            <Image src="/brand/logo-light.png" alt={LOGO_ALT} priority fill sizes="(min-width: 768px) 142px, 102px" className="object-contain" />
+            <Image src="/brand/logo-light.png" alt={LOGO_ALT} loading="eager" fill sizes="(min-width: 768px) 142px, 102px" className="object-contain" />
           </span>
         </Link>
 

@@ -425,7 +425,7 @@ export interface Page {
                   /**
                    * Empty: shown without a link (page not online yet).
                    */
-                  href?: ('/' | '/maison' | '/events' | '/catering' | '/contact') | null;
+                  href?: ('/' | '/shop' | '/snack' | '/maison' | '/events' | '/catering' | '/contact') | null;
                   style: 'solid' | 'outline';
                   id?: string | null;
                 }[]
@@ -1842,7 +1842,7 @@ export interface BusinessSetting {
   createdAt?: string | null;
 }
 /**
- * The big title and photo at the top of the home page. Upcoming events appear there by themselves.
+ * The big title and the photos of the home page. Upcoming events appear there by themselves.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "HomePage".
@@ -1858,6 +1858,17 @@ export interface HomePage {
      * Empty: the current wine-glass photo.
      */
     image?: (string | null) | Media;
+  };
+  photos?: {
+    shop?: (string | null) | Media;
+    snack?: (string | null) | Media;
+    catering?: (string | null) | Media;
+    events?: (string | null) | Media;
+    port?: (string | null) | Media;
+    cheese?: (string | null) | Media;
+    pastel?: (string | null) | Media;
+    table?: (string | null) | Media;
+    interior?: (string | null) | Media;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1879,7 +1890,7 @@ export interface Header {
         /**
          * Empty: shown without a link (page not online yet).
          */
-        href?: ('/' | '/maison' | '/events' | '/catering' | '/contact') | null;
+        href?: ('/' | '/shop' | '/snack' | '/maison' | '/events' | '/catering' | '/contact') | null;
         id?: string | null;
       }[]
     | null;
@@ -1904,7 +1915,7 @@ export interface Footer {
               /**
                * Empty: shown without a link (page not online yet).
                */
-              href?: ('/' | '/maison' | '/events' | '/catering' | '/contact') | null;
+              href?: ('/' | '/shop' | '/snack' | '/maison' | '/events' | '/catering' | '/contact') | null;
               id?: string | null;
             }[]
           | null;
@@ -2232,6 +2243,19 @@ export interface HomePageSelect<T extends boolean = true> {
         titleB?: T;
         subtitle?: T;
         image?: T;
+      };
+  photos?:
+    | T
+    | {
+        shop?: T;
+        snack?: T;
+        catering?: T;
+        events?: T;
+        port?: T;
+        cheese?: T;
+        pastel?: T;
+        table?: T;
+        interior?: T;
       };
   updatedAt?: T;
   createdAt?: T;

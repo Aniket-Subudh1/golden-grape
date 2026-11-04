@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { cn } from '@/lib/cn';
 import { getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { AuthShell } from '@/modules/customers/components/auth-shell';
-import { ForgotForm, SignInForm, SignUpForm } from '@/modules/customers/components/auth-forms';
+import { ForgotForm, GoTo, SignInForm, SignUpForm } from '@/modules/customers/components/auth-forms';
 import { currentCustomer } from '@/modules/customers/service';
 
 type Props = PageProps<'/[locale]/auth'>;
@@ -23,7 +23,8 @@ const safeNext = (value: unknown, locale: Locale) => (typeof value === 'string' 
 async function Forms({ locale, searchParams }: { locale: Locale; searchParams: Props['searchParams'] }) {
   const sp = await searchParams;
   const next = safeNext(sp.next, locale);
-  if (await currentCustomer()) redirect(next);
+  // Already signed in: hand over to the account on the client (a redirect thrown while rendering breaks instant navigation).
+  if (await currentCustomer()) return <GoTo href={next} />;
   const { auth: t, form } = await getDictionary(locale);
   const view = sp.view === 'signup' || sp.view === 'forgot' ? sp.view : 'signin';
   const tab = (id: 'signin' | 'signup', label: string) => (

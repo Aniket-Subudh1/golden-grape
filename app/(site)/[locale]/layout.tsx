@@ -84,7 +84,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   if (!isLocale(locale)) notFound();
   const t = await getDictionary(locale);
   return (
-    <html lang={locale} className={`${serif.variable} ${sans.variable}`}>
+    <html lang={locale} className={`${serif.variable} ${sans.variable}`} data-scroll-behavior="smooth">
       <body id="top" className="bg-bone text-ink">
         <CartProvider locale={locale} notices={t.cart.notices}>
           <Suspense fallback={null}>

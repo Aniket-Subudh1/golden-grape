@@ -13,7 +13,7 @@ export function Gallery({ photos, name }: { photos: Photo[]; name: string }) {
     <div>
       <div className="relative aspect-[4/5] overflow-hidden bg-champagne/40">
         {photo ? (
-          <Image src={photo.src} alt={photo.alt || name} fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+          <Image src={photo.src} alt={photo.alt || name} fill loading="eager" fetchPriority="high" sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
         ) : (
           <div className="bg-azulejo absolute inset-0 opacity-20" aria-hidden="true" />
         )}

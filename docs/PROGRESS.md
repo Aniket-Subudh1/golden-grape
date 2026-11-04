@@ -56,6 +56,26 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-04 · M2.2 completed: instant-navigation error, Home page settings wired, `lib/brand.ts` deleted
+- **Fixed (reported by Aniket):** "Could not validate `instant` because an error prevented the target segment from rendering."
+  - Cause: the account layout threw `redirect()` while rendering for a signed-out visitor (and the sign-in page did the same for a signed-in one); Next's dev instant-navigation check fails on a redirect thrown during render.
+  - Now `proxy.ts` sends visitors without the session cookie from `/…/account` to `/auth?next=…` before rendering. An expired session shows a "Session expirée" panel with a sign-in button, and the sign-in page hands a signed-in visitor over on the client.
+  - Reproduced by clicking through the site, then confirmed gone.
+- **Found while checking M2.2:** the "Page d'accueil" settings (M1.3) were never read by the website, so editing the hero changed nothing.
+  - The home page now uses them, with each empty text falling back to the dictionary as the global already promised.
+  - A new "Photos" tab holds the photos of every home section: the four universes, three craft cards, the hospitality table and the shop interior (also used on Contact). The seed fills them with today's photos, plus two new media items with alt text in 4 languages.
+  - With that, `lib/brand.ts` has no imports and is deleted (M2.2 T2 / M1.2 T6).
+  - **Run `npm run seed` once on any database that has not had it since this change** (including the shared one used by localhost): until then the home sections show their dark background instead of a photo.
+- **Smaller fixes:**
+  - `data-scroll-behavior="smooth"` on `<html>` (Next's warning).
+  - The deprecated `priority` on images is replaced by `loading="eager"` + `fetchPriority="high"`.
+  - The first four shop cards load eagerly (the largest image on screen).
+- **Verified:**
+  - Clicking through every nav link, the account icon, a product and back home: no console error.
+  - The home page and contact show the CMS photos; the admin Photos tab works.
+  - `npm run check` (87) and `npm run test:int` (47) pass.
+- **M2.2 checklist against the milestone:** T1–T6 all done, and the `lib/brand.ts` deletion is now done too. Two items are deferred because they depend on later milestones: `customers.priceList` (M3.2) and the `orders` scoping test, which comes with orders in M2.3.
+
 ### 2026-11-04 · M2.2 · Shop, Counter, cart, customer accounts, SEO
 - **T1 Pricing v1** (`modules/promotions/pricing.ts` + 9 unit vectors, `service.ts`):
   - Pure `quote()` with the final input/output types of 04 §6. v1 does step 1 (box price, or factor × bottle price) and step 5 (VAT per rate group). The other steps are no-ops for M2.3/M3.2.
@@ -107,7 +127,7 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
   - Desktop in FR. The admin customers list and page.
   - `npm run check` (87 unit), `npm run test:int` (47), `next build` with no env, and e2e on that build: 16 passed, 2 skipped.
 - **Not done, on purpose:**
-  - `lib/brand.ts` is not deleted yet. The home sections (hero, universes, craft, store, hospitality) and the contact photo still use its fixed images; deleting it needs those images moved into the CMS, which no milestone has scheduled. Tracked here.
+  - `lib/brand.ts` was deleted in the follow-up entry above.
   - `customers.priceList` arrives with `priceLists` in M3.2.
 - **For the live site after deploy:**
   - Run `npm run seed` on the server, so the Header and Footer link to the shop and counter and the catalogue exists.

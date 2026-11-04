@@ -14,7 +14,7 @@ type T = Dictionary['auth'];
 type Messages = Dictionary['form'];
 
 /** After a successful sign-in, go on to the account (or where the visitor came from) and refresh the server parts. */
-function GoTo({ href }: { href: string }) {
+export function GoTo({ href }: { href: string }) {
   const router = useRouter();
   useEffect(() => {
     router.replace(href);

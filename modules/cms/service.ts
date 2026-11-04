@@ -38,6 +38,13 @@ async function happyHourCached(locale: Locale) {
   return payload.findGlobal({ slug: 'HappyHour', locale, depth: 1 });
 }
 
+async function homePageCached(locale: Locale) {
+  'use cache';
+  cacheTag('home');
+  const payload = await getPayloadClient();
+  return payload.findGlobal({ slug: 'HomePage', locale, depth: 1 });
+}
+
 const publishedSlug = (slug: string) => ({ slug: { equals: slug }, _status: { equals: 'published' as const } });
 
 async function pageCached(slug: string, locale: Locale) {
@@ -65,5 +72,6 @@ export function mediaOf(value: string | Media | null | undefined) {
 export const getHeader = atRequest(headerCached);
 export const getFooter = atRequest(footerCached);
 export const getHappyHour = atRequest(happyHourCached);
+export const getHomePage = atRequest(homePageCached);
 export const getPage = atRequest(pageCached);
 export const getLegal = atRequest(legalCached);

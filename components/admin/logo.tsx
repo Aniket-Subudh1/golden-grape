@@ -6,7 +6,7 @@ import { adminText } from './text';
 export default function AdminLogo({ i18n }: { i18n?: I18nClient }) {
   return (
     <span className="gg-lockup">
-      <Image src="/brand/mark.png" alt="" width={223} height={240} priority className="gg-lockup__logo" />
+      <Image src="/brand/mark.png" alt="" width={223} height={240} loading="eager" className="gg-lockup__logo" />
       <span className="gg-lockup__text">
         <span className="gg-lockup__name">
           Golden <b>Grape</b>

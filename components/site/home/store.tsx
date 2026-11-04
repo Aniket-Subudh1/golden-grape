@@ -6,11 +6,11 @@ import { Parallax } from '@/components/site/parallax';
 import { Reveal } from '@/components/site/reveal';
 import { useNow } from '@/components/site/use-now';
 import { Button } from '@/components/ui/button';
-import { storeInterior } from '@/lib/brand';
 import type { Dictionary } from '@/lib/i18n';
 import { isOpenNow } from '@/lib/time';
 
 type Props = {
+  image?: string | null;
   t: Dictionary['store'];
   address: string[];
   hours: { days: string; slots: string }[];
@@ -21,7 +21,7 @@ type Props = {
   tastingHref: string;
 };
 
-export function Store({ t, address, hours, schedule, closedDates, directionsHref, tastingHref }: Props) {
+export function Store({ t, address, hours, schedule, closedDates, directionsHref, tastingHref, image }: Props) {
   const now = useNow();
   const open = now === undefined ? undefined : isOpenNow(schedule, closedDates, new Date(now));
   return (
@@ -29,7 +29,7 @@ export function Store({ t, address, hours, schedule, closedDates, directionsHref
       <div className="grid min-h-[100svh] grid-cols-1 md:grid-cols-12">
         <div className="relative aspect-[4/3] overflow-hidden md:col-span-7 md:aspect-auto">
           <Parallax>
-            <Image src={storeInterior} alt="" fill sizes="(min-width: 768px) 58vw, 100vw" className="object-cover" />
+            {image && <Image src={image} alt="" fill sizes="(min-width: 768px) 58vw, 100vw" className="object-cover" />}
           </Parallax>
           <div className="absolute inset-0 bg-gradient-to-r from-transparent to-ink/70" />
         </div>

@@ -13,6 +13,16 @@ export function proxy(request: NextRequest) {
     return NextResponse.next({ request: { headers } });
   }
 
+  // Customer area: a visitor without the session cookie goes to sign-in before anything renders (a redirect thrown
+  // while rendering breaks Next's instant-navigation check). An expired session is handled by the page itself.
+  const account = /^\/(fr|en|de|pt)\/account(\/|$)/.exec(pathname);
+  if (account && !request.cookies.has('gg_customer')) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/${account[1]}/auth`;
+    url.search = `?next=${encodeURIComponent(pathname)}`;
+    return NextResponse.redirect(url, 307);
+  }
+
   // Website: French is always the entry language; a language picked in the switcher (NEXT_LOCALE cookie) wins.
   if (isLocale(pathname.split('/')[1])) return NextResponse.next();
   const cookie = request.cookies.get('NEXT_LOCALE')?.value;

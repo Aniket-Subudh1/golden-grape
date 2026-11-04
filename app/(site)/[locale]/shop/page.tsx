@@ -63,8 +63,8 @@ async function Results({ locale, t, searchParams }: { locale: Locale; t: Diction
             <>
               <p className="eyebrow mb-8 text-ink/40">{s.count.replace('{{count}}', String(data.total))}</p>
               <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:gap-8 lg:grid-cols-4">
-                {data.products.map((p) => (
-                  <ProductCard key={p.id} product={p} locale={locale} t={s} />
+                {data.products.map((p, i) => (
+                  <ProductCard key={p.id} product={p} locale={locale} t={s} priority={i < 4} />
                 ))}
               </div>
             </>
