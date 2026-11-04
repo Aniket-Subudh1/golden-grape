@@ -159,3 +159,47 @@
     animation: none;
   }
 }
+
+/* Horizontal chip rows scroll without a visible bar (shop categories). */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Side sheet (components/ui/sheet.tsx): a native <dialog> sliding in from the right, or up from the bottom on phones. */
+.gg-sheet {
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  /* A <dialog> scrolls its own content; a wide child must never shift the panel sideways. */
+  overflow: hidden;
+  background: transparent;
+}
+.gg-sheet::backdrop {
+  background: oklch(0.18 0.01 60 / 0.45);
+  backdrop-filter: blur(2px);
+  animation: gg-fade-in 0.3s ease both;
+}
+.gg-sheet[open] > .gg-sheet__panel {
+  animation: gg-sheet-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes gg-sheet-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes gg-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gg-sheet[open] > .gg-sheet__panel,
+  .gg-sheet::backdrop {
+    animation: none;
+  }
+}

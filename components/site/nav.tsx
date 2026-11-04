@@ -1,12 +1,13 @@
 'use client';
 
-import { Menu, Phone, X } from 'lucide-react';
+import { Menu, Phone, Search, ShoppingBag, UserRound, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/cn';
 import { type Locale, localePath } from '@/lib/i18n';
+import { useCart } from '@/modules/webshop/cart';
 import { LanguageSwitcher } from './language-switcher';
 import { type NavItem, NavLink } from './nav-link';
 import { InstagramIcon } from './social-icons';
@@ -14,7 +15,7 @@ import { InstagramIcon } from './social-icons';
 type Props = {
   locale: Locale;
   items: NavItem[];
-  labels: { openMenu: string; closeMenu: string; language: string; phone: string };
+  labels: { openMenu: string; closeMenu: string; language: string; phone: string; search: string; account: string; bag: string };
   phone?: string | null;
   instagram?: string | null;
 };
@@ -27,6 +28,7 @@ export function Nav({ locale, items, labels, phone, instagram }: Props) {
   const isHome = pathname === localePath(locale);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const cart = useCart();
 
   useEffect(() => {
     if (!isHome) return;
@@ -54,6 +56,15 @@ export function Nav({ locale, items, labels, phone, instagram }: Props) {
     );
   const linkRow = 'hidden items-center gap-4 text-[10px] font-medium tracking-[0.14em] uppercase md:flex lg:gap-7 lg:text-[11px] lg:tracking-[0.24em] xl:gap-9 xl:tracking-[0.28em]';
   const icon = 'hidden transition-colors hover:text-gold xl:block';
+  const tool = 'relative grid h-9 w-9 place-items-center rounded-full transition-colors hover:text-gold focus-visible:outline-2 focus-visible:outline-gold';
+  const bag = (
+    <button type="button" onClick={() => cart.setOpen(true)} aria-label={labels.bag} className={tool}>
+      <ShoppingBag className="h-[18px] w-[18px]" />
+      {cart.count > 0 && (
+        <span className="absolute -top-0.5 -right-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-gold px-1 text-[9px] font-medium text-ink">{cart.count}</span>
+      )}
+    </button>
+  );
 
   return (
     <header
@@ -103,8 +114,18 @@ export function Nav({ locale, items, labels, phone, instagram }: Props) {
               </a>
             )}
           </nav>
-          <div className="md:hidden">
+          <div className="ml-1 hidden items-center md:flex lg:ml-3">
+            <Link href={`${localePath(locale, '/shop')}#search`} aria-label={labels.search} className={tool}>
+              <Search className="h-[18px] w-[18px]" />
+            </Link>
+            <Link href={localePath(locale, '/account')} aria-label={labels.account} className={tool}>
+              <UserRound className="h-[18px] w-[18px]" />
+            </Link>
+            {bag}
+          </div>
+          <div className="flex items-center md:hidden">
             <LanguageSwitcher locale={locale} label={labels.language} />
+            {bag}
           </div>
         </div>
       </div>
@@ -132,7 +153,11 @@ export function Nav({ locale, items, labels, phone, instagram }: Props) {
               className={cn('font-serif text-4xl font-light tracking-tight sm:text-5xl', isActive(item) && 'text-gold')}
             />
           ))}
-          <div className="mt-2 flex items-center gap-6 border-t border-bone/10 pt-8">
+          <div className="mt-2 flex flex-wrap items-center gap-6 border-t border-bone/10 pt-8">
+            <Link href={localePath(locale, '/account')} onClick={() => setOpen(false)} className="flex items-center gap-2 text-sm font-light text-bone/80">
+              <UserRound className="h-4 w-4 text-gold" />
+              {labels.account}
+            </Link>
             {phone && (
               <a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-center gap-2 text-sm font-light text-bone/80">
                 <Phone className="h-4 w-4 text-gold" />

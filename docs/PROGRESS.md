@@ -10,7 +10,7 @@ Update this file at the end of every task (`00-START-HERE.md` §2). The newest l
 | M1.2 | Design system + i18n shell | P1 | Wed 4 Nov | Done (agent checks; AC-03 side-by-side and the checklist are human) | — |
 | M1.3 | CMS, pages, settings, roles | P1 | Thu 5 Nov | In progress (all ACs pass except AC-04's real e-mail delivery, which waits for SMTP) | — |
 | M2.1 | Catalogue + inventory core | P2 $250 | Sat 7 Nov | Done (all 7 ACs pass; checklist walked in the browser; the client's spreadsheet DEP-04 pending) | — |
-| M2.2 | Shop, cart, accounts, SEO | P2 | Mon 9 Nov | Not started | — |
+| M2.2 | Shop, cart, accounts, SEO | P2 | Mon 9 Nov | Done (all 7 ACs pass; Rich Results Test and real e-mail delivery wait for staging/SMTP) | — |
 | M2.3 | Checkout, orders, reservations | P2 | Tue 10 Nov | Not started | — |
 | M3.1 | Mobile back office + purchasing | P3 $250 | Thu 12 Nov | Not started | — |
 | M3.2 | B2B, documents, pricing, loyalty, gift cards | P3 | Sat 14 Nov | Not started | — |
@@ -55,6 +55,64 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-12 | Until DEP-07, the seeded catalogue's VAT classes: wines intermediate (14 %); port, beer, gift boxes and the glass of wine standard (17 %); cheese, charcuterie, groceries and counter dishes super-reduced (3 %). The client's spreadsheet sets each product's class | M2.1 T6 seed | — |
 
 ## 4. Log
+
+### 2026-11-04 · M2.2 · Shop, Counter, cart, customer accounts, SEO
+- **T1 Pricing v1** (`modules/promotions/pricing.ts` + 9 unit vectors, `service.ts`):
+  - Pure `quote()` with the final input/output types of 04 §6. v1 does step 1 (box price, or factor × bottle price) and step 5 (VAT per rate group). The other steps are no-ops for M2.3/M3.2.
+  - `quoteCart` loads the variants, boxes, VAT rates (BusinessSettings, LU rates as fallback, A-07) and live stock. It returns localized names and photos, drops lines no longer for sale and clamps lines above the stock. `unitPrices` prices cards and product options through the same `quote`.
+- **T2 Shop and Counter:**
+  - `/shop`: category chips from the CMS; server-side search on the text index (debounced, in the URL); region, colour and price filters (inline on desktop, a sheet on phones); 24 per page; the prototype's empty text.
+  - `ProductCard` = `MediaCard 4/5` with "+" turning into "✓", and "Épuisé" with a disabled button when out of stock.
+  - Product page (new): gallery, breadcrumb, wine facts, bottle / box options with their prices, a stepper capped at the stock, add to cart, 4 related products.
+  - `/snack`: the prototype's menu with add/stepper, allergens, and the 3 CTAs opening the cart in pick-up / delivery / table mode.
+  - The Header, Footer and Maison links to the shop and counter now have their `href` (seed and the admin's link list).
+- **T3 Cart:**
+  - The browser keeps only `{variant, unit?, qty}` and the mode (`gg_cart_v2`; older keys are dropped). Every number comes from `quoteCartAction`, 300 ms after a change; tampered prices change nothing.
+  - The sheet and floating cart are ported from the prototype, with VAT "dont TVA x %" per rate.
+  - The nav now shows search, account and cart (with a count).
+  - The "Checkout" button stays hidden until M2.3 builds `/checkout` (law 12: no placeholder).
+- **T4 Accounts** (`modules/customers/*`):
+  - `customers` and `customerGroups`. A customer cannot set group, terms or points.
+  - Sign-up for private or business; business needs company and VAT, checked by country format (`vat.ts`, 15 vectors).
+  - Sign-in, forgot/reset password (e-mail in the shared layout and the customer's language), rate limits as specified (plus 5 forgot-password requests per hour per address).
+  - `/account`: overview, profile, password, addresses (one default), and orders (empty; its link appears only once a customer has orders).
+  - The session is our own `gg_customer` cookie holding the Payload token (see 04 §3), and sign-out ends the server session. The API cannot create customers; staff can, in the admin ("Clients", "Groupes de clients").
+- **T5 SEO:**
+  - Shop, product and counter: metadata, canonical, 4 hreflang + x-default, OG image.
+  - JSON-LD: `Product` + `Offer` + `BreadcrumbList` on products; `LiquorStore` (the schema.org `LocalBusiness` type for a wine shop: there is no `WineStore`) on home and contact. It uses hours from settings, and geo once the new optional latitude/longitude are filled in.
+  - `sitemap.xml`: every public page × 4 languages with alternates, plus active products, published events, the Maison page and published legal pages.
+  - `robots.txt`: disallows admin, staff, api, and account, checkout and auth under every language.
+- **T6 Tests:** `pricing.test.ts` and `vat.test.ts` (unit); `modules/customers/access.int.test.ts` (7 tests: A cannot find, read, update or create; cannot set group, terms or points; the session token resolves only to its customer; no staff data). The `orders` part comes with M2.3, when orders exist.
+- **Bugs found and fixed on the way:**
+  - The nav and product cards stream in after the cart loads from localStorage, so the cart badge and "✓" broke hydration. `useCart` now shows each component an empty cart while it hydrates.
+  - The filters sheet opened shifted left on phones: the `<dialog>` scrolled sideways to its wide footer buttons. The sheet no longer scrolls sideways, and the buttons shrink.
+  - Sign-out only deleted the cookie, so a copied token stayed valid for 30 days. It now ends the Payload session.
+  - The product page read `params` outside Suspense.
+- **Acceptance criteria** (browser checks on a throwaway database, never the shared one):
+
+  | AC | Result | How |
+  |---|---|---|
+  | 01 filter "Port" + search "tawny" in EN | Pass | `/en/shop?category=port&q=tawny` shows only "Port Tawny 20 years", URL holds both |
+  | 02 box of 6 + 2 snacks = `quote()`; tampered localStorage prices change nothing | Pass | sheet: 193,00 € (180 + 2 × 6,50), TVA 14 % 22,11 €, TVA 3 % 0,38 € (= `quote` by hand); same after adding fake prices to localStorage |
+  | 03 2 in stock: stepper stops at 2; a stored 5 is clamped to 2 with a notice | Pass | "+" disabled at 2; stored 5 → 2 and "Quantité ajustée au stock disponible." |
+  | 04 business sign-up without VAT rejected on the field; with it, a business account | Pass | "Ce champ est obligatoire." / "Numéro de TVA invalide"; `LU 1234 5678` → account with company and `LU12345678` |
+  | 05 A never reads B (pages, actions, REST) | Pass | int test (7); REST with B's token: GET A → 404, PATCH A → 403, list → only B; A's signed-out cookie → 403; actions only act on `currentCustomer()` |
+  | 06 product page: canonical, 4 hreflang, OG, valid `Product` JSON-LD | Pass (Rich Results Test on staging is manual) | checked in the served HTML; JSON-LD parses with Offer 32.00 EUR InStock |
+  | 07 sitemap lists every published product in 4 locales; robots blocks private paths | Pass | 18 products × 4, each with 5 hreflang; robots as above |
+
+- **Also verified:**
+  - The reset e-mail goes out with its Portuguese subject for a Portuguese account; the link signs in at `/pt/account`; a reused link is refused.
+  - Profile save, addresses (add, second as default, delete), sign-out sends `/account` to `/auth`, and a wrong password gives one generic message.
+  - Phones (390 px) in DE, PT and EN: shop, filters sheet, counter, product, sign-up and cart, with 0 px overflow and no console errors.
+  - Desktop in FR. The admin customers list and page.
+  - `npm run check` (87 unit), `npm run test:int` (47), `next build` with no env, and e2e on that build: 16 passed, 2 skipped.
+- **Not done, on purpose:**
+  - `lib/brand.ts` is not deleted yet. The home sections (hero, universes, craft, store, hospitality) and the contact photo still use its fixed images; deleting it needs those images moved into the CMS, which no milestone has scheduled. Tracked here.
+  - `customers.priceList` arrives with `priceLists` in M3.2.
+- **For the live site after deploy:**
+  - Run `npm run seed` on the server, so the Header and Footer link to the shop and counter and the catalogue exists.
+  - Every product shows "Épuisé" until its stock is entered (opening stock via the client's spreadsheet, DEP-04, or "Corriger le stock").
+- **Human checklist, not performed:** a real phone in all 4 languages, the reset e-mail in a real inbox (needs SMTP), and the Google Rich Results Test on staging.
 
 ### 2026-11-04 · One page layout for the whole admin, M2.1 audit (requested by Aniket)
 - **Uniform admin:**

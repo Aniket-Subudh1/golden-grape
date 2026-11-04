@@ -17,7 +17,7 @@ type Props = {
 
 export function MediaCard({ image, alt, ratio, tag, overlay, action, children, sizes = '(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw' }: Props) {
   return (
-    <article className="group flex flex-col bg-bone">
+    <article className="group relative flex flex-col bg-bone">
       <div className={cn('relative overflow-hidden bg-ink', ratio === '4/5' ? 'aspect-[4/5]' : 'aspect-[4/3]')}>
         {image && (
           <Image

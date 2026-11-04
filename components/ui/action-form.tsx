@@ -35,11 +35,15 @@ type Props<T> = Omit<ComponentProps<'form'>, 'action' | 'onSubmit'> & {
   messages: { success?: string; error: string; fields: Record<string, string> } & Record<string, unknown>;
   /** Shown instead of the form after a successful submit. */
   done?: (data: T) => ReactNode;
+  /** Called once after a successful submit (refresh the page, close an editor…). */
+  onSuccess?: (data: T) => void;
+  /** Keep what was typed after success (an edited profile stays on screen); otherwise the form is cleared. */
+  keepValues?: boolean;
 };
 
 // Submits through the server action without React's automatic form reset, so a failed submit keeps
 // what the user typed; the form is reset only on success.
-export function ActionForm<T>({ action, messages, done, children, ...props }: Props<T>) {
+export function ActionForm<T>({ action, messages, done, onSuccess, keepValues, children, ...props }: Props<T>) {
   const [state, formAction] = useActionState(action, null);
   const form = useRef<HTMLFormElement>(null);
 
@@ -47,12 +51,15 @@ export function ActionForm<T>({ action, messages, done, children, ...props }: Pr
     if (!state) return;
     if (state.ok) {
       if (messages.success) toast.success(messages.success);
-      form.current?.reset();
+      if (!keepValues) form.current?.reset();
+      onSuccess?.(state.data);
     } else if (!state.fieldErrors) {
       const byCode = messages[state.error];
       toast.error(typeof byCode === 'string' ? byCode : messages.error);
     }
-  }, [state, messages]);
+    // Only a new result triggers this; the callbacks are read at that moment.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   if (state?.ok && done) return done(state.data);
 

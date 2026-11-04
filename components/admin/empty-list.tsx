@@ -1,4 +1,4 @@
-import { ArrowLeftRight, ClipboardCheck, Package, Store, Tags, TriangleAlert } from 'lucide-react';
+import { ArrowLeftRight, ClipboardCheck, Package, Store, Tags, TriangleAlert, UsersRound } from 'lucide-react';
 import type { PaginatedDocs } from 'payload';
 import type { Label } from '@/lib/admin';
 import CreateButton from './create-button';
@@ -7,7 +7,7 @@ import CreateButton from './create-button';
 // is for and the button to add the first one, instead of Payload's generic "No results". It shows only when nothing
 // exists yet; when a search or filter matches nothing, Payload's own message stays (restyled in custom.css).
 
-const ICONS = { products: Package, categories: Tags, producers: Store, counts: ClipboardCheck, movements: ArrowLeftRight, lowStock: TriangleAlert };
+const ICONS = { products: Package, categories: Tags, producers: Store, counts: ClipboardCheck, movements: ArrowLeftRight, lowStock: TriangleAlert, customers: UsersRound };
 export type EmptyIcon = keyof typeof ICONS;
 
 type Props = {

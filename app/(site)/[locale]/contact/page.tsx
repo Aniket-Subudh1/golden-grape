@@ -4,12 +4,14 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { type ReactNode, Suspense } from 'react';
 import { Container } from '@/components/site/container';
+import { JsonLd } from '@/components/site/json-ld';
 import { PageHero } from '@/components/site/page-hero';
 import { FacebookIcon, InstagramIcon } from '@/components/site/social-icons';
 import { storeInterior } from '@/lib/brand';
-import { alternates, type Dictionary, getDictionary, isLocale, type Locale } from '@/lib/i18n';
+import { alternates, type Dictionary, getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { weekHours } from '@/lib/time';
 import { ContactForm } from '@/modules/cms/components/contact-form';
+import { localBusinessJsonLd } from '@/modules/settings/seo';
 import { directionsUrl, getSettings } from '@/modules/settings/service';
 
 export async function generateMetadata({ params }: PageProps<'/[locale]/contact'>): Promise<Metadata> {
@@ -35,10 +37,12 @@ const iconCircle = 'grid h-10 w-10 place-items-center rounded-full border border
 const link = 'transition hover:text-gold-deep';
 
 async function Info({ locale, t }: { locale: Locale; t: Dictionary['contactPage'] }) {
-  const { business: b, hours } = await getSettings();
+  const settings = await getSettings();
+  const { business: b, hours } = settings;
   if (!b?.street) return null; // BusinessSettings not filled in yet
   return (
     <>
+      <JsonLd data={localBusinessJsonLd(settings, localePath(locale, '/contact'))} />
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <InfoRow icon={<MapPin className="h-4 w-4" />} label={t.info.address}>
           {b.street}

@@ -60,14 +60,120 @@ export async function findSellable(payload: Payload, ids: string[], channel: Cha
 
 const PAGE_SIZE = 24;
 
-/** Active products for the shop and the counter, by category slug and full-text search, paginated (M2.2). */
-export async function listProducts(payload: Payload, { locale, category, q, page = 1 }: { locale: Locale; category?: string; q?: string; page?: number }) {
-  const where: Where = { status: { equals: 'active' } };
-  if (category) where['category.slug'] = { equals: category };
-  if (q?.trim()) {
+export type ProductFilters = {
+  locale: Locale;
+  /** `shop`: everything but the counter's dishes. `snack`: the counter. */
+  kind?: 'shop' | 'snack';
+  category?: string;
+  q?: string;
+  region?: string;
+  colour?: string;
+  /** Price of the cheapest size, in cents (VAT incl.). */
+  minCents?: number;
+  maxCents?: number;
+  page?: number;
+  limit?: number;
+};
+
+/** Active products for the shop and the counter: category slug, full-text search and filters, paginated (24). */
+export async function listProducts(payload: Payload, f: ProductFilters) {
+  const and: Where[] = [{ status: { equals: 'active' } }];
+  if (f.kind) and.push({ kind: f.kind === 'snack' ? { equals: 'snack' } : { not_equals: 'snack' } });
+  if (f.category) and.push({ 'category.slug': { equals: f.category } });
+  if (f.region) and.push({ 'wine.region': { equals: f.region } });
+  if (f.colour) and.push({ 'wine.colour': { equals: f.colour } });
+  if (f.q?.trim()) {
     // Mongo's text index (custom.indexes on products): Payload has no `$text` operator, so match ids first.
-    const hits = await model(payload, 'products').find({ $text: { $search: q.trim() } }, { _id: 1 }).limit(500).lean<{ _id: unknown }[]>();
-    where.id = { in: hits.map((h) => String(h._id)) };
+    const hits = await model(payload, 'products').find({ $text: { $search: f.q.trim() } }, { _id: 1 }).limit(500).lean<{ _id: unknown }[]>();
+    and.push({ id: { in: hits.map((h) => String(h._id)) } });
   }
-  return payload.find({ collection: 'products', where, locale, page, limit: PAGE_SIZE, sort: 'name', depth: 1, overrideAccess: true });
+  if (f.minCents !== undefined || f.maxCents !== undefined) {
+    const { docs } = await payload.find({
+      collection: 'variants',
+      where: {
+        active: { equals: true },
+        priceCents: { ...(f.minCents !== undefined ? { greater_than_equal: f.minCents } : {}), ...(f.maxCents !== undefined ? { less_than_equal: f.maxCents } : {}) },
+      },
+      limit: 0,
+      depth: 0,
+      overrideAccess: true,
+      select: { product: true },
+    });
+    and.push({ id: { in: [...new Set(docs.map((v) => idOf(v.product)))] } });
+  }
+  return payload.find({
+    collection: 'products',
+    where: { and },
+    locale: f.locale,
+    page: f.page ?? 1,
+    limit: f.limit ?? PAGE_SIZE,
+    sort: 'name',
+    depth: 1,
+    overrideAccess: true,
+  });
+}
+
+/** The values the shop filters offer: regions and colours of active wines, in the visitor's language. */
+export async function shopFacets(payload: Payload, locale: Locale) {
+  const { docs } = await payload.find({
+    collection: 'products',
+    where: { status: { equals: 'active' }, kind: { equals: 'wine' } },
+    locale,
+    limit: 0,
+    depth: 0,
+    overrideAccess: true,
+    select: { wine: true },
+  });
+  const regions = [...new Set(docs.map((d) => d.wine?.region).filter((r): r is string => Boolean(r)))].sort((a, b) => a.localeCompare(b, locale));
+  const colours = [...new Set(docs.map((d) => d.wine?.colour).filter((c): c is NonNullable<typeof c> => Boolean(c)))];
+  return { regions, colours };
+}
+
+/** Categories of the shop or the counter, in their order. */
+export async function listCategories(payload: Payload, kind: 'shop' | 'snack', locale: Locale) {
+  const { docs } = await payload.find({ collection: 'categories', where: { kind: { equals: kind } }, sort: 'order', locale, limit: 50, depth: 0, overrideAccess: true });
+  return docs;
+}
+
+/** One active product by slug, with its category, producer and photos. */
+export async function getProduct(payload: Payload, slug: string, locale: Locale) {
+  const { docs } = await payload.find({ collection: 'products', where: { slug: { equals: slug }, status: { equals: 'active' } }, locale, limit: 1, depth: 1, overrideAccess: true });
+  return docs[0] ?? null;
+}
+
+/** The sizes of products sold on the website, cheapest first, with their boxes. */
+export async function sizesOf(payload: Payload, productIds: string[], locale: Locale) {
+  if (productIds.length === 0) return [];
+  const { docs } = await payload.find({
+    collection: 'variants',
+    where: { product: { in: productIds }, active: { equals: true }, channels: { contains: 'webshop' } },
+    sort: 'priceCents',
+    locale,
+    limit: 0,
+    depth: 0,
+    overrideAccess: true,
+  });
+  const { docs: units } = await payload.find({
+    collection: 'packagingUnits',
+    where: { variant: { in: docs.map((v) => v.id) }, active: { equals: true }, channels: { contains: 'webshop' } },
+    sort: 'factor',
+    locale,
+    limit: 0,
+    depth: 0,
+    overrideAccess: true,
+  });
+  return docs.map((v) => ({ ...v, product: idOf(v.product) as string, units: units.filter((u) => idOf(u.variant) === v.id) }));
+}
+
+/** Active product slugs with their last change, for the sitemap. */
+export async function productSlugs(payload: Payload) {
+  const { docs } = await payload.find({
+    collection: 'products',
+    where: { status: { equals: 'active' }, kind: { not_equals: 'snack' } },
+    limit: 0,
+    depth: 0,
+    overrideAccess: true,
+    select: { slug: true, updatedAt: true },
+  });
+  return docs;
 }

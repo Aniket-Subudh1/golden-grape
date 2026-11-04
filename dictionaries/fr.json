@@ -5,7 +5,8 @@
     "bag": "Panier",
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu",
-    "language": "Langue"
+    "language": "Langue",
+    "shopLabel": "Boutique"
   },
   "hero": {
     "eyebrow": "Depuis 2019 · Luxembourg",
@@ -242,6 +243,15 @@
     "toast": {
       "orderTitle": "Commande envoyée",
       "reservationTitle": "Demande envoyée"
+    },
+    "close": "Fermer",
+    "modeLabel": "Mode de commande",
+    "toShop": "La boutique",
+    "toCounter": "Le comptoir",
+    "vatIncluded": "dont TVA {{rate}} %",
+    "notices": {
+      "clamped": "Quantité ajustée au stock disponible.",
+      "removed": "Un article n’est plus disponible et a été retiré du panier."
     }
   },
   "shop": {
@@ -266,7 +276,54 @@
       "signature": "Signature",
       "rare": "Rare",
       "dop": "DOP",
-      "bestseller": "Best-seller"
+      "bestseller": "Best-seller",
+      "homemade": "Fait maison",
+      "new": "Nouveau"
+    },
+    "from": "dès",
+    "outOfStock": "Épuisé",
+    "unavailable": "Ce produit n’est pas disponible en ligne pour le moment.",
+    "count": "{{count}} produits",
+    "pages": "Pages",
+    "breadcrumb": "Fil d’Ariane",
+    "filters": {
+      "filters": "Filtres",
+      "region": "Région",
+      "colour": "Couleur",
+      "price": "Prix",
+      "min": "Min",
+      "max": "Max",
+      "any": "Toutes",
+      "clear": "Effacer",
+      "apply": "Voir les produits"
+    },
+    "colours": {
+      "red": "Rouge",
+      "white": "Blanc",
+      "rose": "Rosé",
+      "sparkling": "Effervescent",
+      "fortified": "Muté (porto)"
+    },
+    "facts": {
+      "producer": "Producteur",
+      "region": "Région",
+      "grape": "Cépages",
+      "vintage": "Millésime",
+      "colour": "Couleur",
+      "abv": "Degré",
+      "serve": "Service"
+    },
+    "buy": {
+      "choose": "Format",
+      "perUnit": "soit {{price}} l’unité",
+      "add": "Ajouter au panier",
+      "added": "Ajouté au panier",
+      "left": "Plus que {{count}} disponibles"
+    },
+    "related": {
+      "eyebrow": "Dans la même cave",
+      "titleA": "Vous aimerez",
+      "titleB": "aussi."
     }
   },
   "snackPage": {
@@ -283,7 +340,26 @@
       "signature": "Signature",
       "homemade": "Fait maison"
     },
-    "add": "Ajouter"
+    "add": "Ajouter",
+    "allergensLabel": "Allergènes",
+    "soldOut": "Indisponible",
+    "empty": "Le menu du comptoir arrive très bientôt.",
+    "allergens": {
+      "gluten": "Gluten",
+      "crustaceans": "Crustacés",
+      "eggs": "Œufs",
+      "fish": "Poisson",
+      "peanuts": "Arachides",
+      "soy": "Soja",
+      "milk": "Lait",
+      "nuts": "Fruits à coque",
+      "celery": "Céleri",
+      "mustard": "Moutarde",
+      "sesame": "Sésame",
+      "sulphites": "Sulfites",
+      "lupin": "Lupin",
+      "molluscs": "Mollusques"
+    }
   },
   "cateringPage": {
     "eyebrow": "Traiteur",
@@ -383,14 +459,56 @@
     "closed": "Fermé"
   },
   "auth": {
-    "title": "Espace client",
-    "subtitle": "Retrouvez vos commandes, réservations et coffrets favoris.",
-    "email": "Email",
+    "title": "Bon retour.",
+    "subtitle": "Connectez-vous pour retrouver votre profil et vos adresses.",
+    "email": "E-mail",
     "password": "Mot de passe",
     "signIn": "Se connecter",
     "signUp": "Créer un compte",
-    "switchToSignUp": "Pas encore de compte ? Créer un compte",
-    "switchToSignIn": "Déjà inscrit ? Se connecter"
+    "eyebrow": "Espace client",
+    "signUpTitle": "Créer un compte.",
+    "signUpSubtitle": "Particulier ou entreprise : un compte pour commander plus vite.",
+    "forgotTitle": "Mot de passe oublié.",
+    "forgotSubtitle": "Indiquez votre e-mail : nous vous envoyons un lien pour en choisir un nouveau.",
+    "resetTitle": "Nouveau mot de passe.",
+    "resetSubtitle": "Choisissez un mot de passe d’au moins 8 caractères.",
+    "panelEyebrow": "Maison",
+    "panelTitle": "Le Portugal, à votre table.",
+    "panelText": "Vos coordonnées et adresses gardées pour commander en un instant, en boutique comme au comptoir.",
+    "name": "Nom et prénom",
+    "phoneOptional": "Téléphone (facultatif)",
+    "company": "Société",
+    "vatNumber": "N° de TVA",
+    "accountType": "Type de compte",
+    "types": {
+      "private": "Particulier",
+      "business": "Entreprise"
+    },
+    "typeHints": {
+      "private": "Pour vous et vos proches",
+      "business": "Factures au nom de la société"
+    },
+    "passwordHint": "8 caractères au moins.",
+    "marketing": "Je souhaite recevoir les nouveautés et les soirées de la Maison par e-mail.",
+    "pending": "Un instant…",
+    "forgot": "Mot de passe oublié ?",
+    "backToSignIn": "Retour à la connexion",
+    "sendLink": "Recevoir le lien",
+    "forgotSentTitle": "Vérifiez vos e-mails",
+    "forgotSent": "Si un compte existe pour cette adresse, un lien vient de partir. Il est valable une heure.",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmez le mot de passe",
+    "savePassword": "Enregistrer et me connecter",
+    "newLink": "Lien expiré ? Recevoir un nouveau lien",
+    "guestNote": "Un compte est facultatif : vous pourrez aussi commander sans compte.",
+    "errors": {
+      "invalidLogin": "E-mail ou mot de passe incorrect.",
+      "emailTaken": "Un compte existe déjà avec cet e-mail.",
+      "password": "8 caractères au moins.",
+      "vatNumber": "Numéro de TVA invalide (ex. LU12345678).",
+      "resetExpired": "Ce lien a expiré ou a déjà servi. Demandez-en un nouveau.",
+      "mismatch": "Les deux mots de passe ne correspondent pas."
+    }
   },
   "meta": {
     "home": {
@@ -410,6 +528,18 @@
     "catering": {
       "title": "Traiteur — Réceptions portugaises · Golden Grape Luxembourg",
       "description": "Trois formules traiteur portugaises pour vos réceptions au Luxembourg. Demande en 30 secondes."
+    },
+    "shop": {
+      "title": "Boutique — Vins portugais & épicerie fine · Golden Grape",
+      "description": "Vins d’auteur, porto, fromages DOP, charcuteries et coffrets cadeaux portugais, livrés au Luxembourg ou à retirer à Bissen."
+    },
+    "snack": {
+      "title": "Comptoir — Snacks portugais à emporter · Golden Grape",
+      "description": "Bifana, prego, pastel de nata : la tradition portugaise à emporter, en livraison ou à table à Bissen."
+    },
+    "product": {
+      "title": "{{name}} · Golden Grape Luxembourg",
+      "description": "{{name}}, sélectionné par Golden Grape, la maison portugaise de Luxembourg."
     }
   },
   "form": {
@@ -455,6 +585,12 @@
       "estimate": "Estimation",
       "number": "Référence",
       "language": "Langue"
+    },
+    "reset": {
+      "subject": "Choisissez un nouveau mot de passe",
+      "body": "Vous avez demandé à changer le mot de passe de votre compte Golden Grape. Le lien ci-dessous est valable une heure.",
+      "button": "Choisir un mot de passe",
+      "ignore": "Vous n’êtes pas à l’origine de cette demande ? Ignorez simplement cet e-mail : votre mot de passe reste inchangé."
     }
   },
   "cookies": {
@@ -462,5 +598,74 @@
     "text": "Ce site n’utilise que des cookies essentiels à son fonctionnement (langue, sécurité). Avec votre accord, nous pourrons mesurer l’audience de façon anonyme.",
     "essential": "Essentiels uniquement",
     "accept": "Accepter la mesure d’audience"
+  },
+  "account": {
+    "eyebrow": "Mon compte",
+    "hello": "Bonjour",
+    "signOut": "Se déconnecter",
+    "nav": {
+      "overview": "Aperçu",
+      "profile": "Profil",
+      "addresses": "Adresses",
+      "orders": "Commandes"
+    },
+    "edit": "Modifier",
+    "defaultAddress": "Adresse par défaut",
+    "noAddress": "Aucune adresse enregistrée.",
+    "manageAddresses": "Gérer mes adresses",
+    "addAddress": "Ajouter une adresse",
+    "shopEyebrow": "La Maison",
+    "shopText": "Une envie de Portugal ? La cave et le comptoir vous attendent.",
+    "toShop": "La boutique",
+    "toCounter": "Le comptoir",
+    "profileTitle": "Mes informations",
+    "passwordTitle": "Mot de passe",
+    "emailTitle": "E-mail de connexion",
+    "emailNote": "Pour changer d’adresse e-mail, écrivez-nous : nous le ferons pour vous.",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Vos informations sont enregistrées.",
+    "changePassword": "Changer le mot de passe",
+    "passwordSaved": "Mot de passe changé.",
+    "addressesTitle": "Mes adresses",
+    "addressesText": "L’adresse par défaut est proposée en premier à la livraison.",
+    "address": "Adresse",
+    "default": "Par défaut",
+    "makeDefault": "En faire mon adresse par défaut",
+    "makeDefaultShort": "Définir par défaut",
+    "defaultSet": "Adresse par défaut changée.",
+    "delete": "Supprimer",
+    "confirmDelete": "Supprimer cette adresse ?",
+    "addressDeleted": "Adresse supprimée.",
+    "addressSaved": "Adresse enregistrée.",
+    "saveAddress": "Enregistrer l’adresse",
+    "cancel": "Annuler",
+    "addressLabelPh": "Maison, Bureau…",
+    "ordersTitle": "Mes commandes",
+    "noOrders": "Vous n’avez pas encore passé de commande en ligne.",
+    "fields": {
+      "name": "Nom et prénom",
+      "phone": "Téléphone",
+      "company": "Société",
+      "vatNumber": "N° de TVA",
+      "locale": "Langue des e-mails",
+      "marketing": "Je souhaite recevoir les nouveautés et les soirées de la Maison par e-mail.",
+      "current": "Mot de passe actuel",
+      "newPassword": "Nouveau mot de passe",
+      "confirm": "Confirmez le mot de passe",
+      "addressLabel": "Nom (facultatif)",
+      "country": "Pays (LU, FR, BE…)",
+      "line1": "Rue et numéro",
+      "line2": "Complément (facultatif)",
+      "postalCode": "Code postal",
+      "city": "Ville"
+    },
+    "errors": {
+      "wrongPassword": "Mot de passe actuel incorrect.",
+      "password": "8 caractères au moins.",
+      "vatNumber": "Numéro de TVA invalide (ex. LU12345678).",
+      "mismatch": "Les deux mots de passe ne correspondent pas.",
+      "signedOut": "Votre session a expiré. Reconnectez-vous."
+    }
   }
 }

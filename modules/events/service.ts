@@ -35,3 +35,10 @@ async function eventCached(slug: string, locale: Locale) {
 
 export const upcomingEvents = atRequest(upcomingCached);
 export const getEvent = atRequest(eventCached);
+
+/** Every published event's slug and last change, for the sitemap. */
+export async function publishedEventSlugs() {
+  const payload = await getPayloadClient();
+  const { docs } = await payload.find({ collection: 'events', where: { _status: { equals: 'published' } }, limit: 0, depth: 0, select: { slug: true, updatedAt: true } });
+  return docs;
+}

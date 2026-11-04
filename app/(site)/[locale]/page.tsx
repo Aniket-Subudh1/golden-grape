@@ -11,9 +11,11 @@ import { Store } from '@/components/site/home/store';
 import { SocialBand } from '@/components/site/home/social-band';
 import { Story } from '@/components/site/home/story';
 import { Universes } from '@/components/site/home/universes';
+import { JsonLd } from '@/components/site/json-ld';
 import { alternates, type Dictionary, getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { groupedHours } from '@/lib/time';
 import { getHappyHour, mediaOf } from '@/modules/cms/service';
+import { localBusinessJsonLd } from '@/modules/settings/seo';
 import { directionsUrl, getSettings } from '@/modules/settings/service';
 
 export async function generateMetadata({ params }: PageProps<'/[locale]'>): Promise<Metadata> {
@@ -63,6 +65,11 @@ async function HappyHourSection({ t, locale }: { t: Dictionary['happyHour']; loc
   return <HappyHour t={t} locale={locale} content={content} reserveHref={localePath(locale, '/contact')} />;
 }
 
+async function BusinessJsonLd({ locale }: { locale: Locale }) {
+  const settings = await getSettings();
+  return settings.business?.street ? <JsonLd data={localBusinessJsonLd(settings, localePath(locale))} /> : null;
+}
+
 async function SocialSection({ t }: { t: Dictionary['socialProof'] }) {
   const { business: b } = await getSettings();
   if (!b?.street) return null;
@@ -78,7 +85,13 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
   return (
     <>
       <Hero t={t.hero} />
-      <Universes t={t.universes} hrefs={{ catering: localePath(locale, '/catering'), events: localePath(locale, '/events') }} />
+      <Suspense fallback={null}>
+        <BusinessJsonLd locale={locale} />
+      </Suspense>
+      <Universes
+        t={t.universes}
+        hrefs={{ shop: localePath(locale, '/shop'), snack: localePath(locale, '/snack'), catering: localePath(locale, '/catering'), events: localePath(locale, '/events') }}
+      />
       <Marquee t={t.marquee} />
       <Hospitality t={t.hospitality} />
       <Craft t={t.craft} />

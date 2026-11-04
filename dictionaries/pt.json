@@ -5,7 +5,8 @@
     "bag": "Cesto",
     "openMenu": "Abrir menu",
     "closeMenu": "Fechar menu",
-    "language": "Idioma"
+    "language": "Idioma",
+    "shopLabel": "Loja"
   },
   "hero": {
     "eyebrow": "Desde 2019 · Luxemburgo",
@@ -242,6 +243,15 @@
     "toast": {
       "orderTitle": "Encomenda enviada",
       "reservationTitle": "Pedido enviado"
+    },
+    "close": "Fechar",
+    "modeLabel": "Tipo de encomenda",
+    "toShop": "A loja",
+    "toCounter": "O balcão",
+    "vatIncluded": "IVA {{rate}} % incluído",
+    "notices": {
+      "clamped": "Quantidade ajustada ao stock disponível.",
+      "removed": "Um artigo já não está disponível e foi retirado do cesto."
     }
   },
   "shop": {
@@ -266,7 +276,54 @@
       "signature": "Signature",
       "rare": "Raro",
       "dop": "DOP",
-      "bestseller": "Mais vendido"
+      "bestseller": "Mais vendido",
+      "homemade": "Caseiro",
+      "new": "Novo"
+    },
+    "from": "desde",
+    "outOfStock": "Esgotado",
+    "unavailable": "Este produto não está disponível online de momento.",
+    "count": "{{count}} produtos",
+    "pages": "Páginas",
+    "breadcrumb": "Navegação",
+    "filters": {
+      "filters": "Filtros",
+      "region": "Região",
+      "colour": "Cor",
+      "price": "Preço",
+      "min": "Mín",
+      "max": "Máx",
+      "any": "Todas",
+      "clear": "Limpar",
+      "apply": "Ver produtos"
+    },
+    "colours": {
+      "red": "Tinto",
+      "white": "Branco",
+      "rose": "Rosé",
+      "sparkling": "Espumante",
+      "fortified": "Generoso (porto)"
+    },
+    "facts": {
+      "producer": "Produtor",
+      "region": "Região",
+      "grape": "Castas",
+      "vintage": "Colheita",
+      "colour": "Cor",
+      "abv": "Teor alcoólico",
+      "serve": "Servir a"
+    },
+    "buy": {
+      "choose": "Formato",
+      "perUnit": "ou seja {{price}} por unidade",
+      "add": "Adicionar ao cesto",
+      "added": "Adicionado ao cesto",
+      "left": "Só restam {{count}}"
+    },
+    "related": {
+      "eyebrow": "Da mesma garrafeira",
+      "titleA": "Também vai",
+      "titleB": "gostar."
     }
   },
   "snackPage": {
@@ -283,7 +340,26 @@
       "signature": "Signature",
       "homemade": "Caseiro"
     },
-    "add": "Adicionar"
+    "add": "Adicionar",
+    "allergensLabel": "Alergénios",
+    "soldOut": "Indisponível",
+    "empty": "O menu do balcão chega muito em breve.",
+    "allergens": {
+      "gluten": "Glúten",
+      "crustaceans": "Crustáceos",
+      "eggs": "Ovos",
+      "fish": "Peixe",
+      "peanuts": "Amendoins",
+      "soy": "Soja",
+      "milk": "Leite",
+      "nuts": "Frutos de casca rija",
+      "celery": "Aipo",
+      "mustard": "Mostarda",
+      "sesame": "Sésamo",
+      "sulphites": "Sulfitos",
+      "lupin": "Tremoço",
+      "molluscs": "Moluscos"
+    }
   },
   "cateringPage": {
     "eyebrow": "Catering",
@@ -383,14 +459,56 @@
     "closed": "Fechado"
   },
   "auth": {
-    "title": "Área do cliente",
-    "subtitle": "Aceda a encomendas, reservas e caixas favoritas.",
-    "email": "Email",
+    "title": "Bem-vindo de volta.",
+    "subtitle": "Entre para ver o seu perfil e as suas moradas.",
+    "email": "E-mail",
     "password": "Palavra-passe",
     "signIn": "Entrar",
-    "signUp": "Criar conta",
-    "switchToSignUp": "Sem conta? Criar conta",
-    "switchToSignIn": "Já tem conta? Entrar"
+    "signUp": "Criar uma conta",
+    "eyebrow": "Área de cliente",
+    "signUpTitle": "Criar uma conta.",
+    "signUpSubtitle": "Particular ou empresa: uma conta para encomendar mais depressa.",
+    "forgotTitle": "Esqueceu a palavra-passe.",
+    "forgotSubtitle": "Indique o seu e-mail: enviamos-lhe uma ligação para escolher uma nova.",
+    "resetTitle": "Nova palavra-passe.",
+    "resetSubtitle": "Escolha uma palavra-passe com pelo menos 8 caracteres.",
+    "panelEyebrow": "Maison",
+    "panelTitle": "Portugal, à sua mesa.",
+    "panelText": "Os seus dados e moradas guardados para encomendar num instante, na loja ou no balcão.",
+    "name": "Nome completo",
+    "phoneOptional": "Telefone (opcional)",
+    "company": "Empresa",
+    "vatNumber": "N.º de IVA",
+    "accountType": "Tipo de conta",
+    "types": {
+      "private": "Particular",
+      "business": "Empresa"
+    },
+    "typeHints": {
+      "private": "Para si e para os seus",
+      "business": "Faturas em nome da empresa"
+    },
+    "passwordHint": "Pelo menos 8 caracteres.",
+    "marketing": "Quero receber as novidades e as noites da Casa por e-mail.",
+    "pending": "Um momento…",
+    "forgot": "Esqueceu a palavra-passe?",
+    "backToSignIn": "Voltar a entrar",
+    "sendLink": "Receber a ligação",
+    "forgotSentTitle": "Verifique o seu e-mail",
+    "forgotSent": "Se existir uma conta com este endereço, a ligação já foi enviada. É válida durante uma hora.",
+    "newPassword": "Nova palavra-passe",
+    "confirmPassword": "Confirme a palavra-passe",
+    "savePassword": "Guardar e entrar",
+    "newLink": "Ligação expirada? Receber uma nova",
+    "guestNote": "A conta é opcional: também poderá encomendar sem conta.",
+    "errors": {
+      "invalidLogin": "E-mail ou palavra-passe incorretos.",
+      "emailTaken": "Já existe uma conta com este e-mail.",
+      "password": "Pelo menos 8 caracteres.",
+      "vatNumber": "N.º de IVA inválido (ex. LU12345678).",
+      "resetExpired": "Esta ligação expirou ou já foi usada. Peça uma nova.",
+      "mismatch": "As duas palavras-passe não coincidem."
+    }
   },
   "meta": {
     "home": {
@@ -410,6 +528,18 @@
     "catering": {
       "title": "Catering — Receções portuguesas · Golden Grape Luxembourg",
       "description": "Três propostas de catering portuguesas para as suas receções no Luxemburgo. Pedido em 30 segundos."
+    },
+    "shop": {
+      "title": "Loja — Vinhos portugueses & mercearia fina · Golden Grape",
+      "description": "Vinhos de autor, porto, queijos DOP, enchidos e cabazes de oferta portugueses, entregues no Luxemburgo ou a levantar em Bissen."
+    },
+    "snack": {
+      "title": "Balcão — Petiscos portugueses para levar · Golden Grape",
+      "description": "Bifana, prego, pastel de nata: a tradição portuguesa para levar, entregue ou à mesa em Bissen."
+    },
+    "product": {
+      "title": "{{name}} · Golden Grape Luxemburgo",
+      "description": "{{name}}, escolhido pela Golden Grape, a casa portuguesa do Luxemburgo."
     }
   },
   "form": {
@@ -455,6 +585,12 @@
       "estimate": "Estimativa",
       "number": "Referência",
       "language": "Idioma"
+    },
+    "reset": {
+      "subject": "Escolha uma nova palavra-passe",
+      "body": "Pediu para mudar a palavra-passe da sua conta Golden Grape. A ligação abaixo é válida durante uma hora.",
+      "button": "Escolher uma palavra-passe",
+      "ignore": "Não fez este pedido? Ignore simplesmente este e-mail: a sua palavra-passe não muda."
     }
   },
   "cookies": {
@@ -462,5 +598,74 @@
     "text": "Este site só utiliza cookies essenciais ao seu funcionamento (idioma, segurança). Com o seu consentimento, poderemos medir a audiência de forma anónima.",
     "essential": "Apenas essenciais",
     "accept": "Aceitar medição de audiência"
+  },
+  "account": {
+    "eyebrow": "A minha conta",
+    "hello": "Olá",
+    "signOut": "Sair",
+    "nav": {
+      "overview": "Resumo",
+      "profile": "Perfil",
+      "addresses": "Moradas",
+      "orders": "Encomendas"
+    },
+    "edit": "Editar",
+    "defaultAddress": "Morada predefinida",
+    "noAddress": "Ainda sem morada guardada.",
+    "manageAddresses": "Gerir as minhas moradas",
+    "addAddress": "Adicionar uma morada",
+    "shopEyebrow": "A Casa",
+    "shopText": "Saudades de Portugal? A garrafeira e o balcão esperam por si.",
+    "toShop": "A loja",
+    "toCounter": "O balcão",
+    "profileTitle": "Os meus dados",
+    "passwordTitle": "Palavra-passe",
+    "emailTitle": "E-mail de acesso",
+    "emailNote": "Para mudar o endereço de e-mail, escreva-nos: tratamos disso por si.",
+    "save": "Guardar",
+    "saving": "A guardar…",
+    "saved": "Os seus dados foram guardados.",
+    "changePassword": "Mudar a palavra-passe",
+    "passwordSaved": "Palavra-passe alterada.",
+    "addressesTitle": "As minhas moradas",
+    "addressesText": "A morada predefinida é proposta primeiro na entrega.",
+    "address": "Morada",
+    "default": "Predefinida",
+    "makeDefault": "Tornar a minha morada predefinida",
+    "makeDefaultShort": "Predefinir",
+    "defaultSet": "Morada predefinida alterada.",
+    "delete": "Apagar",
+    "confirmDelete": "Apagar esta morada?",
+    "addressDeleted": "Morada apagada.",
+    "addressSaved": "Morada guardada.",
+    "saveAddress": "Guardar a morada",
+    "cancel": "Cancelar",
+    "addressLabelPh": "Casa, Escritório…",
+    "ordersTitle": "As minhas encomendas",
+    "noOrders": "Ainda não fez nenhuma encomenda online.",
+    "fields": {
+      "name": "Nome completo",
+      "phone": "Telefone",
+      "company": "Empresa",
+      "vatNumber": "N.º de IVA",
+      "locale": "Língua dos e-mails",
+      "marketing": "Quero receber as novidades e as noites da Casa por e-mail.",
+      "current": "Palavra-passe atual",
+      "newPassword": "Nova palavra-passe",
+      "confirm": "Confirme a palavra-passe",
+      "addressLabel": "Nome (opcional)",
+      "country": "País (LU, FR, BE…)",
+      "line1": "Rua e número",
+      "line2": "Complemento (opcional)",
+      "postalCode": "Código postal",
+      "city": "Localidade"
+    },
+    "errors": {
+      "wrongPassword": "Palavra-passe atual incorreta.",
+      "password": "Pelo menos 8 caracteres.",
+      "vatNumber": "N.º de IVA inválido (ex. LU12345678).",
+      "mismatch": "As duas palavras-passe não coincidem.",
+      "signedOut": "A sua sessão expirou. Entre de novo."
+    }
   }
 }

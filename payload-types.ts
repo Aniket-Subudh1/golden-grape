@@ -64,6 +64,7 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    customers: CustomerAuthOperations;
   };
   blocks: {};
   collections: {
@@ -85,6 +86,8 @@ export interface Config {
     stockLevels: StockLevel;
     stockMovements: StockMovement;
     stockCounts: StockCount;
+    customers: Customer;
+    customerGroups: CustomerGroup;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -117,6 +120,8 @@ export interface Config {
     stockLevels: StockLevelsSelect<false> | StockLevelsSelect<true>;
     stockMovements: StockMovementsSelect<false> | StockMovementsSelect<true>;
     stockCounts: StockCountsSelect<false> | StockCountsSelect<true>;
+    customers: CustomersSelect<false> | CustomersSelect<true>;
+    customerGroups: CustomerGroupsSelect<false> | CustomerGroupsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -145,13 +150,31 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User;
+  user: User | Customer;
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
 export interface UserAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface CustomerAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -780,6 +803,68 @@ export interface StockCount {
   createdAt: string;
 }
 /**
+ * The accounts created on the website (private and business).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customers".
+ */
+export interface Customer {
+  id: string;
+  name: string;
+  phone?: string | null;
+  type: 'private' | 'business';
+  company?: string | null;
+  vatNumber?: string | null;
+  locale: 'fr' | 'en' | 'de' | 'pt';
+  marketingConsent?: boolean | null;
+  addresses?:
+    | {
+        label?: string | null;
+        isDefault?: boolean | null;
+        line1: string;
+        line2?: string | null;
+        postalCode: string;
+        city: string;
+        country: string;
+        id?: string | null;
+      }[]
+    | null;
+  group?: (string | null) | CustomerGroup;
+  paymentTerm?: string | null;
+  loyaltyBalance?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'customers';
+}
+/**
+ * For example “Restaurants” or “Companies”. Group prices come with price lists.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customerGroups".
+ */
+export interface CustomerGroup {
+  id: string;
+  name: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -874,12 +959,25 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'stockCounts';
         value: string | StockCount;
+      } | null)
+    | ({
+        relationTo: 'customers';
+        value: string | Customer;
+      } | null)
+    | ({
+        relationTo: 'customerGroups';
+        value: string | CustomerGroup;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: string | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: string | User;
+      }
+    | {
+        relationTo: 'customers';
+        value: string | Customer;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -889,10 +987,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: string;
-  user: {
-    relationTo: 'users';
-    value: string | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: string | User;
+      }
+    | {
+        relationTo: 'customers';
+        value: string | Customer;
+      };
   key?: string | null;
   value?:
     | {
@@ -1360,6 +1463,60 @@ export interface StockCountsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customers_select".
+ */
+export interface CustomersSelect<T extends boolean = true> {
+  name?: T;
+  phone?: T;
+  type?: T;
+  company?: T;
+  vatNumber?: T;
+  locale?: T;
+  marketingConsent?: T;
+  addresses?:
+    | T
+    | {
+        label?: T;
+        isDefault?: T;
+        line1?: T;
+        line2?: T;
+        postalCode?: T;
+        city?: T;
+        country?: T;
+        id?: T;
+      };
+  group?: T;
+  paymentTerm?: T;
+  loyaltyBalance?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customerGroups_select".
+ */
+export interface CustomerGroupsSelect<T extends boolean = true> {
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1423,6 +1580,11 @@ export interface BusinessSetting {
     facebook?: string | null;
     vatNumber?: string | null;
     rcs?: string | null;
+    latitude?: number | null;
+    /**
+     * Places the shop on Google. Right-click the shop in Google Maps to copy them.
+     */
+    longitude?: number | null;
     iban?: string | null;
     bic?: string | null;
   };
@@ -1990,6 +2152,8 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
         facebook?: T;
         vatNumber?: T;
         rcs?: T;
+        latitude?: T;
+        longitude?: T;
         iban?: T;
         bic?: T;
       };

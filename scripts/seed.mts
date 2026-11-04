@@ -225,13 +225,13 @@ await global('BusinessSettings', () => ({
 }));
 log('BusinessSettings saved');
 
-// 4. Header, Footer, Happy Hour. Shop and Snack have no href until their pages exist (M2.2).
+// 4. Header, Footer, Happy Hour.
 await global('Header', (l) => {
   const n = c(l).nav;
   return {
     navItems: [
-      { label: n.shop },
-      { label: n.snack },
+      { label: n.shop, href: '/shop' },
+      { label: n.snack, href: '/snack' },
       { label: n.catering, href: '/catering' },
       { label: n.events, href: '/events' },
       { label: n.maison, href: '/maison' },
@@ -244,7 +244,7 @@ await global('Footer', (l) => {
   return {
     tagline: f.tagline,
     columns: [
-      { title: f.colMaison, links: [{ label: f.links.history, href: '/maison' }, { label: f.links.shop }, { label: f.links.counter }, { label: f.links.contact, href: '/contact' }] },
+      { title: f.colMaison, links: [{ label: f.links.history, href: '/maison' }, { label: f.links.shop, href: '/shop' }, { label: f.links.counter, href: '/snack' }, { label: f.links.contact, href: '/contact' }] },
       { title: f.colServices, links: [{ label: f.links.catering, href: '/catering' }, { label: f.links.events, href: '/events' }, { label: f.links.happy, href: '/events' }, { label: f.links.gifts }] },
     ],
   };
@@ -297,7 +297,6 @@ await upsert('pages', { slug: { equals: 'maison' } }, (l) => {
         variant: 'dark',
         cards: m.values.map((v, i) => ({ image: media[['team', 'grazing', 'olive'][i]], eyebrow: v.t, title: v.d })),
       },
-      // The shop button gets its href when the shop exists (M2.2).
       {
         blockType: 'cta',
         eyebrow: m.ctaEyebrow,
@@ -306,7 +305,7 @@ await upsert('pages', { slug: { equals: 'maison' } }, (l) => {
         subtitle: m.ctaSubtitle,
         buttons: [
           { label: m.ctaContact, href: '/contact', style: 'solid' },
-          { label: m.ctaShop, style: 'outline' },
+          { label: m.ctaShop, href: '/shop', style: 'outline' },
         ],
       },
     ],

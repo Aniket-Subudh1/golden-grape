@@ -5,6 +5,7 @@ import {
   ArrowLeftRight,
   BookOpenText,
   ClipboardCheck,
+  Contact,
   CalendarDays,
   ClipboardList,
   ExternalLink,
@@ -62,6 +63,7 @@ const ICONS = {
   lowStock: TriangleAlert,
   counts: ClipboardCheck,
   movements: ArrowLeftRight,
+  groups: Contact,
 };
 
 function Item({ item, active, external }: { item: NavItem; active: boolean; external?: boolean }) {

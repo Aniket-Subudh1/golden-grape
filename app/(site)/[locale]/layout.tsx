@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { Cormorant_Garamond, Inter } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
+import { CartSheet } from '@/components/site/cart-sheet';
 import { CookieConsent } from '@/components/site/cookie-consent';
+import { FloatingCart } from '@/components/site/floating-cart';
 import { Footer } from '@/components/site/footer';
 import { Nav } from '@/components/site/nav';
 import type { NavItem } from '@/components/site/nav-link';
@@ -12,6 +14,7 @@ import { type Dictionary, getDictionary, isLocale, type Locale, LOCALES, localeP
 import { groupedHours } from '@/lib/time';
 import { getFooter, getHeader } from '@/modules/cms/service';
 import { directionsUrl, getSettings } from '@/modules/settings/service';
+import { CartProvider } from '@/modules/webshop/cart';
 import '../../globals.css';
 
 const serif = Cormorant_Garamond({
@@ -39,7 +42,15 @@ async function SiteNav({ locale, t }: { locale: Locale; t: Dictionary }) {
     <Nav
       locale={locale}
       items={(header.navItems ?? []).map(toItem(locale))}
-      labels={{ openMenu: t.nav.openMenu, closeMenu: t.nav.closeMenu, language: t.nav.language, phone: t.contactPage.info.phone }}
+      labels={{
+        openMenu: t.nav.openMenu,
+        closeMenu: t.nav.closeMenu,
+        language: t.nav.language,
+        phone: t.contactPage.info.phone,
+        search: t.nav.search,
+        account: t.nav.account,
+        bag: t.nav.bag,
+      }}
       phone={business?.phone}
       instagram={business?.instagram}
     />
@@ -75,13 +86,17 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   return (
     <html lang={locale} className={`${serif.variable} ${sans.variable}`}>
       <body id="top" className="bg-bone text-ink">
-        <Suspense fallback={null}>
-          <SiteNav locale={locale} t={t} />
-        </Suspense>
-        <main>{children}</main>
-        <Suspense fallback={null}>
-          <SiteFooter locale={locale} t={t} />
-        </Suspense>
+        <CartProvider locale={locale} notices={t.cart.notices}>
+          <Suspense fallback={null}>
+            <SiteNav locale={locale} t={t} />
+          </Suspense>
+          <main>{children}</main>
+          <Suspense fallback={null}>
+            <SiteFooter locale={locale} t={t} />
+          </Suspense>
+          <CartSheet locale={locale} t={t.cart} />
+          <FloatingCart locale={locale} t={t.floatingCart} />
+        </CartProvider>
         <CookieConsent t={t.cookies} />
         <Toaster position="top-center" />
       </body>

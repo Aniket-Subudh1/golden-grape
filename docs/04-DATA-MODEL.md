@@ -37,7 +37,7 @@ Access: read is Staff(any) for itself and admin/manager for everyone; create, up
 ### `BusinessSettings` (global)
 | Group | Fields |
 |---|---|
-| `business` | `name`, `legalName`, `street`, `postalCode`, `city`, `country`, `phone`, `email`, `vatNumber`, `rcs`, `iban`, `bic`, `mapsUrl`, `instagram`, `facebook` |
+| `business` | `name`, `legalName`, `street`, `postalCode`, `city`, `country`, `phone`, `email`, `vatNumber`, `rcs`, `iban`, `bic`, `mapsUrl`, `instagram`, `facebook`, `latitude`, `longitude` (optional, for the `LocalBusiness` geo in JSON-LD, M2.2) |
 | `hours` | array `{ day 0–6, open "HH:mm", close "HH:mm" }` + `closedDates` array of dates |
 | `vat` | array `{ key: 'standard' \| 'intermediate' \| 'reduced' \| 'superReduced', rateBp }`; default LU 1700/1400/800/300, confirmed by the accountant (DEP-07) |
 | `numbering` | `{ invoice, creditNote, quotation, deliveryNote, order, cateringRequest }` format strings, e.g. `INV-{YYYY}-{00000}`, `REQ-{YYYY}-{0000}` |
@@ -105,7 +105,9 @@ On the "Add" form only, a virtual group `firstVariant` { `priceCents` (required)
 ## 3. Customers (M2.2)
 
 ### `customers` (auth: shop accounts)
-`name`, `email` (auth), `phone`, `locale`, `addresses` array `{ label, line1, line2, postalCode, city, country default LU, isDefault }`, `type` (`private` \| `business`), `company`, `vatNumber`, `group` (rel customerGroups), `priceList` (rel priceLists, M3.2), `paymentTerm` (key, M3.2), `loyaltyBalance` (int, cache, M3.2), `marketingConsent` (checkbox). Access: read and update by `staffOrSelf('id')`; create is public (sign-up) or Staff(sales); delete by admin only. The fields `group`, `priceList`, `paymentTerm` and `loyaltyBalance` can only be updated by staff (field-level access). A customer can never set their own price list.
+`name`, `email` (auth), `phone`, `locale`, `addresses` array `{ label, line1, line2, postalCode, city, country default LU, isDefault }`, `type` (`private` \| `business`), `company`, `vatNumber`, `group` (rel customerGroups), `priceList` (rel priceLists, M3.2), `paymentTerm` (key, M3.2), `loyaltyBalance` (int, cache, M3.2), `marketingConsent` (checkbox). Access: read and update by `staffOrSelf('id')`; create through the sign-up action (rate-limited, only the sign-up fields) or by Staff(sales): **the API's create is staff-only**, so nobody bypasses the rate limit or the business-account checks; delete by admin only. The fields `group`, `priceList`, `paymentTerm` and `loyaltyBalance` can only be updated by staff (field-level access; `loyaltyBalance` by no one through the API). A customer can never set their own price list. `priceList` is added in M3.2 with the `priceLists` collection it points to.
+
+Session (M2.2): Payload's auth cookie name is shared by every auth collection, so the website keeps the customer's Payload token in its own httpOnly cookie `gg_customer` and verifies it with `payload.auth` (`Authorization: JWT …`). A staff session in the same browser is never replaced. Sign-out also ends the Payload session (`useSessions`), so a copied token stops working. Password reset uses Payload's `forgotPassword` with our e-mail template, in the customer's `locale`.
 
 ### `customerGroups`
 `name`, `priceList` (rel, M3.2). Example: "Restaurants", "Companies".

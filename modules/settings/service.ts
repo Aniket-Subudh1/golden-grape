@@ -28,6 +28,8 @@ async function settingsCached() {
     mapsUrl: b.mapsUrl,
     instagram: b.instagram,
     facebook: b.facebook,
+    latitude: b.latitude,
+    longitude: b.longitude,
   };
   return { business, hours: hours ?? [], closedDates: closedDates ?? [], modules };
 }

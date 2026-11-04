@@ -32,7 +32,14 @@ const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean;
       { label: 'stockMovements', slug: 'stockMovements', icon: 'movements' },
     ],
   },
-  { label: 'requests', items: [{ label: 'cateringRequests', slug: 'cateringRequests', icon: 'requests' }] },
+  {
+    label: 'requests',
+    items: [
+      { label: 'customers', slug: 'customers', icon: 'users' },
+      { label: 'customerGroups', slug: 'customerGroups', icon: 'groups' },
+      { label: 'cateringRequests', slug: 'cateringRequests', icon: 'requests' },
+    ],
+  },
   {
     label: 'settings',
     items: [

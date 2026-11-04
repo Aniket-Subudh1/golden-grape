@@ -16,6 +16,7 @@ import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { cmsCollections } from '@/modules/cms/collections';
 import { cmsGlobals } from '@/modules/cms/globals';
 import { catalogueCollections } from '@/modules/catalogue/collections';
+import { customerGroups, customers } from '@/modules/customers/collections';
 import { cateringPackages, cateringRequests } from '@/modules/catering/collections';
 import { events } from '@/modules/events/collections';
 import { inventoryCollections } from '@/modules/inventory/collections';
@@ -56,6 +57,8 @@ export default buildConfig({
     cateringRequests,
     ...catalogueCollections,
     ...inventoryCollections,
+    customers,
+    customerGroups,
   ],
   globals: [businessSettings, ...cmsGlobals],
   db: mongooseAdapter({

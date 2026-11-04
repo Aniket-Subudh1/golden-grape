@@ -43,6 +43,8 @@ export const linkTo = (width?: string): Field => ({
   label: l('Mène vers', 'Links to', 'Führt zu', 'Leva a'),
   options: [
     { value: '/', label: l('Accueil', 'Home', 'Startseite', 'Início') },
+    { value: '/shop', label: l('Boutique', 'Shop', 'Shop', 'Loja') },
+    { value: '/snack', label: l('Comptoir', 'Counter', 'Theke', 'Balcão') },
     { value: '/maison', label: l('La Maison', 'The House', 'Das Haus', 'A Casa') },
     { value: '/events', label: l('Événements', 'Events', 'Veranstaltungen', 'Eventos') },
     { value: '/catering', label: l('Traiteur', 'Catering', 'Catering', 'Catering') },

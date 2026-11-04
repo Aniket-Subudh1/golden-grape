@@ -95,7 +95,8 @@ modules/<name>/
 | `cms` | `pages`, `media`, `legal`, `Header`/`Footer`/`HappyHour` globals | `getPage(slug, locale)` | M1.3 |
 | `catalogue` | `categories`, `brands`, `products`, `variants`, `packagingUnits` | `findSellable(ids)`, `findByBarcode(code)` | M2.1 |
 | `inventory` | `stockMovements`, `stockLevels`, `stockCounts` | **`postMovements(tx, lines)`**, `onHand(ids)`, `lowStock()` | M2.1 |
-| `customers` | `customers`, `customerGroups` | `getCustomer(id)` | M2.2 |
+| `customers` | `customers`, `customerGroups` | `getCustomer(id)`, `currentCustomer()` | M2.2 |
+| `webshop` | none (the cart lives in the browser: `{ variant, unit?, qty }` only) | `shopPage`, `productPage`, `counterMenu`; `CartProvider`/`useCart`, `quoteCartAction` | M2.2 |
 | `sales` | `orders`, `reservations`, `deliveryZones`, `slotRules` | `placeOrder(input)`, `transition(orderId, to)` | M2.3 |
 | `payments` | `payments` | `provider(name)`, `startPayment(order)` | M2.3 (manual), M4.1 (wallee) |
 | `events` | `events`, `eventBookings` | `upcoming(locale)`, `book(input)` | M1.3 (content), M2.3 (booking) |
