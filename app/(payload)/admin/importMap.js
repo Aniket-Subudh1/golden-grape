@@ -26,9 +26,18 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { default as default_fe401d340ce00cc899cf727d6137f487 } from '@/components/admin/row-label'
 import { NumberCell as NumberCell_f2a5de4e6cd5b225ec768dfc00185072 } from '@/components/admin/number-field'
 import { default as default_f2a5de4e6cd5b225ec768dfc00185072 } from '@/components/admin/number-field'
+import { BadgeCell as BadgeCell_e05f6ac9ede25467f55f09817b54f69f } from '@/components/admin/cells'
+import { default as default_ea5aef8a9a35ef0cb8d9e90a51957cfa } from '@/components/admin/empty-list'
+import { CategoryCell as CategoryCell_e9bb4d3db189c5a7e4368b00cc26eb11 } from '@/modules/catalogue/admin/product-cells'
+import { PhotoCell as PhotoCell_e9bb4d3db189c5a7e4368b00cc26eb11 } from '@/modules/catalogue/admin/product-cells'
+import { OfferCell as OfferCell_e9bb4d3db189c5a7e4368b00cc26eb11 } from '@/modules/catalogue/admin/product-cells'
 import { default as default_18a246622f2fde6f084f603ce7663055 } from '@/modules/inventory/admin/stock-panel'
-import { ReasonCell as ReasonCell_00f222da1c5cba2acc44b463c3f4ac03 } from '@/modules/inventory/admin/adjust-button'
+import { StockCell as StockCell_5bea5cab201ede96546b31bd184de260 } from '@/modules/inventory/admin/cells'
+import { ThresholdCell as ThresholdCell_5bea5cab201ede96546b31bd184de260 } from '@/modules/inventory/admin/cells'
+import { SignedCell as SignedCell_e05f6ac9ede25467f55f09817b54f69f } from '@/components/admin/cells'
+import { ReasonCell as ReasonCell_5bea5cab201ede96546b31bd184de260 } from '@/modules/inventory/admin/cells'
 import { default as default_4c47180b2e77f55067f27acaa2019504 } from '@/modules/inventory/admin/post-count-button'
+import { default as default_d70d7a107c8e989d5b795a0688b5fa32 } from '@/modules/inventory/admin/count-row-label'
 import { default as default_a2f0eccb7507197ce791108816851322 } from '@/components/admin/nav'
 import { default as default_0430f5fb3b8132a602107d7535a2a344 } from '@/components/admin/icon'
 import { default as default_334250e18ce0b45af3e0c04bb6fe8307 } from '@/components/admin/logo'
@@ -70,9 +79,18 @@ export const importMap = {
   "@/components/admin/row-label#default": default_fe401d340ce00cc899cf727d6137f487,
   "@/components/admin/number-field#NumberCell": NumberCell_f2a5de4e6cd5b225ec768dfc00185072,
   "@/components/admin/number-field#default": default_f2a5de4e6cd5b225ec768dfc00185072,
+  "@/components/admin/cells#BadgeCell": BadgeCell_e05f6ac9ede25467f55f09817b54f69f,
+  "@/components/admin/empty-list#default": default_ea5aef8a9a35ef0cb8d9e90a51957cfa,
+  "@/modules/catalogue/admin/product-cells#CategoryCell": CategoryCell_e9bb4d3db189c5a7e4368b00cc26eb11,
+  "@/modules/catalogue/admin/product-cells#PhotoCell": PhotoCell_e9bb4d3db189c5a7e4368b00cc26eb11,
+  "@/modules/catalogue/admin/product-cells#OfferCell": OfferCell_e9bb4d3db189c5a7e4368b00cc26eb11,
   "@/modules/inventory/admin/stock-panel#default": default_18a246622f2fde6f084f603ce7663055,
-  "@/modules/inventory/admin/adjust-button#ReasonCell": ReasonCell_00f222da1c5cba2acc44b463c3f4ac03,
+  "@/modules/inventory/admin/cells#StockCell": StockCell_5bea5cab201ede96546b31bd184de260,
+  "@/modules/inventory/admin/cells#ThresholdCell": ThresholdCell_5bea5cab201ede96546b31bd184de260,
+  "@/components/admin/cells#SignedCell": SignedCell_e05f6ac9ede25467f55f09817b54f69f,
+  "@/modules/inventory/admin/cells#ReasonCell": ReasonCell_5bea5cab201ede96546b31bd184de260,
   "@/modules/inventory/admin/post-count-button#default": default_4c47180b2e77f55067f27acaa2019504,
+  "@/modules/inventory/admin/count-row-label#default": default_d70d7a107c8e989d5b795a0688b5fa32,
   "@/components/admin/nav#default": default_a2f0eccb7507197ce791108816851322,
   "@/components/admin/icon#default": default_0430f5fb3b8132a602107d7535a2a344,
   "@/components/admin/logo#default": default_334250e18ce0b45af3e0c04bb6fe8307,

@@ -1,6 +1,6 @@
 import { APIError, type CollectionConfig, type Field, type PayloadRequest, type Validate } from 'payload';
 import { hiddenUnless, isStaff } from '@/lib/access';
-import { autoSlug, createInDrawer, type Label, l, scaledNumber, seoSection } from '@/lib/admin';
+import { autoSlug, badgeCell, createInDrawer, emptyList, type Label, l, scaledNumber, seoSection } from '@/lib/admin';
 import { validateFactor } from './packaging';
 
 // The catalogue (04-DATA-MODEL §2). Staff-only through the API: the website reads it through service.ts.
@@ -104,7 +104,20 @@ export const categories: CollectionConfig = {
       'Die Regale des Ladens (Weine, Portwein…) und der Theke, in Ihrer Reihenfolge.',
       'As secções da loja (Vinhos, Porto…) e do balcão, pela ordem escolhida.',
     ),
-    components: createInDrawer('categories', l('Ajouter une catégorie', 'Add a category', 'Kategorie hinzufügen', 'Adicionar uma categoria')),
+    components: {
+      ...createInDrawer('categories', l('Ajouter une catégorie', 'Add a category', 'Kategorie hinzufügen', 'Adicionar uma categoria')),
+      ...emptyList({
+        icon: 'categories',
+        title: l('Aucune catégorie pour l’instant', 'No categories yet', 'Noch keine Kategorien', 'Ainda sem categorias'),
+        text: l(
+          'Les catégories rangent la boutique (Vins, Porto, Épicerie…) et le comptoir. Créez-les avant d’ajouter des produits.',
+          'Categories arrange the shop (Wines, Port, Groceries…) and the counter. Create them before adding products.',
+          'Kategorien ordnen den Laden (Weine, Portwein, Feinkost…) und die Theke. Legen Sie sie vor den Produkten an.',
+          'As categorias organizam a loja (Vinhos, Porto, Mercearia…) e o balcão. Crie-as antes de adicionar produtos.',
+        ),
+        action: l('Ajouter une catégorie', 'Add a category', 'Kategorie hinzufügen', 'Adicionar uma categoria'),
+      }),
+    },
   },
   access: { read: isStaff(), create: isStaff('manager'), update: isStaff('manager'), delete: isStaff('manager') },
   defaultSort: 'order',
@@ -122,7 +135,7 @@ export const categories: CollectionConfig = {
           { value: 'shop', label: l('La boutique', 'The shop', 'Den Laden', 'A loja') },
           { value: 'snack', label: l('Le comptoir', 'The counter', 'Die Theke', 'O balcão') },
         ],
-        admin: { width: '25%', isClearable: false },
+        admin: { width: '25%', isClearable: false, components: badgeCell({ shop: 'info', snack: 'neutral' }) },
       },
       {
         name: 'order',
@@ -151,7 +164,26 @@ export const brands: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'origin'],
     hidden: hiddenUnless('manager'),
-    components: createInDrawer('brands', l('Ajouter un producteur', 'Add a producer', 'Erzeuger hinzufügen', 'Adicionar um produtor')),
+    description: l(
+      'Les domaines et maisons dont vous vendez les produits. Ils s’ajoutent aussi depuis la fiche produit ou l’import.',
+      'The estates and houses whose products you sell. They can also be added from a product or the import.',
+      'Die Weingüter und Häuser, deren Produkte Sie verkaufen. Auch im Produkt oder beim Import anlegbar.',
+      'As quintas e casas cujos produtos vende. Também se adicionam a partir do produto ou da importação.',
+    ),
+    components: {
+      ...createInDrawer('brands', l('Ajouter un producteur', 'Add a producer', 'Erzeuger hinzufügen', 'Adicionar um produtor')),
+      ...emptyList({
+        icon: 'producers',
+        title: l('Aucun producteur pour l’instant', 'No producers yet', 'Noch keine Erzeuger', 'Ainda sem produtores'),
+        text: l(
+          'Ajoutez les domaines et maisons de vos vins (Quinta do Crasto, Niepoort…) pour les relier à leurs produits.',
+          'Add the estates and houses behind your wines (Quinta do Crasto, Niepoort…) to link them to their products.',
+          'Legen Sie die Weingüter und Häuser Ihrer Weine an (Quinta do Crasto, Niepoort…), um sie mit Produkten zu verknüpfen.',
+          'Adicione as quintas e casas dos seus vinhos (Quinta do Crasto, Niepoort…) para as ligar aos produtos.',
+        ),
+        action: l('Ajouter un producteur', 'Add a producer', 'Erzeuger hinzufügen', 'Adicionar um produtor'),
+      }),
+    },
   },
   access: { read: isStaff(), create: isStaff('manager', 'stock'), update: isStaff('manager', 'stock'), delete: isStaff('manager') },
   fields: [
@@ -223,7 +255,7 @@ export const products: CollectionConfig = {
   labels: { singular: l('Produit', 'Product', 'Produkt', 'Produto'), plural: l('Produits', 'Products', 'Produkte', 'Produtos') },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'category', 'kind', 'status'],
+    defaultColumns: ['images', 'name', 'category', 'offer', 'status'],
     listSearchableFields: ['name'],
     hidden: hiddenUnless('manager', 'stock'),
     description: l(
@@ -232,7 +264,20 @@ export const products: CollectionConfig = {
       'Weine, Feinkost und Thekenkarte. Preis und Barcode stehen bei jedem Format (Flasche, Magnum…).',
       'Os vinhos, a mercearia e o menu do balcão. O preço e o código de barras estão em cada formato (garrafa, magnum…).',
     ),
-    components: createInDrawer('products', l('Ajouter un produit', 'Add a product', 'Produkt hinzufügen', 'Adicionar um produto')),
+    components: {
+      ...createInDrawer('products', l('Ajouter un produit', 'Add a product', 'Produkt hinzufügen', 'Adicionar um produto')),
+      ...emptyList({
+        icon: 'products',
+        title: l('Aucun produit pour l’instant', 'No products yet', 'Noch keine Produkte', 'Ainda sem produtos'),
+        text: l(
+          'Ajoutez vos vins, votre épicerie et le menu du comptoir. Chaque produit reçoit un prix, un code-barres et son stock.',
+          'Add your wines, groceries and the counter menu. Each product gets a price, a barcode and its stock.',
+          'Fügen Sie Weine, Feinkost und die Thekenkarte hinzu. Jedes Produkt erhält Preis, Barcode und Bestand.',
+          'Adicione os vinhos, a mercearia e o menu do balcão. Cada produto recebe preço, código de barras e stock.',
+        ),
+        action: l('Ajouter un produit', 'Add a product', 'Produkt hinzufügen', 'Adicionar um produto'),
+      }),
+    },
   },
   access: { read: isStaff(), create: editors, update: editors, delete: isStaff('admin') },
   hooks: {
@@ -246,192 +291,225 @@ export const products: CollectionConfig = {
     afterDelete: [({ id, req }) => req.payload.delete({ collection: 'variants', where: { product: { equals: id } }, req, overrideAccess: true })],
   },
   fields: [
-    row(
-      { name: 'name', type: 'text', localized: true, required: true, label: l('Nom', 'Name', 'Name', 'Nome'), admin: { width: '50%' } },
-      {
-        name: 'kind',
-        type: 'select',
-        required: true,
-        defaultValue: 'wine',
-        label: l('Type', 'Type', 'Art', 'Tipo'),
-        options: [
-          { value: 'wine', label: l('Vin, porto, bière', 'Wine, port, beer', 'Wein, Portwein, Bier', 'Vinho, porto, cerveja') },
-          { value: 'grocery', label: l('Épicerie', 'Grocery', 'Feinkost', 'Mercearia') },
-          { value: 'snack', label: l('Comptoir (préparé sur place)', 'Counter (made here)', 'Theke (vor Ort zubereitet)', 'Balcão (feito cá)') },
-          { value: 'gift', label: l('Coffret cadeau', 'Gift box', 'Geschenkbox', 'Cabaz de oferta') },
-          { value: 'other', label: l('Autre', 'Other', 'Sonstiges', 'Outro') },
-        ],
-        admin: { width: '25%', isClearable: false },
-      },
-      {
-        name: 'status',
-        type: 'select',
-        required: true,
-        defaultValue: 'active',
-        index: true,
-        label: l('Statut', 'Status', 'Status', 'Estado'),
-        options: [
-          { value: 'active', label: l('En vente', 'On sale', 'Im Verkauf', 'À venda') },
-          { value: 'draft', label: l('En préparation', 'Being prepared', 'In Vorbereitung', 'Em preparação') },
-          { value: 'archived', label: l('Archivé', 'Archived', 'Archiviert', 'Arquivado') },
-        ],
-        admin: { width: '25%', isClearable: false },
-      },
-    ),
-    autoSlug('products', 'name'),
-    row(
-      {
-        name: 'category',
-        type: 'relationship',
-        relationTo: 'categories',
-        required: true,
-        index: true,
-        label: l('Catégorie', 'Category', 'Kategorie', 'Categoria'),
-        filterOptions: ({ data }) => ({ kind: { equals: data?.kind === 'snack' ? 'snack' : 'shop' } }),
-        admin: { width: '50%' },
-      },
-      { name: 'brand', type: 'relationship', relationTo: 'brands', index: true, label: l('Producteur', 'Producer', 'Erzeuger', 'Produtor'), admin: { width: '50%' } },
-    ),
     {
-      // Only on the "Add" form: the price and barcode of the first size. Afterwards they live on the size itself.
-      // Virtual fields are read-only and unvalidated by default in Payload: both are switched back on here.
-      name: 'firstVariant',
-      type: 'group',
-      virtual: true,
-      label: l('Prix et code-barres', 'Price and barcode', 'Preis und Barcode', 'Preço e código de barras'),
-      admin: { readOnly: false, condition: (_, __, { operation }) => operation === 'create' },
-      fields: [
-        row(
-          {
-            name: 'priceCents',
-            type: 'number',
-            required: true,
-            min: 0,
-            virtual: true,
-            label: l('Prix de vente TTC', 'Selling price incl. VAT', 'Verkaufspreis inkl. MwSt.', 'Preço de venda c/ IVA'),
-            validate: (value: number | null | undefined, { req }: { req: PayloadRequest }) =>
-              (Number.isInteger(value) && (value as number) >= 0) ||
-              say(req, l('Indiquez le prix, par ex. 24,50.', 'Enter the price, e.g. 24.50.', 'Geben Sie den Preis ein, z. B. 24,50.', 'Indique o preço, por ex. 24,50.')),
-            admin: { readOnly: false, width: '33%', components: scaledNumber('€') },
-          },
-          {
-            name: 'barcode',
-            type: 'text',
-            virtual: true,
-            label: l('Code-barres (facultatif)', 'Barcode (optional)', 'Barcode (optional)', 'Código de barras (opcional)'),
-            validate: validateBarcode('variants'),
-            admin: { readOnly: false, width: '33%' },
-          },
-          {
-            name: 'sku',
-            type: 'text',
-            virtual: true,
-            label: l('Référence (facultatif)', 'Reference (optional)', 'Referenz (optional)', 'Referência (opcional)'),
-            admin: { readOnly: false, width: '33%', description: l('Vide : créée à partir du nom.', 'Empty: made from the name.', 'Leer: aus dem Namen erstellt.', 'Vazio: criada a partir do nome.') },
-          },
-        ),
-      ],
-    },
-    {
-      name: 'vatClass',
-      type: 'select',
-      required: true,
-      defaultValue: 'standard',
-      label: l('TVA', 'VAT', 'MwSt.', 'IVA'),
-      options: [
-        { value: 'standard', label: l('Taux normal (17 %)', 'Standard rate (17%)', 'Normalsatz (17 %)', 'Taxa normal (17 %)') },
-        { value: 'intermediate', label: l('Taux intermédiaire (14 %)', 'Intermediate rate (14%)', 'Zwischensatz (14 %)', 'Taxa intermédia (14 %)') },
-        { value: 'reduced', label: l('Taux réduit (8 %)', 'Reduced rate (8%)', 'Ermäßigter Satz (8 %)', 'Taxa reduzida (8 %)') },
-        { value: 'superReduced', label: l('Taux super-réduit (3 %)', 'Super-reduced rate (3%)', 'Stark ermäßigter Satz (3 %)', 'Taxa super-reduzida (3 %)') },
-      ],
-      admin: { isClearable: false },
-    },
-    {
-      name: 'variants',
-      type: 'join',
-      collection: 'variants',
-      on: 'product',
-      label: l('Formats et prix', 'Sizes and prices', 'Formate und Preise', 'Formatos e preços'),
-      admin: {
-        condition: (_, __, { operation }) => operation === 'update',
-        defaultColumns: ['title', 'sku', 'barcode', 'priceCents'],
-        description: l(
-          'Chaque format a son prix, son code-barres et son stock. Ouvrez-le pour ajouter un carton de 6 ou de 12.',
-          'Each size has its own price, barcode and stock. Open it to add a box of 6 or 12.',
-          'Jedes Format hat eigenen Preis, Barcode und Bestand. Öffnen Sie es, um einen 6er- oder 12er-Karton hinzuzufügen.',
-          'Cada formato tem o seu preço, código de barras e stock. Abra-o para adicionar uma caixa de 6 ou de 12.',
-        ),
-      },
-    },
-    { name: 'description', type: 'richText', localized: true, label: l('Description', 'Description', 'Beschreibung', 'Descrição') },
-    { name: 'images', type: 'upload', relationTo: 'media', hasMany: true, label: l('Photos (la première sert de vignette)', 'Photos (the first is the card image)', 'Fotos (das erste ist das Vorschaubild)', 'Fotos (a primeira é a miniatura)') },
-    {
-      name: 'badges',
-      type: 'select',
-      hasMany: true,
-      label: l('Étiquettes', 'Labels', 'Etiketten', 'Etiquetas'),
-      options: [
-        { value: 'signature', label: l('Signature', 'Signature', 'Signature', 'Assinatura') },
-        { value: 'rare', label: l('Rare', 'Rare', 'Selten', 'Raro') },
-        { value: 'dop', label: l('DOP', 'PDO', 'g.U.', 'DOP') },
-        { value: 'bestseller', label: l('Best-seller', 'Bestseller', 'Bestseller', 'Mais vendido') },
-        { value: 'homemade', label: l('Fait maison', 'Homemade', 'Hausgemacht', 'Caseiro') },
-        { value: 'new', label: l('Nouveau', 'New', 'Neu', 'Novo') },
-      ],
-    },
-    {
-      name: 'wine',
-      type: 'group',
-      label: l('Le vin', 'The wine', 'Der Wein', 'O vinho'),
-      admin: { condition: (data) => data?.kind === 'wine' },
-      fields: [
-        row(
-          { name: 'region', type: 'text', localized: true, label: l('Région', 'Region', 'Region', 'Região'), admin: { width: '50%' } },
-          { name: 'grape', type: 'text', localized: true, label: l('Cépages', 'Grapes', 'Rebsorten', 'Castas'), admin: { width: '50%' } },
-        ),
-        row(
-          { name: 'vintage', type: 'number', min: 1800, max: 2100, label: l('Millésime', 'Vintage', 'Jahrgang', 'Colheita'), admin: { width: '25%' } },
-          {
-            name: 'colour',
-            type: 'select',
-            label: l('Couleur', 'Colour', 'Farbe', 'Cor'),
-            options: [
-              { value: 'red', label: l('Rouge', 'Red', 'Rot', 'Tinto') },
-              { value: 'white', label: l('Blanc', 'White', 'Weiß', 'Branco') },
-              { value: 'rose', label: l('Rosé', 'Rosé', 'Rosé', 'Rosé') },
-              { value: 'sparkling', label: l('Effervescent', 'Sparkling', 'Schaumwein', 'Espumante') },
-              { value: 'fortified', label: l('Muté (porto…)', 'Fortified (port…)', 'Likörwein (Portwein…)', 'Generoso (porto…)') },
-            ],
-            admin: { width: '25%' },
-          },
-          { name: 'abv', type: 'number', min: 0, max: 10000, label: l('Degré d’alcool', 'Alcohol', 'Alkoholgehalt', 'Teor alcoólico'), admin: { width: '25%', components: scaledNumber('%') } },
-          { name: 'servingTemp', type: 'text', label: l('Service', 'Serve at', 'Serviertemperatur', 'Servir a'), admin: { width: '25%', placeholder: '16–18 °C' } },
-        ),
-      ],
-    },
-    {
-      name: 'snack',
-      type: 'group',
-      label: l('Le plat', 'The dish', 'Das Gericht', 'O prato'),
-      admin: { condition: (data) => data?.kind === 'snack' },
-      fields: [
-        { name: 'ingredients', type: 'textarea', localized: true, label: l('Ingrédients', 'Ingredients', 'Zutaten', 'Ingredientes') },
+      // Unnamed tabs only group the form; the stored data keeps its shape.
+      type: 'tabs',
+      tabs: [
         {
-          name: 'allergens',
-          type: 'select',
-          hasMany: true,
-          label: l('Allergènes', 'Allergens', 'Allergene', 'Alergénios'),
-          options: ALLERGENS.map(([value, label]) => ({ value, label })),
+          label: l('Produit', 'Product', 'Produkt', 'Produto'),
+          fields: [
+          row(
+            { name: 'name', type: 'text', localized: true, required: true, label: l('Nom', 'Name', 'Name', 'Nome'), admin: { width: '50%' } },
+            {
+              name: 'kind',
+              type: 'select',
+              required: true,
+              defaultValue: 'wine',
+              label: l('Type', 'Type', 'Art', 'Tipo'),
+              options: [
+                { value: 'wine', label: l('Vin, porto, bière', 'Wine, port, beer', 'Wein, Portwein, Bier', 'Vinho, porto, cerveja') },
+                { value: 'grocery', label: l('Épicerie', 'Grocery', 'Feinkost', 'Mercearia') },
+                { value: 'snack', label: l('Comptoir (préparé sur place)', 'Counter (made here)', 'Theke (vor Ort zubereitet)', 'Balcão (feito cá)') },
+                { value: 'gift', label: l('Coffret cadeau', 'Gift box', 'Geschenkbox', 'Cabaz de oferta') },
+                { value: 'other', label: l('Autre', 'Other', 'Sonstiges', 'Outro') },
+              ],
+              admin: { width: '25%', isClearable: false },
+            },
+            {
+              name: 'status',
+              type: 'select',
+              required: true,
+              defaultValue: 'active',
+              index: true,
+              label: l('Statut', 'Status', 'Status', 'Estado'),
+              options: [
+                { value: 'active', label: l('En vente', 'On sale', 'Im Verkauf', 'À venda') },
+                { value: 'draft', label: l('En préparation', 'Being prepared', 'In Vorbereitung', 'Em preparação') },
+                { value: 'archived', label: l('Archivé', 'Archived', 'Archiviert', 'Arquivado') },
+              ],
+              admin: { width: '25%', isClearable: false, components: badgeCell({ active: 'success', draft: 'warning', archived: 'neutral' }) },
+            },
+          ),
+          autoSlug('products', 'name'),
+          row(
+            {
+              name: 'category',
+              type: 'relationship',
+              relationTo: 'categories',
+              required: true,
+              index: true,
+              label: l('Catégorie', 'Category', 'Kategorie', 'Categoria'),
+              filterOptions: ({ data }) => ({ kind: { equals: data?.kind === 'snack' ? 'snack' : 'shop' } }),
+              admin: { width: '50%', components: { Cell: '@/modules/catalogue/admin/product-cells#CategoryCell' } },
+            },
+            { name: 'brand', type: 'relationship', relationTo: 'brands', index: true, label: l('Producteur', 'Producer', 'Erzeuger', 'Produtor'), admin: { width: '50%' } },
+          ),
+          {
+            // Only on the "Add" form: the price and barcode of the first size. Afterwards they live on the size itself.
+            // Virtual fields are read-only and unvalidated by default in Payload: both are switched back on here.
+            name: 'firstVariant',
+            type: 'group',
+            virtual: true,
+            label: l('Prix et code-barres', 'Price and barcode', 'Preis und Barcode', 'Preço e código de barras'),
+            admin: { readOnly: false, condition: (_, __, { operation }) => operation === 'create' },
+            fields: [
+              row(
+                {
+                  name: 'priceCents',
+                  type: 'number',
+                  required: true,
+                  min: 0,
+                  virtual: true,
+                  label: l('Prix de vente TTC', 'Selling price incl. VAT', 'Verkaufspreis inkl. MwSt.', 'Preço de venda c/ IVA'),
+                  validate: (value: number | null | undefined, { req }: { req: PayloadRequest }) =>
+                    (Number.isInteger(value) && (value as number) >= 0) ||
+                    say(req, l('Indiquez le prix, par ex. 24,50.', 'Enter the price, e.g. 24.50.', 'Geben Sie den Preis ein, z. B. 24,50.', 'Indique o preço, por ex. 24,50.')),
+                  admin: { readOnly: false, width: '33%', components: scaledNumber('€') },
+                },
+                {
+                  name: 'barcode',
+                  type: 'text',
+                  virtual: true,
+                  label: l('Code-barres (facultatif)', 'Barcode (optional)', 'Barcode (optional)', 'Código de barras (opcional)'),
+                  validate: validateBarcode('variants'),
+                  admin: { readOnly: false, width: '33%' },
+                },
+                {
+                  name: 'sku',
+                  type: 'text',
+                  virtual: true,
+                  label: l('Référence (facultatif)', 'Reference (optional)', 'Referenz (optional)', 'Referência (opcional)'),
+                  admin: { readOnly: false, width: '33%', description: l('Vide : créée à partir du nom.', 'Empty: made from the name.', 'Leer: aus dem Namen erstellt.', 'Vazio: criada a partir do nome.') },
+                },
+              ),
+            ],
+          },
+          {
+            name: 'vatClass',
+            type: 'select',
+            required: true,
+            defaultValue: 'standard',
+            label: l('TVA', 'VAT', 'MwSt.', 'IVA'),
+            options: [
+              { value: 'standard', label: l('Taux normal (17 %)', 'Standard rate (17%)', 'Normalsatz (17 %)', 'Taxa normal (17 %)') },
+              { value: 'intermediate', label: l('Taux intermédiaire (14 %)', 'Intermediate rate (14%)', 'Zwischensatz (14 %)', 'Taxa intermédia (14 %)') },
+              { value: 'reduced', label: l('Taux réduit (8 %)', 'Reduced rate (8%)', 'Ermäßigter Satz (8 %)', 'Taxa reduzida (8 %)') },
+              { value: 'superReduced', label: l('Taux super-réduit (3 %)', 'Super-reduced rate (3%)', 'Stark ermäßigter Satz (3 %)', 'Taxa super-reduzida (3 %)') },
+            ],
+            admin: { isClearable: false },
+          },
+          {
+            name: 'variants',
+            type: 'join',
+            collection: 'variants',
+            on: 'product',
+            label: l('Formats et prix', 'Sizes and prices', 'Formate und Preise', 'Formatos e preços'),
+            admin: {
+              condition: (_, __, { operation }) => operation === 'update',
+              defaultColumns: ['title', 'sku', 'barcode', 'priceCents'],
+              description: l(
+                'Chaque format a son prix, son code-barres et son stock. Ouvrez-le pour ajouter un carton de 6 ou de 12.',
+                'Each size has its own price, barcode and stock. Open it to add a box of 6 or 12.',
+                'Jedes Format hat eigenen Preis, Barcode und Bestand. Öffnen Sie es, um einen 6er- oder 12er-Karton hinzuzufügen.',
+                'Cada formato tem o seu preço, código de barras e stock. Abra-o para adicionar uma caixa de 6 ou de 12.',
+              ),
+            },
+          },
+          {
+            name: 'wine',
+            type: 'group',
+            label: l('Le vin', 'The wine', 'Der Wein', 'O vinho'),
+            admin: { condition: (data) => data?.kind === 'wine' },
+            fields: [
+              row(
+                { name: 'region', type: 'text', localized: true, label: l('Région', 'Region', 'Region', 'Região'), admin: { width: '50%' } },
+                { name: 'grape', type: 'text', localized: true, label: l('Cépages', 'Grapes', 'Rebsorten', 'Castas'), admin: { width: '50%' } },
+              ),
+              row(
+                { name: 'vintage', type: 'number', min: 1800, max: 2100, label: l('Millésime', 'Vintage', 'Jahrgang', 'Colheita'), admin: { width: '25%' } },
+                {
+                  name: 'colour',
+                  type: 'select',
+                  label: l('Couleur', 'Colour', 'Farbe', 'Cor'),
+                  options: [
+                    { value: 'red', label: l('Rouge', 'Red', 'Rot', 'Tinto') },
+                    { value: 'white', label: l('Blanc', 'White', 'Weiß', 'Branco') },
+                    { value: 'rose', label: l('Rosé', 'Rosé', 'Rosé', 'Rosé') },
+                    { value: 'sparkling', label: l('Effervescent', 'Sparkling', 'Schaumwein', 'Espumante') },
+                    { value: 'fortified', label: l('Muté (porto…)', 'Fortified (port…)', 'Likörwein (Portwein…)', 'Generoso (porto…)') },
+                  ],
+                  admin: { width: '25%' },
+                },
+                { name: 'abv', type: 'number', min: 0, max: 10000, label: l('Degré d’alcool', 'Alcohol', 'Alkoholgehalt', 'Teor alcoólico'), admin: { width: '25%', components: scaledNumber('%') } },
+                { name: 'servingTemp', type: 'text', label: l('Service', 'Serve at', 'Serviertemperatur', 'Servir a'), admin: { width: '25%', placeholder: '16–18 °C' } },
+              ),
+            ],
+          },
+          {
+            name: 'snack',
+            type: 'group',
+            label: l('Le plat', 'The dish', 'Das Gericht', 'O prato'),
+            admin: { condition: (data) => data?.kind === 'snack' },
+            fields: [
+              { name: 'ingredients', type: 'textarea', localized: true, label: l('Ingrédients', 'Ingredients', 'Zutaten', 'Ingredientes') },
+              {
+                name: 'allergens',
+                type: 'select',
+                hasMany: true,
+                label: l('Allergènes', 'Allergens', 'Allergene', 'Alergénios'),
+                options: ALLERGENS.map(([value, label]) => ({ value, label })),
+              },
+            ],
+          },
+          ],
+        },
+        {
+          label: l('Photos et texte', 'Photos and text', 'Fotos und Text', 'Fotos e texto'),
+          fields: [
+          {
+            name: 'images',
+            type: 'upload',
+            relationTo: 'media',
+            hasMany: true,
+            label: l('Photos', 'Photos', 'Fotos', 'Fotos'),
+            admin: {
+              description: l('La première sert de vignette dans la boutique.', 'The first one is the card image in the shop.', 'Das erste ist das Vorschaubild im Shop.', 'A primeira é a miniatura na loja.'),
+              components: { Cell: '@/modules/catalogue/admin/product-cells#PhotoCell' },
+            },
+          },
+          {
+            name: 'badges',
+            type: 'select',
+            hasMany: true,
+            label: l('Étiquettes', 'Labels', 'Etiketten', 'Etiquetas'),
+            options: [
+              { value: 'signature', label: l('Signature', 'Signature', 'Signature', 'Assinatura') },
+              { value: 'rare', label: l('Rare', 'Rare', 'Selten', 'Raro') },
+              { value: 'dop', label: l('DOP', 'PDO', 'g.U.', 'DOP') },
+              { value: 'bestseller', label: l('Best-seller', 'Bestseller', 'Bestseller', 'Mais vendido') },
+              { value: 'homemade', label: l('Fait maison', 'Homemade', 'Hausgemacht', 'Caseiro') },
+              { value: 'new', label: l('Nouveau', 'New', 'Neu', 'Novo') },
+            ],
+          },
+          { name: 'description', type: 'richText', localized: true, label: l('Description', 'Description', 'Beschreibung', 'Descrição') },
+          seoSection([
+            { name: 'title', type: 'text', localized: true, label: l('Titre dans Google', 'Title in Google', 'Titel bei Google', 'Título no Google') },
+            { name: 'description', type: 'textarea', localized: true, label: l('Texte dans Google', 'Text in Google', 'Text bei Google', 'Texto no Google') },
+          ]),
+          ],
         },
       ],
     },
     // Used from M3.2 (loyalty, gift cards); kept in the data, not shown before then.
     { name: 'loyaltyExcluded', type: 'checkbox', defaultValue: false, admin: { hidden: true } },
     { name: 'giftCard', type: 'checkbox', defaultValue: false, admin: { hidden: true } },
-    seoSection([
-      { name: 'title', type: 'text', localized: true, label: l('Titre dans Google', 'Title in Google', 'Titel bei Google', 'Título no Google') },
-      { name: 'description', type: 'textarea', localized: true, label: l('Texte dans Google', 'Text in Google', 'Text bei Google', 'Texto no Google') },
-    ]),
+    // List column only: lowest price and stock across the sizes (modules/catalogue/admin/product-cells.tsx).
+    {
+      name: 'offer',
+      type: 'ui',
+      label: l('Prix et stock', 'Price and stock', 'Preis und Bestand', 'Preço e stock'),
+      admin: { components: { Cell: '@/modules/catalogue/admin/product-cells#OfferCell' } },
+    },
   ],
   custom: {
     // Localized text is stored per locale (`name.fr`, `wine.region.fr`): checked in catalogue.int.test.ts.

@@ -103,3 +103,16 @@ export const seoSection = (fields: Field[]): Field => ({
   },
   fields: [{ name: 'seo', type: 'group', label: false, fields }],
 });
+
+type Tone = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+
+/** A select shown as a coloured badge in list columns (components/admin/cells.tsx). */
+export const badgeCell = (tones: Record<string, Tone>) => ({ Cell: { path: '@/components/admin/cells#BadgeCell', clientProps: { tones } } });
+
+/** A signed quantity in list columns: +12 green, −3 red. */
+export const signedCell = { Cell: '@/components/admin/cells#SignedCell' };
+
+/** The list's first-use state: what it is for and a button to add the first one (components/admin/empty-list.tsx). */
+export const emptyList = (empty: { icon: string; title: Label; text: Label; action?: Label; evenFiltered?: boolean }) => ({
+  beforeListTable: [{ path: '@/components/admin/empty-list', clientProps: empty }],
+});

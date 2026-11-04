@@ -2,7 +2,6 @@
 
 import { toast, useTranslation } from '@payloadcms/ui';
 import { ChevronLeft, ChevronRight, PackageMinus } from 'lucide-react';
-import type { DefaultCellComponentProps } from 'payload';
 import { type KeyboardEvent, useEffect, useState } from 'react';
 import type { Label } from '@/lib/admin';
 import { adjustStock, setLowStockAlert } from '../actions';
@@ -175,13 +174,6 @@ async function fetchStock(variant: string, lang: Lang, page: number) {
 }
 
 const errorText = (t: (typeof TEXT)['fr'], code: string) => t.errors[code as keyof typeof t.errors] ?? t.errors.other;
-
-/** A stored reason as words: listed reasons are keys, "other" is the staff member's own text. */
-export function ReasonCell({ cellData }: DefaultCellComponentProps) {
-  const lang = useLang();
-  if (typeof cellData !== 'string') return null;
-  return <span>{pick(REASON_LABELS[cellData], lang) ?? cellData}</span>;
-}
 
 const noEnter = (e: KeyboardEvent) => {
   // These inputs sit inside Payload's document form: Enter must not save the whole document.

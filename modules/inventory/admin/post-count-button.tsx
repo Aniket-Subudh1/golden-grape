@@ -1,7 +1,7 @@
 'use client';
 
 import { toast, useDocumentInfo, useFormFields, useFormModified, useTranslation } from '@payloadcms/ui';
-import { ClipboardCheck } from 'lucide-react';
+import { CircleCheck, ClipboardCheck } from 'lucide-react';
 import { useState } from 'react';
 import { postStockCount } from '../actions';
 
@@ -15,7 +15,9 @@ const TEXT = {
     saveFirst: 'Enregistrez d’abord vos changements.',
     confirm: 'Valider cet inventaire ? Le stock sera remplacé par les quantités comptées.',
     done: 'Inventaire validé.',
-    posted: 'Inventaire validé : il ne peut plus être modifié.',
+    title: 'Prêt à valider ?',
+    posted: 'Inventaire validé',
+    postedOn: (d: string) => `Le ${d}. Le stock a pris les quantités comptées ; l’inventaire ne peut plus être modifié.`,
     error: 'Impossible de valider. Vérifiez qu’un article n’apparaît pas deux fois.',
   },
   en: {
@@ -24,7 +26,9 @@ const TEXT = {
     saveFirst: 'Save your changes first.',
     confirm: 'Post this count? Stock will be replaced by the counted quantities.',
     done: 'Count posted.',
-    posted: 'Count posted: it can no longer be changed.',
+    title: 'Ready to post?',
+    posted: 'Count posted',
+    postedOn: (d: string) => `On ${d}. Stock now matches the counted quantities; the count can no longer be changed.`,
     error: 'Could not post. Check that no item appears twice.',
   },
   de: {
@@ -33,7 +37,9 @@ const TEXT = {
     saveFirst: 'Speichern Sie zuerst Ihre Änderungen.',
     confirm: 'Diese Inventur buchen? Der Bestand wird durch die gezählten Mengen ersetzt.',
     done: 'Inventur gebucht.',
-    posted: 'Inventur gebucht: sie kann nicht mehr geändert werden.',
+    title: 'Bereit zum Buchen?',
+    posted: 'Inventur gebucht',
+    postedOn: (d: string) => `Am ${d}. Der Bestand entspricht den gezählten Mengen; die Inventur ist nicht mehr änderbar.`,
     error: 'Buchen nicht möglich. Prüfen Sie, dass kein Artikel doppelt vorkommt.',
   },
   pt: {
@@ -42,7 +48,9 @@ const TEXT = {
     saveFirst: 'Guarde primeiro as suas alterações.',
     confirm: 'Validar este inventário? O stock será substituído pelas quantidades contadas.',
     done: 'Inventário validado.',
-    posted: 'Inventário validado: já não pode ser alterado.',
+    title: 'Pronto para validar?',
+    posted: 'Inventário validado',
+    postedOn: (d: string) => `Em ${d}. O stock passou a ser o contado; o inventário já não pode ser alterado.`,
     error: 'Não foi possível validar. Verifique que nenhum artigo aparece duas vezes.',
   },
 };
@@ -52,10 +60,24 @@ export default function PostCountButton() {
   const t = TEXT[(i18n.language in TEXT ? i18n.language : 'fr') as keyof typeof TEXT];
   const { id } = useDocumentInfo();
   const status = useFormFields(([fields]) => fields.status?.value);
+  const postedAt = useFormFields(([fields]) => fields.postedAt?.value) as string | undefined;
   const modified = useFormModified();
   const [busy, setBusy] = useState(false);
   if (!id) return null;
-  if (status === 'posted') return <p className="gg-stock__hint gg-stock__done">{t.posted}</p>;
+  if (status === 'posted') {
+    const when = postedAt
+      ? new Intl.DateTimeFormat(i18n.language, { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/Luxembourg' }).format(new Date(postedAt))
+      : '';
+    return (
+      <div className="gg-callout gg-callout--success">
+        <CircleCheck />
+        <div>
+          <b>{t.posted}</b>
+          <p>{t.postedOn(when)}</p>
+        </div>
+      </div>
+    );
+  }
 
   async function post() {
     if (!window.confirm(t.confirm)) return;
@@ -71,11 +93,14 @@ export default function PostCountButton() {
   }
 
   return (
-    <div className="gg-stock gg-stock--count">
-      <p className="gg-stock__hint">{modified ? t.saveFirst : t.explain}</p>
+    <div className="gg-callout">
+      <ClipboardCheck />
+      <div>
+        <b>{t.title}</b>
+        <p>{modified ? t.saveFirst : t.explain}</p>
+      </div>
       <button type="button" className="gg-btn gg-btn--primary" disabled={busy || modified} onClick={post}>
-        <ClipboardCheck />
-        <span>{t.post}</span>
+        {t.post}
       </button>
     </div>
   );

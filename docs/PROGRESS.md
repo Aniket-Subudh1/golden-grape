@@ -56,6 +56,28 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-04 · Shop and stock admin made professional (requested by Aniket)
+- **Product list:** a photo, the name, the category, the price (lowest size, "dès" when sizes differ) with stock at a glance ("24 en stock", "· stock bas", "Rupture", "Préparé sur place"), and the status as a coloured badge.
+- **Product form:** split into "Produit" and "Photos et texte" tabs instead of one long page.
+- **Stock lists:**
+  - "État du stock" shows quantities with "Stock bas"/"Rupture" badges and "Par défaut" for the alert level.
+  - Movements show coloured type badges and signed quantities.
+  - Counts show a status badge and the number of lines.
+  - The meaningless "Rechercher par ID" bar is gone from stock levels and movements.
+- **Empty lists:** an icon, what the list is for and the "Ajouter" dialog button ("Aucun inventaire pour l'instant…"). The low-stock list says "Rien en stock bas" in green. A search with no match shows a centred "Aucun résultat" card without the duplicate page link.
+- **Stock count form:**
+  - A "Prêt à valider ?" callout with the button, and a green "Inventaire validé · le 4 novembre 2026 à 11:52" banner afterwards.
+  - Lines are titled by product and quantity, and "Attendu" appears only once posted.
+  - Name, status and author share one row.
+- **Stock tab:** quantity and alert level as tiles.
+- **Whole admin:**
+  - Payload's clumsy French replaced: "Ajouter : Produit", "Ajout : Produit", "Ajouter", "Choisir dans la photothèque", and "—" instead of "<Pas de Par>". German and Portuguese equivalents too.
+  - Dates read `04/11/2026 16:08`.
+- **Bug found on the way:** Payload's client relationship cells load names in one batch and showed "—" for rows that arrived after the async photo and price cells. The product category is now rendered on the server like those cells.
+- **Verified:**
+  - On a throwaway database in Chrome: every new page at 1440 px, and the product list, Stock tab and empty state at 390 px. Created and posted a count. No console errors.
+  - `npm run check` (64) and `npm run test:int` (38) pass.
+
 ### 2026-11-04 · Empty lists centred (requested by Aniket)
 - An empty admin list ("No results" + "Create new …", e.g. Producers before any is added) sat as plain text against the left edge. It is now a centred white card like the list tables, on every collection. Checked at 1440 and 390 px on a throwaway database.
 

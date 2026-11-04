@@ -135,6 +135,12 @@ export async function onHand(payload: Payload, variantIds: string[]): Promise<Re
   return Object.fromEntries(variantIds.map((id) => [id, byVariant.get(id) ?? 0]));
 }
 
+/** Staff overview of several variants together (the product list): units on hand and whether any is low. */
+export async function stockSummary(payload: Payload, variantIds: string[]) {
+  const { docs } = await payload.find({ collection: 'stockLevels', where: { variant: { in: variantIds } }, limit: 0, depth: 0, overrideAccess: true });
+  return { onHand: docs.reduce((sum, d) => sum + d.onHand, 0), low: docs.some((d) => d.lowStock) };
+}
+
 /** The public projection: never the raw count. Variants that do not track stock are always available. */
 export async function availability(payload: Payload, variantIds: string[]): Promise<Record<string, { inStock: boolean; maxQty: number | null }>> {
   const [{ variants }, stock] = await Promise.all([stockRules({ payload }, variantIds, []), onHand(payload, variantIds)]);

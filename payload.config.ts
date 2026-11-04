@@ -36,6 +36,8 @@ export default buildConfig({
     importMap: { baseDir: dirname },
     // One light theme in Golden Grape colours (styles in app/(payload)/custom.css); no theme switcher.
     theme: 'light',
+    // Day first, 24 h, as in Luxembourg (Payload's default reads "November 4th 2026, 3:52 PM").
+    dateFormat: 'dd/MM/yyyy HH:mm',
     meta: { titleSuffix: ' · Golden Grape', icons: [{ rel: 'icon', type: 'image/png', url: '/icon.png' }] },
     components: {
       graphics: { Logo: '@/components/admin/logo', Icon: '@/components/admin/icon' },
@@ -100,10 +102,21 @@ export default buildConfig({
     translations: {
       fr: {
         general: {
+          noLabel: '—',
+          noResultsFound: 'Aucun résultat',
+          noResultsDescription: 'Rien ne correspond à cette recherche ou à ces filtres. Essayez d’autres mots ou retirez un filtre.',
+          createNewLabel: 'Ajouter : {{label}}',
+          creatingNewLabel: 'Ajout : {{label}}',
           locale: 'Texte du site',
           createNew: 'Ajouter',
           updatedSuccessfully: 'Enregistré. Le site est à jour.',
           successfullyCreated: 'Ajouté. Le site est à jour.',
+        },
+        fields: {
+          addNew: 'Ajouter',
+          addNewLabel: 'Ajouter : {{label}}',
+          chooseFromExisting: 'Choisir dans la photothèque',
+          uploadNewLabel: 'Envoyer : {{label}}',
         },
         version: {
           saveDraft: 'Enregistrer sans publier',
@@ -114,10 +127,21 @@ export default buildConfig({
       },
       en: {
         general: {
+          noLabel: '—',
+          noResultsFound: 'No results',
+          noResultsDescription: 'Nothing matches this search or these filters. Try other words or remove a filter.',
+          createNewLabel: 'Add {{label}}',
+          creatingNewLabel: 'New {{label}}',
           locale: 'Website text',
           createNew: 'Add',
           updatedSuccessfully: 'Saved. The website is up to date.',
           successfullyCreated: 'Added. The website is up to date.',
+        },
+        fields: {
+          addNew: 'Add',
+          addNewLabel: 'Add {{label}}',
+          chooseFromExisting: 'Choose from the library',
+          uploadNewLabel: 'Upload {{label}}',
         },
         version: {
           saveDraft: 'Save without publishing',
@@ -128,10 +152,21 @@ export default buildConfig({
       },
       de: {
         general: {
+          noLabel: '—',
+          noResultsFound: 'Keine Ergebnisse',
+          noResultsDescription: 'Nichts passt zu dieser Suche oder diesen Filtern. Versuchen Sie andere Wörter oder entfernen Sie einen Filter.',
+          createNewLabel: 'Hinzufügen: {{label}}',
+          creatingNewLabel: 'Neu: {{label}}',
           locale: 'Websitetext',
           createNew: 'Hinzufügen',
           updatedSuccessfully: 'Gespeichert. Die Website ist aktuell.',
           successfullyCreated: 'Hinzugefügt. Die Website ist aktuell.',
+        },
+        fields: {
+          addNew: 'Hinzufügen',
+          addNewLabel: 'Hinzufügen: {{label}}',
+          chooseFromExisting: 'Aus der Mediathek wählen',
+          uploadNewLabel: 'Hochladen: {{label}}',
         },
         version: {
           saveDraft: 'Speichern, nicht veröffentlichen',
@@ -142,10 +177,21 @@ export default buildConfig({
       },
       pt: {
         general: {
+          noLabel: '—',
+          noResultsFound: 'Sem resultados',
+          noResultsDescription: 'Nada corresponde a esta pesquisa ou a estes filtros. Experimente outras palavras ou retire um filtro.',
+          createNewLabel: 'Adicionar: {{label}}',
+          creatingNewLabel: 'Novo: {{label}}',
           locale: 'Texto do site',
           createNew: 'Adicionar',
           updatedSuccessfully: 'Guardado. O site está atualizado.',
           successfullyCreated: 'Adicionado. O site está atualizado.',
+        },
+        fields: {
+          addNew: 'Adicionar',
+          addNewLabel: 'Adicionar: {{label}}',
+          chooseFromExisting: 'Escolher na biblioteca',
+          uploadNewLabel: 'Carregar: {{label}}',
         },
         version: {
           saveDraft: 'Guardar sem publicar',

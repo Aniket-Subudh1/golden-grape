@@ -558,6 +558,8 @@ export interface Category {
   createdAt: string;
 }
 /**
+ * The estates and houses whose products you sell. They can also be added from a product or the import.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "brands".
  */
@@ -600,23 +602,6 @@ export interface Product {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  images?: (string | Media)[] | null;
-  badges?: ('signature' | 'rare' | 'dop' | 'bestseller' | 'homemade' | 'new')[] | null;
   wine?: {
     region?: string | null;
     grape?: string | null;
@@ -646,12 +631,32 @@ export interface Product {
         )[]
       | null;
   };
-  loyaltyExcluded?: boolean | null;
-  giftCard?: boolean | null;
+  /**
+   * The first one is the card image in the shop.
+   */
+  images?: (string | Media)[] | null;
+  badges?: ('signature' | 'rare' | 'dop' | 'bestseller' | 'homemade' | 'new')[] | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   seo?: {
     title?: string | null;
     description?: string | null;
   };
+  loyaltyExcluded?: boolean | null;
+  giftCard?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -758,19 +763,19 @@ export interface StockCount {
   id: string;
   note?: string | null;
   status: 'open' | 'posted';
+  user?: (string | null) | User;
   postedAt?: string | null;
+  /**
+   * One line per size counted. “Expected” is filled in when posting: the stock at that moment.
+   */
   lines?:
     | {
         variant: string | Variant;
         counted: number;
-        /**
-         * Stock at the moment of posting.
-         */
         expected?: number | null;
         id?: string | null;
       }[]
     | null;
-  user?: (string | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -1240,9 +1245,6 @@ export interface ProductsSelect<T extends boolean = true> {
       };
   vatClass?: T;
   variants?: T;
-  description?: T;
-  images?: T;
-  badges?: T;
   wine?:
     | T
     | {
@@ -1259,14 +1261,17 @@ export interface ProductsSelect<T extends boolean = true> {
         ingredients?: T;
         allergens?: T;
       };
-  loyaltyExcluded?: T;
-  giftCard?: T;
+  images?: T;
+  badges?: T;
+  description?: T;
   seo?:
     | T
     | {
         title?: T;
         description?: T;
       };
+  loyaltyExcluded?: T;
+  giftCard?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1340,6 +1345,7 @@ export interface StockMovementsSelect<T extends boolean = true> {
 export interface StockCountsSelect<T extends boolean = true> {
   note?: T;
   status?: T;
+  user?: T;
   postedAt?: T;
   lines?:
     | T
@@ -1349,7 +1355,6 @@ export interface StockCountsSelect<T extends boolean = true> {
         expected?: T;
         id?: T;
       };
-  user?: T;
   updatedAt?: T;
   createdAt?: T;
 }
