@@ -56,6 +56,9 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-04 · Empty lists centred (requested by Aniket)
+- An empty admin list ("No results" + "Create new …", e.g. Producers before any is added) sat as plain text against the left edge. It is now a centred white card like the list tables, on every collection. Checked at 1440 and 390 px on a throwaway database.
+
 ### 2026-11-04 · M2.1 · Catalogue, packaging and inventory ledger core
 - **T1 Catalogue** (`modules/catalogue/collections.ts`, `service.ts`): `categories`, `brands` (shown as "Producteurs"), `products`, `variants`, `packagingUnits` per 04 §2, with the `wine` / `snack` groups shown by kind. The "Add a product" dialog asks for the price and barcode of the first size (virtual group `firstVariant`). The default variant is created by an idempotent `afterChange`, gets a reference (SKU) generated from the slug, and a stock row at 0. Barcodes are digits only and unique across variants **and** packaging units: field validation plus a partial unique index per collection. Text-index path verified: `name.fr`, `wine.region.fr`. Service: `findByBarcode` (packaging first), `findSellable`, `listProducts` (text search through `$text`), `stockRules`.
 - **T2 Packaging** (`packaging.ts` + 20 unit vectors): `toBaseQty`, `normalizeLines` (incl. the merge vector → 8), `validateFactor` (< 2 rejected).
