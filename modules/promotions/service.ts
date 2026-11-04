@@ -4,7 +4,7 @@ import type { Media } from '@/payload-types';
 import { findSellable } from '@/modules/catalogue/service';
 import { availability } from '@/modules/inventory/service';
 import { getSettingsPrivate } from '@/modules/settings/service';
-import { type Channel, quote, type QuoteCatalogue, type QuoteLineInput, type VatClass } from './pricing';
+import { type Channel, quote, type QuoteCatalogue, type QuoteLineInput, type QuoteRules, type VatClass } from './pricing';
 
 // I/O around the pricing engine: loads what `quote` needs (02 §5.2). The shop, the cart, checkout (M2.3), mobile
 // sales and documents (M3.x) all price through here; nothing else computes a price.
@@ -50,7 +50,7 @@ export type CartNotice = { variant: string; unit?: string; kind: 'clamped' | 're
 export async function quoteCart(
   payload: Payload,
   input: QuoteLineInput[],
-  { customer, channel, locale }: { customer?: { id: string } | null; channel: Channel; locale: Locale },
+  { customer, channel, locale, delivery }: { customer?: { id: string } | null; channel: Channel; locale: Locale; delivery?: QuoteRules['delivery'] },
 ) {
   const ids = [...new Set(input.map((l) => l.variant))];
   const [sellable, stock, rates] = await Promise.all([findSellable(payload, ids, channel, locale), availability(payload, ids), vatRates()]);
@@ -74,7 +74,7 @@ export async function quoteCart(
     lines.push({ ...line, qty, maxQty: maxQty === null ? null : qty + Math.floor((left.get(line.variant) ?? 0) / factor) });
   }
 
-  const q = quote({ lines, customer, channel, now: new Date(), catalogue, rules: { vatRates: rates } });
+  const q = quote({ lines, customer, channel, now: new Date(), catalogue, rules: { vatRates: rates, delivery } });
 
   const productImages = sellable.map((v) => (v.product as { images?: unknown[] }).images?.[0]).map(idOf).filter(Boolean) as string[];
   const { docs: media } = productImages.length

@@ -6,12 +6,12 @@ import { Container } from '@/components/site/container';
 import { MediaCard } from '@/components/site/media-card';
 import { MediaGrid } from '@/components/site/media-grid';
 import { PageHero } from '@/components/site/page-hero';
-import { Button } from '@/components/ui/button';
-import { alternates, type Dictionary, getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
+import { alternates, type Dictionary, getDictionary, interpolate, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { eventDate } from '@/lib/time';
 import { mediaOf } from '@/modules/cms/service';
-import { upcomingEvents } from '@/modules/events/service';
+import { ReserveDialog } from '@/modules/events/components/reserve-dialog';
+import { seatsLeft, upcomingEvents } from '@/modules/events/service';
 
 export async function generateMetadata({ params }: PageProps<'/[locale]/events'>): Promise<Metadata> {
   const { locale } = await params;
@@ -20,9 +20,10 @@ export async function generateMetadata({ params }: PageProps<'/[locale]/events'>
   return { ...meta.events, alternates: alternates('/events', locale) };
 }
 
-async function EventList({ locale, t }: { locale: Locale; t: Dictionary['eventsPage'] }) {
+async function EventList({ locale, t, dict }: { locale: Locale; t: Dictionary['eventsPage']; dict: Dictionary }) {
   const events = await upcomingEvents(locale);
   if (events.length === 0) return <p className="max-w-xl text-lg font-light text-ink/60">{t.empty}</p>;
+  const left = await seatsLeft(events.map((e) => e.id));
   return (
     <MediaGrid cols={4} hairline>
       {events.map((e) => {
@@ -43,6 +44,11 @@ async function EventList({ locale, t }: { locale: Locale; t: Dictionary['eventsP
                   </Link>
                 </h3>
                 <p className="mt-1 text-xs opacity-80">{time}</p>
+                {left[e.id] != null && left[e.id]! <= 10 && (
+                  <p className="mt-3 inline-flex rounded-full bg-gold/90 px-3 py-1 text-[10px] tracking-[0.18em] text-ink uppercase">
+                    {left[e.id] === 0 ? t.dialog.soldOut : interpolate(left[e.id] === 1 ? t.dialog.seatsLeft_one : t.dialog.seatsLeft_other, { count: left[e.id]! })}
+                  </p>
+                )}
               </>
             }
           >
@@ -50,10 +56,15 @@ async function EventList({ locale, t }: { locale: Locale; t: Dictionary['eventsP
               <p className="flex-1 text-sm font-light text-ink/60">{e.description}</p>
               <div className="relative z-10 mt-5 flex items-center justify-between">
                 <span className="font-serif text-xl">{e.priceCents ? formatMoney(e.priceCents, locale, { compact: true }) : t.free}</span>
-                {/* Online booking arrives in M2.3; until then a request goes through the contact form. */}
-                <Button asChild className="h-10 text-[10px]">
-                  <Link href={localePath(locale, '/contact')}>{t.reserve}</Link>
-                </Button>
+                <ReserveDialog
+                  event={{ id: e.id, title: e.title, when: `${date} · ${time}`, priceCents: e.priceCents }}
+                  left={left[e.id] ?? null}
+                  locale={locale}
+                  t={t}
+                  form={dict.form}
+                  labels={{ minus: dict.cart.minus, plus: dict.cart.plus }}
+                  className="h-10 text-[10px]"
+                />
               </div>
             </div>
           </MediaCard>
@@ -66,14 +77,15 @@ async function EventList({ locale, t }: { locale: Locale; t: Dictionary['eventsP
 export default async function EventsPage({ params }: PageProps<'/[locale]/events'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const { eventsPage: t } = await getDictionary(locale);
+  const dict = await getDictionary(locale);
+  const t = dict.eventsPage;
   return (
     <>
       <PageHero eyebrow={t.eyebrow} title={[t.titleA, t.titleB]} subtitle={t.subtitle} />
       <section className="pb-32">
         <Container className="px-6">
           <Suspense fallback={null}>
-            <EventList locale={locale} t={t} />
+            <EventList locale={locale} t={t} dict={dict} />
           </Suspense>
         </Container>
       </section>

@@ -16,6 +16,8 @@ const STORAGE = 'gg_cart_v2';
 const OLD_STORAGE = ['gg_cart_v1', 'gg-cart', 'cart']; // earlier versions held client prices: dropped
 
 type CartContext = {
+  /** The saved cart has been read (before that, `items` is empty because it is not known yet). */
+  ready: boolean;
   items: CartItem[];
   mode: CartMode;
   open: boolean;
@@ -28,6 +30,10 @@ type CartContext = {
   qtyOf: (variant: string, unit?: string) => number;
   add: (item: { variant: string; unit?: string }, qty?: number) => void;
   setQty: (item: { variant: string; unit?: string }, qty: number) => void;
+  /** Empties the cart (after an order is placed). */
+  clear: () => void;
+  /** Asks the server again (checkout was told the stock changed). */
+  refresh: () => void;
 };
 
 const Context = createContext<CartContext | null>(null);
@@ -43,7 +49,7 @@ export function useCart(): CartContext {
   const cart = useContext(Context);
   const hydrated = useSyncExternalStore(noSubscribe, () => true, () => false);
   if (!cart) throw new Error('useCart outside CartProvider');
-  return hydrated ? cart : { ...cart, items: [], count: 0, quote: null, qtyOf: () => 0 };
+  return hydrated ? cart : { ...cart, ready: false, items: [], count: 0, quote: null, qtyOf: () => 0 };
 }
 
 const same = (a: { variant: string; unit?: string }, b: { variant: string; unit?: string }) => a.variant === b.variant && (a.unit ?? '') === (b.unit ?? '');
@@ -72,6 +78,7 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
   const [loaded, setLoaded] = useState(false);
   const [quote, setQuote] = useState<CartQuote | null>(null);
   const [pending, setPending] = useState(false);
+  const [asked, setAsked] = useState(0);
   const request = useRef(0);
 
   useEffect(() => {
@@ -120,7 +127,7 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
       }
     }, 300);
     return () => window.clearTimeout(timer);
-  }, [items, loaded, locale, notices]);
+  }, [items, loaded, locale, notices, asked]);
 
   const setQty = useCallback((target: { variant: string; unit?: string }, qty: number) => {
     setItems((current) => {
@@ -132,6 +139,7 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
 
   const value = useMemo<CartContext>(
     () => ({
+      ready: loaded,
       items,
       mode,
       open,
@@ -147,8 +155,10 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
       qtyOf: (variant, unit) => items.find((i) => same(i, { variant, unit }))?.qty ?? 0,
       add: (target, qty = 1) => setQty(target, (items.find((i) => same(i, target))?.qty ?? 0) + qty),
       setQty,
+      clear: () => setItems([]),
+      refresh: () => setAsked((n) => n + 1),
     }),
-    [items, mode, open, quote, pending, setQty],
+    [loaded, items, mode, open, quote, pending, setQty],
   );
 
   return <Context value={value}>{children}</Context>;

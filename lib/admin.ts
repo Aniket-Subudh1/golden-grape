@@ -122,3 +122,9 @@ export const signedCell = { Cell: '@/components/admin/cells#SignedCell' };
 export const emptyList = (empty: { icon: string; title: Label; text: Label; action?: Label; evenFiltered?: boolean }) => ({
   beforeListTable: [{ path: '@/components/admin/empty-list', clientProps: empty }],
 });
+
+/**
+ * A field kept for list columns and filters but not drawn in the edit view, where a summary panel (a `ui` field)
+ * shows the document instead: orders, reservations and bookings, which only their services write.
+ */
+export const listOnly = (field: Field): Field => ({ ...field, admin: { ...('admin' in field ? field.admin : {}), condition: () => false } }) as Field;

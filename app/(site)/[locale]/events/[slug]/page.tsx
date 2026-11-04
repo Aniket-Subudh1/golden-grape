@@ -5,12 +5,12 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { Container } from '@/components/site/container';
 import { PageHero } from '@/components/site/page-hero';
-import { Button } from '@/components/ui/button';
-import { alternates, getDictionary, isLocale, localePath } from '@/lib/i18n';
+import { alternates, getDictionary, interpolate, isLocale, localePath } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { eventDate } from '@/lib/time';
 import { mediaOf } from '@/modules/cms/service';
-import { getEvent } from '@/modules/events/service';
+import { ReserveDialog } from '@/modules/events/components/reserve-dialog';
+import { getEvent, seatsLeft } from '@/modules/events/service';
 
 type Props = PageProps<'/[locale]/events/[slug]'>;
 
@@ -28,8 +28,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 async function EventDetail({ params }: Pick<Props, 'params'>) {
   const { locale, slug } = await params;
   if (!isLocale(locale)) notFound();
-  const [event, { eventsPage: t }] = await Promise.all([getEvent(slug, locale), getDictionary(locale)]);
+  const [event, dict] = await Promise.all([getEvent(slug, locale), getDictionary(locale)]);
   if (!event) notFound();
+  const t = dict.eventsPage;
+  const left = (await seatsLeft([event.id]))[event.id] ?? null;
   const { date, time } = eventDate(event.startsAt, event.endsAt, locale);
   const image = mediaOf(event.image);
   return (
@@ -37,9 +39,19 @@ async function EventDetail({ params }: Pick<Props, 'params'>) {
       <PageHero eyebrow={`${date} · ${time}`} title={[event.title]} subtitle={event.description}>
         <div className="mt-8 flex flex-wrap items-center gap-8">
           <p className="font-serif text-3xl">{event.priceCents ? formatMoney(event.priceCents, locale, { compact: true }) : t.free}</p>
-          <Button asChild>
-            <Link href={localePath(locale, '/contact')}>{t.reserve}</Link>
-          </Button>
+          <ReserveDialog
+            event={{ id: event.id, title: event.title, when: `${date} · ${time}`, priceCents: event.priceCents }}
+            left={left}
+            locale={locale}
+            t={t}
+            form={dict.form}
+            labels={{ minus: dict.cart.minus, plus: dict.cart.plus }}
+          />
+          {left !== null && left <= 10 && (
+            <p className="text-[11px] tracking-[0.18em] text-gold-deep uppercase">
+              {left === 0 ? t.dialog.soldOut : interpolate(left === 1 ? t.dialog.seatsLeft_one : t.dialog.seatsLeft_other, { count: left })}
+            </p>
+          )}
         </div>
       </PageHero>
       <section className="pb-32">

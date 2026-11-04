@@ -3,6 +3,7 @@
 import { Bike, ShoppingBag, Trash2, UtensilsCrossed } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { Sheet } from '@/components/ui/sheet';
 import { cn } from '@/lib/cn';
 import { type Dictionary, interpolate, type Locale, localePath } from '@/lib/i18n';
@@ -60,6 +61,13 @@ export function CartSheet({ locale, t }: { locale: Locale; t: Dictionary['cart']
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
           <p className="font-serif text-2xl text-ink/60 italic">{t.empty.title}</p>
           <p className="text-sm text-ink/50">{t.empty.subtitle}</p>
+          {mode === 'table' && (
+            <Button asChild className="mt-4">
+              <Link href={localePath(locale, '/checkout')} onClick={() => setOpen(false)}>
+                {t.bookTable}
+              </Link>
+            </Button>
+          )}
           <div className="mt-4 flex flex-wrap justify-center gap-3">
             <Link href={localePath(locale, '/shop')} onClick={() => setOpen(false)} className="eyebrow border-b border-gold-deep pb-1 text-gold-deep">
               {t.toShop}
@@ -124,7 +132,11 @@ export function CartSheet({ locale, t }: { locale: Locale; t: Dictionary['cart']
                 </dl>
               </>
             )}
-            {/* M2.3 adds the "Checkout" button here (M2.2 T3: hidden until the checkout page exists). */}
+            <Button asChild className="w-full">
+              <Link href={localePath(locale, '/checkout')} onClick={() => setOpen(false)}>
+                {mode === 'table' ? t.bookTable : t.checkout}
+              </Link>
+            </Button>
           </footer>
         </>
       )}

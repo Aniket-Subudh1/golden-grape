@@ -196,9 +196,9 @@
       "table": "Table"
     },
     "hints": {
-      "pickup": "Collect your order at the boutique.",
-      "delivery": "Delivery in Luxembourg City within 45 min.",
-      "table": "Book a table, optionally pre-order your food."
+      "pickup": "Collect your order at the shop, at the time you choose.",
+      "delivery": "Delivered to your door, at the time you choose.",
+      "table": "Book a table, and pre-order if you like."
     },
     "empty": {
       "title": "Your bag is empty",
@@ -252,7 +252,9 @@
     "notices": {
       "clamped": "Quantity adjusted to the stock available.",
       "removed": "An item is no longer available and was removed from your bag."
-    }
+    },
+    "checkout": "Checkout",
+    "bookTable": "Book a table"
   },
   "shop": {
     "eyebrow": "Shop · Wines & Grocery",
@@ -414,7 +416,19 @@
       "sending": "Sending…",
       "toastTitle": "Request sent",
       "toastDesc": "{{title}} · {{count}} guests — we'll confirm shortly.",
-      "doneTitle": "Request sent. We'll be in touch very soon."
+      "doneTitle": "Request sent. We'll be in touch very soon.",
+      "email": "E-mail",
+      "emailPh": "you@example.com",
+      "seatsLeft_one": "Only {{count}} seat left",
+      "seatsLeft_other": "Only {{count}} seats left",
+      "soldOut": "Sold out",
+      "payOnsite": "Paid on site on the day.",
+      "freeEntry": "Free entry",
+      "title": "Book your seats",
+      "doneConfirmed": "Your seats are booked",
+      "donePending": "Your seats are held",
+      "doneText": "A confirmation is on its way to {{email}}.",
+      "close": "Close"
     },
     "empty": "No upcoming events right now. Check back soon — or write to us to be told first.",
     "back": "All events"
@@ -540,6 +554,14 @@
     "product": {
       "title": "{{name}} · Golden Grape Luxembourg",
       "description": "{{name}}, chosen by Golden Grape, Luxembourg’s Portuguese house."
+    },
+    "checkout": {
+      "title": "Checkout — Golden Grape",
+      "description": "Pickup, delivery or a table: choose your time and confirm."
+    },
+    "order": {
+      "title": "Your order — Golden Grape",
+      "description": "Your order at Golden Grape."
     }
   },
   "form": {
@@ -552,8 +574,19 @@
       "tooLong": "This text is too long.",
       "minGuests": "Fewer guests than this package’s minimum.",
       "dateTooSoon": "Choose a date at least 2 days ahead.",
-      "invalid": "Invalid value."
-    }
+      "invalid": "Invalid value.",
+      "slotFull": "This time has just been taken. Please choose another one.",
+      "slotUnavailable": "This time is no longer available. Please choose another one.",
+      "outsideZone": "We do not deliver to this postcode yet.",
+      "belowMinimum": "Your order is below the delivery minimum.",
+      "cartChanged": "Your bag changed (stock). Please check it and try again.",
+      "emptyCart": "Your bag is empty.",
+      "soldOut": "Sold out: there are not enough seats left.",
+      "transition": "This change is no longer possible: the page will refresh.",
+      "event": "This event can no longer be booked."
+    },
+    "CONFLICT": "This was just changed by someone else. Please try again.",
+    "OUT_OF_STOCK": "Your bag changed (stock). Please check it and try again."
   },
   "mail": {
     "signature": "The Golden Grape team",
@@ -584,13 +617,89 @@
       "notes": "Comments",
       "estimate": "Estimate",
       "number": "Reference",
-      "language": "Language"
+      "language": "Language",
+      "mode": "Type",
+      "slot": "When",
+      "address": "Address",
+      "items": "Items",
+      "qty": "Qty",
+      "subtotal": "Subtotal",
+      "delivery": "Delivery",
+      "total": "Total",
+      "vat": "incl. VAT {{rate}} %",
+      "payment": "Payment",
+      "beneficiary": "Beneficiary",
+      "iban": "IBAN",
+      "bic": "BIC",
+      "reference": "Reference",
+      "amount": "Amount",
+      "status": "Status",
+      "event": "Event"
     },
     "reset": {
       "subject": "Choose a new password",
       "body": "You asked to change the password of your Golden Grape account. The link below is valid for one hour.",
       "button": "Choose a password",
       "ignore": "Did not ask for this? Simply ignore this e-mail: your password stays the same."
+    },
+    "modes": {
+      "pickup": "Pickup at the shop",
+      "delivery": "Delivery",
+      "table": "Table"
+    },
+    "payments": {
+      "onsite": "To pay at the shop",
+      "transfer": "Bank transfer",
+      "invoice": "On invoice",
+      "card": "Card"
+    },
+    "status": {
+      "pending": "Being confirmed",
+      "awaiting_payment": "Awaiting your transfer",
+      "confirmed": "Confirmed",
+      "ready": "Ready",
+      "out_for_delivery": "On its way",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded"
+    },
+    "view": "View my order",
+    "order": {
+      "subject": "Your order {{number}}",
+      "title": "Thank you for your order",
+      "confirmedBody": "Your order is confirmed. We will have everything ready for the time you chose.",
+      "awaitingBody": "Your order is reserved. As soon as your transfer arrives, we confirm it and prepare it.",
+      "transferTitle": "Bank transfer details",
+      "transferNote": "Please use the reference so we can match your payment.",
+      "statusSubject": "Order {{number}}: {{status}}",
+      "statusBody": {
+        "confirmed": "Your order is confirmed and being prepared.",
+        "ready": "Your order is ready. See you at the shop!",
+        "out_for_delivery": "Your order is on its way to you.",
+        "cancelled": "Your order has been cancelled. If you had already paid, we will refund you.",
+        "refunded": "Your order has been refunded."
+      },
+      "staffSubject": "New order {{number}} — {{name}}"
+    },
+    "reservation": {
+      "pendingSubject": "Your table request {{number}}",
+      "pendingBody": "We have received your request and will confirm it very soon.",
+      "acceptedSubject": "Your table is confirmed — {{number}}",
+      "acceptedBody": "Good news: your table is confirmed. We look forward to welcoming you.",
+      "rejectedSubject": "Your table request {{number}}",
+      "rejectedBody": "We are sorry: we cannot welcome you at that time. Do not hesitate to choose another time.",
+      "cancelledSubject": "Your reservation {{number}} is cancelled",
+      "cancelledBody": "Your reservation has been cancelled. We hope to see you another time.",
+      "staffSubject": "New table request {{number}} — {{name}} ({{guests}})",
+      "preorder": "Your pre-order"
+    },
+    "eventBooking": {
+      "subject": "Your booking — {{title}}",
+      "confirmedBody": "Your seats are booked. See you soon!",
+      "pendingBody": "Your seats are held. The amount is paid on site on the day.",
+      "cancelledSubject": "Your booking for {{title}} is cancelled",
+      "cancelledBody": "Your booking has been cancelled.",
+      "staffSubject": "New booking: {{title}} — {{name}} ({{guests}})"
     }
   },
   "cookies": {
@@ -668,6 +777,152 @@
       "signedOut": "Your session expired. Please sign in again."
     },
     "expiredTitle": "Session expired.",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "orders": {
+      "reservations": "My table reservations",
+      "noReservations": "No table reservations yet.",
+      "number": "Reference",
+      "date": "Date",
+      "status": "Status",
+      "total": "Total",
+      "view": "View",
+      "guests_one": "{{count}} guest",
+      "guests_other": "{{count}} guests"
+    }
+  },
+  "checkout": {
+    "eyebrow": "Checkout",
+    "title": "Your order",
+    "titleTable": "Your table",
+    "steps": {
+      "mode": "How would you like it?",
+      "when": "When?",
+      "guests": "How many guests?",
+      "address": "Where should we deliver?",
+      "details": "Your details",
+      "payment": "Payment"
+    },
+    "noDays": "No time is open for this right now. Call us and we will find a solution.",
+    "pickTime": "Choose a time",
+    "full": "Full",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "fields": {
+      "name": "Full name",
+      "email": "E-mail",
+      "phone": "Phone",
+      "line1": "Street and number",
+      "line2": "Floor, apartment (optional)",
+      "postalCode": "Postcode",
+      "city": "Town",
+      "notes": "Comment (optional)",
+      "notesPh": "Allergies, door code, occasion…"
+    },
+    "zone": {
+      "enterCode": "Enter your postcode to see the delivery fee.",
+      "fee": "Delivery {{fee}}",
+      "min": "minimum {{min}}",
+      "free": "free from {{free}}",
+      "outside": "We do not deliver to this postcode yet.",
+      "choosePickup": "Choose pickup instead",
+      "belowMin": "Add {{missing}} more to reach the {{min}} delivery minimum.",
+      "freeNow": "Delivery is free"
+    },
+    "preorder": {
+      "label": "Pre-order dishes and drinks",
+      "hint": "Served when you arrive, prepared in advance.",
+      "empty": "Your bag is empty: add a few dishes from the counter to pre-order.",
+      "toCounter": "Browse the counter"
+    },
+    "payment": {
+      "onsite": "Pay at the shop",
+      "onsiteHint": "By card or cash when you collect your order.",
+      "onsiteTable": "Pay at the table",
+      "onsiteTableHint": "Settle at the end of your visit.",
+      "transfer": "Bank transfer",
+      "transferHint": "We prepare your order as soon as the transfer arrives. The details follow on the next page and by e-mail."
+    },
+    "summary": "Summary",
+    "editBag": "Edit",
+    "subtotal": "Subtotal",
+    "delivery": "Delivery",
+    "free": "Free",
+    "total": "Total",
+    "toChoose": "To be confirmed",
+    "reservation": "Table for {{count}}",
+    "noPreorder": "No pre-order: you choose on the spot.",
+    "submit": "Place order",
+    "submitTable": "Send my request",
+    "sending": "Sending…",
+    "signedOut": "Have an account?",
+    "signIn": "Sign in",
+    "signInHint": "to fill this in faster and find your orders later.",
+    "footnote": "Prices include VAT. Every table request is confirmed by the House.",
+    "emptyTitle": "Your bag is empty",
+    "emptyText": "Add a few treasures from the shop or the counter, or book a table.",
+    "bookTable": "Book a table",
+    "when": "When"
+  },
+  "order": {
+    "eyebrow": "Order {{number}}",
+    "reservationEyebrow": "Reservation {{number}}",
+    "thanks": "Thank you, {{name}}",
+    "emailSent": "A confirmation has been sent to {{email}}.",
+    "intro": {
+      "pickup": "We are preparing your order for pickup at the shop.",
+      "delivery": "We are preparing your order for delivery.",
+      "awaiting": "Your order is reserved. We confirm and prepare it as soon as your transfer arrives.",
+      "table": "We have your request and will confirm your table very soon.",
+      "accepted": "Your table is confirmed. We look forward to welcoming you.",
+      "cancelled": "This order has been cancelled.",
+      "rejected": "We are sorry: we cannot welcome you at that time."
+    },
+    "status": {
+      "pending": "Being confirmed",
+      "awaiting_payment": "Awaiting your transfer",
+      "confirmed": "Confirmed",
+      "ready": "Ready",
+      "out_for_delivery": "On its way",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded"
+    },
+    "reservationStatus": {
+      "pending": "Awaiting confirmation",
+      "accepted": "Confirmed",
+      "rejected": "Declined",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    },
+    "modes": {
+      "pickup": "Pickup at the shop",
+      "delivery": "Delivery",
+      "table": "Table"
+    },
+    "when": "When",
+    "where": "Where",
+    "guests": "Guests",
+    "items": "Your items",
+    "payment": "Payment",
+    "preorder": "Pre-order",
+    "payOnsite": "To pay at the shop",
+    "payTable": "To pay at the table",
+    "payTransfer": "Bank transfer",
+    "paid": "Paid",
+    "transfer": {
+      "title": "Bank transfer details",
+      "beneficiary": "Beneficiary",
+      "iban": "IBAN",
+      "bic": "BIC",
+      "reference": "Reference",
+      "amount": "Amount",
+      "note": "Please use the reference so we can match your payment.",
+      "missing": "We will send you our bank details by e-mail."
+    },
+    "invalidTitle": "This link is not valid",
+    "invalidText": "Open the link from your confirmation e-mail, or sign in to see your orders.",
+    "continue": "Continue shopping",
+    "myOrders": "My orders",
+    "print": "Print"
   }
 }

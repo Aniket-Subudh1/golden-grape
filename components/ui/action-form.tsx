@@ -82,10 +82,10 @@ export function ActionForm<T>({ action, messages, done, onSuccess, keepValues, c
 }
 
 /** Submit button that shows `pendingLabel` and is disabled while the action runs. */
-export function SubmitButton({ label, pendingLabel, ...props }: ComponentProps<typeof Button> & { label: string; pendingLabel: string }) {
+export function SubmitButton({ label, pendingLabel, disabled, ...props }: ComponentProps<typeof Button> & { label: string; pendingLabel: string }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending} {...props}>
+    <Button type="submit" disabled={pending || disabled} {...props}>
       {pending ? pendingLabel : label}
     </Button>
   );

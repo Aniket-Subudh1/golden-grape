@@ -1,11 +1,11 @@
-import type { CollectionConfig } from 'payload';
-import { hiddenUnless, isStaff, published } from '@/lib/access';
-import { autoSlug, addButton, l, scaledNumber, seoSection } from '@/lib/admin';
+import type { CollectionConfig, Field } from 'payload';
+import { hiddenUnless, isStaff, none, published, staffOrSelf } from '@/lib/access';
+import { autoSlug, addButton, badgeCell, emptyList, l, listOnly, scaledNumber, seoSection } from '@/lib/admin';
+import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { revalidateTagHook } from '@/lib/revalidate';
 
 const editors = isStaff('manager');
 
-// Content only in M1.3; bookings (eventBookings, the `booked` counter) arrive in M2.3.
 export const events: CollectionConfig = {
   slug: 'events',
   labels: {
@@ -86,11 +86,91 @@ export const events: CollectionConfig = {
         },
       ],
     },
-    // Filled by bookings from M2.3; never typed by staff.
+    // Seats taken, written only by the booking service with a conditional $inc (service.ts); never typed by staff.
     { name: 'booked', type: 'number', defaultValue: 0, access: { create: () => false, update: () => false }, admin: { hidden: true } },
     seoSection([
       { name: 'title', type: 'text', localized: true, label: l('Titre dans Google', 'Title in Google', 'Titel bei Google', 'Título no Google') },
       { name: 'description', type: 'textarea', localized: true, label: l('Texte dans Google', 'Text in Google', 'Text bei Google', 'Texto no Google') },
     ]),
+  ],
+};
+
+export const BOOKING_STATUS = {
+  pending: l('À confirmer', 'To confirm', 'Zu bestätigen', 'Por confirmar'),
+  confirmed: l('Confirmée', 'Confirmed', 'Bestätigt', 'Confirmada'),
+  cancelled: l('Annulée', 'Cancelled', 'Storniert', 'Cancelada'),
+};
+
+// Written only by bookEvent and the staff booking actions (service.ts), so `events.booked` always matches.
+export const eventBookings: CollectionConfig = {
+  slug: 'eventBookings',
+  labels: {
+    singular: l('Réservation d’événement', 'Event booking', 'Veranstaltungsbuchung', 'Reserva de evento'),
+    plural: l('Places réservées', 'Event bookings', 'Veranstaltungsbuchungen', 'Reservas de eventos'),
+  },
+  admin: {
+    defaultColumns: ['event', 'contact', 'guests', 'status', 'createdAt'],
+    hidden: hiddenUnless('sales'),
+    listSearchableFields: ['contact.name', 'contact.email', 'contact.phone'],
+    description: l(
+      'Les places réservées depuis la page Événements. Les événements payants se règlent sur place.',
+      'Seats booked from the Events page. Paid events are paid on site.',
+      'Auf der Veranstaltungsseite gebuchte Plätze. Kostenpflichtige Veranstaltungen werden vor Ort bezahlt.',
+      'Lugares reservados na página Eventos. Os eventos pagos são pagos no local.',
+    ),
+    components: emptyList({
+      icon: 'bookings',
+      title: l('Aucune réservation d’événement', 'No event bookings yet', 'Noch keine Buchungen', 'Ainda sem reservas de eventos'),
+      text: l(
+        'Quand un client réserve des places pour un événement, la réservation apparaît ici.',
+        'When a customer books seats for an event, the booking appears here.',
+        'Wenn ein Kunde Plätze für eine Veranstaltung bucht, erscheint die Buchung hier.',
+        'Quando um cliente reserva lugares para um evento, a reserva aparece aqui.',
+      ),
+    }),
+  },
+  access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
+  defaultSort: '-createdAt',
+  fields: [
+    { name: 'panel', type: 'ui', admin: { components: { Field: '@/modules/events/admin/booking-panel' } } },
+    ...(
+      [
+        { name: 'event', type: 'relationship', relationTo: 'events', required: true, index: true, label: l('Événement', 'Event', 'Veranstaltung', 'Evento') },
+        { name: 'idempotencyKey', type: 'text', required: true, unique: true, admin: { disableListColumn: true, disableListFilter: true } },
+        { name: 'customer', type: 'relationship', relationTo: 'customers', label: l('Compte client', 'Customer account', 'Kundenkonto', 'Conta de cliente') },
+        {
+          name: 'contact',
+          type: 'group',
+          label: l('Client', 'Customer', 'Kunde', 'Cliente'),
+          admin: { components: { Cell: '@/modules/sales/admin/cells#ContactCell' } },
+          fields: [
+            { name: 'name', type: 'text', required: true, label: l('Nom', 'Name', 'Name', 'Nome') },
+            { name: 'email', type: 'email', required: true, label: l('E-mail', 'E-mail', 'E-Mail', 'E-mail') },
+            { name: 'phone', type: 'text', required: true, label: l('Téléphone', 'Phone', 'Telefon', 'Telefone') },
+          ],
+        },
+        { name: 'guests', type: 'number', required: true, min: 1, label: l('Personnes', 'Guests', 'Personen', 'Pessoas') },
+        { name: 'amountCents', type: 'number', defaultValue: 0, label: l('Total', 'Total', 'Summe', 'Total'), admin: { components: scaledNumber('€') } },
+        {
+          name: 'status',
+          type: 'select',
+          required: true,
+          defaultValue: 'pending',
+          index: true,
+          label: l('Statut', 'Status', 'Status', 'Estado'),
+          options: (Object.keys(BOOKING_STATUS) as (keyof typeof BOOKING_STATUS)[]).map((value) => ({ value, label: BOOKING_STATUS[value] })),
+          admin: { components: badgeCell({ pending: 'warning', confirmed: 'success', cancelled: 'danger' }) },
+        },
+        { name: 'notes', type: 'textarea', label: l('Message du client', 'Customer’s message', 'Nachricht des Kunden', 'Mensagem do cliente') },
+        {
+          name: 'locale',
+          type: 'select',
+          required: true,
+          defaultValue: 'fr',
+          label: l('Langue du client', 'Customer’s language', 'Sprache des Kunden', 'Língua do cliente'),
+          options: LOCALES.map((value) => ({ value, label: LOCALE_NAMES[value] })),
+        },
+      ] as Field[]
+    ).map(listOnly),
   ],
 };

@@ -108,8 +108,25 @@ export const businessSettings: GlobalConfig = {
                     },
                   },
                 ),
-                { name: 'iban', type: 'text', admin: later },
-                { name: 'bic', type: 'text', admin: later },
+                // Shown to customers who pay by bank transfer (order page and e-mail), with the order number as reference.
+                row(
+                  {
+                    name: 'iban',
+                    type: 'text',
+                    label: l('IBAN (pour les virements)', 'IBAN (for bank transfers)', 'IBAN (für Überweisungen)', 'IBAN (para transferências)'),
+                    admin: {
+                      width: '60%',
+                      placeholder: 'LU28 0019 4006 4475 0000',
+                      description: l(
+                        'Affiché aux clients qui paient par virement, avec le numéro de commande comme communication.',
+                        'Shown to customers who pay by transfer, with the order number as the reference.',
+                        'Wird Kunden mit Überweisung angezeigt, mit der Bestellnummer als Verwendungszweck.',
+                        'Mostrado aos clientes que pagam por transferência, com o número da encomenda como referência.',
+                      ),
+                    },
+                  },
+                  { name: 'bic', type: 'text', label: l('BIC', 'BIC', 'BIC', 'BIC'), admin: { width: '40%', placeholder: 'BCEELULL' } },
+                ),
               ],
             },
           ],
@@ -185,6 +202,7 @@ export const businessSettings: GlobalConfig = {
         def('deliveryNote', 'DN-{YYYY}-{00000}'),
         def('order', 'ORD-{YYYY}-{00000}'),
         def('cateringRequest', 'REQ-{YYYY}-{0000}'),
+        def('reservation', 'RES-{YYYY}-{00000}'),
       ],
     },
     {

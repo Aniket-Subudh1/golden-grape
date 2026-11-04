@@ -121,8 +121,8 @@ export const stockMovements: CollectionConfig = {
         { value: 'backoffice', label: l('Espace gestion', 'Back office', 'Verwaltung', 'Gestão') },
       ],
     },
-    // Orders, purchase orders and POS imports join this list when their milestones create them.
-    { name: 'ref', type: 'relationship', relationTo: ['stockCounts'], label: l('Origine', 'Source', 'Ursprung', 'Origem') },
+    // Purchase orders and POS imports join this list when their milestones create them.
+    { name: 'ref', type: 'relationship', relationTo: ['stockCounts', 'orders'], label: l('Origine', 'Source', 'Ursprung', 'Origem') },
     { name: 'user', type: 'relationship', relationTo: 'users', label: l('Par', 'By', 'Von', 'Por') },
   ],
   custom: { indexes: [{ fields: { variant: 1, createdAt: -1 } }, { fields: { 'ref.value': 1 } }] },

@@ -38,7 +38,7 @@ Brand motifs added for personality (Aniket's request): the azulejo tile (`bg-azu
 
 ### 3.1 `components/ui/` (shadcn, port only these)
 
-`button` (the base; our `Button` in §3.2 wraps or replaces it), `sheet` (cart, shop filters on phones; **built on the native `<dialog>`** in `components/ui/sheet.tsx`, since M2.2 adds no package: the browser traps focus, closes on Escape and draws the backdrop), `dialog` (event booking), `sonner` (toasts), `input`, `textarea`, `select`, `label`, `checkbox`, `radio-group`, `calendar` + `popover` (slot date picker), `table` (staff lists), `tabs` (staff screens), `badge`, `skeleton`, `separator`. Add another primitive only when a milestone needs it. The prototype's other ~30 primitives are **not** ported.
+`button` (the base; our `Button` in §3.2 wraps or replaces it), `sheet` (cart, shop filters on phones; **built on the native `<dialog>`** in `components/ui/sheet.tsx`, since M2.2 adds no package: the browser traps focus, closes on Escape and draws the backdrop), `dialog` (event booking: the `Sheet` with `variant="center"`, M2.3), `sonner` (toasts), `input`, `textarea`, `select`, `label`, `checkbox`, `radio-group`, `calendar` + `popover` (not ported: the slot picker uses day chips, M2.3), `table` (staff lists), `tabs` (staff screens), `badge`, `skeleton`, `separator`. Add another primitive only when a milestone needs it. The prototype's other ~30 primitives are **not** ported.
 
 ### 3.2 Our components: each replaces repeated prototype markup
 
@@ -139,3 +139,7 @@ Route group `app/(staff)/staff/`, protected by staff auth in `proxy.ts` plus a s
 - Visible focus ring: `focus-visible:outline-gold-deep`.
 - Honour `prefers-reduced-motion` in `Reveal` and in `animate-slow-zoom`.
 - Use `next/image` with `sizes` for every CMS and product image.
+
+### Documents written by services (M2.3)
+Orders, table reservations and event bookings are never edited field by field. Their admin page is one summary (`components/admin/doc-panel.tsx`): a header with the status badge and a one-line summary, three cards (customer, slot, payment), the items with totals and VAT, the customer's message and the history (when, what, who, why). Under the header, `components/admin/decision-bar.tsx` offers only the moves the state machine allows; each one first says what will happen (stock, e-mail), asks for an optional reason when it undoes something, then reloads the page.
+

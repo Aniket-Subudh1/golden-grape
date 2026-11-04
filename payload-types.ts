@@ -88,6 +88,12 @@ export interface Config {
     stockCounts: StockCount;
     customers: Customer;
     customerGroups: CustomerGroup;
+    orders: Order;
+    reservations: Reservation;
+    slotRules: SlotRule;
+    deliveryZones: DeliveryZone;
+    eventBookings: EventBooking;
+    payments: Payment;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -122,6 +128,12 @@ export interface Config {
     stockCounts: StockCountsSelect<false> | StockCountsSelect<true>;
     customers: CustomersSelect<false> | CustomersSelect<true>;
     customerGroups: CustomerGroupsSelect<false> | CustomerGroupsSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    reservations: ReservationsSelect<false> | ReservationsSelect<true>;
+    slotRules: SlotRulesSelect<false> | SlotRulesSelect<true>;
+    deliveryZones: DeliveryZonesSelect<false> | DeliveryZonesSelect<true>;
+    eventBookings: EventBookingsSelect<false> | EventBookingsSelect<true>;
+    payments: PaymentsSelect<false> | PaymentsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -768,10 +780,15 @@ export interface StockMovement {
   type: 'sale' | 'return' | 'cancel' | 'adjustment' | 'count' | 'receipt' | 'pos_import';
   reason?: string | null;
   channel: 'webshop' | 'mobile' | 'pos' | 'backoffice';
-  ref?: {
-    relationTo: 'stockCounts';
-    value: string | StockCount;
-  } | null;
+  ref?:
+    | ({
+        relationTo: 'stockCounts';
+        value: string | StockCount;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: string | Order;
+      } | null);
   user?: (string | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -796,6 +813,102 @@ export interface StockCount {
         variant: string | Variant;
         counted: number;
         expected?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Website orders, soonest first. Open one to confirm, prepare or cancel it.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: string;
+  number?: string | null;
+  status?:
+    | (
+        | 'pending'
+        | 'awaiting_payment'
+        | 'confirmed'
+        | 'ready'
+        | 'out_for_delivery'
+        | 'completed'
+        | 'cancelled'
+        | 'refunded'
+      )
+    | null;
+  channel?: ('webshop' | 'mobile' | 'pos') | null;
+  mode?: ('pickup' | 'delivery' | 'table' | 'b2b' | 'instore') | null;
+  idempotencyKey?: string | null;
+  customer?: (string | null) | Customer;
+  contact?: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  address?: {
+    line1?: string | null;
+    line2?: string | null;
+    postalCode?: string | null;
+    city?: string | null;
+    country?: string | null;
+  };
+  slot?: {
+    date?: string | null;
+    from?: string | null;
+    to?: string | null;
+  };
+  slotAt?: string | null;
+  lines?:
+    | {
+        variant: string | Variant;
+        unit?: (string | null) | PackagingUnit;
+        unitQty: number;
+        baseQty: number;
+        name: string;
+        detail?: string | null;
+        unitPriceCents: number;
+        discountCents?: number | null;
+        vatBp: number;
+        totalCents: number;
+        id?: string | null;
+      }[]
+    | null;
+  totals?: {
+    subtotalCents: number;
+    discountCents?: number | null;
+    deliveryCents?: number | null;
+    vatCents: number;
+    totalCents: number;
+    vatBreakdown?:
+      | {
+          rateBp?: number | null;
+          baseCents?: number | null;
+          vatCents?: number | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  payment?: {
+    provider?: ('manual' | 'wallee') | null;
+    method?: ('onsite' | 'transfer' | 'invoice' | 'card') | null;
+    status?: ('none' | 'pending' | 'authorized' | 'paid' | 'refunded' | 'voided') | null;
+    ref?: string | null;
+  };
+  locale?: ('fr' | 'en' | 'de' | 'pt') | null;
+  staff?: (string | null) | User;
+  stockPosted?: boolean | null;
+  notes?: string | null;
+  history?:
+    | {
+        at?: string | null;
+        from?: string | null;
+        to?: string | null;
+        user?: (string | null) | User;
+        reason?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -861,6 +974,343 @@ export interface Customer {
 export interface CustomerGroup {
   id: string;
   name: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Table requests from the website. Accept or decline: the customer gets an e-mail in their language.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reservations".
+ */
+export interface Reservation {
+  id: string;
+  number?: string | null;
+  status?: ('pending' | 'accepted' | 'rejected' | 'cancelled' | 'completed') | null;
+  idempotencyKey?: string | null;
+  customer?: (string | null) | Customer;
+  contact?: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  slot?: {
+    date: string;
+    from: string;
+    to?: string | null;
+  };
+  slotAt?: string | null;
+  guests?: number | null;
+  preorder?: (string | null) | Order;
+  notes?: string | null;
+  locale?: ('fr' | 'en' | 'de' | 'pt') | null;
+  history?:
+    | {
+        at?: string | null;
+        from?: string | null;
+        to?: string | null;
+        user?: (string | null) | User;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * How the website offers times: one rule for pickup, one for delivery, one for tables.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "slotRules".
+ */
+export interface SlotRule {
+  id: string;
+  mode: 'pickup' | 'delivery' | 'table';
+  intervalMin: number;
+  /**
+   * Orders; for tables: guests.
+   */
+  capacityPerSlot: number;
+  /**
+   * Time to prepare.
+   */
+  leadTimeMin: number;
+  maxDaysAhead: number;
+  /**
+   * Empty: the shop’s opening hours. Otherwise, only these days and times.
+   */
+  days?:
+    | {
+        day: '0' | '1' | '2' | '3' | '4' | '5' | '6';
+        open:
+          | '00:00'
+          | '00:15'
+          | '00:30'
+          | '00:45'
+          | '01:00'
+          | '01:15'
+          | '01:30'
+          | '01:45'
+          | '02:00'
+          | '02:15'
+          | '02:30'
+          | '02:45'
+          | '03:00'
+          | '03:15'
+          | '03:30'
+          | '03:45'
+          | '04:00'
+          | '04:15'
+          | '04:30'
+          | '04:45'
+          | '05:00'
+          | '05:15'
+          | '05:30'
+          | '05:45'
+          | '06:00'
+          | '06:15'
+          | '06:30'
+          | '06:45'
+          | '07:00'
+          | '07:15'
+          | '07:30'
+          | '07:45'
+          | '08:00'
+          | '08:15'
+          | '08:30'
+          | '08:45'
+          | '09:00'
+          | '09:15'
+          | '09:30'
+          | '09:45'
+          | '10:00'
+          | '10:15'
+          | '10:30'
+          | '10:45'
+          | '11:00'
+          | '11:15'
+          | '11:30'
+          | '11:45'
+          | '12:00'
+          | '12:15'
+          | '12:30'
+          | '12:45'
+          | '13:00'
+          | '13:15'
+          | '13:30'
+          | '13:45'
+          | '14:00'
+          | '14:15'
+          | '14:30'
+          | '14:45'
+          | '15:00'
+          | '15:15'
+          | '15:30'
+          | '15:45'
+          | '16:00'
+          | '16:15'
+          | '16:30'
+          | '16:45'
+          | '17:00'
+          | '17:15'
+          | '17:30'
+          | '17:45'
+          | '18:00'
+          | '18:15'
+          | '18:30'
+          | '18:45'
+          | '19:00'
+          | '19:15'
+          | '19:30'
+          | '19:45'
+          | '20:00'
+          | '20:15'
+          | '20:30'
+          | '20:45'
+          | '21:00'
+          | '21:15'
+          | '21:30'
+          | '21:45'
+          | '22:00'
+          | '22:15'
+          | '22:30'
+          | '22:45'
+          | '23:00'
+          | '23:15'
+          | '23:30'
+          | '23:45';
+        close:
+          | '00:00'
+          | '00:15'
+          | '00:30'
+          | '00:45'
+          | '01:00'
+          | '01:15'
+          | '01:30'
+          | '01:45'
+          | '02:00'
+          | '02:15'
+          | '02:30'
+          | '02:45'
+          | '03:00'
+          | '03:15'
+          | '03:30'
+          | '03:45'
+          | '04:00'
+          | '04:15'
+          | '04:30'
+          | '04:45'
+          | '05:00'
+          | '05:15'
+          | '05:30'
+          | '05:45'
+          | '06:00'
+          | '06:15'
+          | '06:30'
+          | '06:45'
+          | '07:00'
+          | '07:15'
+          | '07:30'
+          | '07:45'
+          | '08:00'
+          | '08:15'
+          | '08:30'
+          | '08:45'
+          | '09:00'
+          | '09:15'
+          | '09:30'
+          | '09:45'
+          | '10:00'
+          | '10:15'
+          | '10:30'
+          | '10:45'
+          | '11:00'
+          | '11:15'
+          | '11:30'
+          | '11:45'
+          | '12:00'
+          | '12:15'
+          | '12:30'
+          | '12:45'
+          | '13:00'
+          | '13:15'
+          | '13:30'
+          | '13:45'
+          | '14:00'
+          | '14:15'
+          | '14:30'
+          | '14:45'
+          | '15:00'
+          | '15:15'
+          | '15:30'
+          | '15:45'
+          | '16:00'
+          | '16:15'
+          | '16:30'
+          | '16:45'
+          | '17:00'
+          | '17:15'
+          | '17:30'
+          | '17:45'
+          | '18:00'
+          | '18:15'
+          | '18:30'
+          | '18:45'
+          | '19:00'
+          | '19:15'
+          | '19:30'
+          | '19:45'
+          | '20:00'
+          | '20:15'
+          | '20:30'
+          | '20:45'
+          | '21:00'
+          | '21:15'
+          | '21:30'
+          | '21:45'
+          | '22:00'
+          | '22:15'
+          | '22:30'
+          | '22:45'
+          | '23:00'
+          | '23:15'
+          | '23:30'
+          | '23:45';
+        id?: string | null;
+      }[]
+    | null;
+  lockVersion?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Where you deliver, at what price and from which amount. A postcode outside every area is offered pickup.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "deliveryZones".
+ */
+export interface DeliveryZone {
+  id: string;
+  name: string;
+  active?: boolean | null;
+  /**
+   * Type a code and press Enter. “L-7795” and “7795” are the same.
+   */
+  postalCodes: string[];
+  feeCents: number;
+  minOrderCents: number;
+  freeFromCents?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Seats booked from the Events page. Paid events are paid on site.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventBookings".
+ */
+export interface EventBooking {
+  id: string;
+  event?: (string | null) | Event;
+  idempotencyKey?: string | null;
+  customer?: (string | null) | Customer;
+  contact?: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  guests?: number | null;
+  amountCents?: number | null;
+  status?: ('pending' | 'confirmed' | 'cancelled') | null;
+  notes?: string | null;
+  locale?: ('fr' | 'en' | 'de' | 'pt') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Every payment and refund recorded on an order. Nothing here can be changed.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payments".
+ */
+export interface Payment {
+  id: string;
+  order: string | Order;
+  provider: 'manual' | 'wallee';
+  kind: 'charge' | 'refund' | 'authorization' | 'capture' | 'void';
+  amountCents: number;
+  method?: string | null;
+  status: string;
+  providerRef?: string | null;
+  user?: (string | null) | User;
+  raw?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -967,6 +1417,30 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'customerGroups';
         value: string | CustomerGroup;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: string | Order;
+      } | null)
+    | ({
+        relationTo: 'reservations';
+        value: string | Reservation;
+      } | null)
+    | ({
+        relationTo: 'slotRules';
+        value: string | SlotRule;
+      } | null)
+    | ({
+        relationTo: 'deliveryZones';
+        value: string | DeliveryZone;
+      } | null)
+    | ({
+        relationTo: 'eventBookings';
+        value: string | EventBooking;
+      } | null)
+    | ({
+        relationTo: 'payments';
+        value: string | Payment;
       } | null);
   globalSlug?: string | null;
   user:
@@ -1517,6 +1991,214 @@ export interface CustomerGroupsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  number?: T;
+  status?: T;
+  channel?: T;
+  mode?: T;
+  idempotencyKey?: T;
+  customer?: T;
+  contact?:
+    | T
+    | {
+        name?: T;
+        email?: T;
+        phone?: T;
+      };
+  address?:
+    | T
+    | {
+        line1?: T;
+        line2?: T;
+        postalCode?: T;
+        city?: T;
+        country?: T;
+      };
+  slot?:
+    | T
+    | {
+        date?: T;
+        from?: T;
+        to?: T;
+      };
+  slotAt?: T;
+  lines?:
+    | T
+    | {
+        variant?: T;
+        unit?: T;
+        unitQty?: T;
+        baseQty?: T;
+        name?: T;
+        detail?: T;
+        unitPriceCents?: T;
+        discountCents?: T;
+        vatBp?: T;
+        totalCents?: T;
+        id?: T;
+      };
+  totals?:
+    | T
+    | {
+        subtotalCents?: T;
+        discountCents?: T;
+        deliveryCents?: T;
+        vatCents?: T;
+        totalCents?: T;
+        vatBreakdown?:
+          | T
+          | {
+              rateBp?: T;
+              baseCents?: T;
+              vatCents?: T;
+              id?: T;
+            };
+      };
+  payment?:
+    | T
+    | {
+        provider?: T;
+        method?: T;
+        status?: T;
+        ref?: T;
+      };
+  locale?: T;
+  staff?: T;
+  stockPosted?: T;
+  notes?: T;
+  history?:
+    | T
+    | {
+        at?: T;
+        from?: T;
+        to?: T;
+        user?: T;
+        reason?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reservations_select".
+ */
+export interface ReservationsSelect<T extends boolean = true> {
+  number?: T;
+  status?: T;
+  idempotencyKey?: T;
+  customer?: T;
+  contact?:
+    | T
+    | {
+        name?: T;
+        email?: T;
+        phone?: T;
+      };
+  slot?:
+    | T
+    | {
+        date?: T;
+        from?: T;
+        to?: T;
+      };
+  slotAt?: T;
+  guests?: T;
+  preorder?: T;
+  notes?: T;
+  locale?: T;
+  history?:
+    | T
+    | {
+        at?: T;
+        from?: T;
+        to?: T;
+        user?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "slotRules_select".
+ */
+export interface SlotRulesSelect<T extends boolean = true> {
+  mode?: T;
+  intervalMin?: T;
+  capacityPerSlot?: T;
+  leadTimeMin?: T;
+  maxDaysAhead?: T;
+  days?:
+    | T
+    | {
+        day?: T;
+        open?: T;
+        close?: T;
+        id?: T;
+      };
+  lockVersion?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "deliveryZones_select".
+ */
+export interface DeliveryZonesSelect<T extends boolean = true> {
+  name?: T;
+  active?: T;
+  postalCodes?: T;
+  feeCents?: T;
+  minOrderCents?: T;
+  freeFromCents?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventBookings_select".
+ */
+export interface EventBookingsSelect<T extends boolean = true> {
+  event?: T;
+  idempotencyKey?: T;
+  customer?: T;
+  contact?:
+    | T
+    | {
+        name?: T;
+        email?: T;
+        phone?: T;
+      };
+  guests?: T;
+  amountCents?: T;
+  status?: T;
+  notes?: T;
+  locale?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payments_select".
+ */
+export interface PaymentsSelect<T extends boolean = true> {
+  order?: T;
+  provider?: T;
+  kind?: T;
+  amountCents?: T;
+  method?: T;
+  status?: T;
+  providerRef?: T;
+  user?: T;
+  raw?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1814,6 +2496,7 @@ export interface BusinessSetting {
     deliveryNote?: string | null;
     order?: string | null;
     cateringRequest?: string | null;
+    reservation?: string | null;
   };
   alerts?: {
     defaultLowStock?: number | null;
@@ -2198,6 +2881,7 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
         deliveryNote?: T;
         order?: T;
         cateringRequest?: T;
+        reservation?: T;
       };
   alerts?:
     | T

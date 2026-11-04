@@ -58,3 +58,33 @@ describe('quote v1', () => {
     expect(run([])).toMatchObject({ totalCents: 0, vatCents: 0, vatBreakdown: [], amountDueCents: 0 });
   });
 });
+
+describe('quote: delivery (step 4)', () => {
+  const deliver = (lines: { variant: string; qty: number }[], delivery: QuoteRules['delivery']) =>
+    quote({ lines, channel: 'webshop', now: new Date(), catalogue, rules: { ...rules, delivery } });
+
+  it('adds the fee to the total, with standard VAT in the breakdown', () => {
+    const q = deliver([{ variant: 'cheese', qty: 1 }], { feeCents: 500, freeFromCents: 8000 });
+    expect(q).toMatchObject({ subtotalCents: 1800, deliveryCents: 500, totalCents: 2300, amountDueCents: 2300 });
+    expect(q.vatBreakdown).toEqual([
+      { rateBp: 1700, baseCents: 427, vatCents: 73 },
+      { rateBp: 300, baseCents: 1748, vatCents: 52 },
+    ]);
+    expect(q.vatCents).toBe(125);
+  });
+
+  it('merges the fee into an existing standard-rate group', () => {
+    const q = deliver([{ variant: 'wine', qty: 1 }], { feeCents: 500 });
+    expect(q.vatBreakdown).toEqual([{ rateBp: 1700, baseCents: 2136, vatCents: 363 }]);
+  });
+
+  it('is free at the threshold, charged one cent below it', () => {
+    expect(deliver([{ variant: 'wine', qty: 4 }], { feeCents: 500, freeFromCents: 7996 }).deliveryCents).toBe(0);
+    expect(deliver([{ variant: 'wine', qty: 4 }], { feeCents: 500, freeFromCents: 7997 }).deliveryCents).toBe(500);
+  });
+
+  it('no delivery rule (pickup, table) or an empty cart → no fee', () => {
+    expect(deliver([{ variant: 'wine', qty: 1 }], null).deliveryCents).toBe(0);
+    expect(deliver([], { feeCents: 500 }).totalCents).toBe(0);
+  });
+});

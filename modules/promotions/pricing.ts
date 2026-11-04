@@ -1,9 +1,9 @@
 import { add, mulQty, vatFromGross } from '@/lib/money';
 
 // The one pricing engine (02 §5.2, 04 §6). Pure: no Payload import. Every price shown or charged comes from `quote`.
-// v1 (M2.2) implements step 1 with the public price only and step 5 (VAT per rate). Steps 2, 3, 4, 6 and 7 are
-// no-ops that M2.3 (delivery) and M3.2 (price lists, promotions, codes, loyalty, gift cards) fill in; the input and
-// output types are already final, so callers do not change.
+// Implemented: step 1 with the public price (M2.2), step 4 delivery (M2.3) and step 5 (VAT per rate). Steps 2, 3, 6
+// and 7 are no-ops that M3.2 (price lists, promotions, codes, loyalty, gift cards) fills in; the input and output
+// types are already final, so callers do not change.
 
 export type Channel = 'webshop' | 'mobile' | 'pos';
 export type VatClass = 'standard' | 'intermediate' | 'reduced' | 'superReduced';
@@ -93,14 +93,19 @@ export function quote(input: QuoteInput): Quote {
     };
   });
 
-  // Steps 2–4 (promotion, code, delivery): M2.3 and M3.2.
+  // Steps 2–3 (promotion, code): M3.2.
   const subtotalCents = add(...lines.map((l) => l.totalCents));
   const discountCents = 0;
-  const deliveryCents = 0;
+
+  // Step 4: delivery, free from the zone's threshold (on the discounted goods total). The fee carries standard VAT.
+  const goodsCents = subtotalCents - discountCents;
+  const delivery = rules.delivery;
+  const deliveryCents = delivery && lines.length > 0 && !(delivery.freeFromCents != null && goodsCents >= delivery.freeFromCents) ? delivery.feeCents : 0;
 
   // Step 5: VAT per rate group, so the breakdown matches the invoice.
   const byRate = new Map<number, number>();
   for (const line of lines) byRate.set(line.vatBp, (byRate.get(line.vatBp) ?? 0) + line.totalCents - line.discountCents);
+  if (deliveryCents > 0) byRate.set(rules.vatRates.standard, (byRate.get(rules.vatRates.standard) ?? 0) + deliveryCents);
   const vatBreakdown = [...byRate.entries()]
     .sort(([a], [b]) => b - a)
     .map(([rateBp, grossCents]) => {

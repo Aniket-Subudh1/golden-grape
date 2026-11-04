@@ -39,6 +39,13 @@ import { SignedCell as SignedCell_e05f6ac9ede25467f55f09817b54f69f } from '@/com
 import { ReasonCell as ReasonCell_5bea5cab201ede96546b31bd184de260 } from '@/modules/inventory/admin/cells'
 import { default as default_4c47180b2e77f55067f27acaa2019504 } from '@/modules/inventory/admin/post-count-button'
 import { default as default_d70d7a107c8e989d5b795a0688b5fa32 } from '@/modules/inventory/admin/count-row-label'
+import { default as default_7bc2721c8713877962a76a55647681b3 } from '@/modules/sales/admin/order-panel'
+import { ContactCell as ContactCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@/modules/sales/admin/cells'
+import { SlotCell as SlotCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@/modules/sales/admin/cells'
+import { TotalCell as TotalCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@/modules/sales/admin/cells'
+import { default as default_1032e7f4a7ea2c2fe5848dd9521e5ee8 } from '@/modules/sales/admin/reservation-panel'
+import { PreorderCell as PreorderCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@/modules/sales/admin/cells'
+import { default as default_5ae1914325a0ee108216435b317303b1 } from '@/modules/events/admin/booking-panel'
 import { default as default_a2f0eccb7507197ce791108816851322 } from '@/components/admin/nav'
 import { default as default_0430f5fb3b8132a602107d7535a2a344 } from '@/components/admin/icon'
 import { default as default_334250e18ce0b45af3e0c04bb6fe8307 } from '@/components/admin/logo'
@@ -93,6 +100,13 @@ export const importMap = {
   "@/modules/inventory/admin/cells#ReasonCell": ReasonCell_5bea5cab201ede96546b31bd184de260,
   "@/modules/inventory/admin/post-count-button#default": default_4c47180b2e77f55067f27acaa2019504,
   "@/modules/inventory/admin/count-row-label#default": default_d70d7a107c8e989d5b795a0688b5fa32,
+  "@/modules/sales/admin/order-panel#default": default_7bc2721c8713877962a76a55647681b3,
+  "@/modules/sales/admin/cells#ContactCell": ContactCell_2af359ddeeb3df48a49ffdf99c6a1917,
+  "@/modules/sales/admin/cells#SlotCell": SlotCell_2af359ddeeb3df48a49ffdf99c6a1917,
+  "@/modules/sales/admin/cells#TotalCell": TotalCell_2af359ddeeb3df48a49ffdf99c6a1917,
+  "@/modules/sales/admin/reservation-panel#default": default_1032e7f4a7ea2c2fe5848dd9521e5ee8,
+  "@/modules/sales/admin/cells#PreorderCell": PreorderCell_2af359ddeeb3df48a49ffdf99c6a1917,
+  "@/modules/events/admin/booking-panel#default": default_5ae1914325a0ee108216435b317303b1,
   "@/components/admin/nav#default": default_a2f0eccb7507197ce791108816851322,
   "@/components/admin/icon#default": default_0430f5fb3b8132a602107d7535a2a344,
   "@/components/admin/logo#default": default_334250e18ce0b45af3e0c04bb6fe8307,

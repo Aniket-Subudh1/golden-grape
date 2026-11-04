@@ -97,9 +97,9 @@ modules/<name>/
 | `inventory` | `stockMovements`, `stockLevels`, `stockCounts` | **`postMovements(tx, lines)`**, `onHand(ids)`, `lowStock()` | M2.1 |
 | `customers` | `customers`, `customerGroups` | `getCustomer(id)`, `currentCustomer()` | M2.2 |
 | `webshop` | none (the cart lives in the browser: `{ variant, unit?, qty }` only) | `shopPage`, `productPage`, `counterMenu`; `CartProvider`/`useCart`, `quoteCartAction` | M2.2 |
-| `sales` | `orders`, `reservations`, `deliveryZones`, `slotRules` | `placeOrder(input)`, `transition(orderId, to)` | M2.3 |
-| `payments` | `payments` | `provider(name)`, `startPayment(order)` | M2.3 (manual), M4.1 (wallee) |
-| `events` | `events`, `eventBookings` | `upcoming(locale)`, `book(input)` | M1.3 (content), M2.3 (booking) |
+| `sales` | `orders`, `reservations`, `deliveryZones`, `slotRules` | `placeOrder(input)`, `transition(orderId, to)`, `slotCalendar(mode)`, `zoneFor(postalCode)`, `transitionReservation(id, to)` | M2.3 |
+| `payments` | `payments` | `provider(name)` → `start`, `capture`, `void`, `refund` (in the caller's transaction) | M2.3 (manual), M4.1 (wallee) |
+| `events` | `events`, `eventBookings` | `upcomingEvents(locale)`, `bookEvent(input)`, `seatsLeft(ids)` | M1.3 (content), M2.3 (booking) |
 | `catering` | `cateringPackages`, `cateringRequests` | `requestCatering(input)` | M1.3 |
 | `notifications` | none (e-mail templates only) | template components rendered by `lib/mail.ts` | M1.3 |
 | `purchasing` | `suppliers`, `supplierProducts`, `purchaseOrders` | `receive(poId, lines)`, `reorderList()` | M3.1 |

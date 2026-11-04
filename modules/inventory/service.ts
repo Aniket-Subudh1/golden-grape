@@ -15,7 +15,7 @@ export type MovementLine = {
   type: MovementType;
   reason?: string;
   channel: MovementChannel;
-  ref?: { relationTo: 'stockCounts'; value: string };
+  ref?: { relationTo: 'stockCounts' | 'orders'; value: string };
   user?: string;
 };
 

@@ -192,6 +192,16 @@
     transform: translateX(100%);
   }
 }
+.gg-sheet--center[open] > .gg-sheet__panel {
+  animation-name: gg-dialog-in;
+  animation-duration: 0.3s;
+}
+@keyframes gg-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
 @keyframes gg-fade-in {
   from {
     opacity: 0;

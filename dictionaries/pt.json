@@ -196,9 +196,9 @@
       "table": "Mesa"
     },
     "hints": {
-      "pickup": "Levante a encomenda na loja.",
-      "delivery": "Entrega na cidade em 45 min.",
-      "table": "Reserve mesa, com pré-encomenda opcional."
+      "pickup": "Levante a sua encomenda na loja, à hora escolhida.",
+      "delivery": "Entregue em sua casa, à hora escolhida.",
+      "table": "Reserve uma mesa e, se quiser, pré-encomende."
     },
     "empty": {
       "title": "Cesto vazio",
@@ -252,7 +252,9 @@
     "notices": {
       "clamped": "Quantidade ajustada ao stock disponível.",
       "removed": "Um artigo já não está disponível e foi retirado do cesto."
-    }
+    },
+    "checkout": "Finalizar",
+    "bookTable": "Reservar mesa"
   },
   "shop": {
     "eyebrow": "Loja · Vinhos & Mercearia",
@@ -414,7 +416,19 @@
       "sending": "A enviar…",
       "toastTitle": "Pedido enviado",
       "toastDesc": "{{title}} · {{count}} pessoas — confirmaremos em breve.",
-      "doneTitle": "Pedido enviado. Voltamos em breve."
+      "doneTitle": "Pedido enviado. Voltamos em breve.",
+      "email": "E-mail",
+      "emailPh": "voce@exemplo.lu",
+      "seatsLeft_one": "Só resta {{count}} lugar",
+      "seatsLeft_other": "Só restam {{count}} lugares",
+      "soldOut": "Esgotado",
+      "payOnsite": "Pago no local, no próprio dia.",
+      "freeEntry": "Entrada livre",
+      "title": "Reserve os seus lugares",
+      "doneConfirmed": "Os seus lugares estão reservados",
+      "donePending": "Os seus lugares estão guardados",
+      "doneText": "Uma confirmação vai a caminho de {{email}}.",
+      "close": "Fechar"
     },
     "empty": "Sem eventos agendados de momento. Volte em breve — ou escreva-nos para ser o primeiro a saber.",
     "back": "Todos os eventos"
@@ -540,6 +554,14 @@
     "product": {
       "title": "{{name}} · Golden Grape Luxemburgo",
       "description": "{{name}}, escolhido pela Golden Grape, a casa portuguesa do Luxemburgo."
+    },
+    "checkout": {
+      "title": "Finalizar — Golden Grape",
+      "description": "Levantamento, entrega ou mesa: escolha o horário e confirme."
+    },
+    "order": {
+      "title": "A sua encomenda — Golden Grape",
+      "description": "A sua encomenda na Golden Grape."
     }
   },
   "form": {
@@ -552,8 +574,19 @@
       "tooLong": "Este texto é demasiado longo.",
       "minGuests": "Menos convidados do que o mínimo desta proposta.",
       "dateTooSoon": "Escolha uma data com pelo menos 2 dias de antecedência.",
-      "invalid": "Valor inválido."
-    }
+      "invalid": "Valor inválido.",
+      "slotFull": "Este horário acabou de ser reservado. Escolha outro.",
+      "slotUnavailable": "Este horário já não está disponível. Escolha outro.",
+      "outsideZone": "Ainda não entregamos neste código postal.",
+      "belowMinimum": "A sua encomenda não atinge o mínimo de entrega.",
+      "cartChanged": "O seu saco mudou (stock). Verifique-o e tente de novo.",
+      "emptyCart": "O seu saco está vazio.",
+      "soldOut": "Esgotado: já não há lugares suficientes.",
+      "transition": "Esta alteração já não é possível: a página vai atualizar.",
+      "event": "Este evento já não pode ser reservado."
+    },
+    "CONFLICT": "Isto acabou de ser alterado por outra pessoa. Tente de novo.",
+    "OUT_OF_STOCK": "O seu saco mudou (stock). Verifique-o e tente de novo."
   },
   "mail": {
     "signature": "A equipa Golden Grape",
@@ -584,13 +617,89 @@
       "notes": "Comentários",
       "estimate": "Estimativa",
       "number": "Referência",
-      "language": "Idioma"
+      "language": "Idioma",
+      "mode": "Tipo",
+      "slot": "Quando",
+      "address": "Morada",
+      "items": "Artigos",
+      "qty": "Qtd.",
+      "subtotal": "Subtotal",
+      "delivery": "Entrega",
+      "total": "Total",
+      "vat": "IVA incluído {{rate}} %",
+      "payment": "Pagamento",
+      "beneficiary": "Beneficiário",
+      "iban": "IBAN",
+      "bic": "BIC",
+      "reference": "Referência",
+      "amount": "Montante",
+      "status": "Estado",
+      "event": "Evento"
     },
     "reset": {
       "subject": "Escolha uma nova palavra-passe",
       "body": "Pediu para mudar a palavra-passe da sua conta Golden Grape. A ligação abaixo é válida durante uma hora.",
       "button": "Escolher uma palavra-passe",
       "ignore": "Não fez este pedido? Ignore simplesmente este e-mail: a sua palavra-passe não muda."
+    },
+    "modes": {
+      "pickup": "Levantamento na loja",
+      "delivery": "Entrega",
+      "table": "Mesa"
+    },
+    "payments": {
+      "onsite": "A pagar na loja",
+      "transfer": "Transferência bancária",
+      "invoice": "Por fatura",
+      "card": "Cartão"
+    },
+    "status": {
+      "pending": "Em confirmação",
+      "awaiting_payment": "A aguardar a sua transferência",
+      "confirmed": "Confirmada",
+      "ready": "Pronta",
+      "out_for_delivery": "A caminho",
+      "completed": "Concluída",
+      "cancelled": "Cancelada",
+      "refunded": "Reembolsada"
+    },
+    "view": "Ver a minha encomenda",
+    "order": {
+      "subject": "A sua encomenda {{number}}",
+      "title": "Obrigado pela sua encomenda",
+      "confirmedBody": "A sua encomenda está confirmada. Tudo estará pronto à hora escolhida.",
+      "awaitingBody": "A sua encomenda está reservada. Assim que a transferência chegar, confirmamos e preparamos.",
+      "transferTitle": "Dados para a transferência",
+      "transferNote": "Indique a referência para identificarmos o seu pagamento.",
+      "statusSubject": "Encomenda {{number}}: {{status}}",
+      "statusBody": {
+        "confirmed": "A sua encomenda está confirmada e em preparação.",
+        "ready": "A sua encomenda está pronta. Até já na loja!",
+        "out_for_delivery": "A sua encomenda está a caminho.",
+        "cancelled": "A sua encomenda foi cancelada. Se já tinha pago, reembolsamos.",
+        "refunded": "A sua encomenda foi reembolsada."
+      },
+      "staffSubject": "Nova encomenda {{number}} — {{name}}"
+    },
+    "reservation": {
+      "pendingSubject": "O seu pedido de mesa {{number}}",
+      "pendingBody": "Recebemos o seu pedido e confirmamos muito em breve.",
+      "acceptedSubject": "A sua mesa está confirmada — {{number}}",
+      "acceptedBody": "Boas notícias: a sua mesa está confirmada. Será um prazer recebê-lo.",
+      "rejectedSubject": "O seu pedido de mesa {{number}}",
+      "rejectedBody": "Lamentamos: não o podemos receber a essa hora. Não hesite em escolher outro horário.",
+      "cancelledSubject": "A sua reserva {{number}} foi cancelada",
+      "cancelledBody": "A sua reserva foi cancelada. Esperamos vê-lo noutra ocasião.",
+      "staffSubject": "Novo pedido de mesa {{number}} — {{name}} ({{guests}})",
+      "preorder": "A sua pré-encomenda"
+    },
+    "eventBooking": {
+      "subject": "A sua reserva — {{title}}",
+      "confirmedBody": "Os seus lugares estão reservados. Até breve!",
+      "pendingBody": "Os seus lugares estão guardados. O montante paga-se no local, no próprio dia.",
+      "cancelledSubject": "A sua reserva para {{title}} foi cancelada",
+      "cancelledBody": "A sua reserva foi cancelada.",
+      "staffSubject": "Nova reserva: {{title}} — {{name}} ({{guests}})"
     }
   },
   "cookies": {
@@ -668,6 +777,152 @@
       "signedOut": "A sua sessão expirou. Entre de novo."
     },
     "expiredTitle": "Sessão expirada.",
-    "signIn": "Entrar"
+    "signIn": "Entrar",
+    "orders": {
+      "reservations": "As minhas reservas de mesa",
+      "noReservations": "Ainda sem reservas de mesa.",
+      "number": "Referência",
+      "date": "Data",
+      "status": "Estado",
+      "total": "Total",
+      "view": "Ver",
+      "guests_one": "{{count}} pessoa",
+      "guests_other": "{{count}} pessoas"
+    }
+  },
+  "checkout": {
+    "eyebrow": "Finalizar",
+    "title": "A sua encomenda",
+    "titleTable": "A sua mesa",
+    "steps": {
+      "mode": "Como a prefere?",
+      "when": "Quando?",
+      "guests": "Quantas pessoas?",
+      "address": "Onde entregamos?",
+      "details": "Os seus dados",
+      "payment": "Pagamento"
+    },
+    "noDays": "De momento não há horários disponíveis. Ligue-nos e encontramos uma solução.",
+    "pickTime": "Escolha uma hora",
+    "full": "Cheio",
+    "today": "Hoje",
+    "tomorrow": "Amanhã",
+    "fields": {
+      "name": "Nome completo",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "line1": "Rua e número",
+      "line2": "Andar, apartamento (opcional)",
+      "postalCode": "Código postal",
+      "city": "Localidade",
+      "notes": "Comentário (opcional)",
+      "notesPh": "Alergias, código da porta, ocasião…"
+    },
+    "zone": {
+      "enterCode": "Indique o seu código postal para ver a taxa de entrega.",
+      "fee": "Entrega {{fee}}",
+      "min": "mínimo {{min}}",
+      "free": "grátis a partir de {{free}}",
+      "outside": "Ainda não entregamos neste código postal.",
+      "choosePickup": "Escolher levantamento",
+      "belowMin": "Faltam {{missing}} para o mínimo de entrega de {{min}}.",
+      "freeNow": "Entrega grátis"
+    },
+    "preorder": {
+      "label": "Pré-encomendar pratos e bebidas",
+      "hint": "Preparado com antecedência, servido à sua chegada.",
+      "empty": "O seu saco está vazio: junte alguns pratos do balcão para pré-encomendar.",
+      "toCounter": "Ver o balcão"
+    },
+    "payment": {
+      "onsite": "Pagar na loja",
+      "onsiteHint": "Com cartão ou em dinheiro no levantamento.",
+      "onsiteTable": "Pagar à mesa",
+      "onsiteTableHint": "Paga no fim da sua visita.",
+      "transfer": "Transferência bancária",
+      "transferHint": "Preparamos a sua encomenda assim que a transferência chegar. Os dados seguem na próxima página e por e-mail."
+    },
+    "summary": "Resumo",
+    "editBag": "Alterar",
+    "subtotal": "Subtotal",
+    "delivery": "Entrega",
+    "free": "Grátis",
+    "total": "Total",
+    "toChoose": "A confirmar",
+    "reservation": "Mesa para {{count}}",
+    "noPreorder": "Sem pré-encomenda: escolhe no local.",
+    "submit": "Confirmar encomenda",
+    "submitTable": "Enviar pedido",
+    "sending": "A enviar…",
+    "signedOut": "Tem conta?",
+    "signIn": "Entrar",
+    "signInHint": "para preencher mais depressa e encontrar as suas encomendas.",
+    "footnote": "Preços com IVA incluído. Cada pedido de mesa é confirmado pela Casa.",
+    "emptyTitle": "O seu saco está vazio",
+    "emptyText": "Junte alguns tesouros da loja ou do balcão, ou reserve uma mesa.",
+    "bookTable": "Reservar mesa",
+    "when": "Quando"
+  },
+  "order": {
+    "eyebrow": "Encomenda {{number}}",
+    "reservationEyebrow": "Reserva {{number}}",
+    "thanks": "Obrigado, {{name}}",
+    "emailSent": "Foi enviada uma confirmação para {{email}}.",
+    "intro": {
+      "pickup": "Estamos a preparar a sua encomenda para levantar na loja.",
+      "delivery": "Estamos a preparar a sua encomenda para entrega.",
+      "awaiting": "A sua encomenda está reservada. Confirmamos e preparamos assim que a transferência chegar.",
+      "table": "Recebemos o seu pedido e confirmamos a sua mesa muito em breve.",
+      "accepted": "A sua mesa está confirmada. Será um prazer recebê-lo.",
+      "cancelled": "Esta encomenda foi cancelada.",
+      "rejected": "Lamentamos: não o podemos receber a essa hora."
+    },
+    "status": {
+      "pending": "Em confirmação",
+      "awaiting_payment": "A aguardar a sua transferência",
+      "confirmed": "Confirmada",
+      "ready": "Pronta",
+      "out_for_delivery": "A caminho",
+      "completed": "Concluída",
+      "cancelled": "Cancelada",
+      "refunded": "Reembolsada"
+    },
+    "reservationStatus": {
+      "pending": "A aguardar confirmação",
+      "accepted": "Confirmada",
+      "rejected": "Recusada",
+      "cancelled": "Cancelada",
+      "completed": "Concluída"
+    },
+    "modes": {
+      "pickup": "Levantamento na loja",
+      "delivery": "Entrega",
+      "table": "Mesa"
+    },
+    "when": "Quando",
+    "where": "Onde",
+    "guests": "Pessoas",
+    "items": "Os seus artigos",
+    "payment": "Pagamento",
+    "preorder": "Pré-encomenda",
+    "payOnsite": "A pagar na loja",
+    "payTable": "A pagar à mesa",
+    "payTransfer": "Transferência bancária",
+    "paid": "Pago",
+    "transfer": {
+      "title": "Dados para a transferência",
+      "beneficiary": "Beneficiário",
+      "iban": "IBAN",
+      "bic": "BIC",
+      "reference": "Referência",
+      "amount": "Montante",
+      "note": "Indique a referência para identificarmos o seu pagamento.",
+      "missing": "Enviamos-lhe os nossos dados bancários por e-mail."
+    },
+    "invalidTitle": "Este link não é válido",
+    "invalidText": "Abra o link do seu e-mail de confirmação, ou entre na sua conta para ver as suas encomendas.",
+    "continue": "Continuar a comprar",
+    "myOrders": "As minhas encomendas",
+    "print": "Imprimir"
   }
 }

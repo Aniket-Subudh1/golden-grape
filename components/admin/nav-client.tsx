@@ -3,6 +3,11 @@
 import { useNav, usePreferences } from '@payloadcms/ui';
 import {
   ArrowLeftRight,
+  CalendarCheck,
+  Clock,
+  MapPin,
+  ShoppingBag,
+  Ticket,
   BookOpenText,
   ClipboardCheck,
   Contact,
@@ -32,7 +37,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 
 export type NavItem = { label: string; icon: string; href: string };
 export type NavGroup = { label: string; items: NavItem[] };
@@ -48,6 +53,11 @@ const ICONS = {
   media: Images,
   legal: Scale,
   requests: ClipboardList,
+  orders: ShoppingBag,
+  reservations: CalendarCheck,
+  bookings: Ticket,
+  zones: MapPin,
+  slots: Clock,
   settings: Settings,
   header: Menu,
   footer: PanelBottom,
@@ -84,9 +94,24 @@ function Item({ item, active, external }: { item: NavItem; active: boolean; exte
   );
 }
 
+const SCROLL_KEY = 'gg_nav_scroll';
+
 export function NavClient({ groups, text }: { groups: NavGroup[]; text: Text }) {
   const pathname = usePathname();
   const { hydrated, navOpen, navRef, setNavOpen, shouldAnimate } = useNav();
+  // Payload renders the sidebar again on every page, which would put it back at the top and hide the item just
+  // clicked. Its scroll position is kept for the visit and restored before the page paints; the active item is then
+  // brought into view if it is still outside.
+  useLayoutEffect(() => {
+    const el = navRef.current;
+    if (!el) return;
+    const saved = Number(sessionStorage.getItem(SCROLL_KEY));
+    if (saved) el.scrollTop = saved;
+    el.querySelector<HTMLElement>('[data-active]')?.scrollIntoView({ block: 'nearest' });
+    const remember = () => sessionStorage.setItem(SCROLL_KEY, String(el.scrollTop));
+    el.addEventListener('scroll', remember, { passive: true });
+    return () => el.removeEventListener('scroll', remember);
+  }, [pathname, navRef]);
   const { getPreference } = usePreferences();
   // Payload closes the sidebar on load on any window up to 1440 px, which is most laptops. Like the LMS, it stays open
   // on every desktop width unless the user closed it; below 1025 px it remains Payload's slide-over menu.

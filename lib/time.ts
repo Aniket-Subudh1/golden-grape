@@ -35,8 +35,9 @@ export function today(now: Date = new Date()) {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
-// Converts a Luxembourg wall-clock time to the instant it denotes (handles the DST offset).
-function fromLocal(year: number, month: number, day: number, hour = 0, minute = 0) {
+/** The instant a Luxembourg wall-clock time denotes (handles the DST offset). A time skipped by the spring change
+ * maps to an instant whose local time differs from the one asked for. */
+export function fromLocal(year: number, month: number, day: number, hour = 0, minute = 0) {
   const wall = Date.UTC(year, month - 1, day, hour, minute);
   const offsetAt = (instant: number) => {
     const l = toLocal(new Date(instant));
@@ -126,4 +127,16 @@ export function eventDate(startsAt: string, endsAt: string | null | undefined, l
 export function addDays(date: string, days: number) {
   const [y, m, d] = date.split('-').map(Number);
   return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
+}
+
+/**
+ * A booked slot in words: `Jeudi 12 novembre · 12:30 — 13:00` (`short`: `jeu. 12 nov. · 12:30`). `date` is a calendar
+ * day (`YYYY-MM-DD`), not an instant, so it is formatted as such.
+ */
+export function slotLabel(slot: { date?: string | null; from?: string | null; to?: string | null }, locale: string, style: 'long' | 'short' = 'long') {
+  if (!slot.date) return '';
+  const [y, m, d] = slot.date.split('-').map(Number);
+  const day = new Intl.DateTimeFormat(locale, { weekday: style, day: 'numeric', month: style, timeZone: 'UTC' }).format(new Date(Date.UTC(y, m - 1, d)));
+  const time = style === 'long' && slot.to ? `${slot.from} — ${slot.to}` : (slot.from ?? '');
+  return [style === 'long' ? capitalize(day) : day, time].filter(Boolean).join(' · ');
 }

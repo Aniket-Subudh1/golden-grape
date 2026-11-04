@@ -1,5 +1,6 @@
 import type { I18nClient } from '@payloadcms/translations';
 import type { VisibleEntities } from 'payload';
+import { today } from '@/lib/time';
 import { type NavGroup, NavClient } from './nav-client';
 import { adminText } from './text';
 
@@ -33,6 +34,15 @@ const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean;
     ],
   },
   {
+    label: 'sales',
+    items: [
+      // Opened on today and what is coming (staff can clear the filter to see the past).
+      { label: 'orders', slug: 'orders', icon: 'orders', query: '?where[slotAt][greater_than_equal]={today}&sort=slotAt' },
+      { label: 'reservations', slug: 'reservations', icon: 'reservations', query: '?where[slotAt][greater_than_equal]={today}&sort=slotAt' },
+      { label: 'eventBookings', slug: 'eventBookings', icon: 'bookings' },
+    ],
+  },
+  {
     label: 'requests',
     items: [
       { label: 'customers', slug: 'customers', icon: 'users' },
@@ -44,6 +54,8 @@ const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean;
     label: 'settings',
     items: [
       { label: 'shop', slug: 'BusinessSettings', global: true, icon: 'settings' },
+      { label: 'deliveryZones', slug: 'deliveryZones', icon: 'zones' },
+      { label: 'slotRules', slug: 'slotRules', icon: 'slots' },
       { label: 'topMenu', slug: 'Header', global: true, icon: 'header' },
       { label: 'footer', slug: 'Footer', global: true, icon: 'footer' },
       { label: 'team', slug: 'users', icon: 'users' },
@@ -58,7 +70,7 @@ export default function AdminNav({ visibleEntities, i18n }: { visibleEntities: V
     label: t.nav[g.label],
     items: g.items
       .filter((i) => ((i.global ? visibleEntities.globals : visibleEntities.collections) as string[]).includes(i.slug))
-      .map((i) => ({ label: t.nav[i.label], icon: i.icon, href: `/admin/${i.global ? 'globals' : 'collections'}/${i.slug}${i.query ?? ''}` })),
+      .map((i) => ({ label: t.nav[i.label], icon: i.icon, href: `/admin/${i.global ? 'globals' : 'collections'}/${i.slug}${(i.query ?? '').replace('{today}', today())}` })),
   })).filter((g) => g.items.length > 0);
   return <NavClient groups={groups} text={{ ...t.nav, brandSub: t.brandSub }} />;
 }

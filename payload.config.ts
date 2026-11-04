@@ -18,7 +18,9 @@ import { cmsGlobals } from '@/modules/cms/globals';
 import { catalogueCollections } from '@/modules/catalogue/collections';
 import { customerGroups, customers } from '@/modules/customers/collections';
 import { cateringPackages, cateringRequests } from '@/modules/catering/collections';
-import { events } from '@/modules/events/collections';
+import { eventBookings, events } from '@/modules/events/collections';
+import { payments } from '@/modules/payments/collections';
+import { salesCollections } from '@/modules/sales/collections';
 import { inventoryCollections } from '@/modules/inventory/collections';
 import { settingsCollections } from '@/modules/settings/collections';
 import { businessSettings } from '@/modules/settings/globals';
@@ -59,6 +61,9 @@ export default buildConfig({
     ...inventoryCollections,
     customers,
     customerGroups,
+    ...salesCollections,
+    eventBookings,
+    payments,
   ],
   globals: [businessSettings, ...cmsGlobals],
   db: mongooseAdapter({

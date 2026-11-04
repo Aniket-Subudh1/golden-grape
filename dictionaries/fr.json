@@ -196,9 +196,9 @@
       "table": "Table"
     },
     "hints": {
-      "pickup": "Récupérez votre commande à la boutique.",
-      "delivery": "Livraison à Luxembourg-Ville sous 45 min.",
-      "table": "Réservez une table, précommandez si vous le souhaitez."
+      "pickup": "Retirez votre commande en boutique, à l’heure choisie.",
+      "delivery": "Livrée chez vous, à l’heure choisie.",
+      "table": "Réservez une table, et pré-commandez si vous le souhaitez."
     },
     "empty": {
       "title": "Panier vide",
@@ -252,7 +252,9 @@
     "notices": {
       "clamped": "Quantité ajustée au stock disponible.",
       "removed": "Un article n’est plus disponible et a été retiré du panier."
-    }
+    },
+    "checkout": "Commander",
+    "bookTable": "Réserver une table"
   },
   "shop": {
     "eyebrow": "Boutique · Vins & Épicerie",
@@ -414,7 +416,19 @@
       "sending": "Envoi…",
       "toastTitle": "Demande envoyée",
       "toastDesc": "{{title}} · {{count}} pers. — nous confirmerons rapidement.",
-      "doneTitle": "Demande envoyée. Nous revenons vers vous très vite."
+      "doneTitle": "Demande envoyée. Nous revenons vers vous très vite.",
+      "email": "E-mail",
+      "emailPh": "vous@exemple.lu",
+      "seatsLeft_one": "Plus que {{count}} place",
+      "seatsLeft_other": "Plus que {{count}} places",
+      "soldOut": "Complet",
+      "payOnsite": "À régler sur place le jour même.",
+      "freeEntry": "Entrée libre",
+      "title": "Réservez vos places",
+      "doneConfirmed": "Vos places sont réservées",
+      "donePending": "Vos places sont retenues",
+      "doneText": "Une confirmation est en route vers {{email}}.",
+      "close": "Fermer"
     },
     "empty": "Aucun événement à venir pour le moment. Revenez bientôt — ou écrivez-nous pour être prévenu.",
     "back": "Tous les événements"
@@ -540,6 +554,14 @@
     "product": {
       "title": "{{name}} · Golden Grape Luxembourg",
       "description": "{{name}}, sélectionné par Golden Grape, la maison portugaise de Luxembourg."
+    },
+    "checkout": {
+      "title": "Commande — Golden Grape",
+      "description": "À emporter, en livraison ou à table : choisissez votre créneau et confirmez."
+    },
+    "order": {
+      "title": "Votre commande — Golden Grape",
+      "description": "Votre commande chez Golden Grape."
     }
   },
   "form": {
@@ -552,8 +574,19 @@
       "tooLong": "Ce texte est trop long.",
       "minGuests": "Nombre de convives inférieur au minimum de cette formule.",
       "dateTooSoon": "Choisissez une date au moins 2 jours à l’avance.",
-      "invalid": "Valeur invalide."
-    }
+      "invalid": "Valeur invalide.",
+      "slotFull": "Ce créneau vient d’être pris. Choisissez-en un autre.",
+      "slotUnavailable": "Ce créneau n’est plus disponible. Choisissez-en un autre.",
+      "outsideZone": "Nous ne livrons pas encore ce code postal.",
+      "belowMinimum": "Votre commande n’atteint pas le minimum de livraison.",
+      "cartChanged": "Votre panier a changé (stock). Vérifiez-le et réessayez.",
+      "emptyCart": "Votre panier est vide.",
+      "soldOut": "Complet : il ne reste pas assez de places.",
+      "transition": "Ce changement n’est plus possible : la page va se rafraîchir.",
+      "event": "Cet événement ne peut plus être réservé."
+    },
+    "CONFLICT": "Quelqu’un vient de modifier cet élément. Réessayez.",
+    "OUT_OF_STOCK": "Votre panier a changé (stock). Vérifiez-le et réessayez."
   },
   "mail": {
     "signature": "L’équipe Golden Grape",
@@ -584,13 +617,89 @@
       "notes": "Commentaires",
       "estimate": "Estimation",
       "number": "Référence",
-      "language": "Langue"
+      "language": "Langue",
+      "mode": "Type",
+      "slot": "Quand",
+      "address": "Adresse",
+      "items": "Articles",
+      "qty": "Qté",
+      "subtotal": "Sous-total",
+      "delivery": "Livraison",
+      "total": "Total",
+      "vat": "dont TVA {{rate}} %",
+      "payment": "Paiement",
+      "beneficiary": "Bénéficiaire",
+      "iban": "IBAN",
+      "bic": "BIC",
+      "reference": "Communication",
+      "amount": "Montant",
+      "status": "Statut",
+      "event": "Événement"
     },
     "reset": {
       "subject": "Choisissez un nouveau mot de passe",
       "body": "Vous avez demandé à changer le mot de passe de votre compte Golden Grape. Le lien ci-dessous est valable une heure.",
       "button": "Choisir un mot de passe",
       "ignore": "Vous n’êtes pas à l’origine de cette demande ? Ignorez simplement cet e-mail : votre mot de passe reste inchangé."
+    },
+    "modes": {
+      "pickup": "À retirer en boutique",
+      "delivery": "Livraison",
+      "table": "Table"
+    },
+    "payments": {
+      "onsite": "À régler en boutique",
+      "transfer": "Virement bancaire",
+      "invoice": "Sur facture",
+      "card": "Carte"
+    },
+    "status": {
+      "pending": "En cours de confirmation",
+      "awaiting_payment": "En attente de votre virement",
+      "confirmed": "Confirmée",
+      "ready": "Prête",
+      "out_for_delivery": "En route",
+      "completed": "Terminée",
+      "cancelled": "Annulée",
+      "refunded": "Remboursée"
+    },
+    "view": "Voir ma commande",
+    "order": {
+      "subject": "Votre commande {{number}}",
+      "title": "Merci pour votre commande",
+      "confirmedBody": "Votre commande est confirmée. Tout sera prêt pour l’heure choisie.",
+      "awaitingBody": "Votre commande est réservée. Dès réception de votre virement, nous la confirmons et la préparons.",
+      "transferTitle": "Coordonnées pour le virement",
+      "transferNote": "Indiquez la communication pour que nous retrouvions votre paiement.",
+      "statusSubject": "Commande {{number}} : {{status}}",
+      "statusBody": {
+        "confirmed": "Votre commande est confirmée et en préparation.",
+        "ready": "Votre commande est prête. À tout de suite en boutique !",
+        "out_for_delivery": "Votre commande est en route.",
+        "cancelled": "Votre commande a été annulée. Si vous aviez déjà payé, nous vous remboursons.",
+        "refunded": "Votre commande a été remboursée."
+      },
+      "staffSubject": "Nouvelle commande {{number}} — {{name}}"
+    },
+    "reservation": {
+      "pendingSubject": "Votre demande de table {{number}}",
+      "pendingBody": "Nous avons bien reçu votre demande et la confirmons très vite.",
+      "acceptedSubject": "Votre table est confirmée — {{number}}",
+      "acceptedBody": "Bonne nouvelle : votre table est confirmée. Au plaisir de vous accueillir.",
+      "rejectedSubject": "Votre demande de table {{number}}",
+      "rejectedBody": "Nous sommes désolés : nous ne pouvons pas vous accueillir à cette heure-là. N’hésitez pas à choisir un autre moment.",
+      "cancelledSubject": "Votre réservation {{number}} est annulée",
+      "cancelledBody": "Votre réservation a été annulée. Au plaisir de vous voir une prochaine fois.",
+      "staffSubject": "Nouvelle demande de table {{number}} — {{name}} ({{guests}})",
+      "preorder": "Votre pré-commande"
+    },
+    "eventBooking": {
+      "subject": "Votre réservation — {{title}}",
+      "confirmedBody": "Vos places sont réservées. À bientôt !",
+      "pendingBody": "Vos places sont retenues. Le montant se règle sur place le jour même.",
+      "cancelledSubject": "Votre réservation pour {{title}} est annulée",
+      "cancelledBody": "Votre réservation a été annulée.",
+      "staffSubject": "Nouvelle réservation : {{title}} — {{name}} ({{guests}})"
     }
   },
   "cookies": {
@@ -668,6 +777,152 @@
       "signedOut": "Votre session a expiré. Reconnectez-vous."
     },
     "expiredTitle": "Session expirée.",
-    "signIn": "Se connecter"
+    "signIn": "Se connecter",
+    "orders": {
+      "reservations": "Mes réservations de table",
+      "noReservations": "Aucune réservation de table pour l’instant.",
+      "number": "Référence",
+      "date": "Date",
+      "status": "Statut",
+      "total": "Total",
+      "view": "Voir",
+      "guests_one": "{{count}} personne",
+      "guests_other": "{{count}} personnes"
+    }
+  },
+  "checkout": {
+    "eyebrow": "Commande",
+    "title": "Votre commande",
+    "titleTable": "Votre table",
+    "steps": {
+      "mode": "Comment la souhaitez-vous ?",
+      "when": "Quand ?",
+      "guests": "Combien de personnes ?",
+      "address": "Où livrer ?",
+      "details": "Vos coordonnées",
+      "payment": "Paiement"
+    },
+    "noDays": "Aucun créneau n’est ouvert pour l’instant. Appelez-nous, nous trouverons une solution.",
+    "pickTime": "Choisissez une heure",
+    "full": "Complet",
+    "today": "Aujourd’hui",
+    "tomorrow": "Demain",
+    "fields": {
+      "name": "Nom complet",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "line1": "Rue et numéro",
+      "line2": "Étage, appartement (facultatif)",
+      "postalCode": "Code postal",
+      "city": "Localité",
+      "notes": "Commentaire (facultatif)",
+      "notesPh": "Allergies, code d’entrée, occasion…"
+    },
+    "zone": {
+      "enterCode": "Indiquez votre code postal pour voir les frais de livraison.",
+      "fee": "Livraison {{fee}}",
+      "min": "minimum {{min}}",
+      "free": "offerte dès {{free}}",
+      "outside": "Nous ne livrons pas encore ce code postal.",
+      "choosePickup": "Choisir plutôt à emporter",
+      "belowMin": "Ajoutez encore {{missing}} pour atteindre le minimum de livraison de {{min}}.",
+      "freeNow": "Livraison offerte"
+    },
+    "preorder": {
+      "label": "Pré-commander plats et boissons",
+      "hint": "Préparé à l’avance, servi à votre arrivée.",
+      "empty": "Votre panier est vide : ajoutez quelques plats du comptoir pour pré-commander.",
+      "toCounter": "Voir le comptoir"
+    },
+    "payment": {
+      "onsite": "Payer en boutique",
+      "onsiteHint": "Par carte ou en espèces au retrait.",
+      "onsiteTable": "Payer à table",
+      "onsiteTableHint": "Vous réglez à la fin de votre visite.",
+      "transfer": "Virement bancaire",
+      "transferHint": "Nous préparons votre commande dès réception du virement. Les coordonnées suivent sur la page suivante et par e-mail."
+    },
+    "summary": "Récapitulatif",
+    "editBag": "Modifier",
+    "subtotal": "Sous-total",
+    "delivery": "Livraison",
+    "free": "Offerte",
+    "total": "Total",
+    "toChoose": "À confirmer",
+    "reservation": "Table pour {{count}}",
+    "noPreorder": "Sans pré-commande : vous choisissez sur place.",
+    "submit": "Valider la commande",
+    "submitTable": "Envoyer ma demande",
+    "sending": "Envoi…",
+    "signedOut": "Vous avez un compte ?",
+    "signIn": "Se connecter",
+    "signInHint": "pour remplir plus vite et retrouver vos commandes.",
+    "footnote": "Prix TVA comprise. Chaque demande de table est confirmée par la Maison.",
+    "emptyTitle": "Votre panier est vide",
+    "emptyText": "Ajoutez quelques trésors de la boutique ou du comptoir, ou réservez une table.",
+    "bookTable": "Réserver une table",
+    "when": "Quand"
+  },
+  "order": {
+    "eyebrow": "Commande {{number}}",
+    "reservationEyebrow": "Réservation {{number}}",
+    "thanks": "Merci, {{name}}",
+    "emailSent": "Une confirmation a été envoyée à {{email}}.",
+    "intro": {
+      "pickup": "Nous préparons votre commande, à retirer en boutique.",
+      "delivery": "Nous préparons votre commande pour la livraison.",
+      "awaiting": "Votre commande est réservée. Nous la confirmons et la préparons dès réception de votre virement.",
+      "table": "Nous avons bien reçu votre demande et confirmons votre table très vite.",
+      "accepted": "Votre table est confirmée. Au plaisir de vous accueillir.",
+      "cancelled": "Cette commande a été annulée.",
+      "rejected": "Nous sommes désolés : nous ne pouvons pas vous accueillir à cette heure-là."
+    },
+    "status": {
+      "pending": "En cours de confirmation",
+      "awaiting_payment": "En attente de votre virement",
+      "confirmed": "Confirmée",
+      "ready": "Prête",
+      "out_for_delivery": "En route",
+      "completed": "Terminée",
+      "cancelled": "Annulée",
+      "refunded": "Remboursée"
+    },
+    "reservationStatus": {
+      "pending": "En attente de confirmation",
+      "accepted": "Confirmée",
+      "rejected": "Refusée",
+      "cancelled": "Annulée",
+      "completed": "Terminée"
+    },
+    "modes": {
+      "pickup": "À retirer en boutique",
+      "delivery": "Livraison",
+      "table": "Table"
+    },
+    "when": "Quand",
+    "where": "Où",
+    "guests": "Personnes",
+    "items": "Vos articles",
+    "payment": "Paiement",
+    "preorder": "Pré-commande",
+    "payOnsite": "À régler en boutique",
+    "payTable": "À régler à table",
+    "payTransfer": "Virement bancaire",
+    "paid": "Payé",
+    "transfer": {
+      "title": "Coordonnées pour le virement",
+      "beneficiary": "Bénéficiaire",
+      "iban": "IBAN",
+      "bic": "BIC",
+      "reference": "Communication",
+      "amount": "Montant",
+      "note": "Indiquez la communication pour que nous retrouvions votre paiement.",
+      "missing": "Nous vous envoyons nos coordonnées bancaires par e-mail."
+    },
+    "invalidTitle": "Ce lien n’est pas valide",
+    "invalidText": "Ouvrez le lien de votre e-mail de confirmation, ou connectez-vous pour voir vos commandes.",
+    "continue": "Continuer mes achats",
+    "myOrders": "Mes commandes",
+    "print": "Imprimer"
   }
 }

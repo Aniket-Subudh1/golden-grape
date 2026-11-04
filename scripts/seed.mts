@@ -206,9 +206,13 @@ for (const [slot, { file, alt }] of Object.entries(PHOTOS)) {
   media[slot] = doc.id;
 }
 
-// 3. Business settings (contact details and hours from the prototype; LU VAT until DEP-07)
+// 3. Business settings (contact details and hours from the prototype; LU VAT until DEP-07). What staff already
+// entered wins: the seed only fills empty fields (bank details, edited hours and contact stay as they are).
+const current = await payload.findGlobal({ slug: 'BusinessSettings', depth: 0, overrideAccess: true });
+const filled = <T extends Record<string, unknown>>(seed: T, saved: Record<string, unknown> | null | undefined): T =>
+  ({ ...seed, ...Object.fromEntries(Object.entries(saved ?? {}).filter(([, v]) => v !== null && v !== undefined && v !== '')) }) as T;
 await global('BusinessSettings', () => ({
-  business: {
+  business: filled({
     name: 'Golden Grape Luxembourg',
     street: '25 Zac Klengbousbierg',
     postalCode: '7795',
@@ -217,9 +221,9 @@ await global('BusinessSettings', () => ({
     phone: '+352 691 855 844',
     email: 'hello@goldengrape.lu',
     instagram: 'https://www.instagram.com/goldengrape.lu/',
-  },
-  hours: [1, 2, 3, 4, 5].map((day) => ({ day: String(day), open: '10:00', close: '18:00' })),
-  vat: [
+  }, current.business),
+  hours: current.hours?.length ? current.hours : [1, 2, 3, 4, 5].map((day) => ({ day: String(day), open: '10:00', close: '18:00' })),
+  vat: current.vat?.length ? current.vat : [
     { key: 'standard', rateBp: 1700 },
     { key: 'intermediate', rateBp: 1400 },
     { key: 'reduced', rateBp: 800 },
@@ -417,6 +421,27 @@ const rows: CatalogueRow[] = [
 const imported = await importCatalogue(payload, rows);
 if (imported.errors.length) throw new Error(`catalogue: ${imported.errors.map((e) => `row ${e.row} ${e.column}: ${e.message}`).join('; ')}`);
 log(`catalogue: ${SHOP_CATEGORIES.length + 1} categories, ${imported.created} products created, ${imported.updated} updated`);
+
+// 10. Time slots and delivery areas: assumption A-05 until DEP-06 (zones, hours, slot rules). Created only when missing,
+// so what staff set in the admin is never overwritten. Every mode follows the shop's opening hours.
+const SLOT_RULES = [
+  { mode: 'pickup', intervalMin: 30, capacityPerSlot: 4, leadTimeMin: 60, maxDaysAhead: 14 },
+  { mode: 'delivery', intervalMin: 60, capacityPerSlot: 3, leadTimeMin: 120, maxDaysAhead: 14 },
+  { mode: 'table', intervalMin: 30, capacityPerSlot: 16, leadTimeMin: 120, maxDaysAhead: 30 },
+] as const;
+for (const rule of SLOT_RULES) {
+  const { totalDocs } = await payload.count({ collection: 'slotRules', where: { mode: { equals: rule.mode } }, overrideAccess: true });
+  if (totalDocs === 0) await payload.create({ collection: 'slotRules', data: rule, overrideAccess: true, context: seedContext() });
+}
+const ZONES = [
+  { name: 'Bissen', postalCodes: ['7760', '7770', '7780', '7790', '7795'], feeCents: 500, minOrderCents: 3000, freeFromCents: 8000 },
+  { name: 'Mersch et Colmar-Berg', postalCodes: ['7501', '7510', '7520', '7530', '7540', '7550', '7730', '7740', '7750'], feeCents: 800, minOrderCents: 5000, freeFromCents: 12000 },
+];
+for (const zone of ZONES) {
+  const { totalDocs } = await payload.count({ collection: 'deliveryZones', where: { name: { equals: zone.name } }, overrideAccess: true });
+  if (totalDocs === 0) await payload.create({ collection: 'deliveryZones', data: { ...zone, active: true }, overrideAccess: true, context: seedContext() });
+}
+log(`time slots (${SLOT_RULES.length} modes) and ${ZONES.length} delivery areas checked`);
 
 await payload.destroy();
 log('done');

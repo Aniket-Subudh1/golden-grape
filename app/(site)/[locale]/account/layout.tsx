@@ -42,7 +42,7 @@ async function Shell({ locale, children }: { locale: Locale; children: React.Rea
             { href: base, label: t.nav.overview },
             { href: `${base}/profile`, label: t.nav.profile },
             { href: `${base}/addresses`, label: t.nav.addresses },
-            // Order history: linked once the customer has orders (they arrive with checkout, M2.3).
+            { href: `${base}/orders`, label: t.nav.orders },
           ]}
         />
       </div>
