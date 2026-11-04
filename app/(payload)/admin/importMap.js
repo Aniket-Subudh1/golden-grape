@@ -26,6 +26,9 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { default as default_fe401d340ce00cc899cf727d6137f487 } from '@/components/admin/row-label'
 import { NumberCell as NumberCell_f2a5de4e6cd5b225ec768dfc00185072 } from '@/components/admin/number-field'
 import { default as default_f2a5de4e6cd5b225ec768dfc00185072 } from '@/components/admin/number-field'
+import { default as default_18a246622f2fde6f084f603ce7663055 } from '@/modules/inventory/admin/stock-panel'
+import { ReasonCell as ReasonCell_00f222da1c5cba2acc44b463c3f4ac03 } from '@/modules/inventory/admin/adjust-button'
+import { default as default_4c47180b2e77f55067f27acaa2019504 } from '@/modules/inventory/admin/post-count-button'
 import { default as default_a2f0eccb7507197ce791108816851322 } from '@/components/admin/nav'
 import { default as default_0430f5fb3b8132a602107d7535a2a344 } from '@/components/admin/icon'
 import { default as default_334250e18ce0b45af3e0c04bb6fe8307 } from '@/components/admin/logo'
@@ -67,6 +70,9 @@ export const importMap = {
   "@/components/admin/row-label#default": default_fe401d340ce00cc899cf727d6137f487,
   "@/components/admin/number-field#NumberCell": NumberCell_f2a5de4e6cd5b225ec768dfc00185072,
   "@/components/admin/number-field#default": default_f2a5de4e6cd5b225ec768dfc00185072,
+  "@/modules/inventory/admin/stock-panel#default": default_18a246622f2fde6f084f603ce7663055,
+  "@/modules/inventory/admin/adjust-button#ReasonCell": ReasonCell_00f222da1c5cba2acc44b463c3f4ac03,
+  "@/modules/inventory/admin/post-count-button#default": default_4c47180b2e77f55067f27acaa2019504,
   "@/components/admin/nav#default": default_a2f0eccb7507197ce791108816851322,
   "@/components/admin/icon#default": default_0430f5fb3b8132a602107d7535a2a344,
   "@/components/admin/logo#default": default_334250e18ce0b45af3e0c04bb6fe8307,

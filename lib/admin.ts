@@ -1,4 +1,4 @@
-import type { Field, FieldHook, TextField } from 'payload';
+import type { CollectionSlug, Field, FieldHook, TextField } from 'payload';
 
 // Admin building blocks shared by several collections and globals. The admin is used by non-technical staff
 // (docs/03-CODING-LAWS.md): everyday words in the four languages, no codes, cents, paths or IDs on screen.
@@ -22,11 +22,11 @@ const slugify = (text: string) =>
     .replace(/^-+|-+$/g, '')
     .slice(0, 80);
 
-/** The web address (`/events/<slug>`), made from the title when the document is created, then kept. Hidden. */
-export const autoSlug = (collection: 'events' | 'legal' | 'pages'): TextField => {
+/** The web address (`/events/<slug>`), made from the title (or `from`) when the document is created, then kept. Hidden. */
+export const autoSlug = (collection: CollectionSlug, from = 'title'): TextField => {
   const fill: FieldHook = async ({ value, data, req, originalDoc }) => {
     if (value || originalDoc?.slug) return value || originalDoc?.slug;
-    const base = slugify(String(data?.title ?? '')) || 'page';
+    const base = slugify(String(data?.[from] ?? '')) || 'page';
     for (let n = 1; ; n++) {
       const slug = n === 1 ? base : `${base}-${n}`;
       const { totalDocs } = await req.payload.count({ collection, where: { slug: { equals: slug } }, req });

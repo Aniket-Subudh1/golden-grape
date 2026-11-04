@@ -1,5 +1,6 @@
 // Idempotent seed: first admin, business settings, globals, the Maison page, legal stubs (draft),
-// catering packages and events, plus the client's photos as media. Re-running overwrites CMS edits to these.
+// catering packages and events, the prototype's catalogue (until DEP-04), plus the client's photos as media.
+// Re-running overwrites CMS edits to these.
 // Run: npm run seed -- --email you@example.lu --password '…' --name 'Your Name'
 import path from 'node:path';
 import { parseArgs } from 'node:util';
@@ -7,6 +8,7 @@ import { type CollectionSlug, getPayload } from 'payload';
 import { interpolate, type Locale } from '@/lib/i18n';
 import { nextWeekly } from '@/lib/time';
 import { indexesReady } from '@/lib/tx';
+import { type CatalogueRow, importCatalogue } from '@/modules/catalogue/import';
 import content from './seed-content.json';
 
 const LOCALES: Locale[] = ['fr', 'en', 'de', 'pt'];
@@ -67,6 +69,21 @@ const PHOTOS: Record<string, { file: string; alt: Record<Locale, string> }> = {
   risotto: { file: 'catering-events/Catering_8.jpg', alt: { fr: 'Assiette de risotto servie à table', en: 'A plate of risotto served at the table', de: 'Ein Teller Risotto am Tisch serviert', pt: 'Prato de risoto servido à mesa' } },
   grazing: { file: 'catering-events/Catering_9.jpg', alt: { fr: 'Longue table traiteur garnie de fromages et de pains', en: 'Long catering table laden with cheese and bread', de: 'Lange Catering-Tafel mit Käse und Brot', pt: 'Longa mesa de catering com queijos e pão' } },
   ivoTable: { file: 'catering-events/Catering_11.jpg', alt: { fr: 'Une grande table traiteur dressée dans la boutique', en: 'A large catering table laid out in the shop', de: 'Eine große Catering-Tafel im Laden', pt: 'Uma grande mesa de catering na loja' } },
+  // Product photos: the prototype's choice per product (its routes/shop.tsx and snack.tsx), several reused as stand-ins.
+  wines: { file: 'home-store/Home_2.jpg', alt: { fr: 'Bouteilles de vins portugais alignées devant les étagères de la boutique', en: 'Portuguese wine bottles lined up in front of the shop’s shelves', de: 'Portugiesische Weinflaschen vor den Regalen des Ladens', pt: 'Garrafas de vinho português alinhadas diante das prateleiras da loja' } },
+  board: { file: 'shop-wines-gourmet/Shop_5.jpg', alt: { fr: 'Une bouteille de rouge du Douro sur une planche avec raisins et jambon', en: 'A bottle of Douro red on a board with grapes and cured ham', de: 'Eine Flasche Douro-Rotwein auf einem Brett mit Trauben und Schinken', pt: 'Uma garrafa de tinto do Douro numa tábua com uvas e presunto' } },
+  bottleGuitar: { file: 'shop-wines-gourmet/Shop_8.jpg', alt: { fr: 'Une bouteille de vin rouge et un verre devant une guitare portugaise', en: 'A bottle of red wine and a glass in front of a Portuguese guitar', de: 'Eine Flasche Rotwein und ein Glas vor einer portugiesischen Gitarre', pt: 'Uma garrafa de vinho tinto e um copo diante de uma guitarra portuguesa' } },
+  accessories: { file: 'shop-wines-gourmet/Shop_6.jpg', alt: { fr: 'Coffrets d’accessoires pour le vin sur une étagère en bois', en: 'Wine accessory gift sets on a wooden shelf', de: 'Weinzubehör-Geschenksets auf einem Holzregal', pt: 'Conjuntos de acessórios de vinho numa prateleira de madeira' } },
+  charcuterie: { file: 'snack-menu/Snack_7.jpg', alt: { fr: 'Planche de charcuterie, fromage et olives avec un verre de vin rouge', en: 'Board of cured meats, cheese and olives with a glass of red wine', de: 'Platte mit Aufschnitt, Käse und Oliven und einem Glas Rotwein', pt: 'Tábua de enchidos, queijo e azeitonas com um copo de vinho tinto' } },
+  server: { file: 'catering-events/Catering_10.jpg', alt: { fr: 'Plateau de charcuterie, fromages, fruits et pain présenté dans la boutique', en: 'Platter of cured meats, cheeses, fruit and bread presented in the shop', de: 'Platte mit Aufschnitt, Käse, Obst und Brot im Laden', pt: 'Travessa de enchidos, queijos, fruta e pão apresentada na loja' } },
+  tray: { file: 'shop-wines-gourmet/Shop_16.jpg', alt: { fr: 'Plateau garni de vins, biscuits et confiture portugaise', en: 'Tray filled with wines, biscuits and Portuguese jam', de: 'Tablett mit Weinen, Gebäck und portugiesischer Konfitüre', pt: 'Tabuleiro com vinhos, bolachas e doce português' } },
+  giftBasket: { file: 'shop-wines-gourmet/Shop_14.jpg', alt: { fr: 'Panier cadeau avec vins, aguardente et produits portugais', en: 'Gift basket with wines, aguardente and Portuguese delicacies', de: 'Geschenkkorb mit Weinen, Aguardente und portugiesischen Spezialitäten', pt: 'Cesto de oferta com vinhos, aguardente e produtos portugueses' } },
+  crates: { file: 'shop-wines-gourmet/Shop_37.jpg', alt: { fr: 'Caisses en bois garnies de vins, fromage et produits fins', en: 'Wooden crates filled with wines, cheese and fine foods', de: 'Holzkisten mit Weinen, Käse und Feinkost', pt: 'Caixas de madeira com vinhos, queijo e produtos finos' } },
+  bifana: { file: 'snack-menu/Snack_3.jpg', alt: { fr: 'Sandwich chaud aux frites allumettes, servi avec un verre de vin rouge', en: 'Hot sandwich with straw fries, served with a glass of red wine', de: 'Warmes Sandwich mit Strohkartoffeln und einem Glas Rotwein', pt: 'Sanduíche quente com batata palha e um copo de vinho tinto' } },
+  pasta: { file: 'snack-menu/Snack_2.jpg', alt: { fr: 'Bol de pâtes au parmesan avec un verre de vin rouge', en: 'Bowl of pasta with parmesan and a glass of red wine', de: 'Schale Pasta mit Parmesan und einem Glas Rotwein', pt: 'Taça de massa com parmesão e um copo de vinho tinto' } },
+  bacalhau: { file: 'snack-menu/Snack_6.jpg', alt: { fr: 'Bacalhau à Brás aux olives noires, avec un verre de vin rouge', en: 'Bacalhau à Brás with black olives and a glass of red wine', de: 'Bacalhau à Brás mit schwarzen Oliven und einem Glas Rotwein', pt: 'Bacalhau à Brás com azeitonas pretas e um copo de vinho tinto' } },
+  dessert: { file: 'snack-menu/Snack_1.jpg', alt: { fr: 'Deux parts de gâteau et des cafés servis sur des assiettes dorées', en: 'Two slices of cake and coffees served on gold plates', de: 'Zwei Stück Kuchen und Kaffee auf goldenen Tellern', pt: 'Duas fatias de bolo e cafés servidos em pratos dourados' } },
+  pizza: { file: 'snack-menu/Snack_5.jpg', alt: { fr: 'Pizza à la tomate et au fromage coupée en parts', en: 'Tomato and cheese pizza cut into slices', de: 'Tomaten-Käse-Pizza in Stücken', pt: 'Piza de tomate e queijo cortada em fatias' } },
 };
 
 const LEGAL: Record<string, Record<Locale, string>> = {
@@ -91,6 +108,44 @@ const PACKAGES = [
   { key: 'prestige', order: 3, priceCents: 9500, image: 'ivoTable' },
 ] as const;
 const MIN_GUESTS = 10; // assumption A-11 until Golden Grape confirms
+
+// The prototype's catalogue until the client's spreadsheet arrives (DEP-04): its PRODUCTS and MENU arrays (price,
+// photo, category, tag) with the texts that were in the dictionaries. VAT classes are assumption A-12 (DEP-07).
+// No barcodes and no opening stock: the real spreadsheet sets them, and its opening stock is posted only for a
+// size with no movement yet.
+const SHOP_CATEGORIES = ['wines', 'port', 'beers', 'cheese', 'charcuterie', 'grocery', 'gifts'] as const;
+type ShopCategory = (typeof SHOP_CATEGORIES)[number];
+const KIND: Record<ShopCategory, CatalogueRow['kind']> = { wines: 'wine', port: 'wine', beers: 'wine', cheese: 'grocery', charcuterie: 'grocery', grocery: 'grocery', gifts: 'gift' };
+const VAT: Record<ShopCategory, CatalogueRow['vat_class']> = { wines: 'intermediate', port: 'standard', beers: 'standard', cheese: 'superReduced', charcuterie: 'superReduced', grocery: 'superReduced', gifts: 'standard' };
+const SHOP: [id: keyof Content['catalogue']['products'], price: number, photo: string, category: ShopCategory, badge?: string][] = [
+  ['douro-reserva', 3200, 'wines', 'wines', 'signature'],
+  ['alentejo-tinto', 2100, 'board', 'wines'],
+  ['vinho-verde', 1400, 'bottleGuitar', 'wines'],
+  ['dao-quinta', 2600, 'table', 'wines'],
+  ['port-tawny', 6800, 'aguardente', 'port', 'rare'],
+  ['port-lbv', 2400, 'wines', 'port'],
+  ['sagres', 1200, 'accessories', 'beers'],
+  ['super-bock', 450, 'bottleGuitar', 'beers'],
+  ['sao-jorge', 1800, 'platter', 'cheese', 'dop'],
+  ['serra', 2200, 'charcuterie', 'cheese'],
+  ['chourico', 1200, 'charcuterie', 'charcuterie'],
+  ['presunto', 1600, 'server', 'charcuterie', 'signature'],
+  ['azeite', 1900, 'tray', 'grocery'],
+  ['sardines', 900, 'tray', 'grocery'],
+  ['flor-sal', 800, 'board', 'grocery'],
+  ['box-descoberta', 8900, 'giftBasket', 'gifts', 'bestseller'],
+  ['box-prestige', 22000, 'crates', 'gifts'],
+  ['box-porto', 6500, 'giftBasket', 'gifts'],
+];
+// The glass of wine is an alcoholic drink (standard VAT); the dishes are food served on site (super-reduced).
+const MENU: [id: keyof Content['catalogue']['menu'], price: number, photo: string, badge?: string][] = [
+  ['bifana', 650, 'bifana', 'signature'],
+  ['prego', 850, 'pasta'],
+  ['alheira', 1200, 'bacalhau'],
+  ['pastel', 220, 'dessert', 'homemade'],
+  ['queijo', 1600, 'charcuterie'],
+  ['vinho', 700, 'pizza'],
+];
 
 // ---- run -----------------------------------------------------------------------------------------------
 
@@ -302,6 +357,47 @@ for (const e of EVENTS) {
   });
 }
 log('4 events published');
+
+// 9. Catalogue: categories, then the products through the catalogue import (same validation and upsert as a CSV)
+for (const [i, key] of [...SHOP_CATEGORIES, 'counter' as const].entries()) {
+  await upsert('categories', { slug: { equals: key } }, (l) => ({
+    name: key === 'counter' ? c(l).catalogue.counter : c(l).catalogue.categories[key],
+    slug: key,
+    kind: key === 'counter' ? 'snack' : 'shop',
+    order: i + 1,
+  }));
+}
+const names = <K extends 'products' | 'menu'>(group: K, id: keyof Content['catalogue'][K]) =>
+  Object.fromEntries(LOCALES.map((l) => [`name_${l}`, (c(l).catalogue[group] as Record<string, { name: string }>)[id as string].name])) as Record<`name_${Locale}`, string>;
+const rows: CatalogueRow[] = [
+  ...SHOP.map(([id, price, photo, category, badge]): CatalogueRow => ({
+    ...names('products', id),
+    sku: `GG-${id.toUpperCase()}`,
+    slug: id,
+    kind: KIND[category],
+    category_slug: category,
+    region_fr: KIND[category] === 'wine' && category !== 'beers' ? c('fr').catalogue.products[id].region : undefined,
+    vat_class: VAT[category],
+    price_eur: price,
+    images: [media[photo]],
+    badges: badge ? [badge] : [],
+  } as CatalogueRow)),
+  ...MENU.map(([id, price, photo, badge]): CatalogueRow => ({
+    ...names('menu', id),
+    sku: `GG-${id.toUpperCase()}`,
+    slug: id,
+    kind: 'snack',
+    category_slug: 'counter',
+    vat_class: id === 'vinho' ? 'standard' : 'superReduced',
+    price_eur: price,
+    images: [media[photo]],
+    badges: badge ? [badge] : [],
+    description: Object.fromEntries(LOCALES.map((l) => [l, richText(node('paragraph', c(l).catalogue.menu[id].desc))])),
+  } as CatalogueRow)),
+];
+const imported = await importCatalogue(payload, rows);
+if (imported.errors.length) throw new Error(`catalogue: ${imported.errors.map((e) => `row ${e.row} ${e.column}: ${e.message}`).join('; ')}`);
+log(`catalogue: ${SHOP_CATEGORIES.length + 1} categories, ${imported.created} products created, ${imported.updated} updated`);
 
 await payload.destroy();
 log('done');

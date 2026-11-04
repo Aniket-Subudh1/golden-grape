@@ -267,80 +267,6 @@
       "rare": "Rare",
       "dop": "DOP",
       "bestseller": "Best-seller"
-    },
-    "products": {
-      "douro-reserva": {
-        "name": "Douro Reserva 2019",
-        "region": "Douro"
-      },
-      "alentejo-tinto": {
-        "name": "Alentejo Tinto",
-        "region": "Alentejo"
-      },
-      "vinho-verde": {
-        "name": "Vinho Verde",
-        "region": "Minho"
-      },
-      "dao-quinta": {
-        "name": "Quinta do Dão",
-        "region": "Dão"
-      },
-      "port-tawny": {
-        "name": "Porto Tawny 20 ans",
-        "region": "Porto"
-      },
-      "port-lbv": {
-        "name": "Porto LBV 2017",
-        "region": "Porto"
-      },
-      "sagres": {
-        "name": "Sagres · Pack 6",
-        "region": "Bière"
-      },
-      "super-bock": {
-        "name": "Super Bock",
-        "region": "Bière"
-      },
-      "sao-jorge": {
-        "name": "São Jorge affiné 12 mois",
-        "region": "Açores"
-      },
-      "serra": {
-        "name": "Serra da Estrela",
-        "region": "Beira"
-      },
-      "chourico": {
-        "name": "Chouriço fumé",
-        "region": "Trás-os-Montes"
-      },
-      "presunto": {
-        "name": "Presunto Bísaro",
-        "region": "Trás-os-Montes"
-      },
-      "azeite": {
-        "name": "Huile d'olive extra vierge",
-        "region": "Alentejo"
-      },
-      "sardines": {
-        "name": "Sardines à l'huile",
-        "region": "Conserve"
-      },
-      "flor-sal": {
-        "name": "Fleur de sel de l'Algarve",
-        "region": "Algarve"
-      },
-      "box-descoberta": {
-        "name": "Coffret Descoberta",
-        "region": "Cadeau"
-      },
-      "box-prestige": {
-        "name": "Coffret Prestige",
-        "region": "Cadeau"
-      },
-      "box-porto": {
-        "name": "Coffret Porto & Chocolat",
-        "region": "Cadeau"
-      }
     }
   },
   "snackPage": {
@@ -357,33 +283,7 @@
       "signature": "Signature",
       "homemade": "Fait maison"
     },
-    "add": "Ajouter",
-    "menu": {
-      "bifana": {
-        "name": "Bifana",
-        "desc": "Porc mariné à la portugaise, moutarde piri-piri, pain croustillant."
-      },
-      "prego": {
-        "name": "Prego no Pão",
-        "desc": "Steak juteux à l'ail, dans un pain doré au beurre."
-      },
-      "alheira": {
-        "name": "Alheira de Mirandela",
-        "desc": "Saucisse traditionnelle, œuf au plat, frites maison."
-      },
-      "pastel": {
-        "name": "Pastel de Nata",
-        "desc": "Feuilleté croustillant, crème vanillée dorée au four."
-      },
-      "queijo": {
-        "name": "Planche de fromages",
-        "desc": "São Jorge, Serra, Azeitão, confiture, pain, olives."
-      },
-      "vinho": {
-        "name": "Verre de vin du jour",
-        "desc": "Sélection d'Ivo — rouge, blanc ou rosé, servi au verre."
-      }
-    }
+    "add": "Ajouter"
   },
   "cateringPage": {
     "eyebrow": "Traiteur",

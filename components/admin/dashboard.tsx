@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Scale,
   Settings,
+  TriangleAlert,
   Wine,
 } from 'lucide-react';
 import type { AdminViewServerProps } from 'payload';
@@ -23,6 +24,8 @@ import { eventDate, toLocal, TZ } from '@/lib/time';
 // No navigation cards: the sidebar already lists every section. Blocks appear only for roles that may open them.
 
 type Attention = { key: string; href: string; title: string; detail: string; badge: string; tone: 'danger' | 'warning' };
+
+const LOW_STOCK = '/admin/collections/stockLevels?where[lowStock][equals]=true';
 
 const LANGUAGE_TAGS: Record<AdminLanguage, string> = { fr: 'fr-FR', en: 'en-GB', de: 'de-DE', pt: 'pt-PT' };
 
@@ -62,10 +65,11 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
   const now = new Date();
   const editor = hasRole(user, ['manager']);
   const sales = hasRole(user, ['sales']);
+  const stock = hasRole(user, ['manager', 'stock']);
   const firstName = (user.name ?? '').split(' ')[0];
   const greeting = t.home.greeting[toLocal(now).hour < 12 ? 0 : toLocal(now).hour < 18 ? 1 : 2];
 
-  const [requests, newCount, upcoming, drafts, legalDrafts, media, settings] = await Promise.all([
+  const [requests, newCount, upcoming, drafts, legalDrafts, media, settings, lowStock] = await Promise.all([
     sales ? payload.find({ collection: 'cateringRequests', sort: '-createdAt', limit: 5, depth: 1, overrideAccess: true }) : null,
     sales ? payload.count({ collection: 'cateringRequests', where: { status: { equals: 'new' } }, overrideAccess: true }) : null,
     editor
@@ -82,6 +86,7 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
     editor ? payload.count({ collection: 'legal', where: { _status: { equals: 'draft' } }, overrideAccess: true }) : null,
     editor ? payload.count({ collection: 'media', overrideAccess: true }) : null,
     editor ? payload.findGlobal({ slug: 'BusinessSettings', overrideAccess: true, depth: 0 }) : null,
+    stock ? payload.count({ collection: 'stockLevels', where: { lowStock: { equals: true } }, overrideAccess: true }) : null,
   ]);
 
   const attention: Attention[] = [
@@ -95,6 +100,9 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
         badge: t.home.newBadge,
         tone: 'danger' as const,
       })),
+    ...(lowStock?.totalDocs
+      ? [{ key: 'low-stock', href: LOW_STOCK, title: t.home.lowStockTitle(lowStock.totalDocs), detail: t.home.lowStockText, badge: t.home.stockBadge, tone: 'warning' as const }]
+      : []),
     ...(upcoming && upcoming.totalDocs === 0
       ? [{ key: 'no-events', href: '/admin/collections/events', title: t.home.noEventTitle, detail: t.home.noEventText, badge: t.home.websiteBadge, tone: 'warning' as const }]
       : []),
@@ -114,6 +122,7 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
           { label: t.home.changeHours, href: '/admin/globals/BusinessSettings', icon: <Settings /> },
         ]
       : []),
+    ...(stock ? [{ label: t.home.seeLowStock, href: LOW_STOCK, icon: <TriangleAlert /> }] : []),
     ...(sales ? [{ label: t.home.seeRequests, href: '/admin/collections/cateringRequests', icon: <ClipboardList /> }] : []),
     { label: t.nav.viewSite, href: '/fr', icon: <ExternalLink />, external: true },
   ];
@@ -137,6 +146,7 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
             <CreateButton collectionSlug="media" label={t.home.uploadPhotos} quiet />
           </>
         )}
+        {stock && <CreateButton collectionSlug="stockCounts" label={t.home.newCount} quiet={editor} />}
         {actions.map((a) => (
           <a key={a.label} href={a.href} className="gg-btn" {...(a.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
             {a.icon}
@@ -147,12 +157,12 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
 
       <div className="gg-home__grid">
         <div className="gg-home__col">
-          {!editor && !sales && (
+          {!editor && !sales && !stock && (
             <Section title={t.home.emptyTitle} description={t.home.emptyText}>
               <Empty>{t.home.emptyBody}</Empty>
             </Section>
           )}
-          {(editor || sales) && (
+          {(editor || sales || stock) && (
             <Section title={t.home.attention} description={t.home.attentionText}>
               {attention.length === 0 ? (
                 <Empty>{t.home.nothingWaiting}</Empty>

@@ -77,12 +77,27 @@ export interface Config {
     events: Event;
     cateringPackages: CateringPackage;
     cateringRequests: CateringRequest;
+    categories: Category;
+    brands: Brand;
+    products: Product;
+    variants: Variant;
+    packagingUnits: PackagingUnit;
+    stockLevels: StockLevel;
+    stockMovements: StockMovement;
+    stockCounts: StockCount;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    products: {
+      variants: 'variants';
+    };
+    variants: {
+      packaging: 'packagingUnits';
+    };
+  };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     auditLogs: AuditLogsSelect<false> | AuditLogsSelect<true>;
@@ -94,6 +109,14 @@ export interface Config {
     events: EventsSelect<false> | EventsSelect<true>;
     cateringPackages: CateringPackagesSelect<false> | CateringPackagesSelect<true>;
     cateringRequests: CateringRequestsSelect<false> | CateringRequestsSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    brands: BrandsSelect<false> | BrandsSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    variants: VariantsSelect<false> | VariantsSelect<true>;
+    packagingUnits: PackagingUnitsSelect<false> | PackagingUnitsSelect<true>;
+    stockLevels: StockLevelsSelect<false> | StockLevelsSelect<true>;
+    stockMovements: StockMovementsSelect<false> | StockMovementsSelect<true>;
+    stockCounts: StockCountsSelect<false> | StockCountsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -106,12 +129,14 @@ export interface Config {
     ('false' | 'none' | 'null') | false | null | ('fr' | 'en' | 'de' | 'pt') | ('fr' | 'en' | 'de' | 'pt')[];
   globals: {
     BusinessSettings: BusinessSetting;
+    HomePage: HomePage;
     Header: Header;
     Footer: Footer;
     HappyHour: HappyHour;
   };
   globalsSelect: {
     BusinessSettings: BusinessSettingsSelect<false> | BusinessSettingsSelect<true>;
+    HomePage: HomePageSelect<false> | HomePageSelect<true>;
     Header: HeaderSelect<false> | HeaderSelect<true>;
     Footer: FooterSelect<false> | FooterSelect<true>;
     HappyHour: HappyHourSelect<false> | HappyHourSelect<true>;
@@ -145,6 +170,8 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * The people who can sign in here, and what each one may do.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -175,6 +202,8 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Who changed what, and when. Read only.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "auditLogs".
  */
@@ -226,13 +255,15 @@ export interface Counter {
   last: number;
 }
 /**
+ * All the photos of the website. Add them here or straight from an event.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
   id: string;
   /**
-   * Describes the image (accessibility, SEO).
+   * Read aloud to blind visitors and used by Google. E.g. “Table set in the wine cellar”.
    */
   alt: string;
   caption?: string | null;
@@ -276,6 +307,8 @@ export interface Media {
   };
 }
 /**
+ * The content of “The House” page, block by block.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
  */
@@ -288,9 +321,6 @@ export interface Page {
         | {
             eyebrow?: string | null;
             titleA: string;
-            /**
-             * Shown in gold italics
-             */
             titleB?: string | null;
             subtitle?: string | null;
             image?: (string | null) | Media;
@@ -323,9 +353,6 @@ export interface Page {
             imagePosition: 'left' | 'right';
             eyebrow?: string | null;
             titleA: string;
-            /**
-             * Shown in gold italics
-             */
             titleB?: string | null;
             body?: {
               root: {
@@ -349,9 +376,6 @@ export interface Page {
         | {
             eyebrow?: string | null;
             titleA?: string | null;
-            /**
-             * Shown in gold italics
-             */
             titleB?: string | null;
             variant: 'hairline' | 'cards' | 'dark';
             cards?:
@@ -370,18 +394,15 @@ export interface Page {
         | {
             eyebrow?: string | null;
             titleA: string;
-            /**
-             * Shown in gold italics
-             */
             titleB?: string | null;
             subtitle?: string | null;
             buttons?:
               | {
                   label: string;
                   /**
-                   * Path without language, e.g. /contact. Empty: not clickable (page not online yet).
+                   * Empty: shown without a link (page not online yet).
                    */
-                  href?: string | null;
+                  href?: ('/' | '/maison' | '/events' | '/catering' | '/contact') | null;
                   style: 'solid' | 'outline';
                   id?: string | null;
                 }[]
@@ -402,6 +423,8 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Legal notice, privacy, terms. A page that is online appears in the footer.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legal".
  */
@@ -429,6 +452,8 @@ export interface Legal {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * The evenings and tastings shown on the Events page and on the home page.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
@@ -438,10 +463,13 @@ export interface Event {
   slug: string;
   startsAt: string;
   endsAt?: string | null;
-  image?: (string | null) | Media;
-  description?: string | null;
   /**
-   * Per person, in cents: 4500 = 45 €. 0 = free.
+   * Two or three sentences, shown under the name.
+   */
+  description?: string | null;
+  image?: (string | null) | Media;
+  /**
+   * 0 = free
    */
   priceCents: number;
   capacity?: number | null;
@@ -455,6 +483,8 @@ export interface Event {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * The menus on the Catering page, in the order you choose.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cateringPackages".
  */
@@ -462,23 +492,25 @@ export interface CateringPackage {
   id: string;
   name: string;
   tagline?: string | null;
+  pricePerGuestCents: number;
+  minGuests: number;
+  /**
+   * 1 = shown first
+   */
+  order?: number | null;
   includes?:
     | {
         item: string;
         id?: string | null;
       }[]
     | null;
-  /**
-   * In cents: 5500 = 55 €
-   */
-  pricePerGuestCents: number;
-  minGuests: number;
-  order?: number | null;
   image?: (string | null) | Media;
   updatedAt: string;
   createdAt: string;
 }
 /**
+ * Requests sent from the Catering page. Change the status when you reply.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cateringRequests".
  */
@@ -498,10 +530,247 @@ export interface CateringRequest {
   };
   notes?: string | null;
   /**
-   * Price per guest × guests, computed on the server.
+   * Price per guest × guests
    */
   estimateCents: number;
   locale: 'fr' | 'en' | 'de' | 'pt';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * The shop’s aisles (Wines, Port…) and the counter’s, in the order you choose.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  name: string;
+  kind: 'shop' | 'snack';
+  /**
+   * 1 = shown first
+   */
+  order?: number | null;
+  slug: string;
+  parent?: (string | null) | Category;
+  image?: (string | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brands".
+ */
+export interface Brand {
+  id: string;
+  name: string;
+  origin?: string | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * The wines, groceries and counter menu. Price and barcode are on each size (bottle, magnum…).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: string;
+  name: string;
+  kind: 'wine' | 'grocery' | 'snack' | 'gift' | 'other';
+  status: 'active' | 'draft' | 'archived';
+  slug: string;
+  category: string | Category;
+  brand?: (string | null) | Brand;
+  firstVariant?: {
+    priceCents: number;
+    barcode?: string | null;
+    /**
+     * Empty: made from the name.
+     */
+    sku?: string | null;
+  };
+  vatClass: 'standard' | 'intermediate' | 'reduced' | 'superReduced';
+  /**
+   * Each size has its own price, barcode and stock. Open it to add a box of 6 or 12.
+   */
+  variants?: {
+    docs?: (string | Variant)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  images?: (string | Media)[] | null;
+  badges?: ('signature' | 'rare' | 'dop' | 'bestseller' | 'homemade' | 'new')[] | null;
+  wine?: {
+    region?: string | null;
+    grape?: string | null;
+    vintage?: number | null;
+    colour?: ('red' | 'white' | 'rose' | 'sparkling' | 'fortified') | null;
+    abv?: number | null;
+    servingTemp?: string | null;
+  };
+  snack?: {
+    ingredients?: string | null;
+    allergens?:
+      | (
+          | 'gluten'
+          | 'crustaceans'
+          | 'eggs'
+          | 'fish'
+          | 'peanuts'
+          | 'soy'
+          | 'milk'
+          | 'nuts'
+          | 'celery'
+          | 'mustard'
+          | 'sesame'
+          | 'sulphites'
+          | 'lupin'
+          | 'molluscs'
+        )[]
+      | null;
+  };
+  loyaltyExcluded?: boolean | null;
+  giftCard?: boolean | null;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "variants".
+ */
+export interface Variant {
+  id: string;
+  title?: string | null;
+  product: string | Product;
+  label?: string | null;
+  priceCents: number;
+  costCents?: number | null;
+  /**
+   * Empty: made from the name.
+   */
+  sku: string;
+  barcode?: string | null;
+  channels?: ('webshop' | 'mobile' | 'pos')[] | null;
+  active?: boolean | null;
+  /**
+   * Unticked for what is made to order (counter) or gift vouchers.
+   */
+  trackStock?: boolean | null;
+  /**
+   * A box of 6 sells or receives 6 bottles at once. It can have its own barcode and price.
+   */
+  packaging?: {
+    docs?: (string | PackagingUnit)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "packagingUnits".
+ */
+export interface PackagingUnit {
+  id: string;
+  variant: string | Variant;
+  label: string;
+  factor: number;
+  barcode?: string | null;
+  /**
+   * Empty: units × unit price.
+   */
+  priceCents?: number | null;
+  channels?: ('webshop' | 'mobile' | 'pos')[] | null;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Quantities in stock, computed from the history. To correct stock, open the size and use “Correct stock”.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stockLevels".
+ */
+export interface StockLevel {
+  id: string;
+  variant: string | Variant;
+  onHand: number;
+  /**
+   * Empty: the default from the settings.
+   */
+  lowStockThreshold?: number | null;
+  lowStock?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Every stock movement in and out, with who and why. Nothing here can be changed or deleted.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stockMovements".
+ */
+export interface StockMovement {
+  id: string;
+  variant: string | Variant;
+  qty: number;
+  unit?: (string | null) | PackagingUnit;
+  unitQty?: number | null;
+  type: 'sale' | 'return' | 'cancel' | 'adjustment' | 'count' | 'receipt' | 'pos_import';
+  reason?: string | null;
+  channel: 'webshop' | 'mobile' | 'pos' | 'backoffice';
+  ref?: {
+    relationTo: 'stockCounts';
+    value: string | StockCount;
+  } | null;
+  user?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Count the bottles on the shelf, enter the quantities, then post: stock takes the counted quantities.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stockCounts".
+ */
+export interface StockCount {
+  id: string;
+  note?: string | null;
+  status: 'open' | 'posted';
+  postedAt?: string | null;
+  lines?:
+    | {
+        variant: string | Variant;
+        counted: number;
+        /**
+         * Stock at the moment of posting.
+         */
+        expected?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  user?: (string | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -568,6 +837,38 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'cateringRequests';
         value: string | CateringRequest;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: string | Category;
+      } | null)
+    | ({
+        relationTo: 'brands';
+        value: string | Brand;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: string | Product;
+      } | null)
+    | ({
+        relationTo: 'variants';
+        value: string | Variant;
+      } | null)
+    | ({
+        relationTo: 'packagingUnits';
+        value: string | PackagingUnit;
+      } | null)
+    | ({
+        relationTo: 'stockLevels';
+        value: string | StockLevel;
+      } | null)
+    | ({
+        relationTo: 'stockMovements';
+        value: string | StockMovement;
+      } | null)
+    | ({
+        relationTo: 'stockCounts';
+        value: string | StockCount;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -834,8 +1135,8 @@ export interface EventsSelect<T extends boolean = true> {
   slug?: T;
   startsAt?: T;
   endsAt?: T;
-  image?: T;
   description?: T;
+  image?: T;
   priceCents?: T;
   capacity?: T;
   booked?: T;
@@ -856,15 +1157,15 @@ export interface EventsSelect<T extends boolean = true> {
 export interface CateringPackagesSelect<T extends boolean = true> {
   name?: T;
   tagline?: T;
+  pricePerGuestCents?: T;
+  minGuests?: T;
+  order?: T;
   includes?:
     | T
     | {
         item?: T;
         id?: T;
       };
-  pricePerGuestCents?: T;
-  minGuests?: T;
-  order?: T;
   image?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -891,6 +1192,164 @@ export interface CateringRequestsSelect<T extends boolean = true> {
   notes?: T;
   estimateCents?: T;
   locale?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  kind?: T;
+  order?: T;
+  slug?: T;
+  parent?: T;
+  image?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brands_select".
+ */
+export interface BrandsSelect<T extends boolean = true> {
+  name?: T;
+  origin?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  name?: T;
+  kind?: T;
+  status?: T;
+  slug?: T;
+  category?: T;
+  brand?: T;
+  firstVariant?:
+    | T
+    | {
+        priceCents?: T;
+        barcode?: T;
+        sku?: T;
+      };
+  vatClass?: T;
+  variants?: T;
+  description?: T;
+  images?: T;
+  badges?: T;
+  wine?:
+    | T
+    | {
+        region?: T;
+        grape?: T;
+        vintage?: T;
+        colour?: T;
+        abv?: T;
+        servingTemp?: T;
+      };
+  snack?:
+    | T
+    | {
+        ingredients?: T;
+        allergens?: T;
+      };
+  loyaltyExcluded?: T;
+  giftCard?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "variants_select".
+ */
+export interface VariantsSelect<T extends boolean = true> {
+  title?: T;
+  product?: T;
+  label?: T;
+  priceCents?: T;
+  costCents?: T;
+  sku?: T;
+  barcode?: T;
+  channels?: T;
+  active?: T;
+  trackStock?: T;
+  packaging?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "packagingUnits_select".
+ */
+export interface PackagingUnitsSelect<T extends boolean = true> {
+  variant?: T;
+  label?: T;
+  factor?: T;
+  barcode?: T;
+  priceCents?: T;
+  channels?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stockLevels_select".
+ */
+export interface StockLevelsSelect<T extends boolean = true> {
+  variant?: T;
+  onHand?: T;
+  lowStockThreshold?: T;
+  lowStock?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stockMovements_select".
+ */
+export interface StockMovementsSelect<T extends boolean = true> {
+  variant?: T;
+  qty?: T;
+  unit?: T;
+  unitQty?: T;
+  type?: T;
+  reason?: T;
+  channel?: T;
+  ref?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stockCounts_select".
+ */
+export interface StockCountsSelect<T extends boolean = true> {
+  note?: T;
+  status?: T;
+  postedAt?: T;
+  lines?:
+    | T
+    | {
+        variant?: T;
+        counted?: T;
+        expected?: T;
+        id?: T;
+      };
+  user?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -935,6 +1394,8 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Address, contact, opening hours and social links, shown all over the website.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "BusinessSettings".
  */
@@ -943,31 +1404,229 @@ export interface BusinessSetting {
   business: {
     name: string;
     legalName?: string | null;
+    phone?: string | null;
+    email?: string | null;
     street: string;
     postalCode: string;
     city: string;
     country?: string | null;
-    phone?: string | null;
-    email?: string | null;
+    /**
+     * Empty: directions are found from the address.
+     */
+    mapsUrl?: string | null;
+    instagram?: string | null;
+    facebook?: string | null;
     vatNumber?: string | null;
     rcs?: string | null;
     iban?: string | null;
     bic?: string | null;
-    mapsUrl?: string | null;
-    instagram?: string | null;
-    facebook?: string | null;
   };
   /**
-   * One row per open day (a day may have two rows). Days without a row are closed.
+   * One line per open day (two lines if you close at lunchtime). A day without a line is closed.
    */
   hours?:
     | {
         day: '0' | '1' | '2' | '3' | '4' | '5' | '6';
-        open: string;
-        close: string;
+        open:
+          | '00:00'
+          | '00:15'
+          | '00:30'
+          | '00:45'
+          | '01:00'
+          | '01:15'
+          | '01:30'
+          | '01:45'
+          | '02:00'
+          | '02:15'
+          | '02:30'
+          | '02:45'
+          | '03:00'
+          | '03:15'
+          | '03:30'
+          | '03:45'
+          | '04:00'
+          | '04:15'
+          | '04:30'
+          | '04:45'
+          | '05:00'
+          | '05:15'
+          | '05:30'
+          | '05:45'
+          | '06:00'
+          | '06:15'
+          | '06:30'
+          | '06:45'
+          | '07:00'
+          | '07:15'
+          | '07:30'
+          | '07:45'
+          | '08:00'
+          | '08:15'
+          | '08:30'
+          | '08:45'
+          | '09:00'
+          | '09:15'
+          | '09:30'
+          | '09:45'
+          | '10:00'
+          | '10:15'
+          | '10:30'
+          | '10:45'
+          | '11:00'
+          | '11:15'
+          | '11:30'
+          | '11:45'
+          | '12:00'
+          | '12:15'
+          | '12:30'
+          | '12:45'
+          | '13:00'
+          | '13:15'
+          | '13:30'
+          | '13:45'
+          | '14:00'
+          | '14:15'
+          | '14:30'
+          | '14:45'
+          | '15:00'
+          | '15:15'
+          | '15:30'
+          | '15:45'
+          | '16:00'
+          | '16:15'
+          | '16:30'
+          | '16:45'
+          | '17:00'
+          | '17:15'
+          | '17:30'
+          | '17:45'
+          | '18:00'
+          | '18:15'
+          | '18:30'
+          | '18:45'
+          | '19:00'
+          | '19:15'
+          | '19:30'
+          | '19:45'
+          | '20:00'
+          | '20:15'
+          | '20:30'
+          | '20:45'
+          | '21:00'
+          | '21:15'
+          | '21:30'
+          | '21:45'
+          | '22:00'
+          | '22:15'
+          | '22:30'
+          | '22:45'
+          | '23:00'
+          | '23:15'
+          | '23:30'
+          | '23:45';
+        close:
+          | '00:00'
+          | '00:15'
+          | '00:30'
+          | '00:45'
+          | '01:00'
+          | '01:15'
+          | '01:30'
+          | '01:45'
+          | '02:00'
+          | '02:15'
+          | '02:30'
+          | '02:45'
+          | '03:00'
+          | '03:15'
+          | '03:30'
+          | '03:45'
+          | '04:00'
+          | '04:15'
+          | '04:30'
+          | '04:45'
+          | '05:00'
+          | '05:15'
+          | '05:30'
+          | '05:45'
+          | '06:00'
+          | '06:15'
+          | '06:30'
+          | '06:45'
+          | '07:00'
+          | '07:15'
+          | '07:30'
+          | '07:45'
+          | '08:00'
+          | '08:15'
+          | '08:30'
+          | '08:45'
+          | '09:00'
+          | '09:15'
+          | '09:30'
+          | '09:45'
+          | '10:00'
+          | '10:15'
+          | '10:30'
+          | '10:45'
+          | '11:00'
+          | '11:15'
+          | '11:30'
+          | '11:45'
+          | '12:00'
+          | '12:15'
+          | '12:30'
+          | '12:45'
+          | '13:00'
+          | '13:15'
+          | '13:30'
+          | '13:45'
+          | '14:00'
+          | '14:15'
+          | '14:30'
+          | '14:45'
+          | '15:00'
+          | '15:15'
+          | '15:30'
+          | '15:45'
+          | '16:00'
+          | '16:15'
+          | '16:30'
+          | '16:45'
+          | '17:00'
+          | '17:15'
+          | '17:30'
+          | '17:45'
+          | '18:00'
+          | '18:15'
+          | '18:30'
+          | '18:45'
+          | '19:00'
+          | '19:15'
+          | '19:30'
+          | '19:45'
+          | '20:00'
+          | '20:15'
+          | '20:30'
+          | '20:45'
+          | '21:00'
+          | '21:15'
+          | '21:30'
+          | '21:45'
+          | '22:00'
+          | '22:15'
+          | '22:30'
+          | '22:45'
+          | '23:00'
+          | '23:15'
+          | '23:30'
+          | '23:45';
         id?: string | null;
       }[]
     | null;
+  /**
+   * Public holidays, holidays: the website shows “closed” that day.
+   */
   closedDates?:
     | {
         date: string;
@@ -977,16 +1636,10 @@ export interface BusinessSetting {
   vat?:
     | {
         key: 'standard' | 'intermediate' | 'reduced' | 'superReduced';
-        /**
-         * Basis points: 1700 = 17 %
-         */
         rateBp: number;
         id?: string | null;
       }[]
     | null;
-  /**
-   * {YYYY} = year, {0000} = zero-padded number.
-   */
   numbering?: {
     invoice?: string | null;
     creditNote?: string | null;
@@ -1000,9 +1653,6 @@ export interface BusinessSetting {
     lowStockEmail?: string | null;
     outboxAlertEmail?: string | null;
   };
-  /**
-   * Optional modules. Core modules cannot be switched off.
-   */
   modules?: {
     b2b?: boolean | null;
     purchasing?: boolean | null;
@@ -1025,21 +1675,44 @@ export interface BusinessSetting {
   createdAt?: string | null;
 }
 /**
+ * The big title and photo at the top of the home page. Upcoming events appear there by themselves.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HomePage".
+ */
+export interface HomePage {
+  id: string;
+  hero?: {
+    eyebrow?: string | null;
+    titleA?: string | null;
+    titleB?: string | null;
+    subtitle?: string | null;
+    /**
+     * Empty: the current wine-glass photo.
+     */
+    image?: (string | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The links at the top of every page of the website.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "Header".
  */
 export interface Header {
   id: string;
   /**
-   * The first three sit left of the logo on desktop, the rest on the right.
+   * On computers the first three sit left of the logo, the rest on the right. Drag ⠿ to change the order.
    */
   navItems?:
     | {
         label: string;
         /**
-         * Path without language, e.g. /maison. Leave empty to show plain text (page not online yet).
+         * Empty: shown without a link (page not online yet).
          */
-        href?: string | null;
+        href?: ('/' | '/maison' | '/events' | '/catering' | '/contact') | null;
         id?: string | null;
       }[]
     | null;
@@ -1047,7 +1720,7 @@ export interface Header {
   createdAt?: string | null;
 }
 /**
- * Published legal pages are linked automatically.
+ * The bottom of every page. Legal pages that are online are added automatically.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "Footer".
@@ -1062,9 +1735,9 @@ export interface Footer {
           | {
               label: string;
               /**
-               * Path without language, e.g. /maison. Leave empty to show plain text (page not online yet).
+               * Empty: shown without a link (page not online yet).
                */
-              href?: string | null;
+              href?: ('/' | '/maison' | '/events' | '/catering' | '/contact') | null;
               id?: string | null;
             }[]
           | null;
@@ -1075,25 +1748,216 @@ export interface Footer {
   createdAt?: string | null;
 }
 /**
+ * The Happy Hour section of the home page.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "HappyHour".
  */
 export interface HappyHour {
   id: string;
   /**
-   * Hides the home-page section when off.
+   * Untick to hide the section.
    */
   active?: boolean | null;
   days: ('0' | '1' | '2' | '3' | '4' | '5' | '6')[];
-  from: string;
-  to: string;
+  from:
+    | '00:00'
+    | '00:15'
+    | '00:30'
+    | '00:45'
+    | '01:00'
+    | '01:15'
+    | '01:30'
+    | '01:45'
+    | '02:00'
+    | '02:15'
+    | '02:30'
+    | '02:45'
+    | '03:00'
+    | '03:15'
+    | '03:30'
+    | '03:45'
+    | '04:00'
+    | '04:15'
+    | '04:30'
+    | '04:45'
+    | '05:00'
+    | '05:15'
+    | '05:30'
+    | '05:45'
+    | '06:00'
+    | '06:15'
+    | '06:30'
+    | '06:45'
+    | '07:00'
+    | '07:15'
+    | '07:30'
+    | '07:45'
+    | '08:00'
+    | '08:15'
+    | '08:30'
+    | '08:45'
+    | '09:00'
+    | '09:15'
+    | '09:30'
+    | '09:45'
+    | '10:00'
+    | '10:15'
+    | '10:30'
+    | '10:45'
+    | '11:00'
+    | '11:15'
+    | '11:30'
+    | '11:45'
+    | '12:00'
+    | '12:15'
+    | '12:30'
+    | '12:45'
+    | '13:00'
+    | '13:15'
+    | '13:30'
+    | '13:45'
+    | '14:00'
+    | '14:15'
+    | '14:30'
+    | '14:45'
+    | '15:00'
+    | '15:15'
+    | '15:30'
+    | '15:45'
+    | '16:00'
+    | '16:15'
+    | '16:30'
+    | '16:45'
+    | '17:00'
+    | '17:15'
+    | '17:30'
+    | '17:45'
+    | '18:00'
+    | '18:15'
+    | '18:30'
+    | '18:45'
+    | '19:00'
+    | '19:15'
+    | '19:30'
+    | '19:45'
+    | '20:00'
+    | '20:15'
+    | '20:30'
+    | '20:45'
+    | '21:00'
+    | '21:15'
+    | '21:30'
+    | '21:45'
+    | '22:00'
+    | '22:15'
+    | '22:30'
+    | '22:45'
+    | '23:00'
+    | '23:15'
+    | '23:30'
+    | '23:45';
+  to:
+    | '00:00'
+    | '00:15'
+    | '00:30'
+    | '00:45'
+    | '01:00'
+    | '01:15'
+    | '01:30'
+    | '01:45'
+    | '02:00'
+    | '02:15'
+    | '02:30'
+    | '02:45'
+    | '03:00'
+    | '03:15'
+    | '03:30'
+    | '03:45'
+    | '04:00'
+    | '04:15'
+    | '04:30'
+    | '04:45'
+    | '05:00'
+    | '05:15'
+    | '05:30'
+    | '05:45'
+    | '06:00'
+    | '06:15'
+    | '06:30'
+    | '06:45'
+    | '07:00'
+    | '07:15'
+    | '07:30'
+    | '07:45'
+    | '08:00'
+    | '08:15'
+    | '08:30'
+    | '08:45'
+    | '09:00'
+    | '09:15'
+    | '09:30'
+    | '09:45'
+    | '10:00'
+    | '10:15'
+    | '10:30'
+    | '10:45'
+    | '11:00'
+    | '11:15'
+    | '11:30'
+    | '11:45'
+    | '12:00'
+    | '12:15'
+    | '12:30'
+    | '12:45'
+    | '13:00'
+    | '13:15'
+    | '13:30'
+    | '13:45'
+    | '14:00'
+    | '14:15'
+    | '14:30'
+    | '14:45'
+    | '15:00'
+    | '15:15'
+    | '15:30'
+    | '15:45'
+    | '16:00'
+    | '16:15'
+    | '16:30'
+    | '16:45'
+    | '17:00'
+    | '17:15'
+    | '17:30'
+    | '17:45'
+    | '18:00'
+    | '18:15'
+    | '18:30'
+    | '18:45'
+    | '19:00'
+    | '19:15'
+    | '19:30'
+    | '19:45'
+    | '20:00'
+    | '20:15'
+    | '20:30'
+    | '20:45'
+    | '21:00'
+    | '21:15'
+    | '21:30'
+    | '21:45'
+    | '22:00'
+    | '22:15'
+    | '22:30'
+    | '22:45'
+    | '23:00'
+    | '23:15'
+    | '23:30'
+    | '23:45';
   titleA: string;
-  /**
-   * Shown in gold italics
-   */
   titleB?: string | null;
   /**
-   * Wrap words in <gold>…</gold> to colour them gold.
+   * To show words in gold, surround them like this: <gold>half price</gold>
    */
   text?: string | null;
   image?: (string | null) | Media;
@@ -1110,19 +1974,19 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
     | {
         name?: T;
         legalName?: T;
+        phone?: T;
+        email?: T;
         street?: T;
         postalCode?: T;
         city?: T;
         country?: T;
-        phone?: T;
-        email?: T;
+        mapsUrl?: T;
+        instagram?: T;
+        facebook?: T;
         vatNumber?: T;
         rcs?: T;
         iban?: T;
         bic?: T;
-        mapsUrl?: T;
-        instagram?: T;
-        facebook?: T;
       };
   hours?:
     | T
@@ -1181,6 +2045,24 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
         days?: T;
         label?: T;
         id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HomePage_select".
+ */
+export interface HomePageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        titleA?: T;
+        titleB?: T;
+        subtitle?: T;
+        image?: T;
       };
   updatedAt?: T;
   createdAt?: T;

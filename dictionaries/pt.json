@@ -267,80 +267,6 @@
       "rare": "Raro",
       "dop": "DOP",
       "bestseller": "Mais vendido"
-    },
-    "products": {
-      "douro-reserva": {
-        "name": "Douro Reserva 2019",
-        "region": "Douro"
-      },
-      "alentejo-tinto": {
-        "name": "Alentejo Tinto",
-        "region": "Alentejo"
-      },
-      "vinho-verde": {
-        "name": "Vinho Verde",
-        "region": "Minho"
-      },
-      "dao-quinta": {
-        "name": "Quinta do Dão",
-        "region": "Dão"
-      },
-      "port-tawny": {
-        "name": "Porto Tawny 20 anos",
-        "region": "Porto"
-      },
-      "port-lbv": {
-        "name": "Porto LBV 2017",
-        "region": "Porto"
-      },
-      "sagres": {
-        "name": "Sagres · Pack 6",
-        "region": "Cerveja"
-      },
-      "super-bock": {
-        "name": "Super Bock",
-        "region": "Cerveja"
-      },
-      "sao-jorge": {
-        "name": "São Jorge, 12 meses",
-        "region": "Açores"
-      },
-      "serra": {
-        "name": "Serra da Estrela",
-        "region": "Beira"
-      },
-      "chourico": {
-        "name": "Chouriço fumado",
-        "region": "Trás-os-Montes"
-      },
-      "presunto": {
-        "name": "Presunto Bísaro",
-        "region": "Trás-os-Montes"
-      },
-      "azeite": {
-        "name": "Azeite virgem extra",
-        "region": "Alentejo"
-      },
-      "sardines": {
-        "name": "Sardinhas em azeite",
-        "region": "Conserva"
-      },
-      "flor-sal": {
-        "name": "Flor de sal do Algarve",
-        "region": "Algarve"
-      },
-      "box-descoberta": {
-        "name": "Caixa Descoberta",
-        "region": "Oferta"
-      },
-      "box-prestige": {
-        "name": "Caixa Prestige",
-        "region": "Oferta"
-      },
-      "box-porto": {
-        "name": "Caixa Porto & Chocolate",
-        "region": "Oferta"
-      }
     }
   },
   "snackPage": {
@@ -357,33 +283,7 @@
       "signature": "Signature",
       "homemade": "Caseiro"
     },
-    "add": "Adicionar",
-    "menu": {
-      "bifana": {
-        "name": "Bifana",
-        "desc": "Porco marinado à portuguesa, mostarda piri-piri, pão estaladiço."
-      },
-      "prego": {
-        "name": "Prego no Pão",
-        "desc": "Bife suculento no papo-seco amanteigado."
-      },
-      "alheira": {
-        "name": "Alheira de Mirandela",
-        "desc": "Enchido tradicional, ovo estrelado, batatas caseiras."
-      },
-      "pastel": {
-        "name": "Pastel de Nata",
-        "desc": "Massa folhada estaladiça, creme dourado ao forno."
-      },
-      "queijo": {
-        "name": "Tábua de queijos",
-        "desc": "São Jorge, Serra, Azeitão, doce, pão, azeitonas."
-      },
-      "vinho": {
-        "name": "Copo de vinho do dia",
-        "desc": "Escolha do Ivo — tinto, branco ou rosé, ao copo."
-      }
-    }
+    "add": "Adicionar"
   },
   "cateringPage": {
     "eyebrow": "Catering",

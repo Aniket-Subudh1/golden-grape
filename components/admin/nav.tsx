@@ -7,7 +7,7 @@ type Key = keyof ReturnType<typeof adminText>['nav'];
 
 // The admin sidebar (Payload `admin.components.Nav`), laid out like the CUTM LMS sidebar: brand block, grouped
 // icon items in everyday words, then account links. Only what the user's role may open is listed.
-const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean; icon: string }[] }[] = [
+const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean; icon: string; query?: string }[] }[] = [
   {
     label: 'website',
     items: [
@@ -18,6 +18,18 @@ const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean;
       { label: 'photos', slug: 'media', icon: 'media' },
       { label: 'house', slug: 'pages', icon: 'pages' },
       { label: 'legal', slug: 'legal', icon: 'legal' },
+    ],
+  },
+  {
+    label: 'catalogue',
+    items: [
+      { label: 'products', slug: 'products', icon: 'products' },
+      { label: 'categories', slug: 'categories', icon: 'categories' },
+      { label: 'producers', slug: 'brands', icon: 'producers' },
+      // Payload's own list, opened with the low-stock filter (staff can clear it to see all levels).
+      { label: 'lowStock', slug: 'stockLevels', icon: 'lowStock', query: '?where[lowStock][equals]=true' },
+      { label: 'stockCounts', slug: 'stockCounts', icon: 'counts' },
+      { label: 'stockMovements', slug: 'stockMovements', icon: 'movements' },
     ],
   },
   { label: 'requests', items: [{ label: 'cateringRequests', slug: 'cateringRequests', icon: 'requests' }] },
@@ -39,7 +51,7 @@ export default function AdminNav({ visibleEntities, i18n }: { visibleEntities: V
     label: t.nav[g.label],
     items: g.items
       .filter((i) => ((i.global ? visibleEntities.globals : visibleEntities.collections) as string[]).includes(i.slug))
-      .map((i) => ({ label: t.nav[i.label], icon: i.icon, href: `/admin/${i.global ? 'globals' : 'collections'}/${i.slug}` })),
+      .map((i) => ({ label: t.nav[i.label], icon: i.icon, href: `/admin/${i.global ? 'globals' : 'collections'}/${i.slug}${i.query ?? ''}` })),
   })).filter((g) => g.items.length > 0);
   return <NavClient groups={groups} text={{ ...t.nav, brandSub: t.brandSub }} />;
 }

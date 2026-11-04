@@ -8,14 +8,17 @@ import { en } from '@payloadcms/translations/languages/en';
 import { fr } from '@payloadcms/translations/languages/fr';
 import { pt } from '@payloadcms/translations/languages/pt';
 import { s3Storage } from '@payloadcms/storage-s3';
+import type { CreateIndexesOptions, IndexSpecification } from 'mongodb';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
 import { env, isBuildPhase, s3Configured, smtpConfigured } from '@/lib/env';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { cmsCollections } from '@/modules/cms/collections';
 import { cmsGlobals } from '@/modules/cms/globals';
+import { catalogueCollections } from '@/modules/catalogue/collections';
 import { cateringPackages, cateringRequests } from '@/modules/catering/collections';
 import { events } from '@/modules/events/collections';
+import { inventoryCollections } from '@/modules/inventory/collections';
 import { settingsCollections } from '@/modules/settings/collections';
 import { businessSettings } from '@/modules/settings/globals';
 
@@ -43,19 +46,27 @@ export default buildConfig({
       views: { dashboard: { Component: '@/components/admin/dashboard' } },
     },
   },
-  collections: [...settingsCollections, ...cmsCollections, events, cateringPackages, cateringRequests],
+  collections: [
+    ...settingsCollections,
+    ...cmsCollections,
+    events,
+    cateringPackages,
+    cateringRequests,
+    ...catalogueCollections,
+    ...inventoryCollections,
+  ],
   globals: [businessSettings, ...cmsGlobals],
   db: mongooseAdapter({
     url: isBuildPhase ? false : env.DATABASE_URL,
     transactionOptions: {},
-    // Payload has no TTL index option; collections declare `custom.ttl` and get one here.
+    // Indexes Payload cannot declare: TTL (`custom.ttl`), and text, descending or partial ones (`custom.indexes`).
     afterOpenConnection: async (adapter) => {
       for (const { slug, custom } of adapter.payload.config.collections) {
-        if (!custom?.ttl) continue;
-        await adapter.collections[slug].collection.createIndex(
-          { [custom.ttl.field]: 1 },
-          { expireAfterSeconds: custom.ttl.seconds },
-        );
+        const { collection } = adapter.collections[slug];
+        if (custom?.ttl) await collection.createIndex({ [custom.ttl.field]: 1 }, { expireAfterSeconds: custom.ttl.seconds });
+        for (const index of (custom?.indexes ?? []) as { fields: IndexSpecification; options?: CreateIndexesOptions }[]) {
+          await collection.createIndex(index.fields, index.options);
+        }
       }
     },
   }),

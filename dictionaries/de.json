@@ -267,80 +267,6 @@
       "rare": "Selten",
       "dop": "DOP",
       "bestseller": "Bestseller"
-    },
-    "products": {
-      "douro-reserva": {
-        "name": "Douro Reserva 2019",
-        "region": "Douro"
-      },
-      "alentejo-tinto": {
-        "name": "Alentejo Tinto",
-        "region": "Alentejo"
-      },
-      "vinho-verde": {
-        "name": "Vinho Verde",
-        "region": "Minho"
-      },
-      "dao-quinta": {
-        "name": "Quinta do Dão",
-        "region": "Dão"
-      },
-      "port-tawny": {
-        "name": "Portwein Tawny 20 J.",
-        "region": "Porto"
-      },
-      "port-lbv": {
-        "name": "Portwein LBV 2017",
-        "region": "Porto"
-      },
-      "sagres": {
-        "name": "Sagres · 6er-Pack",
-        "region": "Bier"
-      },
-      "super-bock": {
-        "name": "Super Bock",
-        "region": "Bier"
-      },
-      "sao-jorge": {
-        "name": "São Jorge, 12 Monate",
-        "region": "Azoren"
-      },
-      "serra": {
-        "name": "Serra da Estrela",
-        "region": "Beira"
-      },
-      "chourico": {
-        "name": "Chouriço geräuchert",
-        "region": "Trás-os-Montes"
-      },
-      "presunto": {
-        "name": "Presunto Bísaro",
-        "region": "Trás-os-Montes"
-      },
-      "azeite": {
-        "name": "Natives Olivenöl extra",
-        "region": "Alentejo"
-      },
-      "sardines": {
-        "name": "Sardinen in Öl",
-        "region": "Konserve"
-      },
-      "flor-sal": {
-        "name": "Fleur de sel Algarve",
-        "region": "Algarve"
-      },
-      "box-descoberta": {
-        "name": "Geschenkbox Descoberta",
-        "region": "Geschenk"
-      },
-      "box-prestige": {
-        "name": "Geschenkbox Prestige",
-        "region": "Geschenk"
-      },
-      "box-porto": {
-        "name": "Box Port & Schokolade",
-        "region": "Geschenk"
-      }
     }
   },
   "snackPage": {
@@ -357,33 +283,7 @@
       "signature": "Signature",
       "homemade": "Hausgemacht"
     },
-    "add": "Hinzufügen",
-    "menu": {
-      "bifana": {
-        "name": "Bifana",
-        "desc": "Mariniertes Schweinefleisch, Piri-Piri-Senf, knuspriges Brot."
-      },
-      "prego": {
-        "name": "Prego no Pão",
-        "desc": "Saftiges Knoblauchsteak in goldener Butterbrötchen."
-      },
-      "alheira": {
-        "name": "Alheira de Mirandela",
-        "desc": "Traditionelle Wurst, Spiegelei, hausgemachte Pommes."
-      },
-      "pastel": {
-        "name": "Pastel de Nata",
-        "desc": "Knuspriger Blätterteig, goldene Vanillecreme."
-      },
-      "queijo": {
-        "name": "Käseplatte",
-        "desc": "São Jorge, Serra, Azeitão, Konfitüre, Brot, Oliven."
-      },
-      "vinho": {
-        "name": "Wein des Tages",
-        "desc": "Ivos Auswahl — Rot, Weiß oder Rosé, im Glas."
-      }
-    }
+    "add": "Hinzufügen"
   },
   "cateringPage": {
     "eyebrow": "Catering",

@@ -1439,3 +1439,151 @@ main[class*='global-edit--'] .document-fields__fields {
     color: rgb(255 255 255 / 0.82);
   }
 }
+
+/* ---- Stock panel (variant "Stock" tab) and the stock-count Post button --------------------- */
+.gg-stock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.gg-stock--count {
+  padding: 16px;
+  border: 1px solid var(--gg-line);
+  border-radius: 8px;
+  background: var(--gg-accent);
+}
+.gg-stock__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px 40px;
+  width: 100%;
+}
+.gg-stock__level {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.gg-stock__level strong {
+  font: 600 32px/1 var(--font-body);
+}
+.gg-stock__level small {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--gg-text-2);
+}
+.gg-stock__label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gg-text-2);
+}
+.gg-stock__alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 12px;
+}
+.gg-stock input,
+.gg-stock select {
+  height: 36px;
+  min-width: 0;
+  padding: 0 10px;
+  border: 1px solid var(--gg-line-2);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--gg-ink);
+  font: 400 13px var(--font-body);
+}
+.gg-stock__alert input {
+  width: 96px;
+}
+.gg-stock__hint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 12px;
+  color: var(--gg-text-2);
+}
+.gg-stock__done {
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gg-primary);
+}
+.gg-stock__form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px 16px;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--gg-line);
+  border-radius: 8px;
+  background: var(--gg-accent);
+}
+.gg-stock__form input,
+.gg-stock__form select {
+  width: 100%;
+}
+.gg-stock__wide,
+.gg-stock__actions {
+  grid-column: 1 / -1;
+}
+.gg-stock__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.gg-stock .gg-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.gg-stock__title {
+  margin: 8px 0 0;
+  font: 600 15px var(--font-body);
+}
+.gg-stock__table {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--gg-line);
+  border-radius: 8px;
+}
+.gg-stock__table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.gg-stock__table th,
+.gg-stock__table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--gg-line);
+  text-align: left;
+  white-space: nowrap;
+}
+.gg-stock__table th {
+  background: var(--gg-panel);
+  font-weight: 500;
+  color: var(--gg-text-2);
+}
+.gg-stock__table tr:last-child td {
+  border-bottom: 0;
+}
+.gg-stock__minus {
+  color: var(--gg-danger);
+  font-weight: 600;
+}
+.gg-stock__plus {
+  color: #2e6b3a;
+  font-weight: 600;
+}
+.gg-stock__pages {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+.gg-stock .gg-badge {
+  align-self: flex-start;
+  text-transform: none;
+}

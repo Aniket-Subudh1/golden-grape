@@ -164,6 +164,118 @@
           "Sommelier & maître d'hôtel"
         ]
       }
+    },
+    "catalogue": {
+      "categories": {
+        "wines": "Vins",
+        "port": "Porto",
+        "beers": "Bières",
+        "cheese": "Fromages",
+        "charcuterie": "Charcuterie",
+        "grocery": "Épicerie",
+        "gifts": "Coffrets"
+      },
+      "counter": "Comptoir",
+      "products": {
+        "douro-reserva": {
+          "name": "Douro Reserva 2019",
+          "region": "Douro"
+        },
+        "alentejo-tinto": {
+          "name": "Alentejo Tinto",
+          "region": "Alentejo"
+        },
+        "vinho-verde": {
+          "name": "Vinho Verde",
+          "region": "Minho"
+        },
+        "dao-quinta": {
+          "name": "Quinta do Dão",
+          "region": "Dão"
+        },
+        "port-tawny": {
+          "name": "Porto Tawny 20 ans",
+          "region": "Porto"
+        },
+        "port-lbv": {
+          "name": "Porto LBV 2017",
+          "region": "Porto"
+        },
+        "sagres": {
+          "name": "Sagres · Pack 6",
+          "region": "Bière"
+        },
+        "super-bock": {
+          "name": "Super Bock",
+          "region": "Bière"
+        },
+        "sao-jorge": {
+          "name": "São Jorge affiné 12 mois",
+          "region": "Açores"
+        },
+        "serra": {
+          "name": "Serra da Estrela",
+          "region": "Beira"
+        },
+        "chourico": {
+          "name": "Chouriço fumé",
+          "region": "Trás-os-Montes"
+        },
+        "presunto": {
+          "name": "Presunto Bísaro",
+          "region": "Trás-os-Montes"
+        },
+        "azeite": {
+          "name": "Huile d'olive extra vierge",
+          "region": "Alentejo"
+        },
+        "sardines": {
+          "name": "Sardines à l'huile",
+          "region": "Conserve"
+        },
+        "flor-sal": {
+          "name": "Fleur de sel de l'Algarve",
+          "region": "Algarve"
+        },
+        "box-descoberta": {
+          "name": "Coffret Descoberta",
+          "region": "Cadeau"
+        },
+        "box-prestige": {
+          "name": "Coffret Prestige",
+          "region": "Cadeau"
+        },
+        "box-porto": {
+          "name": "Coffret Porto & Chocolat",
+          "region": "Cadeau"
+        }
+      },
+      "menu": {
+        "bifana": {
+          "name": "Bifana",
+          "desc": "Porc mariné à la portugaise, moutarde piri-piri, pain croustillant."
+        },
+        "prego": {
+          "name": "Prego no Pão",
+          "desc": "Steak juteux à l'ail, dans un pain doré au beurre."
+        },
+        "alheira": {
+          "name": "Alheira de Mirandela",
+          "desc": "Saucisse traditionnelle, œuf au plat, frites maison."
+        },
+        "pastel": {
+          "name": "Pastel de Nata",
+          "desc": "Feuilleté croustillant, crème vanillée dorée au four."
+        },
+        "queijo": {
+          "name": "Planche de fromages",
+          "desc": "São Jorge, Serra, Azeitão, confiture, pain, olives."
+        },
+        "vinho": {
+          "name": "Verre de vin du jour",
+          "desc": "Sélection d'Ivo — rouge, blanc ou rosé, servi au verre."
+        }
+      }
     }
   },
   "en": {
@@ -330,6 +442,118 @@
           "Collection wines",
           "Sommelier & maître d'hôtel"
         ]
+      }
+    },
+    "catalogue": {
+      "categories": {
+        "wines": "Wines",
+        "port": "Port",
+        "beers": "Beers",
+        "cheese": "Cheeses",
+        "charcuterie": "Charcuterie",
+        "grocery": "Grocery",
+        "gifts": "Gift boxes"
+      },
+      "counter": "Counter",
+      "products": {
+        "douro-reserva": {
+          "name": "Douro Reserva 2019",
+          "region": "Douro"
+        },
+        "alentejo-tinto": {
+          "name": "Alentejo Tinto",
+          "region": "Alentejo"
+        },
+        "vinho-verde": {
+          "name": "Vinho Verde",
+          "region": "Minho"
+        },
+        "dao-quinta": {
+          "name": "Quinta do Dão",
+          "region": "Dão"
+        },
+        "port-tawny": {
+          "name": "Port Tawny 20 years",
+          "region": "Porto"
+        },
+        "port-lbv": {
+          "name": "Port LBV 2017",
+          "region": "Porto"
+        },
+        "sagres": {
+          "name": "Sagres · 6-pack",
+          "region": "Beer"
+        },
+        "super-bock": {
+          "name": "Super Bock",
+          "region": "Beer"
+        },
+        "sao-jorge": {
+          "name": "São Jorge, 12 months",
+          "region": "Azores"
+        },
+        "serra": {
+          "name": "Serra da Estrela",
+          "region": "Beira"
+        },
+        "chourico": {
+          "name": "Smoked Chouriço",
+          "region": "Trás-os-Montes"
+        },
+        "presunto": {
+          "name": "Presunto Bísaro",
+          "region": "Trás-os-Montes"
+        },
+        "azeite": {
+          "name": "Extra virgin olive oil",
+          "region": "Alentejo"
+        },
+        "sardines": {
+          "name": "Sardines in oil",
+          "region": "Preserve"
+        },
+        "flor-sal": {
+          "name": "Algarve fleur de sel",
+          "region": "Algarve"
+        },
+        "box-descoberta": {
+          "name": "Descoberta Gift Box",
+          "region": "Gift"
+        },
+        "box-prestige": {
+          "name": "Prestige Gift Box",
+          "region": "Gift"
+        },
+        "box-porto": {
+          "name": "Port & Chocolate Box",
+          "region": "Gift"
+        }
+      },
+      "menu": {
+        "bifana": {
+          "name": "Bifana",
+          "desc": "Portuguese-marinated pork, piri-piri mustard, crusty bread."
+        },
+        "prego": {
+          "name": "Prego no Pão",
+          "desc": "Juicy garlic steak in a golden buttered bun."
+        },
+        "alheira": {
+          "name": "Alheira de Mirandela",
+          "desc": "Traditional sausage, fried egg, house fries."
+        },
+        "pastel": {
+          "name": "Pastel de Nata",
+          "desc": "Crispy puff pastry, golden vanilla custard."
+        },
+        "queijo": {
+          "name": "Cheese board",
+          "desc": "São Jorge, Serra, Azeitão, jam, bread, olives."
+        },
+        "vinho": {
+          "name": "Wine of the day",
+          "desc": "Ivo's pick — red, white or rosé, by the glass."
+        }
       }
     }
   },
@@ -498,6 +722,118 @@
           "Sommelier & Maître d'hôtel"
         ]
       }
+    },
+    "catalogue": {
+      "categories": {
+        "wines": "Weine",
+        "port": "Portwein",
+        "beers": "Biere",
+        "cheese": "Käse",
+        "charcuterie": "Charcuterie",
+        "grocery": "Feinkost",
+        "gifts": "Geschenkboxen"
+      },
+      "counter": "Theke",
+      "products": {
+        "douro-reserva": {
+          "name": "Douro Reserva 2019",
+          "region": "Douro"
+        },
+        "alentejo-tinto": {
+          "name": "Alentejo Tinto",
+          "region": "Alentejo"
+        },
+        "vinho-verde": {
+          "name": "Vinho Verde",
+          "region": "Minho"
+        },
+        "dao-quinta": {
+          "name": "Quinta do Dão",
+          "region": "Dão"
+        },
+        "port-tawny": {
+          "name": "Portwein Tawny 20 J.",
+          "region": "Porto"
+        },
+        "port-lbv": {
+          "name": "Portwein LBV 2017",
+          "region": "Porto"
+        },
+        "sagres": {
+          "name": "Sagres · 6er-Pack",
+          "region": "Bier"
+        },
+        "super-bock": {
+          "name": "Super Bock",
+          "region": "Bier"
+        },
+        "sao-jorge": {
+          "name": "São Jorge, 12 Monate",
+          "region": "Azoren"
+        },
+        "serra": {
+          "name": "Serra da Estrela",
+          "region": "Beira"
+        },
+        "chourico": {
+          "name": "Chouriço geräuchert",
+          "region": "Trás-os-Montes"
+        },
+        "presunto": {
+          "name": "Presunto Bísaro",
+          "region": "Trás-os-Montes"
+        },
+        "azeite": {
+          "name": "Natives Olivenöl extra",
+          "region": "Alentejo"
+        },
+        "sardines": {
+          "name": "Sardinen in Öl",
+          "region": "Konserve"
+        },
+        "flor-sal": {
+          "name": "Fleur de sel Algarve",
+          "region": "Algarve"
+        },
+        "box-descoberta": {
+          "name": "Geschenkbox Descoberta",
+          "region": "Geschenk"
+        },
+        "box-prestige": {
+          "name": "Geschenkbox Prestige",
+          "region": "Geschenk"
+        },
+        "box-porto": {
+          "name": "Box Port & Schokolade",
+          "region": "Geschenk"
+        }
+      },
+      "menu": {
+        "bifana": {
+          "name": "Bifana",
+          "desc": "Mariniertes Schweinefleisch, Piri-Piri-Senf, knuspriges Brot."
+        },
+        "prego": {
+          "name": "Prego no Pão",
+          "desc": "Saftiges Knoblauchsteak in goldener Butterbrötchen."
+        },
+        "alheira": {
+          "name": "Alheira de Mirandela",
+          "desc": "Traditionelle Wurst, Spiegelei, hausgemachte Pommes."
+        },
+        "pastel": {
+          "name": "Pastel de Nata",
+          "desc": "Knuspriger Blätterteig, goldene Vanillecreme."
+        },
+        "queijo": {
+          "name": "Käseplatte",
+          "desc": "São Jorge, Serra, Azeitão, Konfitüre, Brot, Oliven."
+        },
+        "vinho": {
+          "name": "Wein des Tages",
+          "desc": "Ivos Auswahl — Rot, Weiß oder Rosé, im Glas."
+        }
+      }
     }
   },
   "pt": {
@@ -664,6 +1000,118 @@
           "Vinhos de coleção",
           "Sommelier & maître"
         ]
+      }
+    },
+    "catalogue": {
+      "categories": {
+        "wines": "Vinhos",
+        "port": "Porto",
+        "beers": "Cervejas",
+        "cheese": "Queijos",
+        "charcuterie": "Charcutaria",
+        "grocery": "Mercearia",
+        "gifts": "Caixas"
+      },
+      "counter": "Balcão",
+      "products": {
+        "douro-reserva": {
+          "name": "Douro Reserva 2019",
+          "region": "Douro"
+        },
+        "alentejo-tinto": {
+          "name": "Alentejo Tinto",
+          "region": "Alentejo"
+        },
+        "vinho-verde": {
+          "name": "Vinho Verde",
+          "region": "Minho"
+        },
+        "dao-quinta": {
+          "name": "Quinta do Dão",
+          "region": "Dão"
+        },
+        "port-tawny": {
+          "name": "Porto Tawny 20 anos",
+          "region": "Porto"
+        },
+        "port-lbv": {
+          "name": "Porto LBV 2017",
+          "region": "Porto"
+        },
+        "sagres": {
+          "name": "Sagres · Pack 6",
+          "region": "Cerveja"
+        },
+        "super-bock": {
+          "name": "Super Bock",
+          "region": "Cerveja"
+        },
+        "sao-jorge": {
+          "name": "São Jorge, 12 meses",
+          "region": "Açores"
+        },
+        "serra": {
+          "name": "Serra da Estrela",
+          "region": "Beira"
+        },
+        "chourico": {
+          "name": "Chouriço fumado",
+          "region": "Trás-os-Montes"
+        },
+        "presunto": {
+          "name": "Presunto Bísaro",
+          "region": "Trás-os-Montes"
+        },
+        "azeite": {
+          "name": "Azeite virgem extra",
+          "region": "Alentejo"
+        },
+        "sardines": {
+          "name": "Sardinhas em azeite",
+          "region": "Conserva"
+        },
+        "flor-sal": {
+          "name": "Flor de sal do Algarve",
+          "region": "Algarve"
+        },
+        "box-descoberta": {
+          "name": "Caixa Descoberta",
+          "region": "Oferta"
+        },
+        "box-prestige": {
+          "name": "Caixa Prestige",
+          "region": "Oferta"
+        },
+        "box-porto": {
+          "name": "Caixa Porto & Chocolate",
+          "region": "Oferta"
+        }
+      },
+      "menu": {
+        "bifana": {
+          "name": "Bifana",
+          "desc": "Porco marinado à portuguesa, mostarda piri-piri, pão estaladiço."
+        },
+        "prego": {
+          "name": "Prego no Pão",
+          "desc": "Bife suculento no papo-seco amanteigado."
+        },
+        "alheira": {
+          "name": "Alheira de Mirandela",
+          "desc": "Enchido tradicional, ovo estrelado, batatas caseiras."
+        },
+        "pastel": {
+          "name": "Pastel de Nata",
+          "desc": "Massa folhada estaladiça, creme dourado ao forno."
+        },
+        "queijo": {
+          "name": "Tábua de queijos",
+          "desc": "São Jorge, Serra, Azeitão, doce, pão, azeitonas."
+        },
+        "vinho": {
+          "name": "Copo de vinho do dia",
+          "desc": "Escolha do Ivo — tinto, branco ou rosé, ao copo."
+        }
       }
     }
   }

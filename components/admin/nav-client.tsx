@@ -2,7 +2,9 @@
 
 import { useNav, usePreferences } from '@payloadcms/ui';
 import {
+  ArrowLeftRight,
   BookOpenText,
+  ClipboardCheck,
   CalendarDays,
   ClipboardList,
   ExternalLink,
@@ -12,10 +14,14 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Package,
   PanelBottom,
   Scale,
   ScrollText,
   Settings,
+  Store,
+  Tags,
+  TriangleAlert,
   UserRound,
   UsersRound,
   UtensilsCrossed,
@@ -50,6 +56,12 @@ const ICONS = {
   site: ExternalLink,
   logout: LogOut,
   docs: BookOpenText,
+  products: Package,
+  categories: Tags,
+  producers: Store,
+  lowStock: TriangleAlert,
+  counts: ClipboardCheck,
+  movements: ArrowLeftRight,
 };
 
 function Item({ item, active, external }: { item: NavItem; active: boolean; external?: boolean }) {
@@ -80,7 +92,10 @@ export function NavClient({ groups, text }: { groups: NavGroup[]; text: Text }) 
     if (!hydrated || !window.matchMedia('(min-width: 1025px)').matches) return;
     void getPreference<{ open?: boolean }>('nav').then((pref) => setNavOpen(pref?.open !== false));
   }, [hydrated, getPreference, setNavOpen]);
-  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const isActive = (link: string) => {
+    const href = link.split('?')[0];
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
   // Payload's own classes keep its open/close behaviour; `gg-nav` restyles everything inside.
   const classes = ['nav', 'gg-nav', navOpen && 'nav--nav-open', shouldAnimate && 'nav--nav-animate', hydrated && 'nav--nav-hydrated'];
 

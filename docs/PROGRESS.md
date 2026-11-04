@@ -9,7 +9,7 @@ Update this file at the end of every task (`00-START-HERE.md` §2). The newest l
 | M1.1 | Foundation | P1 $300 | Tue 3 Nov | Done (staging deploy: Blocked: DEP-02) | — |
 | M1.2 | Design system + i18n shell | P1 | Wed 4 Nov | Done (agent checks; AC-03 side-by-side and the checklist are human) | — |
 | M1.3 | CMS, pages, settings, roles | P1 | Thu 5 Nov | In progress (all ACs pass except AC-04's real e-mail delivery, which waits for SMTP) | — |
-| M2.1 | Catalogue + inventory core | P2 $250 | Sat 7 Nov | Not started | — |
+| M2.1 | Catalogue + inventory core | P2 $250 | Sat 7 Nov | Done (all 7 ACs pass; human checklist and the client's spreadsheet DEP-04 pending) | — |
 | M2.2 | Shop, cart, accounts, SEO | P2 | Mon 9 Nov | Not started | — |
 | M2.3 | Checkout, orders, reservations | P2 | Tue 10 Nov | Not started | — |
 | M3.1 | Mobile back office + purchasing | P3 $250 | Thu 12 Nov | Not started | — |
@@ -52,8 +52,45 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-08 | Loyalty points earned on order completion | M3.2 | — |
 | A-10 | Until a real sample: CashMag CSV columns are mapped through configurable settings | M3.3 | — |
 | A-11 | Catering packages have a minimum of 10 guests (the prototype set none) | M1.3 T7 seed | — |
+| A-12 | Until DEP-07, the seeded catalogue's VAT classes: wines intermediate (14 %); port, beer, gift boxes and the glass of wine standard (17 %); cheese, charcuterie, groceries and counter dishes super-reduced (3 %). The client's spreadsheet sets each product's class | M2.1 T6 seed | — |
 
 ## 4. Log
+
+### 2026-11-04 · M2.1 · Catalogue, packaging and inventory ledger core
+- **T1 Catalogue** (`modules/catalogue/collections.ts`, `service.ts`): `categories`, `brands` (shown as "Producteurs"), `products`, `variants`, `packagingUnits` per 04 §2, with the `wine` / `snack` groups shown by kind. The "Add a product" dialog asks for the price and barcode of the first size (virtual group `firstVariant`). The default variant is created by an idempotent `afterChange`, gets a reference (SKU) generated from the slug, and a stock row at 0. Barcodes are digits only and unique across variants **and** packaging units: field validation plus a partial unique index per collection. Text-index path verified: `name.fr`, `wine.region.fr`. Service: `findByBarcode` (packaging first), `findSellable`, `listProducts` (text search through `$text`), `stockRules`.
+- **T2 Packaging** (`packaging.ts` + 20 unit vectors): `toBaseQty`, `normalizeLines` (incl. the merge vector → 8), `validateFactor` (< 2 rejected).
+- **T3 `postMovements`** (`modules/inventory/service.ts`), the only stock writer. It drops untracked variants, converts and merges, and applies one conditional `$inc` per variant (guarded for sales and adjustments). `lowStock` is recomputed in the same aggregation-pipeline update, and one movement row is written per line. Levels and movements have no API write access. `onHand`, `availability` (public projection), `rebuildStock` + `scripts/rebuild-stock.mts --check`.
+  - `withTx` now retries on MongoDB's `TransientTransactionError`. Without it, parallel sales of one wine fail with `WriteConflict` instead of succeeding or returning `OUT_OF_STOCK`.
+- **T4 Adjustments and counts** (`actions.ts`, `admin/stock-panel.tsx`, `admin/adjust-button.tsx`, `admin/post-count-button.tsx`):
+  - A size's **Stock** tab shows the quantity, the alert level ("Alerte à partir de", set through `setLowStockThreshold`, never a Payload form, because Payload's full-document write would overwrite a concurrent `$inc`) and "Corriger le stock" (signed quantity + reason from the list, or "Autre" with ≥ 3 characters). An adjustment cannot go below 0.
+  - **Counts:** "Inventaires" → add lines → save → "Valider l'inventaire". This snapshots `expected` inside the transaction, writes the variances and locks the count. Posting twice (or in parallel) is a no-op.
+  - **Low stock:** the sidebar's "Stock bas" opens Payload's stock list filtered on `lowStock`. The dashboard shows "N articles en stock bas" to manager and stock roles. The stock role now has a dashboard instead of "nothing to manage".
+- **T5 History:** on the size's Stock tab, newest first, 10 per page: date, type, quantity in units, box, reason (translated), who, source (link to the count). It is read through Payload's access-checked REST API and reloads after each change. Payload's join table cannot be refreshed, so this is the small custom list the milestone allows. Every movement is also in "Mouvements de stock".
+- **T6 Import** (`modules/catalogue/import.ts`, `scripts/import-catalogue.mts`, `docs/templates/catalogue-template.csv`): parse with papaparse (delimiter auto-detected, so `;` exports from a French Excel work), check format and database (category, barcode clashes within the file and against other SKUs), and report every error with its spreadsheet row. With any error nothing is written (exit 1). Otherwise it upserts by SKU, one transaction per row. Opening stock is one `adjustment` "opening stock", only for a size with no movement. The supplier columns go to `<file>.suppliers.json` until M3.1. Log: `<file>.log`.
+- **Seed:** 8 categories, the prototype's 18 shop products and 6 counter dishes (prices, photos and tags recovered from the published prototype's bundle: the local prototype folder is not on this machine), through the same `importCatalogue`. 14 more photos with alt text in 4 languages. No barcodes and **no opening stock**: the client's spreadsheet sets them, and its opening stock is posted only for a size with no movement yet. VAT classes: A-12. The catalogue keys (`shop.products`, `snackPage.menu`) moved from the dictionaries to `scripts/seed-content.json`.
+- **Bugs found and fixed on the way:**
+  - Payload writes a call's `locale` onto a shared `req`, so a lookup in French inside an English save switched the rest of the save to French. The variant hook now restores it, and the test checks labels per language.
+  - Payload makes `virtual` fields read-only and skips their validation, so the first size's price was neither editable nor required. Both are now switched back on, with a test.
+  - Parallel queries on one transaction session fail intermittently: about 1 in 4 count saves were rejected as "invalid selection". Count lines no longer use `filterOptions`, and the reads inside transactions run one after the other.
+  - A circular import (payload config → catalogue → inventory → settings → payload config) broke `next build`. The catalogue hooks now load the inventory service lazily.
+- **Acceptance criteria** (all run in `modules/inventory/inventory.int.test.ts`, 18 tests, stable over 10 runs):
+
+  | AC | Result | How |
+  |---|---|---|
+  | 01 wine in 4 languages + default variant + stock row 0 | Pass | int test; also created in the admin dialog in the browser |
+  | 02 box6 sale −6, box12 receipt +12, unit and base qty on each movement | Pass | int test |
+  | 03 history shows date, type, qty, user, reason; no role can edit/delete a movement | Pass | int test (admin user, `overrideAccess: false`); browser: REST DELETE/PATCH as stock user → 403; history seen as admin and stock user |
+  | 04 5 in stock, 20 parallel sales → 5 succeed, stock 0 | Pass | int test (15 × `OUT_OF_STOCK`, 5 movements) |
+  | 05 threshold 3, stock falls to 3 → low-stock list | Pass | int test; browser: alert 12 → badge and list |
+  | 06 posted count → rebuild-stock 0 differences, count read-only | Pass | int test (incl. 3 parallel posts); browser: posted count is read-only; `npm run rebuild-stock -- --check` → 0 on the throwaway DB |
+  | 07 CSV with an invalid row → nothing written, row number and reason | Pass | int test; CLI on a throwaway DB → exit 1, every error listed |
+
+- **Verified:**
+  - `npm run check` (64 unit) and `npm run test:int` (37 + 1) pass.
+  - `next build` with no env vars passes.
+  - On a throwaway replica set (never the shared database), using the admin in Chrome at 1440 px in French and English: seed twice (24 created, then 24 updated), import, re-import, the error report, create a product, add a box of 6, +12 / −2 / refused −50, set an alert, post a count, the low-stock list, the movement list and the stock-role dashboard. No console errors.
+  - E2E (`npm run test:e2e`) was not run: no page it covers changed.
+- **Not performed (human checklist):** creating a product with box6/box12 in FR then EN by staff, adjusting −2 "breakage" under your own name, a 3-product count, importing the client's spreadsheet (DEP-04) and spot-checking 5 products. The catalogue seed has **not** been run on the live database: run `npm run seed` on the server after deploying.
 
 ### 2026-11-03 · Admin language menu paints over the dashboard (requested by Aniket)
 - The Français menu opened underneath the dashboard panel because the header row clipped it. The breadcrumb still clips in its own wrapper; the language menu now drops over the page.

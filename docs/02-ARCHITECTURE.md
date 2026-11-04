@@ -22,7 +22,7 @@
 
 Add a package only when a milestone lists it under **Packages added**. Install it with `npm install --save-exact` and record the version here.
 
-Pinned in M1.1 (D-02): `next` 16.4.3, `react`/`react-dom` 19.3.0, `payload`, `@payloadcms/next`, `@payloadcms/db-mongodb`, `@payloadcms/richtext-lexical` 3.92.1, `sharp` 0.35.5, `graphql` 16.14.2, `zod` 4.6.7.
+Pinned in M1.1 (D-02): `next` 16.4.3, `react`/`react-dom` 19.3.0, `payload`, `@payloadcms/next`, `@payloadcms/db-mongodb`, `@payloadcms/richtext-lexical` 3.92.1, `sharp` 0.35.5, `graphql` 16.14.2, `zod` 4.6.7. Added in M2.1: `papaparse` 5.7.0 (+ `@types/papaparse` 5.5.2, dev).
 
 The Payload CLI is run as `node --import tsx ./node_modules/payload/bin.js <cmd> --disable-transpile` (the npm scripts do this). Its default `tsImport` loader loads `undici` twice and crashes with `TypeError: Illegal constructor`.
 
@@ -62,7 +62,7 @@ docs/                           this specification
 |---|---|
 | `lib/env.ts` | zod-parsed `process.env`; the only reader of env vars |
 | `lib/payload.ts` | `getPayloadClient()`, a cached `getPayload({ config })` |
-| `lib/tx.ts` | `withTx(payload, fn)` opens a transaction, passes `req` (and the Mongo session for raw atomic ops), and commits or rolls back. **The only file that touches Payload transaction internals.** |
+| `lib/tx.ts` | `withTx(payload, fn)` opens a transaction, passes `req` (and the Mongo session for raw atomic ops), and commits or rolls back. When MongoDB aborts it with a `TransientTransactionError` (two transactions writing the same stock row), it runs `fn` again on a fresh transaction, like the driver's `withTransaction`. **The only file that touches Payload transaction internals.** Inside a transaction, run Payload calls one after the other: parallel operations on one session can fail. |
 | `lib/errors.ts` | `AppError(code, message, field?)`, with codes `VALIDATION`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, `OUT_OF_STOCK`, `RATE_LIMITED` |
 | `lib/action.ts` | `action(schema, { roles }, fn)` and `publicAction(schema, fn)`: the only way to write a server action (03 §4) |
 | `lib/access.ts` | Payload access functions: `isStaff(...roles)`, `isSelfCustomer`, `staffOrSelf`, `publicRead`, `published` |
@@ -123,7 +123,7 @@ modules/<name>/
   3. For each variant whose delta is negative and whose type is `sale`, runs an atomic conditional update `{ variant, onHand: { $gte: -delta } } → $inc onHand` in the transaction session. If nothing matches, it throws `AppError('OUT_OF_STOCK', …, variantId)` and the whole transaction rolls back.
   4. For the other types it runs an unconditional `$inc` (upsert). Adjustments and counts may take stock to any value ≥ 0, and POS imports are facts that are recorded even when the result is negative, flagged for review.
   5. Inserts the movement rows in the same transaction.
-- `scripts/rebuild-stock.ts` recomputes `onHand = Σ qty` from the ledger and reports any difference. It runs in tests and before handover, which proves the cache and the ledger agree.
+- `scripts/rebuild-stock.mts` (`npm run rebuild-stock -- --check`) recomputes `onHand = Σ qty` from the ledger and reports any difference. It runs in tests and before handover, which proves the cache and the ledger agree.
 
 ### 5.2 One pricing engine (R5, R7)
 
