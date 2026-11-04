@@ -103,6 +103,7 @@ export default buildConfig({
       fr: {
         general: {
           noLabel: '—',
+          untitled: 'Nouveau',
           noResultsFound: 'Aucun résultat',
           noResultsDescription: 'Rien ne correspond à cette recherche ou à ces filtres. Essayez d’autres mots ou retirez un filtre.',
           createNewLabel: 'Ajouter : {{label}}',
@@ -128,6 +129,7 @@ export default buildConfig({
       en: {
         general: {
           noLabel: '—',
+          untitled: 'New',
           noResultsFound: 'No results',
           noResultsDescription: 'Nothing matches this search or these filters. Try other words or remove a filter.',
           createNewLabel: 'Add {{label}}',
@@ -153,6 +155,7 @@ export default buildConfig({
       de: {
         general: {
           noLabel: '—',
+          untitled: 'Neu',
           noResultsFound: 'Keine Ergebnisse',
           noResultsDescription: 'Nichts passt zu dieser Suche oder diesen Filtern. Versuchen Sie andere Wörter oder entfernen Sie einen Filter.',
           createNewLabel: 'Hinzufügen: {{label}}',
@@ -178,6 +181,7 @@ export default buildConfig({
       pt: {
         general: {
           noLabel: '—',
+          untitled: 'Novo',
           noResultsFound: 'Sem resultados',
           noResultsDescription: 'Nada corresponde a esta pesquisa ou a estes filtros. Experimente outras palavras ou retire um filtro.',
           createNewLabel: 'Adicionar: {{label}}',

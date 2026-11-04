@@ -33,7 +33,7 @@ export const autoSlug = (collection: CollectionSlug, from = 'title'): TextField 
       if (totalDocs === 0) return slug;
     }
   };
-  return { name: 'slug', type: 'text', required: true, unique: true, index: true, admin: { hidden: true }, hooks: { beforeValidate: [fill] } };
+  return { name: 'slug', type: 'text', required: true, unique: true, index: true, admin: { hidden: true, disableListColumn: true }, hooks: { beforeValidate: [fill] } };
 };
 
 /** "Links to": the website's pages as a list instead of a typed path. Values are the stored paths. */
@@ -101,13 +101,21 @@ export const seoSection = (fields: Field[]): Field => ({
       'O título e o texto mostrados nos resultados do Google. Vazio: são usados o título e a descrição.',
     ),
   },
-  fields: [{ name: 'seo', type: 'group', label: false, fields }],
+  // Search-engine texts are not list columns.
+  fields: [{ name: 'seo', type: 'group', label: false, fields: fields.map((f) => ({ ...f, admin: { ...('admin' in f ? f.admin : {}), disableListColumn: true } }) as Field) }],
 });
 
 type Tone = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
 
 /** A select shown as a coloured badge in list columns (components/admin/cells.tsx). */
 export const badgeCell = (tones: Record<string, Tone>) => ({ Cell: { path: '@/components/admin/cells#BadgeCell', clientProps: { tones } } });
+
+/** Shop and stock forms open as full pages laid out like the settings pages, not as dialogs (create-button.tsx,
+ * drawer-links.tsx, custom.css). */
+export const openAsPage = { openAsPage: true };
+
+/** A join-table title that opens the row's full page. */
+export const pageLinkCell = { Cell: '@/components/admin/cells#PageLinkCell' };
 
 /** A signed quantity in list columns: +12 green, −3 red. */
 export const signedCell = { Cell: '@/components/admin/cells#SignedCell' };

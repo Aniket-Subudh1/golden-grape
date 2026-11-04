@@ -56,6 +56,19 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-04 · Shop and stock forms as pages, columns picker (requested by Aniket)
+- **Full pages instead of dialogs:**
+  - Products, sizes, boxes, categories, producers, stock counts, stock levels and movements no longer open in a dialog. "Ajouter" and a click anywhere on a row open the full page, laid out like "Infos de la boutique": a sticky title row with Save on the right, a centred white card and tabs.
+  - Inside a product, a size's name opens the size's page, and inside a size, a box's name opens its page. Adding a size or a box from those tables still uses Payload's small dialog, because it pre-fills the product or size.
+  - The other admin sections keep their dialogs.
+- **Columns picker:**
+  - A card of chips: the columns shown are gold, the others outlined.
+  - ID, slug, Google texts, the create-only price fields, description, the sizes table and the loyalty/gift-card flags are no longer offered.
+- **Smaller fixes:** new records are titled "[Nouveau]" instead of "[Sans titre]". The author of a stock count shows once it is saved. The product photo links to the product, so a click anywhere on the row opens it.
+- **Verified:**
+  - In Chrome on a throwaway database: the columns picker; "Add a product", which opens `/products/create`; a row click, which opens the product; a size's name in the product, which opens the size; and the new-count page. No console errors.
+  - `npm run check` (64) and `npm run test:int` (38) pass.
+
 ### 2026-11-04 · Shop and stock admin made professional (requested by Aniket)
 - **Product list:** a photo, the name, the category, the price (lowest size, "dès" when sizes differ) with stock at a glance ("24 en stock", "· stock bas", "Rupture", "Préparé sur place"), and the status as a coloured badge.
 - **Product form:** split into "Produit" and "Photos et texte" tabs instead of one long page.

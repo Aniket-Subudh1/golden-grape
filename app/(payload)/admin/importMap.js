@@ -31,6 +31,7 @@ import { default as default_ea5aef8a9a35ef0cb8d9e90a51957cfa } from '@/component
 import { CategoryCell as CategoryCell_e9bb4d3db189c5a7e4368b00cc26eb11 } from '@/modules/catalogue/admin/product-cells'
 import { PhotoCell as PhotoCell_e9bb4d3db189c5a7e4368b00cc26eb11 } from '@/modules/catalogue/admin/product-cells'
 import { OfferCell as OfferCell_e9bb4d3db189c5a7e4368b00cc26eb11 } from '@/modules/catalogue/admin/product-cells'
+import { PageLinkCell as PageLinkCell_e05f6ac9ede25467f55f09817b54f69f } from '@/components/admin/cells'
 import { default as default_18a246622f2fde6f084f603ce7663055 } from '@/modules/inventory/admin/stock-panel'
 import { StockCell as StockCell_5bea5cab201ede96546b31bd184de260 } from '@/modules/inventory/admin/cells'
 import { ThresholdCell as ThresholdCell_5bea5cab201ede96546b31bd184de260 } from '@/modules/inventory/admin/cells'
@@ -84,6 +85,7 @@ export const importMap = {
   "@/modules/catalogue/admin/product-cells#CategoryCell": CategoryCell_e9bb4d3db189c5a7e4368b00cc26eb11,
   "@/modules/catalogue/admin/product-cells#PhotoCell": PhotoCell_e9bb4d3db189c5a7e4368b00cc26eb11,
   "@/modules/catalogue/admin/product-cells#OfferCell": OfferCell_e9bb4d3db189c5a7e4368b00cc26eb11,
+  "@/components/admin/cells#PageLinkCell": PageLinkCell_e05f6ac9ede25467f55f09817b54f69f,
   "@/modules/inventory/admin/stock-panel#default": default_18a246622f2fde6f084f603ce7663055,
   "@/modules/inventory/admin/cells#StockCell": StockCell_5bea5cab201ede96546b31bd184de260,
   "@/modules/inventory/admin/cells#ThresholdCell": ThresholdCell_5bea5cab201ede96546b31bd184de260,

@@ -16,13 +16,18 @@ const TEXT = {
 const TAGS = { fr: 'fr-FR', en: 'en-GB', de: 'de-DE', pt: 'pt-PT' };
 const lang = (i18n: { language: string }) => (i18n.language in TEXT ? i18n.language : 'fr') as keyof typeof TEXT;
 
-/** The first photo as a small square, or an empty tile. */
+/** The first photo as a small square (or an empty tile), linking to the product: it is the list's first column, which
+ * carries the row's link. */
 export async function PhotoCell({ rowData, payload }: CellProps) {
   const first = Array.isArray(rowData.images) ? rowData.images[0] : undefined;
   const id = typeof first === 'object' && first ? (first as { id: string }).id : (first as string | undefined);
   const media = id ? await payload.findByID({ collection: 'media', id, depth: 0, overrideAccess: true, disableErrors: true }) : null;
   const src = media?.sizes?.thumb?.url ?? media?.url;
-  return <span className="gg-thumb">{src ? <Image src={src} alt="" width={44} height={44} unoptimized /> : null}</span>;
+  return (
+    <a className="gg-thumb" href={`/admin/collections/products/${String(rowData.id)}`}>
+      {src ? <Image src={src} alt="" width={44} height={44} unoptimized /> : null}
+    </a>
+  );
 }
 
 /**

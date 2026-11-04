@@ -1,6 +1,6 @@
 import { APIError, type CollectionConfig, type Field, type PayloadRequest, type Validate } from 'payload';
 import { hiddenUnless, isStaff } from '@/lib/access';
-import { autoSlug, badgeCell, createInDrawer, emptyList, type Label, l, scaledNumber, seoSection } from '@/lib/admin';
+import { autoSlug, badgeCell, createInDrawer, emptyList, type Label, l, openAsPage, pageLinkCell, scaledNumber, seoSection } from '@/lib/admin';
 import { validateFactor } from './packaging';
 
 // The catalogue (04-DATA-MODEL §2). Staff-only through the API: the website reads it through service.ts.
@@ -97,6 +97,7 @@ export const categories: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'kind', 'order'],
+    custom: openAsPage,
     hidden: hiddenUnless('manager'),
     description: l(
       'Les rayons de la boutique (Vins, Porto…) et du comptoir, dans l’ordre choisi.',
@@ -163,6 +164,7 @@ export const brands: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'origin'],
+    custom: openAsPage,
     hidden: hiddenUnless('manager'),
     description: l(
       'Les domaines et maisons dont vous vendez les produits. Ils s’ajoutent aussi depuis la fiche produit ou l’import.',
@@ -256,6 +258,7 @@ export const products: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['images', 'name', 'category', 'offer', 'status'],
+    custom: openAsPage,
     listSearchableFields: ['name'],
     hidden: hiddenUnless('manager', 'stock'),
     description: l(
@@ -364,7 +367,7 @@ export const products: CollectionConfig = {
                   validate: (value: number | null | undefined, { req }: { req: PayloadRequest }) =>
                     (Number.isInteger(value) && (value as number) >= 0) ||
                     say(req, l('Indiquez le prix, par ex. 24,50.', 'Enter the price, e.g. 24.50.', 'Geben Sie den Preis ein, z. B. 24,50.', 'Indique o preço, por ex. 24,50.')),
-                  admin: { readOnly: false, width: '33%', components: scaledNumber('€') },
+                  admin: { readOnly: false, disableListColumn: true, width: '33%', components: scaledNumber('€') },
                 },
                 {
                   name: 'barcode',
@@ -372,14 +375,14 @@ export const products: CollectionConfig = {
                   virtual: true,
                   label: l('Code-barres (facultatif)', 'Barcode (optional)', 'Barcode (optional)', 'Código de barras (opcional)'),
                   validate: validateBarcode('variants'),
-                  admin: { readOnly: false, width: '33%' },
+                  admin: { readOnly: false, disableListColumn: true, width: '33%' },
                 },
                 {
                   name: 'sku',
                   type: 'text',
                   virtual: true,
                   label: l('Référence (facultatif)', 'Reference (optional)', 'Referenz (optional)', 'Referência (opcional)'),
-                  admin: { readOnly: false, width: '33%', description: l('Vide : créée à partir du nom.', 'Empty: made from the name.', 'Leer: aus dem Namen erstellt.', 'Vazio: criada a partir do nome.') },
+                  admin: { readOnly: false, disableListColumn: true, width: '33%', description: l('Vide : créée à partir du nom.', 'Empty: made from the name.', 'Leer: aus dem Namen erstellt.', 'Vazio: criada a partir do nome.') },
                 },
               ),
             ],
@@ -406,6 +409,7 @@ export const products: CollectionConfig = {
             label: l('Formats et prix', 'Sizes and prices', 'Formate und Preise', 'Formatos e preços'),
             admin: {
               condition: (_, __, { operation }) => operation === 'update',
+              disableListColumn: true,
               defaultColumns: ['title', 'sku', 'barcode', 'priceCents'],
               description: l(
                 'Chaque format a son prix, son code-barres et son stock. Ouvrez-le pour ajouter un carton de 6 ou de 12.',
@@ -491,7 +495,7 @@ export const products: CollectionConfig = {
               { value: 'new', label: l('Nouveau', 'New', 'Neu', 'Novo') },
             ],
           },
-          { name: 'description', type: 'richText', localized: true, label: l('Description', 'Description', 'Beschreibung', 'Descrição') },
+          { name: 'description', type: 'richText', localized: true, label: l('Description', 'Description', 'Beschreibung', 'Descrição'), admin: { disableListColumn: true } },
           seoSection([
             { name: 'title', type: 'text', localized: true, label: l('Titre dans Google', 'Title in Google', 'Titel bei Google', 'Título no Google') },
             { name: 'description', type: 'textarea', localized: true, label: l('Texte dans Google', 'Text in Google', 'Text bei Google', 'Texto no Google') },
@@ -501,8 +505,8 @@ export const products: CollectionConfig = {
       ],
     },
     // Used from M3.2 (loyalty, gift cards); kept in the data, not shown before then.
-    { name: 'loyaltyExcluded', type: 'checkbox', defaultValue: false, admin: { hidden: true } },
-    { name: 'giftCard', type: 'checkbox', defaultValue: false, admin: { hidden: true } },
+    { name: 'loyaltyExcluded', type: 'checkbox', defaultValue: false, admin: { hidden: true, disableListColumn: true } },
+    { name: 'giftCard', type: 'checkbox', defaultValue: false, admin: { hidden: true, disableListColumn: true } },
     // List column only: lowest price and stock across the sizes (modules/catalogue/admin/product-cells.tsx).
     {
       name: 'offer',
@@ -523,6 +527,7 @@ export const variants: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'sku', 'barcode', 'priceCents', 'active'],
+    custom: openAsPage,
     listSearchableFields: ['title', 'sku', 'barcode'],
     hidden: hiddenUnless('manager', 'stock'),
   },
@@ -577,7 +582,7 @@ export const variants: CollectionConfig = {
     ],
   },
   fields: [
-    { name: 'title', type: 'text', label: l('Format', 'Size', 'Format', 'Formato'), admin: { hidden: true } },
+    { name: 'title', type: 'text', label: l('Format', 'Size', 'Format', 'Formato'), admin: { hidden: true, components: pageLinkCell } },
     {
       type: 'tabs',
       tabs: [
@@ -670,6 +675,7 @@ export const packagingUnits: CollectionConfig = {
   admin: {
     useAsTitle: 'label',
     defaultColumns: ['label', 'variant', 'factor', 'barcode', 'priceCents'],
+    custom: openAsPage,
     hidden: hiddenUnless('manager', 'stock'),
   },
   access: { read: isStaff(), create: editors, update: editors, delete: editors },
@@ -684,7 +690,7 @@ export const packagingUnits: CollectionConfig = {
   fields: [
     row(
       { name: 'variant', type: 'relationship', relationTo: 'variants', required: true, index: true, label: l('Format', 'Size', 'Format', 'Formato'), admin: { width: '50%' } },
-      { name: 'label', type: 'text', localized: true, required: true, label: l('Nom', 'Name', 'Name', 'Nome'), admin: { width: '50%', placeholder: 'Carton de 6' } },
+      { name: 'label', type: 'text', localized: true, required: true, label: l('Nom', 'Name', 'Name', 'Nome'), admin: { width: '50%', placeholder: 'Carton de 6', components: pageLinkCell } },
     ),
     row(
       {

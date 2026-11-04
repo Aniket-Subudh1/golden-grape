@@ -23,3 +23,14 @@ export function SignedCell({ cellData }: DefaultCellComponentProps) {
   if (typeof cellData !== 'number') return null;
   return <span className={`gg-qty ${cellData < 0 ? 'gg-qty--out' : 'gg-qty--in'}`}>{cellData > 0 ? `+${cellData}` : cellData < 0 ? `−${-cellData}` : '0'}</span>;
 }
+
+/** The row's title as a link to its full page (join tables open a dialog by default; these collections use pages). */
+export function PageLinkCell({ cellData, rowData, collectionSlug }: DefaultCellComponentProps) {
+  const id = (rowData as { id?: string } | undefined)?.id;
+  if (!id) return <span>{String(cellData ?? '')}</span>;
+  return (
+    <a className="gg-cell-link" href={`/admin/collections/${collectionSlug}/${id}`}>
+      {String(cellData ?? '—')}
+    </a>
+  );
+}
