@@ -2,6 +2,7 @@
 // catering packages and events, the prototype's catalogue (until DEP-04), plus the client's photos as media.
 // Re-running overwrites CMS edits to these.
 // Run: npm run seed -- --email you@example.lu --password '…' --name 'Your Name'
+import type { MongooseAdapter } from '@payloadcms/db-mongodb';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { type CollectionSlug, getPayload } from 'payload';
@@ -166,8 +167,10 @@ async function upsert(collection: CollectionSlug, where: Record<string, unknown>
   let saved = found.docs[0]
     ? await payload.update({ collection, id: found.docs[0].id, data: build('fr') as never, locale: 'fr', depth: 0, draft, overrideAccess: true, context: seedContext() })
     : await payload.create({ collection, data: build('fr') as never, locale: 'fr', depth: 0, draft, overrideAccess: true, context: seedContext() });
+  // `fallbackLocale: false`: with Payload's fallback on, a partial save in EN would store the French value of every
+  // localized field it does not send (checked on payload 3.92.1).
   for (const l of OTHERS) {
-    saved = await payload.update({ collection, id: saved.id, data: withIds(build(l), saved) as never, locale: l, depth: 0, draft, overrideAccess: true, context: seedContext() });
+    saved = await payload.update({ collection, id: saved.id, data: withIds(build(l), saved) as never, locale: l, fallbackLocale: false, depth: 0, draft, overrideAccess: true, context: seedContext() });
   }
   return saved;
 }
@@ -175,7 +178,7 @@ async function upsert(collection: CollectionSlug, where: Record<string, unknown>
 async function global(slug: 'BusinessSettings' | 'Header' | 'Footer' | 'HappyHour' | 'HomePage', build: (l: Locale) => Record<string, unknown>) {
   let saved = await payload.updateGlobal({ slug, data: build('fr') as never, locale: 'fr', depth: 0, overrideAccess: true, context: seedContext() });
   for (const l of OTHERS) {
-    saved = await payload.updateGlobal({ slug, data: withIds(build(l), saved) as never, locale: l, depth: 0, overrideAccess: true, context: seedContext() });
+    saved = await payload.updateGlobal({ slug, data: withIds(build(l), saved) as never, locale: l, fallbackLocale: false, depth: 0, overrideAccess: true, context: seedContext() });
   }
 }
 
@@ -421,6 +424,21 @@ const rows: CatalogueRow[] = [
 const imported = await importCatalogue(payload, rows);
 if (imported.errors.length) throw new Error(`catalogue: ${imported.errors.map((e) => `row ${e.row} ${e.column}: ${e.message}`).join('; ')}`);
 log(`catalogue: ${SHOP_CATEGORIES.length + 1} categories, ${imported.created} products created, ${imported.updated} updated`);
+
+// Repair (M2.3): earlier seed runs saved the other languages with Payload's fallback on, which stored the French
+// hero texts in EN, DE and PT. A hero text identical to the French one in another language is that copy: cleared, so
+// the page shows that language's own text again.
+{
+  const globals = (payload.db as unknown as MongooseAdapter).globals;
+  const home = await globals.collection.findOne<{ hero?: Record<string, Record<string, string> | undefined> }>({ globalType: 'HomePage' });
+  const unset: Record<string, ''> = {};
+  for (const field of ['eyebrow', 'titleA', 'titleB', 'subtitle']) {
+    const value = home?.hero?.[field];
+    for (const l of OTHERS) if (value?.fr && value[l] === value.fr) unset[`hero.${field}.${l}`] = '';
+  }
+  if (Object.keys(unset).length) await globals.collection.updateOne({ globalType: 'HomePage' }, { $unset: unset });
+  log(`home hero: ${Object.keys(unset).length} copied French texts cleared`);
+}
 
 // 10. Time slots and delivery areas: assumption A-05 until DEP-06 (zones, hours, slot rules). Created only when missing,
 // so what staff set in the admin is never overwritten. Every mode follows the shop's opening hours.

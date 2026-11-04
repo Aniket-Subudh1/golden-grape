@@ -42,7 +42,8 @@ async function homePageCached(locale: Locale) {
   'use cache';
   cacheTag('home');
   const payload = await getPayloadClient();
-  return payload.findGlobal({ slug: 'HomePage', locale, depth: 1 });
+  // No French fallback: an empty translation shows that language's own text (the hero falls back to the dictionary).
+  return payload.findGlobal({ slug: 'HomePage', locale, fallbackLocale: false, depth: 1 });
 }
 
 const publishedSlug = (slug: string) => ({ slug: { equals: slug }, _status: { equals: 'published' as const } });

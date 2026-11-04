@@ -56,6 +56,11 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-04 · P2 gate run: French hero text on the EN/DE/PT home pages (found by the e2e language check)
+- **Cause:** the seed saved the other languages of a document with Payload's locale fallback on. A partial save in EN then stores the French value of every localized field it does not send (reproduced on payload 3.92.1). The Home page settings got their French hero texts copied into EN, DE and PT, so those home pages showed French. Every deployed database that was seeded since M1.3 has it.
+- **Fix:** the seed saves other languages with `fallbackLocale: false` (each language gets its own default instead); a repair step clears any hero text in EN/DE/PT identical to the French one (12 cleared on the test database); `getHomePage` reads without fallback, so an empty translation shows that language's dictionary text. The admin was not affected (it already edits with the fallback off). **Run `npm run seed` once on the live database to repair it.**
+- **Gate (P2), local:** `npm run check` (unit 162), `npm run test:int` (65), `next build` without env, full e2e on the production build: 25 passed, 2 skipped (desktop-only switcher test on phones). Traceability check: nothing missing. SMTP: the `.env` credentials log in (verified without sending); real delivery of each e-mail still to be confirmed.
+
 ### 2026-11-04 · Admin sidebar keeps its place between pages (requested by Aniket)
 - Payload renders the sidebar again for every page, so it jumped back to the top and the item just clicked (Zones de livraison, Historique…) ended up out of sight. `components/admin/nav-client.tsx` now keeps the sidebar's scroll position for the visit (sessionStorage) and restores it before the page paints, then brings the active item into view if it is still outside. Checked in the browser: scroll 721 px before and after each click, the active item visible every time.
 
