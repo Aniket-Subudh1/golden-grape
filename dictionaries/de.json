@@ -393,7 +393,13 @@
       "doneTitle": "Danke {{name}}",
       "doneSubtitle": "Ihre Anfrage ist eingegangen. Wir melden uns binnen 24h.",
       "email": "E-Mail",
-      "emailPh": "sie@beispiel.lu"
+      "emailPh": "sie@beispiel.lu",
+      "select": "Dieses Paket wählen",
+      "selected": "Paket gewählt",
+      "chosen": "Gewähltes Paket: {{name}}",
+      "choose": "Wählen Sie oben ein Paket.",
+      "change": "Ändern",
+      "estimateNote": "Richtbetrag ({{price}} × {{count}} Gäste). Das ist kein Endpreis: Wir senden Ihnen ein persönliches Angebot mit dem endgültigen Preis."
     }
   },
   "eventsPage": {

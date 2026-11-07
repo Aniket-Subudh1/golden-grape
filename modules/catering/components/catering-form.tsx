@@ -1,6 +1,6 @@
 'use client';
 
-import { Check } from 'lucide-react';
+import { Check, Info } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { ActionForm, FormDone, SubmitButton, useFieldError } from '@/components/ui/action-form';
@@ -37,9 +37,15 @@ export function CateringForm({ t, form, locale, packages, minDate }: Props) {
     <ActionForm
       action={requestCatering}
       messages={form}
-      done={(data) => <FormDone title={interpolate(r.doneTitle, { name: data.firstName })} subtitle={r.doneSubtitle} />}
+      done={(data) => (
+        <div id="catering-done" className="scroll-mt-32">
+          <FormDone title={interpolate(r.doneTitle, { name: data.firstName })} subtitle={r.doneSubtitle} />
+        </div>
+      )}
+      // GG-034: the thank-you replaces a long form; bring it into view instead of leaving the page at the bottom.
+      onSuccess={() => document.getElementById('catering-done')?.scrollIntoView({ block: 'start' })}
     >
-      <section className="pb-16">
+      <section id="packages" className="scroll-mt-32 pb-16">
         <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-4 px-6 md:grid-cols-3 md:px-10">
           {packages.map((p) => {
             const active = selected === p.id;
@@ -50,8 +56,8 @@ export function CateringForm({ t, form, locale, packages, minDate }: Props) {
                 aria-pressed={active}
                 onClick={() => setSelected(p.id)}
                 className={cn(
-                  'group relative overflow-hidden border bg-bone text-left transition-all',
-                  active ? '-translate-y-1 border-gold-deep shadow-2xl shadow-ink/10' : 'border-border hover:border-ink/40',
+                  'group relative flex flex-col overflow-hidden border bg-bone text-left transition-all',
+                  active ? '-translate-y-1 border-gold-deep shadow-2xl ring-2 shadow-ink/10 ring-gold-deep' : 'border-border hover:border-ink/40',
                 )}
               >
                 <div className="relative aspect-[4/3] overflow-hidden bg-ink">
@@ -59,7 +65,7 @@ export function CateringForm({ t, form, locale, packages, minDate }: Props) {
                     <Image src={p.image} alt={p.name} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition-transform duration-[1400ms] group-hover:scale-105" />
                   )}
                 </div>
-                <div className="p-6 md:p-8">
+                <div className="flex flex-1 flex-col p-6 md:p-8">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h3 className="font-serif text-3xl font-light">{p.name}</h3>
@@ -82,6 +88,16 @@ export function CateringForm({ t, form, locale, packages, minDate }: Props) {
                       </li>
                     ))}
                   </ul>
+                  {/* GG-032: what clicking does, and which one is chosen, said in words (the whole card stays clickable). */}
+                  <span
+                    className={cn(
+                      'mt-8 inline-flex h-11 items-center justify-center gap-2 rounded-full border text-[11px] tracking-[0.25em] uppercase transition',
+                      active ? 'border-gold-deep bg-gold-deep text-bone' : 'border-ink text-ink group-hover:bg-ink group-hover:text-bone',
+                    )}
+                  >
+                    {active && <Check className="h-4 w-4" />}
+                    {active ? r.selected : r.select}
+                  </span>
                 </div>
               </button>
             );
@@ -94,6 +110,20 @@ export function CateringForm({ t, form, locale, packages, minDate }: Props) {
           <div>
             <p className="eyebrow mb-3 text-gold-deep">{r.eyebrow}</p>
             <h2 className="font-serif text-4xl font-light md:text-5xl">{r.title}</h2>
+            <p className="mt-4 text-sm">
+              {pkg ? (
+                <>
+                  <b className="font-medium">{interpolate(r.chosen, { name: pkg.name })}</b>{' '}
+                  <a href="#packages" className="ml-2 border-b border-gold-deep text-gold-deep">
+                    {r.change}
+                  </a>
+                </>
+              ) : (
+                <a href="#packages" className="border-b border-gold-deep text-gold-deep">
+                  {r.choose}
+                </a>
+              )}
+            </p>
             <input type="hidden" name="package" value={selected ?? ''} />
             <PackageError />
           </div>
@@ -125,7 +155,13 @@ export function CateringForm({ t, form, locale, packages, minDate }: Props) {
               <p className="eyebrow mb-1 text-ink/50">{r.estimate}</p>
               {/* Display only: the stored estimate is recomputed on the server. */}
               <p className="font-serif text-4xl tabular-nums">{pkg ? formatMoney(mulQty(pkg.pricePerGuestCents, guests), locale, { compact: true }) : '—'}</p>
-              <p className="mt-1 text-xs text-ink/50">{pkg ? interpolate(r.packageHint, { name: pkg.name, count: guests }) : r.selectHint}</p>
+              {/* GG-035: an estimate, not a price: the final price comes with the personalised quotation. */}
+              <p className="mt-2 flex max-w-md items-start gap-2 text-xs leading-relaxed text-ink/60">
+                <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold-deep" aria-hidden />
+                {pkg
+                  ? interpolate(r.estimateNote, { price: formatMoney(pkg.pricePerGuestCents, locale, { compact: true }), count: guests })
+                  : r.selectHint}
+              </p>
             </div>
             <SubmitButton label={r.submit} pendingLabel={r.sending} size="lg" className="px-10" />
           </div>

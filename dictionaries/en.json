@@ -393,7 +393,13 @@
       "doneTitle": "Thank you {{name}}",
       "doneSubtitle": "Your request is well received. We'll reply within 24h.",
       "email": "E-mail",
-      "emailPh": "you@example.lu"
+      "emailPh": "you@example.lu",
+      "select": "Select this package",
+      "selected": "Package selected",
+      "chosen": "Selected package: {{name}}",
+      "choose": "Choose a package above.",
+      "change": "Change",
+      "estimateNote": "Indicative amount ({{price}} × {{count}} guests). This is not a final price: we send you a personalised quotation confirming the final price."
     }
   },
   "eventsPage": {

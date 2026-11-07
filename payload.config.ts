@@ -187,6 +187,14 @@ export default buildConfig({
         },
       },
       pt: {
+        // GG-033: Payload's Portuguese says "Login" / "Log out"; the shop uses European Portuguese.
+        authentication: {
+          login: 'Iniciar sessão',
+          logOut: 'Terminar sessão',
+          logout: 'Terminar sessão',
+          loggedOutSuccessfully: 'Sessão terminada.',
+          backToLogin: 'Voltar a iniciar sessão',
+        },
         general: {
           noLabel: '—',
           untitled: 'Novo',

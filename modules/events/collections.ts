@@ -87,7 +87,14 @@ export const events: CollectionConfig = {
       ],
     },
     // Seats taken, written only by the booking service with a conditional $inc (service.ts); never typed by staff.
-    { name: 'booked', type: 'number', defaultValue: 0, access: { create: () => false, update: () => false }, admin: { hidden: true } },
+    {
+      name: 'booked',
+      type: 'number',
+      defaultValue: 0,
+      label: l('Places réservées', 'Seats booked', 'Gebuchte Plätze', 'Lugares reservados'),
+      access: { create: () => false, update: () => false },
+      admin: { hidden: true },
+    },
     seoSection([
       { name: 'title', type: 'text', localized: true, label: l('Titre dans Google', 'Title in Google', 'Titel bei Google', 'Título no Google') },
       { name: 'description', type: 'textarea', localized: true, label: l('Texte dans Google', 'Text in Google', 'Text bei Google', 'Texto no Google') },
@@ -132,7 +139,7 @@ export const eventBookings: CollectionConfig = {
   access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
   defaultSort: '-createdAt',
   fields: [
-    { name: 'panel', type: 'ui', admin: { components: { Field: '@/modules/events/admin/booking-panel' } } },
+    { name: 'panel', type: 'ui', admin: { disableListColumn: true, components: { Field: '@/modules/events/admin/booking-panel' } } },
     ...(
       [
         { name: 'event', type: 'relationship', relationTo: 'events', required: true, index: true, label: l('Événement', 'Event', 'Veranstaltung', 'Evento') },

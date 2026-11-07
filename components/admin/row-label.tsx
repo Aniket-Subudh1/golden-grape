@@ -1,9 +1,16 @@
 'use client';
 
-import { useRowLabel } from '@payloadcms/ui';
+import { useRowLabel, useTranslation } from '@payloadcms/ui';
+import { l, type Label } from '@/lib/admin';
 
-/** Array rows titled by their content ("Boutique", "La Maison") instead of "Nav Item 01" (`admin.components.RowLabel`). */
+const ROW = l('Ligne', 'Row', 'Zeile', 'Linha');
+
+/**
+ * Array rows titled by their content ("Boutique", "La Maison", "Pain et olives") instead of "Nav Item 01"
+ * (`admin.components.RowLabel`). Without any text yet: "Ligne 2" in the admin's language (GG-033).
+ */
 export default function RowLabel() {
-  const { data, rowNumber = 0 } = useRowLabel<{ label?: string; title?: string }>();
-  return <span>{data?.label || data?.title || `Row ${rowNumber + 1}`}</span>;
+  const { i18n } = useTranslation();
+  const { data, rowNumber = 0 } = useRowLabel<{ label?: string; title?: string; item?: string }>();
+  return <span>{data?.label || data?.title || data?.item || `${ROW[i18n.language as keyof Label] ?? ROW.fr} ${rowNumber + 1}`}</span>;
 }

@@ -44,6 +44,7 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | Q-10 | M4.1 T5 says a wallee refund returns stock; since GG-004 a refund never moves stock (returned goods are a stock entry). Keep the GG-004 rule for card refunds too? | APPLUX | M4.1 | Open |
 | Q-11 | GG-028: separate pickup hours for prepared food (e.g. 11:30–14:00) and shop products (10:00–18:00)? Hours to confirm with Golden Grape; needs a fulfilment type per product and per-cart slot rules (see log 2026-11-07 GG-027/028) | APPLUX / Golden Grape | later milestone | Open |
 | Q-12 | GG-030 catering quotations: not in the base scope as asked (M1.3 = enquiry + estimate + status; M3.2 quotations = B2B product quotations → orders). Approve as a change request (scope and cost) to build on M3.2's PDF, numbering and e-mail parts? Also: VAT rate(s) for catering services (DEP-07, accountant) | APPLUX | change request | Open |
+| Q-13 | GG-031 deposits on an accepted catering quotation (amount, date, balance): part of the GG-030 change request (the order payments of GG-003 already record deposits; catering bookings would reuse that pattern) | APPLUX | change request | Open |
 
 ## 3. Assumptions in force
 
@@ -58,6 +59,26 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-12 | Until DEP-07, the seeded catalogue's VAT classes: wines intermediate (14 %); port, beer, gift boxes and the glass of wine standard (17 %); cheese, charcuterie, groceries and counter dishes super-reduced (3 %). The client's spreadsheet sets each product's class | M2.1 T6 seed | — |
 
 ## 4. Log
+
+### 2026-11-07 · GG-038 to GG-040 · Comptoir photos, empty counter, languages (client feedback)
+- **GG-038:** the Comptoir's three options (À emporter, Livraison, Réserver une table) are photo cards from the shop's own photos (Snack_5, Snack_7, Snack_2) with one line each saying what it means; a click opens the cart in that mode, as before. A dish without a photo shows the house mark on its dark tile instead of an empty box (`MediaCard`, every product grid).
+- **GG-039 (content):** the counter's real products, prices, photos and availability are the client's to enter before launch (no code). Fixed the friction it revealed: with an empty basket the table checkout had "pre-order" on and the button blocked ("Votre panier est vide…") until the switch was turned off. Now an empty basket means no pre-order: the switch is off and greyed with the hint to add counter dishes, and the table is booked without one (checked: booking placed "Sans pré-commande").
+- **GG-040:** checked across the four languages: the back office (crawl of GG-033), the website (e2e language checks, 25 passed / 2 skipped on 3 devices), the dictionaries (every value identical to English reviewed: brand and Portuguese words, same-spelling words; fixed "Email" → "E-mail" on the FR/PT contact page) and the customer e-mails (21 kinds × 4 languages rendered: no sentence identical across languages except "BIC <code>").
+
+### 2026-11-07 · GG-036 · Bulk postcode entry for delivery zones (client feedback)
+- Cause: the postcodes field is Payload's list of separate entries; a pasted "7760, 7770" became one entry.
+- `splitPostalCodes` / `isLuxPostalCode` (`modules/sales/zones.ts`, 6 vectors): split on commas, semicolons, spaces and line breaks, "L-" removed, duplicates dropped, order kept.
+- "Coller plusieurs codes postaux" box above the field (`modules/sales/admin/postcode-paste.tsx`): adds the valid codes as separate entries at once, says how many, keeps anything that is not 4 digits in the box with a message.
+- On save, the field itself is split and cleaned (so a list typed into it still ends up as separate codes) and any code that is not 4 digits is refused, listed by value.
+- Checked on a production build: box → separate entries and "12" skipped; "7805, 7806, 7806" typed into the field → saved as 7805 and 7806; after reload, one entry per code. `npm run check` (216) passes.
+
+### 2026-11-07 · GG-031 to GG-035 · Catering page, untranslated labels (client feedback)
+- **GG-031:** not built: deposits belong to the catering quotation change request (Q-12 → Q-13). Orders already record deposits (GG-003).
+- **GG-032:** every package card ends with a "Choisir cette formule" button (the whole card stays clickable); the chosen card gets a gold frame and a filled "✓ Formule choisie" button; the request form says "Formule choisie : … · Changer" (or "Choisissez une formule ci-dessus") with a link back to the cards.
+- **GG-033:** "The requests" does not exist in the code, the dictionaries or Payload's translations (probably a paraphrase). The whole back office was crawled in FR, EN, DE and PT (61 pages each: lists, edit and create pages, globals with every tab) and every text identical to English was reviewed. Fixed: events "Booked" column (now "Places réservées"…), the "Panel" entry in the Columns picker of orders, reservations and event bookings (hidden), "Row 1/2/3" on catering package lines (rows now show their text, else "Ligne 2" in the admin language), Payload's Portuguese "Login"/"Log out" (now "Iniciar sessão"/"Terminar sessão"). Left as Payload's own: screen-reader instructions of drag-and-drop, the rich-text editor's button tooltips, the technical columns of the photo library's Columns picker (URL, MIME type, sizes), "API" (same word in every language).
+- **GG-034:** after sending, the thank-you replaces the form and is scrolled into view (checked: heading 264 px from the top on desktop and a 390 px phone).
+- **GG-035:** under the estimate: "Montant indicatif (55 € × 20 convives). Ce n'est pas un prix définitif : nous vous envoyons un devis personnalisé qui confirme le prix final." (4 languages).
+- **Tests:** check 210, e2e language checks 16 passed / 2 skipped.
 
 ### 2026-11-07 · GG-030 · Catering quotations: scope review, not built
 - Today (M1.3): a catering enquiry has its package, guests, date, time, place, contact, message, the server's indicative estimate and a status (Nouvelle, Devis envoyé, Acceptée, Refusée) that staff set by hand. No quotation document exists.

@@ -21,6 +21,8 @@ export function MediaCard({ image, alt, ratio, tag, overlay, action, children, s
   return (
     <article className="group relative flex flex-col bg-bone">
       <div className={cn('relative overflow-hidden bg-ink', ratio === '4/5' ? 'aspect-[4/5]' : 'aspect-[4/3]')}>
+        {/* No photo yet (GG-038): the house mark on the dark tile, never an empty box. */}
+        {!image && <Image src="/brand/mark.png" alt="" width={223} height={240} className="absolute top-1/2 left-1/2 w-16 -translate-x-1/2 -translate-y-1/2 opacity-30" />}
         {image && (
           <Image
             src={image}

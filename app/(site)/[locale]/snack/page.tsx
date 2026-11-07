@@ -40,7 +40,7 @@ export default async function SnackPage({ params }: Props) {
   return (
     <>
       <PageHero eyebrow={t.snackPage.eyebrow} title={[t.snackPage.titleA, t.snackPage.titleB]} subtitle={t.snackPage.subtitle} className="md:pb-16">
-        <CounterCtas t={t.snackPage.ctas} />
+        <CounterCtas t={t.snackPage.ctas} hints={t.cart.hints} />
       </PageHero>
       <section className="pb-32">
         <Container>

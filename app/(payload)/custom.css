@@ -2605,3 +2605,33 @@ body:has(.gg-create) .no-results__actions {
   font-size: 13px;
   color: var(--gg-text-2);
 }
+
+/* ---- Paste several postcodes (modules/sales/admin/postcode-paste.tsx, GG-036) ---------------------------- */
+.gg-paste {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+.gg-paste label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--gg-text-2);
+}
+.gg-paste textarea {
+  padding: 8px 10px;
+  border: 1px solid var(--gg-line-2);
+  border-radius: 6px;
+  background: #ffffff;
+  font: 400 14px var(--font-body);
+  color: var(--gg-ink);
+  resize: vertical;
+}
+.gg-paste__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--gg-text-2);
+}

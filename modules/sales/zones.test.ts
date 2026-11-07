@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { deliveryFee, normalizePostalCode, resolveZone, type Zone } from './zones';
+import { deliveryFee, isLuxPostalCode, normalizePostalCode, resolveZone, splitPostalCodes, type Zone } from './zones';
 
 const bissen: Zone = { name: 'Bissen', postalCodes: ['7795', 'L-7790'], feeCents: 500, minOrderCents: 3000, freeFromCents: 8000, active: true };
 const closed: Zone = { name: 'Ettelbruck', postalCodes: ['9010'], feeCents: 800, minOrderCents: 4000, active: false };
@@ -36,5 +36,19 @@ describe('deliveryFee', () => {
 
   it('a zone without a free threshold always charges', () => {
     expect(deliveryFee({ ...bissen, freeFromCents: null }, 50000).feeCents).toBe(500);
+  });
+});
+
+describe('splitPostalCodes (GG-036)', () => {
+  it.each([
+    [['7760, 7770, 7780'], ['7760', '7770', '7780']],
+    [['7760 7770\n7780;7790'], ['7760', '7770', '7780', '7790']],
+    [['L-7795, l 7760,L7770'], ['7795', '7760', '7770']],
+    [['7795', '7760, 7795'], ['7795', '7760']],
+    [[' , ,'], []],
+  ])('%j → %j', (input, expected) => expect(splitPostalCodes(input)).toEqual(expected));
+
+  it('a Luxembourg postcode is 4 digits', () => {
+    expect(['7795', '779', '77950', 'abcd'].map(isLuxPostalCode)).toEqual([true, false, false, false]);
   });
 });

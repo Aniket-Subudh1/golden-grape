@@ -260,7 +260,11 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
     };
   }, [postalCode, mode]);
 
-  const withLines = mode !== 'table' || preorder;
+  // GG-039: a pre-order needs something in the basket. With an empty basket the table is booked without one: never
+  // a blocked button because the pre-order switch was on.
+  const canPreorder = items.length > 0;
+  const withPreorder = preorder && canPreorder;
+  const withLines = mode !== 'table' || withPreorder;
   const lines = withLines ? items : [];
 
   // Server totals for what will be ordered, with the delivery fee of the postcode typed (300 ms after the last change).
@@ -359,7 +363,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="payment" value={payment} />
       {mode === 'table' && <input type="hidden" name="guests" value={guests} />}
-      {mode === 'table' && preorder && <input type="hidden" name="preorder" value="on" />}
+      {mode === 'table' && withPreorder && <input type="hidden" name="preorder" value="on" />}
       <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
 
       <div className="min-w-0 space-y-12">
@@ -392,19 +396,20 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
               <button
                 type="button"
                 role="switch"
-                aria-checked={preorder}
+                aria-checked={withPreorder}
+                disabled={!canPreorder}
                 onClick={() => setPreorder((p) => !p)}
-                className="flex w-full items-center justify-between gap-4 rounded-2xl border border-border/70 p-4 text-left transition hover:border-ink"
+                className="flex w-full items-center justify-between gap-4 rounded-2xl border border-border/70 p-4 text-left transition hover:border-ink disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-border/70"
               >
                 <span>
                   <span className="block text-sm font-medium">{t.preorder.label}</span>
                   <span className="mt-0.5 block text-xs text-ink/55">{t.preorder.hint}</span>
                 </span>
-                <span className={cn('relative h-6 w-11 shrink-0 rounded-full transition', preorder ? 'bg-ink' : 'bg-border')}>
-                  <span className={cn('absolute top-1 h-4 w-4 rounded-full bg-bone shadow transition-all', preorder ? 'left-6' : 'left-1')} />
+                <span className={cn('relative h-6 w-11 shrink-0 rounded-full transition', withPreorder ? 'bg-ink' : 'bg-border')}>
+                  <span className={cn('absolute top-1 h-4 w-4 rounded-full bg-bone shadow transition-all', withPreorder ? 'left-6' : 'left-1')} />
                 </span>
               </button>
-              {preorder && items.length === 0 && (
+              {!canPreorder && (
                 <Notice>
                   {t.preorder.empty}{' '}
                   <Link href={localePath(locale, '/snack')} className="border-b border-gold-deep text-gold-deep">
@@ -590,7 +595,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
           {mode === 'table' && (
             <div>
               <p className="font-serif text-2xl">{interpolate(t.reservation, { count: guests })}</p>
-              {!preorder && <p className="mt-1 text-xs text-ink/55">{t.noPreorder}</p>}
+              {!withPreorder && <p className="mt-1 text-xs text-ink/55">{t.noPreorder}</p>}
             </div>
           )}
 

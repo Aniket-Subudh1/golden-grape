@@ -1,8 +1,9 @@
-import type { CollectionConfig, Field } from 'payload';
+import type { CollectionConfig, Field, PayloadRequest } from 'payload';
 import { hiddenUnless, isStaff, none, staffOrSelf } from '@/lib/access';
-import { addButton, badgeCell, emptyList, l, type Label, listOnly, scaledNumber, timeOfDay, WEEKDAYS } from '@/lib/admin';
+import { addButton, badgeCell, emptyList, l, type Label, listOnly, say, scaledNumber, timeOfDay, WEEKDAYS } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { ORDER_STATUSES, RESERVATION_STATUSES } from './order-states';
+import { isLuxPostalCode, splitPostalCodes } from './zones';
 
 // Orders, table reservations, slot rules and delivery zones (04 §4). Orders and reservations are written only by
 // the sales services (placeOrder, transition, the reservation actions): staff read them in the admin, where one
@@ -127,7 +128,7 @@ export const orders: CollectionConfig = {
   access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
   defaultSort: '-createdAt',
   fields: [
-    { name: 'panel', type: 'ui', admin: { components: { Field: '@/modules/sales/admin/order-panel' } } },
+    { name: 'panel', type: 'ui', admin: { disableListColumn: true, components: { Field: '@/modules/sales/admin/order-panel' } } },
     ...[
       { name: 'number', type: 'text', required: true, unique: true, label: l('Numéro', 'Number', 'Nummer', 'Número') },
       {
@@ -261,7 +262,7 @@ export const reservations: CollectionConfig = {
   access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
   defaultSort: '-createdAt',
   fields: [
-    { name: 'panel', type: 'ui', admin: { components: { Field: '@/modules/sales/admin/reservation-panel' } } },
+    { name: 'panel', type: 'ui', admin: { disableListColumn: true, components: { Field: '@/modules/sales/admin/reservation-panel' } } },
     ...[
       { name: 'number', type: 'text', required: true, unique: true, label: l('Numéro', 'Number', 'Nummer', 'Número') },
       {
@@ -478,6 +479,9 @@ export const deliveryZones: CollectionConfig = {
         { name: 'active', type: 'checkbox', defaultValue: true, label: l('Active', 'Active', 'Aktiv', 'Ativa'), admin: { width: '30%', style: { alignSelf: 'flex-end' } } },
       ],
     },
+    // GG-036: paste several codes at once (the box above the field), and anything pasted into the field itself is
+    // split and cleaned when saved.
+    { name: 'postalCodesPaste', type: 'ui', admin: { components: { Field: { path: '@/modules/sales/admin/postcode-paste', clientProps: { field: 'postalCodes' } } } } },
     {
       name: 'postalCodes',
       type: 'text',
@@ -485,12 +489,26 @@ export const deliveryZones: CollectionConfig = {
       required: true,
       index: true,
       label: l('Codes postaux', 'Postcodes', 'Postleitzahlen', 'Códigos postais'),
+      hooks: { beforeValidate: [({ value }) => (Array.isArray(value) ? splitPostalCodes(value.map(String)) : value)] },
+      validate: (value: string[] | null | undefined, { req }: { req: PayloadRequest }) => {
+        const wrong = (value ?? []).filter((c) => !isLuxPostalCode(c));
+        if (wrong.length === 0) return (value ?? []).length > 0 || say(req, l('Ajoutez au moins un code postal.', 'Add at least one postcode.', 'Mindestens eine Postleitzahl angeben.', 'Indique pelo menos um código postal.'));
+        return say(
+          req,
+          l(
+            `Pas un code postal luxembourgeois (4 chiffres) : ${wrong.join(', ')}`,
+            `Not a Luxembourg postcode (4 digits): ${wrong.join(', ')}`,
+            `Keine luxemburgische Postleitzahl (4 Ziffern): ${wrong.join(', ')}`,
+            `Não é um código postal luxemburguês (4 algarismos): ${wrong.join(', ')}`,
+          ),
+        );
+      },
       admin: {
         description: l(
-          'Tapez un code et Entrée. « L-7795 » et « 7795 » sont pareils.',
-          'Type a code and press Enter. “L-7795” and “7795” are the same.',
-          'Code eingeben und Enter drücken. „L-7795“ und „7795“ sind gleich.',
-          'Escreva um código e Enter. «L-7795» e «7795» são iguais.',
+          'Tapez un code et Entrée, ou collez-en plusieurs dans la case au-dessus. « L-7795 » et « 7795 » sont pareils.',
+          'Type a code and press Enter, or paste several in the box above. “L-7795” and “7795” are the same.',
+          'Code eingeben und Enter drücken, oder mehrere im Feld darüber einfügen. „L-7795“ und „7795“ sind gleich.',
+          'Escreva um código e Enter, ou cole vários na caixa acima. «L-7795» e «7795» são iguais.',
         ),
       },
     },

@@ -393,7 +393,13 @@
       "doneTitle": "Obrigado {{name}}",
       "doneSubtitle": "Recebemos o seu pedido. Respondemos em 24h.",
       "email": "E-mail",
-      "emailPh": "voce@exemplo.lu"
+      "emailPh": "voce@exemplo.lu",
+      "select": "Escolher esta proposta",
+      "selected": "Proposta escolhida",
+      "chosen": "Proposta escolhida: {{name}}",
+      "choose": "Escolha uma proposta acima.",
+      "change": "Mudar",
+      "estimateNote": "Montante indicativo ({{price}} × {{count}} convidados). Não é um preço final: enviamos-lhe um orçamento personalizado que confirma o preço final."
     }
   },
   "eventsPage": {
@@ -441,7 +447,7 @@
     "info": {
       "address": "Morada",
       "phone": "Telefone",
-      "email": "Email",
+      "email": "E-mail",
       "hours": "Horário"
     },
     "form": {
@@ -456,7 +462,7 @@
       },
       "name": "Nome",
       "namePh": "Nome e apelido",
-      "email": "Email",
+      "email": "E-mail",
       "emailPh": "voce@exemplo.com",
       "phone": "Telefone",
       "phonePh": "+352 …",
