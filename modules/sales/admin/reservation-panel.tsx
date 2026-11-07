@@ -30,8 +30,9 @@ export default async function ReservationPanel({ id, payload, i18n, user }: UIFi
   const money = (cents: number | null | undefined) => formatMoney(cents ?? 0, lang);
   const decisions: Decision[] = hasRole(user, ['sales'])
     ? (RESERVATION_FLOW[status] as readonly ReservationStatus[]).map((to) => {
-        const tone = to === 'rejected' || to === 'cancelled' ? ('danger' as const) : ('primary' as const);
-        return { to, ...t.reservations[to as keyof typeof t.reservations], tone, reason: false };
+        const tone = to === 'rejected' || to === 'cancelled' || to === 'no_show' ? ('danger' as const) : ('primary' as const);
+        // A reason is kept in the history when the visit does not happen (GG-019); optional.
+        return { to, ...t.reservations[to as keyof typeof t.reservations], tone, reason: tone === 'danger' };
       })
     : [];
 
@@ -133,6 +134,7 @@ export default async function ReservationPanel({ id, payload, i18n, user }: UIFi
                 when: h.at ? when.format(new Date(h.at)) : '',
                 text: RESERVATION_STATUS_LABELS[(h.to ?? 'pending') as ReservationStatus]?.[lang] ?? h.to,
                 by: h.user ? staffName.get(String(h.user)) : null,
+                note: h.reason,
               })),
             ]}
           />

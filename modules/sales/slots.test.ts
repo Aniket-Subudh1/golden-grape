@@ -84,6 +84,15 @@ describe('generateSlots', () => {
     expect(day('2026-11-09', { taken: { '10:00': 4, '10:30': 3 } }).slice(0, 2).map((s) => s.available)).toEqual([0, 1]);
   });
 
+  it('last arrival before closing (GG-025): closing 14:00 with 30 min → the last start is 13:30, whatever the step', () => {
+    const lunch: Hours = [{ day: '2', open: '12:00', close: '14:00' }];
+    const every15 = { ...rule, intervalMin: 15 };
+    expect(run({ hours: lunch, rule: every15 }).at(-1)?.from).toBe('13:45');
+    expect(run({ hours: lunch, rule: { ...every15, lastCallMin: 30 } }).at(-1)?.from).toBe('13:30');
+    expect(run({ hours: lunch, rule: { ...every15, lastCallMin: 45 } }).at(-1)?.from).toBe('13:15');
+    expect(run({ hours: lunch, rule: { ...rule, lastCallMin: 0 } }).at(-1)?.from).toBe('13:30');
+  });
+
   it('a past date is empty', () => {
     expect(run({ date: '2026-11-06' })).toEqual([]);
   });

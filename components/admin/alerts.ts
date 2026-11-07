@@ -3,7 +3,7 @@ import { hasRole } from '@/lib/access';
 import type { Label } from '@/lib/admin';
 import { REQUEST_STATUS } from '@/modules/catering/collections';
 import { BOOKING_STATUS } from '@/modules/events/collections';
-import { ORDER_TABS } from '@/modules/sales/admin/order-tabs';
+import { ORDER_TABS, orderTabWhere } from '@/modules/sales/admin/order-tabs';
 import { ORDER_STATUS_LABELS, RESERVATION_STATUS_LABELS } from '@/modules/sales/collections';
 
 // What waits for staff (GG-002, GG-017): the counts beside the sidebar items and the bell's list. Only what the
@@ -82,7 +82,7 @@ export async function getAlerts(payload: Payload, user: TypedUser | null, now = 
 
   const [orders, reservations, bookings, catering, refunds, freeSeats, doneOrders, doneReservations, doneBookings, doneCatering, lowStock] =
     await Promise.all([
-      find('orders', { status: { in: TODO } }),
+      find('orders', { and: orderTabWhere(ORDER_TABS[0]) }),
       find('reservations', { status: { equals: 'pending' } }),
       find('eventBookings', { status: { equals: 'pending' } }),
       find('cateringRequests', { status: { equals: 'new' } }),

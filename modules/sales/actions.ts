@@ -174,11 +174,12 @@ export const recordOrderRefund = action(
 
 /** Staff accept, decline, cancel or complete a table reservation; its pre-order follows in the same transaction. */
 export const decideReservation = action(
-  z.object({ reservation: z.string().min(1), to: z.enum(['accepted', 'rejected', 'cancelled', 'completed']) }),
+  z.object({ reservation: z.string().min(1), to: z.enum(['accepted', 'rejected', 'cancelled', 'completed', 'no_show']), reason: optionalText(300) }),
   { roles: ['sales'] },
-  async ({ reservation, to }, { payload, user }) => {
-    const result = await transitionReservation(payload, reservation, to, { user: user.id });
-    if (to !== 'completed') after(() => mailReservation(payload, result.reservation, to).catch(logMail('reservation status')));
+  async ({ reservation, to, reason }, { payload, user }) => {
+    const result = await transitionReservation(payload, reservation, to, { user: user.id, reason });
+    // No e-mail for a visit (completed) or a no-show: the customer is not told they did not come.
+    if (to !== 'completed' && to !== 'no_show') after(() => mailReservation(payload, result.reservation, to).catch(logMail('reservation status')));
     return { status: result.reservation.status };
   },
 );

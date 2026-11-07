@@ -157,6 +157,8 @@ export const businessSettings: GlobalConfig = {
         {
           label: l('Horaires', 'Opening hours', 'Öffnungszeiten', 'Horário'),
           fields: [
+            // GG-023: tick several days, give the hours once.
+            { name: 'hoursBulk', type: 'ui', admin: { components: { Field: { path: '@/components/admin/weekday-bulk', clientProps: { array: 'hours' } } } } },
             {
               name: 'hours',
               type: 'array',

@@ -2,7 +2,8 @@ import { type Dictionary, interpolate } from '@/lib/i18n';
 import { Details, heading, MailLayout, type MailBusiness, Reference } from './layout';
 import { type OrderMail, OrderLines, TransferDetails, ViewButton } from './order-received';
 
-export type StatusMail = OrderMail & { status: keyof Dictionary['mail']['order']['statusBody']; statusName: string };
+/** `body`: replaces the status's usual sentence (an order ready before its slot says it can be collected now). */
+export type StatusMail = OrderMail & { status: keyof Dictionary['mail']['order']['statusBody']; statusName: string; body?: string };
 
 /** The customer is told when their order is confirmed, ready, on its way, cancelled or refunded. */
 export function OrderStatusMail({ t, business, logoUrl, data }: { t: Dictionary['mail']; business: MailBusiness; logoUrl: string; data: StatusMail }) {
@@ -11,7 +12,7 @@ export function OrderStatusMail({ t, business, logoUrl, data }: { t: Dictionary[
       <h1 style={heading}>{data.statusName}</h1>
       <Reference>{interpolate(t.order.reference, { number: data.number })}</Reference>
       <p>{interpolate(t.greeting, { name: data.name })}</p>
-      <p>{t.order.statusBody[data.status]}</p>
+      <p>{data.body ?? t.order.statusBody[data.status]}</p>
       <Details
         rows={[
           [t.labels.number, data.number],

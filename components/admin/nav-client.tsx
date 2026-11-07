@@ -104,6 +104,7 @@ const SCROLL_KEY = 'gg_nav_scroll';
 // Collapsible sections (GG-016). Each section's open/closed choice is kept in this browser; without a choice, only the
 // section of the page being viewed is open. The store is localStorage itself, read through useSyncExternalStore.
 const GROUPS_KEY = 'gg_nav_groups';
+const LAST_PAGE_KEY = 'gg_nav_last_page';
 const groupListeners = new Set<() => void>();
 const readGroups = () => localStorage.getItem(GROUPS_KEY) ?? '{}';
 /** A damaged value only loses the choices (every section back to its default), never the sidebar. */
@@ -160,10 +161,14 @@ export function NavClient({ groups, alerts: fresh, text }: { groups: NavGroup[];
   const choices = parseChoices(useSyncExternalStore(subscribeGroups, readGroups, () => '{}'));
   const activeGroup = groups.find((g) => g.items.some((i) => isActive(i.href)))?.id;
   const isOpen = (id: string) => choices[id] ?? id === activeGroup;
-  // Opening a page inside a closed section opens it: the current page is never hidden.
+  // Arriving on a page inside a closed section opens it once, so the page just opened is visible. Only on arrival:
+  // the user can still close that section afterwards (its total then shows on the header).
+  // A reload of the same page is not an arrival: a section closed there stays closed.
   useEffect(() => {
-    if (activeGroup && choices[activeGroup] === false) setGroupOpen(activeGroup, true);
-  }, [activeGroup, choices]);
+    const arrived = sessionStorage.getItem(LAST_PAGE_KEY) !== pathname;
+    sessionStorage.setItem(LAST_PAGE_KEY, pathname);
+    if (arrived && activeGroup && parseChoices(readGroups())[activeGroup] === false) setGroupOpen(activeGroup, true);
+  }, [pathname, activeGroup]);
   // Payload's own classes keep its open/close behaviour; `gg-nav` restyles everything inside.
   const classes = ['nav', 'gg-nav', navOpen && 'nav--nav-open', shouldAnimate && 'nav--nav-animate', hydrated && 'nav--nav-hydrated'];
 

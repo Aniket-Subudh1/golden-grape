@@ -3,7 +3,7 @@ import { appUrl } from '@/lib/env';
 import { getDictionary, interpolate, type Locale } from '@/lib/i18n';
 import { render, sendMail } from '@/lib/mail';
 import { formatMoney } from '@/lib/money';
-import { slotLabel } from '@/lib/time';
+import { isBeforeSlot, slotLabel } from '@/lib/time';
 import { mailContext } from '@/modules/notifications/context';
 import { type OrderMail, OrderReceived, OrderStaff } from '@/modules/notifications/templates/order-received';
 import { OrderStatusMail, type StatusMail } from '@/modules/notifications/templates/order-status';
@@ -90,8 +90,15 @@ export async function mailOrderStatus(order: Order) {
   // The handover (GG-005) says "collected" or "delivered", by mode.
   const handedOver = order.status === 'completed' ? (order.mode === 'delivery' ? 'delivered' : 'completed') : null;
   const status = (handedOver ?? order.status) as StatusMail['status'];
-  const statusName = handedOver ? ctx.customerT.order.handedOver[handedOver] : ctx.customerT.status[order.status as keyof typeof ctx.customerT.status];
-  const data: StatusMail = { ...(await orderMail(order, locale, pageUrl(order.id, locale))), status, statusName };
+  // Ready before the slot the customer chose (GG-027): say it can be collected now, and keep their time valid.
+  const early = order.status === 'ready' && isBeforeSlot(order.slotAt);
+  const statusName = handedOver
+    ? ctx.customerT.order.handedOver[handedOver]
+    : early
+      ? ctx.customerT.order.readyEarlyName
+      : ctx.customerT.status[order.status as keyof typeof ctx.customerT.status];
+  const base = await orderMail(order, locale, pageUrl(order.id, locale));
+  const data: StatusMail = { ...base, status, statusName, body: early ? interpolate(ctx.customerT.order.readyEarly, { slot: base.slot }) : undefined };
   await send(
     data.email,
     interpolate(ctx.customerT.order.statusSubject, { number: data.number, status: data.statusName }),

@@ -35,8 +35,9 @@ export const RESERVATION_STATUS_LABELS: Record<(typeof RESERVATION_STATUSES)[num
   rejected: l('Refusée', 'Declined', 'Abgelehnt', 'Recusada'),
   cancelled: l('Annulée', 'Cancelled', 'Storniert', 'Cancelada'),
   completed: l('Venue', 'Completed', 'Erledigt', 'Concluída'),
+  no_show: l('Pas venu (no-show)', 'No-show', 'Nicht erschienen', 'Não compareceu'),
 };
-export const RESERVATION_STATUS_TONES = { pending: 'warning', accepted: 'success', rejected: 'danger', cancelled: 'danger', completed: 'neutral' } as const;
+export const RESERVATION_STATUS_TONES = { pending: 'warning', accepted: 'success', rejected: 'danger', cancelled: 'danger', completed: 'neutral', no_show: 'danger' } as const;
 
 export const MODE_LABELS = {
   pickup: l('À emporter', 'Pickup', 'Abholung', 'Levantamento'),
@@ -297,7 +298,7 @@ export const reservations: CollectionConfig = {
       },
       { name: 'notes', type: 'textarea', label: l('Message du client', 'Customer’s message', 'Nachricht des Kunden', 'Mensagem do cliente') },
       localeField,
-      { name: 'history', type: 'array', admin: { disableListColumn: true }, fields: [{ name: 'at', type: 'date' }, { name: 'from', type: 'text' }, { name: 'to', type: 'text' }, { name: 'user', type: 'relationship', relationTo: 'users' }] },
+      { name: 'history', type: 'array', admin: { disableListColumn: true }, fields: [{ name: 'at', type: 'date' }, { name: 'from', type: 'text' }, { name: 'to', type: 'text' }, { name: 'user', type: 'relationship', relationTo: 'users' }, { name: 'reason', type: 'text' }] },
     ].map((f) => listOnly(f as Field)),
   ],
   custom: { indexes: [{ fields: { 'slot.date': 1, status: 1 } }] },
@@ -354,10 +355,16 @@ export const slotRules: CollectionConfig = {
           required: true,
           min: 0,
           defaultValue: 4,
-          label: l('Places par créneau', 'Places per slot', 'Plätze pro Zeitfenster', 'Lugares por horário'),
+          // GG-024: what is counted differs by mode; the label and text say exactly how.
+          label: l('Capacité par créneau', 'Capacity per slot', 'Kapazität pro Zeitfenster', 'Capacidade por horário'),
           admin: {
             width: '33%',
-            description: l('Commandes ; pour les tables : personnes.', 'Orders; for tables: guests.', 'Bestellungen; bei Tischen: Personen.', 'Encomendas; para mesas: pessoas.'),
+            description: l(
+              'À emporter et livraison : nombre de commandes par créneau. Tables : nombre de personnes (couverts) qui peuvent arriver dans le créneau ; une table de 2 en utilise 2, une table de 10 en utilise 10. La durée du repas n’est pas comptée.',
+              'Pickup and delivery: number of orders per slot. Tables: number of guests (covers) who can arrive in the slot; a table for 2 uses 2, a table for 10 uses 10. How long the meal lasts is not counted.',
+              'Abholung und Lieferung: Anzahl Bestellungen pro Zeitfenster. Tische: Anzahl Personen (Gedecke), die im Zeitfenster ankommen können; ein Tisch für 2 belegt 2, ein Tisch für 10 belegt 10. Die Dauer des Essens wird nicht berücksichtigt.',
+              'Levantamento e entrega: número de encomendas por horário. Mesas: número de pessoas (lugares) que podem chegar no horário; uma mesa para 2 usa 2, uma mesa para 10 usa 10. A duração da refeição não é contada.',
+            ),
           },
         },
         {
@@ -388,6 +395,23 @@ export const slotRules: CollectionConfig = {
         },
       ],
     },
+    {
+      name: 'lastCallMin',
+      type: 'number',
+      min: 0,
+      defaultValue: 0,
+      label: l('Dernière arrivée (minutes avant la fermeture)', 'Last arrival (minutes before closing)', 'Letzte Ankunft (Minuten vor Schließung)', 'Última chegada (minutos antes do fecho)'),
+      // GG-025: the last booking can be earlier than the closing time (kitchen closes at 14:00, last table 13:30).
+      admin: {
+        description: l(
+          '0 : le dernier créneau se termine à la fermeture. 30 : rien ne commence moins de 30 min avant la fermeture (cuisine fermant à 14:00 → dernière arrivée 13:30). Les tables restent à confirmer par la Maison.',
+          '0: the last slot ends at closing time. 30: nothing starts less than 30 min before closing (kitchen closing at 14:00 → last arrival 13:30). Tables are still confirmed by the House.',
+          '0: das letzte Zeitfenster endet bei Schließung. 30: nichts beginnt weniger als 30 Min. vor Schließung (Küche schließt 14:00 → letzte Ankunft 13:30). Tische werden weiterhin vom Haus bestätigt.',
+          '0: o último horário termina ao fecho. 30: nada começa menos de 30 min antes do fecho (cozinha fecha às 14:00 → última chegada 13:30). As mesas continuam a ser confirmadas pela Casa.',
+        ),
+      },
+    },
+    { name: 'daysBulk', type: 'ui', admin: { components: { Field: { path: '@/components/admin/weekday-bulk', clientProps: { array: 'days' } } } } },
     {
       name: 'days',
       type: 'array',

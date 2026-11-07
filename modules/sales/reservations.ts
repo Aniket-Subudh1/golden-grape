@@ -15,11 +15,13 @@ const PREORDER_MOVE: Record<ReservationStatus, OrderStatus | null> = {
   rejected: 'cancelled',
   cancelled: 'cancelled',
   completed: 'completed',
+  // The guests never came: the pre-order is cancelled like a cancellation (unopened goods back in stock).
+  no_show: 'cancelled',
 };
 
 export type ReservationChange = { reservation: Reservation; preorder: Order | null; from: ReservationStatus };
 
-export function transitionReservation(payload: Payload, id: string, to: ReservationStatus, { user }: { user?: string } = {}): Promise<ReservationChange> {
+export function transitionReservation(payload: Payload, id: string, to: ReservationStatus, { user, reason }: { user?: string; reason?: string } = {}): Promise<ReservationChange> {
   return withTx(payload, async (tx) => {
     const reservation = await payload.findByID({ collection: 'reservations', id, depth: 0, req: tx.req, overrideAccess: true, disableErrors: true });
     if (!reservation) throw new AppError('NOT_FOUND', 'reservation');
@@ -32,7 +34,7 @@ export function transitionReservation(payload: Payload, id: string, to: Reservat
     const move = PREORDER_MOVE[to];
     if (reservation.preorder && move) {
       const preorderId = typeof reservation.preorder === 'object' ? reservation.preorder.id : reservation.preorder;
-      preorder = (await applyTransition(tx, preorderId, move, { user })).order;
+      preorder = (await applyTransition(tx, preorderId, move, { user, reason })).order;
     }
     const updated = await payload.update({
       collection: 'reservations',
@@ -40,7 +42,7 @@ export function transitionReservation(payload: Payload, id: string, to: Reservat
       req: tx.req,
       overrideAccess: true,
       depth: 0,
-      data: { status: to, history: [...(reservation.history ?? []), { at: new Date().toISOString(), from, to, user }] },
+      data: { status: to, history: [...(reservation.history ?? []), { at: new Date().toISOString(), from, to, user, reason }] },
     });
     return { reservation: updated, preorder, from };
   });

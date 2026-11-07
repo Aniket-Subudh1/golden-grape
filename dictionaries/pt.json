@@ -690,7 +690,9 @@
       "staffIntro": "Acabou de ser feita uma encomenda no site. Abra-a na área de gestão para a tratar.",
       "reference": "Encomenda {{number}}",
       "transferMissing": "A nossa equipa vai enviar-lhe os nossos dados bancários. Na transferência, indique a referência abaixo.",
-      "staffTransferMissing": "Atenção: não há IBAN nos Dados da loja. O cliente não recebeu dados bancários: envie-lhos."
+      "staffTransferMissing": "Atenção: não há IBAN nos Dados da loja. O cliente não recebeu dados bancários: envie-lhos.",
+      "readyEarlyName": "Pronta mais cedo do que o previsto",
+      "readyEarly": "Boa notícia: a sua encomenda já está pronta, mais cedo do que o previsto. Pode levantá-la já, no nosso horário de abertura, ou manter a hora escolhida ({{slot}})."
     },
     "reservation": {
       "pendingSubject": "O seu pedido de mesa {{number}}",
@@ -822,7 +824,7 @@
       "details": "Os seus dados",
       "payment": "Pagamento"
     },
-    "noDays": "De momento não há horários disponíveis. Ligue-nos e encontramos uma solução.",
+    "noDays": "Não há horários disponíveis online de momento: está tudo completo ou fechado. Ligue-nos e encontramos uma solução.",
     "pickTime": "Escolha uma hora",
     "full": "Cheio",
     "today": "Hoje",
@@ -903,7 +905,8 @@
       "saved": "As suas moradas",
       "other": "Outra morada",
       "save": "Guardar esta morada na minha conta"
-    }
+    },
+    "noSlots": "A reserva online não é possível: não há horários disponíveis. Ligue-nos para reservar."
   },
   "order": {
     "eyebrow": "Encomenda {{number}}",
@@ -917,7 +920,8 @@
       "table": "Recebemos o seu pedido e confirmamos a sua mesa muito em breve.",
       "accepted": "A sua mesa está confirmada. Será um prazer recebê-lo.",
       "cancelled": "Esta encomenda foi cancelada.",
-      "rejected": "Lamentamos: não o podemos receber a essa hora."
+      "rejected": "Lamentamos: não o podemos receber a essa hora.",
+      "noShow": "Não o vimos à hora reservada. Esperamos recebê-lo noutra ocasião."
     },
     "status": {
       "pending": "Em confirmação",
@@ -934,7 +938,8 @@
       "accepted": "Confirmada",
       "rejected": "Recusada",
       "cancelled": "Cancelada",
-      "completed": "Concluída"
+      "completed": "Concluída",
+      "no_show": "Não comparecida"
     },
     "modes": {
       "pickup": "Levantamento na loja",

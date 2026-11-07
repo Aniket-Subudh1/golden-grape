@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { Container } from '@/components/site/container';
 import { getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { currentCustomer } from '@/modules/customers/service';
+import { getSettings } from '@/modules/settings/service';
 import { CheckoutForm } from '@/modules/webshop/components/checkout-form';
 
 type Props = PageProps<'/[locale]/checkout'>;
@@ -19,7 +20,7 @@ const MODES = ['pickup', 'delivery', 'table'] as const;
 
 /** The signed-in customer's details and default address fill the form; `?mode=table` opens on a table. */
 async function Checkout({ locale, searchParams }: { locale: Locale; searchParams: Props['searchParams'] }) {
-  const [customer, sp, { checkout, cart, form }] = await Promise.all([currentCustomer(), searchParams, getDictionary(locale)]);
+  const [customer, sp, { checkout, cart, form }, { business }] = await Promise.all([currentCustomer(), searchParams, getDictionary(locale), getSettings()]);
   const address = customer?.addresses?.find((a) => a.isDefault) ?? customer?.addresses?.[0] ?? null;
   const mode = MODES.find((m) => m === sp.mode) ?? null;
   return (
@@ -38,6 +39,7 @@ async function Checkout({ locale, searchParams }: { locale: Locale; searchParams
       t={checkout}
       cartT={{ modes: cart.modes, hints: cart.hints, minus: cart.minus, plus: cart.plus, toShop: cart.toShop, toCounter: cart.toCounter, vatIncluded: cart.vatIncluded }}
       formT={form}
+      phone={business.phone}
       signInHref={`${localePath(locale, '/auth')}?next=${encodeURIComponent(localePath(locale, '/checkout'))}`}
     />
   );

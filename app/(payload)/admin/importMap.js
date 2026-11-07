@@ -46,6 +46,7 @@ import { TotalCell as TotalCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@/modul
 import { default as default_17c7c564cab176c87d2ca60abf0e7c3a } from '@/modules/sales/admin/order-tabs'
 import { default as default_1032e7f4a7ea2c2fe5848dd9521e5ee8 } from '@/modules/sales/admin/reservation-panel'
 import { PreorderCell as PreorderCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@/modules/sales/admin/cells'
+import { default as default_e878a1c008f508aed324fd57a4961771 } from '@/components/admin/weekday-bulk'
 import { default as default_5ae1914325a0ee108216435b317303b1 } from '@/modules/events/admin/booking-panel'
 import { default as default_a2f0eccb7507197ce791108816851322 } from '@/components/admin/nav'
 import { default as default_0430f5fb3b8132a602107d7535a2a344 } from '@/components/admin/icon'
@@ -109,6 +110,7 @@ export const importMap = {
   "@/modules/sales/admin/order-tabs#default": default_17c7c564cab176c87d2ca60abf0e7c3a,
   "@/modules/sales/admin/reservation-panel#default": default_1032e7f4a7ea2c2fe5848dd9521e5ee8,
   "@/modules/sales/admin/cells#PreorderCell": PreorderCell_2af359ddeeb3df48a49ffdf99c6a1917,
+  "@/components/admin/weekday-bulk#default": default_e878a1c008f508aed324fd57a4961771,
   "@/modules/events/admin/booking-panel#default": default_5ae1914325a0ee108216435b317303b1,
   "@/components/admin/nav#default": default_a2f0eccb7507197ce791108816851322,
   "@/components/admin/icon#default": default_0430f5fb3b8132a602107d7535a2a344,

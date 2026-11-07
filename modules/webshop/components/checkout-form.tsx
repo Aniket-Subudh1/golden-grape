@@ -19,7 +19,7 @@ import type { AddressSuggestion } from '../address';
 import { PAYMENT_CHOICES, type PaymentChoice } from '@/modules/sales/order-states';
 import type { SlotDay } from '@/modules/sales/service';
 import { type CartMode, useCart } from '../cart';
-import { SlotPicker } from './slot-picker';
+import { CallUs, SlotPicker } from './slot-picker';
 
 // The checkout (M2.3 T5): one page for pickup, delivery and a table with an optional pre-order, on one slot engine.
 // Every number comes from the server (checkoutQuote); the order is placed by placeOrderAction with an idempotency key
@@ -45,6 +45,8 @@ type Props = {
   cartT: Pick<Dictionary['cart'], 'modes' | 'hints' | 'minus' | 'plus' | 'toShop' | 'toCounter' | 'vatIncluded'>;
   formT: Dictionary['form'];
   signInHref: string;
+  /** The shop's phone (Shop details), offered when nothing can be booked online. */
+  phone?: string | null;
 };
 
 type Summary = Extract<Awaited<ReturnType<typeof checkoutQuote>>, { ok: true }>['data'];
@@ -185,7 +187,7 @@ function StreetField({ value, onChange, onPick, label, t }: { value: string; onC
   );
 }
 
-export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, signInHref }: Props) {
+export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, signInHref, phone }: Props) {
   const router = useRouter();
   const cart = useCart();
   const { mode, setMode, items, ready } = cart;
@@ -319,14 +321,17 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
   }
 
   // What still stops the order (GG-006): the same checks as the server, so the button only works when it can succeed.
+  // Loaded, and not one free time in the whole window (GG-022): the order cannot be placed online at all.
+  const noSlots = Boolean(days[mode]) && !days[mode]!.some((d) => d.slots.some((s) => s.available > 0));
   const missing = [
-    !slot.time && t.check.time,
+    !slot.time && !noSlots && t.check.time,
     !contact.name.trim() && t.check.name,
     !isEmail(contact.email) && t.check.email,
     contact.phone.trim().length < 5 && t.check.phone,
     ...(mode === 'delivery' ? [!addr.line1.trim() && t.check.line1, !addr.postalCode.trim() && t.check.postalCode, !addr.city.trim() && t.check.city] : []),
   ].filter((m): m is string => Boolean(m));
   const blockers = [
+    noSlots ? t.noSlots : null,
     withLines && lines.length === 0 ? t.preorder.empty : null,
     outside ? t.zone.outside : null,
     zone?.belowMinimum ? interpolate(t.zone.belowMin, { missing: money(zone.minOrderCents - (quote?.subtotalCents ?? 0)), min: money(zone.minOrderCents) }) : null,
@@ -412,7 +417,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
         )}
 
         <Step n={++n} title={t.steps.when}>
-          <SlotPicker days={days[mode] ?? null} value={slot} onChange={setSlot} locale={locale} t={t} />
+          <SlotPicker days={days[mode] ?? null} value={slot} onChange={setSlot} locale={locale} t={t} phone={phone} />
         </Step>
 
         {mode === 'delivery' && (
@@ -652,6 +657,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
               {b}
             </p>
           ))}
+          {noSlots && phone && <CallUs phone={phone} />}
           <SubmitButton label={mode === 'table' ? t.submitTable : t.submit} pendingLabel={t.sending} className="w-full" disabled={blockers.length > 0 || !key || pricing} />
           <p className="text-center text-[11px] leading-relaxed text-ink/45">{t.footnote}</p>
         </div>

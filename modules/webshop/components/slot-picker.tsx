@@ -1,6 +1,6 @@
 'use client';
 
-import { CalendarX2, ChevronDown } from 'lucide-react';
+import { CalendarX2, ChevronDown, Phone } from 'lucide-react';
 import { useState } from 'react';
 import { useFieldError } from '@/components/ui/action-form';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,8 @@ type Props = {
   onChange: (value: { date: string; time: string }) => void;
   locale: string;
   t: SlotText;
+  /** The shop's number, shown as a tap-to-call link when nothing can be booked online (GG-021). */
+  phone?: string | null;
 };
 
 /**
@@ -27,7 +29,17 @@ type Props = {
  * dates" for the rest of the booking window; nothing is cut off at the edge), then the times of the chosen day.
  * Full times are shown but disabled; the server recounts on submit, so a forged time is refused there too.
  */
-export function SlotPicker({ days, value, onChange, locale, t }: Props) {
+/** "+352 691 855 844" as a link that dials on a phone. */
+export function CallUs({ phone }: { phone: string }) {
+  return (
+    <a href={`tel:${phone.replace(/[^\d+]/g, '')}`} className="mt-3 inline-flex items-center gap-2 border-b border-gold-deep text-base font-medium text-ink">
+      <Phone className="h-4 w-4 text-gold-deep" />
+      {phone}
+    </a>
+  );
+}
+
+export function SlotPicker({ days, value, onChange, locale, t, phone }: Props) {
   const errors = [useFieldError('slot'), useFieldError('time'), useFieldError('date')];
   const [expanded, setExpanded] = useState(false);
   const error = errors.find(Boolean);
@@ -52,11 +64,15 @@ export function SlotPicker({ days, value, onChange, locale, t }: Props) {
     );
   }
 
-  if (days.length === 0) {
+  // Nothing bookable: no open day, or every time full (GG-022). Say why, and how to book anyway.
+  if (!days.some((d) => d.slots.some((s) => s.available > 0))) {
     return (
       <div className="flex items-start gap-3 rounded-2xl border border-border/70 bg-champagne/40 p-5 text-sm text-ink/70">
         <CalendarX2 className="mt-0.5 h-4 w-4 shrink-0 text-gold-deep" />
-        <p>{t.noDays}</p>
+        <div>
+          <p>{t.noDays}</p>
+          {phone && <CallUs phone={phone} />}
+        </div>
       </div>
     );
   }

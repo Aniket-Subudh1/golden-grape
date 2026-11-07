@@ -690,7 +690,9 @@
       "staffIntro": "An order has just been placed on the website. Open it in the back office to handle it.",
       "reference": "Order {{number}}",
       "transferMissing": "Our team will send you our bank details. When you pay, please use the reference below.",
-      "staffTransferMissing": "Warning: no IBAN is set in Shop details. The customer did not receive bank details: please send them."
+      "staffTransferMissing": "Warning: no IBAN is set in Shop details. The customer did not receive bank details: please send them.",
+      "readyEarlyName": "Ready earlier than planned",
+      "readyEarly": "Good news: your order is already ready, earlier than planned. You can collect it now, during our opening hours, or keep the time you chose ({{slot}})."
     },
     "reservation": {
       "pendingSubject": "Your table request {{number}}",
@@ -822,7 +824,7 @@
       "details": "Your details",
       "payment": "Payment"
     },
-    "noDays": "No time is open for this right now. Call us and we will find a solution.",
+    "noDays": "No time is available online right now: everything is full or closed. Call us and we will find a solution.",
     "pickTime": "Choose a time",
     "full": "Full",
     "today": "Today",
@@ -903,7 +905,8 @@
       "saved": "Your addresses",
       "other": "Another address",
       "save": "Save this address to my account"
-    }
+    },
+    "noSlots": "Booking online is not possible: no time is available. Call us to book."
   },
   "order": {
     "eyebrow": "Order {{number}}",
@@ -917,7 +920,8 @@
       "table": "We have your request and will confirm your table very soon.",
       "accepted": "Your table is confirmed. We look forward to welcoming you.",
       "cancelled": "This order has been cancelled.",
-      "rejected": "We are sorry: we cannot welcome you at that time."
+      "rejected": "We are sorry: we cannot welcome you at that time.",
+      "noShow": "We did not see you at the time booked. We hope to welcome you another time."
     },
     "status": {
       "pending": "Being confirmed",
@@ -934,7 +938,8 @@
       "accepted": "Confirmed",
       "rejected": "Declined",
       "cancelled": "Cancelled",
-      "completed": "Completed"
+      "completed": "Completed",
+      "no_show": "Missed"
     },
     "modes": {
       "pickup": "Pickup at the shop",

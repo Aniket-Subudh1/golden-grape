@@ -690,7 +690,9 @@
       "staffIntro": "Auf der Website wurde gerade eine Bestellung aufgegeben. Öffnen Sie sie in der Verwaltung, um sie zu bearbeiten.",
       "reference": "Bestellung {{number}}",
       "transferMissing": "Unser Team sendet Ihnen unsere Bankverbindung. Bitte geben Sie bei der Überweisung den unten stehenden Verwendungszweck an.",
-      "staffTransferMissing": "Achtung: In den Shop-Angaben ist keine IBAN eingetragen. Der Kunde hat keine Bankverbindung erhalten: bitte senden Sie sie ihm."
+      "staffTransferMissing": "Achtung: In den Shop-Angaben ist keine IBAN eingetragen. Der Kunde hat keine Bankverbindung erhalten: bitte senden Sie sie ihm.",
+      "readyEarlyName": "Früher als geplant bereit",
+      "readyEarly": "Gute Nachricht: Ihre Bestellung ist schon früher als geplant fertig. Sie können sie ab sofort während unserer Öffnungszeiten abholen oder bei der gewählten Zeit bleiben ({{slot}})."
     },
     "reservation": {
       "pendingSubject": "Ihre Tischanfrage {{number}}",
@@ -822,7 +824,7 @@
       "details": "Ihre Angaben",
       "payment": "Zahlung"
     },
-    "noDays": "Derzeit ist dafür keine Zeit verfügbar. Rufen Sie uns an, wir finden eine Lösung.",
+    "noDays": "Online ist gerade keine Zeit verfügbar: alles ist ausgebucht oder geschlossen. Rufen Sie uns an, wir finden eine Lösung.",
     "pickTime": "Uhrzeit wählen",
     "full": "Voll",
     "today": "Heute",
@@ -903,7 +905,8 @@
       "saved": "Ihre Adressen",
       "other": "Andere Adresse",
       "save": "Diese Adresse in meinem Konto speichern"
-    }
+    },
+    "noSlots": "Eine Online-Buchung ist nicht möglich: Es ist keine Zeit verfügbar. Rufen Sie uns zum Buchen an."
   },
   "order": {
     "eyebrow": "Bestellung {{number}}",
@@ -917,7 +920,8 @@
       "table": "Wir haben Ihre Anfrage erhalten und bestätigen Ihren Tisch sehr bald.",
       "accepted": "Ihr Tisch ist bestätigt. Wir freuen uns auf Sie.",
       "cancelled": "Diese Bestellung wurde storniert.",
-      "rejected": "Es tut uns leid: zu dieser Zeit können wir Sie nicht empfangen."
+      "rejected": "Es tut uns leid: zu dieser Zeit können wir Sie nicht empfangen.",
+      "noShow": "Wir haben Sie zur reservierten Zeit leider nicht gesehen. Wir freuen uns auf ein anderes Mal."
     },
     "status": {
       "pending": "Wird bestätigt",
@@ -934,7 +938,8 @@
       "accepted": "Bestätigt",
       "rejected": "Abgelehnt",
       "cancelled": "Storniert",
-      "completed": "Abgeschlossen"
+      "completed": "Abgeschlossen",
+      "no_show": "Nicht wahrgenommen"
     },
     "modes": {
       "pickup": "Abholung im Laden",

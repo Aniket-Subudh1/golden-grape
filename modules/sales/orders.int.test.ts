@@ -297,6 +297,20 @@ describe('reservations', () => {
     expect(await stock()).toBe(start - 3);
     await expect(transitionReservation(payload, placed.id, 'accepted', { user: staff.id })).rejects.toMatchObject({ code: 'CONFLICT' });
   });
+
+  it('no-show (GG-019): only after accepting; the pre-order is cancelled and its stock back once; the reason is kept; nothing after it', async () => {
+    const start = await stock();
+    const placed = await placeOrder(payload, table({ time: '12:30', lines: [{ variant: wine.variant.id, qty: 2 }] }), { now: NOW });
+    await expect(transitionReservation(payload, placed.id, 'no_show', { user: staff.id })).rejects.toMatchObject({ code: 'CONFLICT' });
+    await transitionReservation(payload, placed.id, 'accepted', { user: staff.id });
+    expect(await stock()).toBe(start - 2);
+    const { reservation, preorder } = await transitionReservation(payload, placed.id, 'no_show', { user: staff.id, reason: 'Pas de réponse au téléphone' });
+    expect(reservation.status).toBe('no_show');
+    expect(reservation.history?.at(-1)).toMatchObject({ from: 'accepted', to: 'no_show', reason: 'Pas de réponse au téléphone' });
+    expect(preorder).toMatchObject({ status: 'cancelled', stockPosted: false });
+    expect(await stock()).toBe(start);
+    await expect(transitionReservation(payload, placed.id, 'cancelled', { user: staff.id })).rejects.toMatchObject({ code: 'CONFLICT' });
+  });
 });
 
 describe('event bookings', () => {

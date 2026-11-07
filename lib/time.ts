@@ -29,6 +29,16 @@ export function toLocal(date: Date = new Date()) {
   };
 }
 
+/** An instant as Luxembourg `YYYY-MM-DDTHH:mm`, the shape of an order's `slotAt`. */
+export function localStamp(date: Date = new Date()) {
+  const { year, month, day, hour, minute } = toLocal(date);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${year}-${pad(month)}-${pad(day)}T${pad(hour)}:${pad(minute)}`;
+}
+
+/** True when `at` comes before the start of the slot (`slotAt`): an order made ready early (GG-027). */
+export const isBeforeSlot = (slotAt: string | null | undefined, at: Date = new Date()) => Boolean(slotAt) && localStamp(at) < slotAt!;
+
 /** Today's date in Luxembourg as `YYYY-MM-DD`. */
 export function today(now: Date = new Date()) {
   const { year, month, day } = toLocal(now);

@@ -38,6 +38,7 @@ const TONE: Record<string, string> = {
   completed: 'bg-champagne text-ink/70',
   rejected: 'bg-red-50 text-red-800',
   cancelled: 'bg-red-50 text-red-800',
+  no_show: 'bg-red-50 text-red-800',
   refunded: 'bg-red-50 text-red-800',
 };
 
@@ -144,7 +145,9 @@ async function Confirmation({ params, searchParams }: Pick<Props, 'params' | 'se
         ? t.intro.rejected
         : status === 'cancelled'
           ? t.intro.cancelled
-          : t.intro.table
+          : status === 'no_show'
+            ? t.intro.noShow
+            : t.intro.table
     : status === 'cancelled' || status === 'refunded'
       ? t.intro.cancelled
       : awaiting

@@ -75,7 +75,7 @@ export const WEEKDAYS = Array.from({ length: 7 }, (_, day) => ({
   label: l(weekday('fr', day), weekday('en', day), weekday('de', day), weekday('pt', day)),
 }));
 
-const QUARTER_HOURS = Array.from({ length: 96 }, (_, i) => `${String(Math.floor(i / 4)).padStart(2, '0')}:${String((i % 4) * 15).padStart(2, '0')}`);
+export const QUARTER_HOURS = Array.from({ length: 96 }, (_, i) => `${String(Math.floor(i / 4)).padStart(2, '0')}:${String((i % 4) * 15).padStart(2, '0')}`);
 
 /** A time picked from a list of quarter hours; stored as "HH:mm" like before. */
 export const timeOfDay = (name: string, label: Label, width?: string): Field => ({

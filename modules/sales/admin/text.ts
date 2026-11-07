@@ -2,6 +2,10 @@
 // the collection labels (collections.ts), so a list column and the summary always say the same thing.
 
 const fr = {
+  requestedSlot: 'Créneau demandé',
+  readySince: 'Prête depuis',
+  readyEarly: (slot: string) => `En avance — créneau demandé : ${slot}`,
+  readyEarlyHint: 'le client reçoit un e-mail : sa commande est prête plus tôt que prévu, il peut venir dès maintenant ou garder son heure. Le créneau demandé reste noté.',
   customer: 'Client',
   account: 'Compte client',
   guest: 'Sans compte',
@@ -69,6 +73,7 @@ const fr = {
     rejected: { label: 'Refuser', hint: 'le client reçoit un e-mail l’invitant à choisir une autre heure. Rien ne sort du stock.' },
     cancelled: { label: 'Annuler', hint: 'la table est libérée, la pré-commande revient en stock et le client reçoit un e-mail.' },
     completed: { label: 'Client venu', hint: 'la réservation et sa pré-commande sont terminées.' },
+    no_show: { label: 'Client pas venu (no-show)', hint: 'la réservation est notée « pas venu », à part des annulations, pour le suivi. La pré-commande est annulée. Le client ne reçoit pas d’e-mail.' },
   },
   decide: {
     confirm: 'Confirmer',
@@ -94,6 +99,10 @@ const fr = {
 type Text = typeof fr;
 
 const en: Text = {
+  requestedSlot: 'Requested slot',
+  readySince: 'Ready since',
+  readyEarly: (slot: string) => `Early — requested slot: ${slot}`,
+  readyEarlyHint: 'the customer gets an e-mail: their order is ready earlier than planned, they can come now or keep their time. The requested slot stays on record.',
   customer: 'Customer',
   account: 'Customer account',
   guest: 'No account',
@@ -161,6 +170,7 @@ const en: Text = {
     rejected: { label: 'Decline', hint: 'the customer gets an e-mail inviting them to choose another time. No stock moves.' },
     cancelled: { label: 'Cancel', hint: 'the table is freed, the pre-order goes back into stock and the customer gets an e-mail.' },
     completed: { label: 'Guests came', hint: 'the reservation and its pre-order are closed.' },
+    no_show: { label: 'Guests did not come (no-show)', hint: 'the reservation is recorded as a no-show, apart from cancellations, for follow-up. The pre-order is cancelled. The customer gets no e-mail.' },
   },
   decide: {
     confirm: 'Confirm',
@@ -184,6 +194,10 @@ const en: Text = {
 };
 
 const de: Text = {
+  requestedSlot: 'Gewünschtes Zeitfenster',
+  readySince: 'Bereit seit',
+  readyEarly: (slot: string) => `Früher — gewünschtes Zeitfenster: ${slot}`,
+  readyEarlyHint: 'der Kunde erhält eine E-Mail: die Bestellung ist früher als geplant fertig, er kann sofort kommen oder bei seiner Zeit bleiben. Das gewünschte Zeitfenster bleibt vermerkt.',
   customer: 'Kunde',
   account: 'Kundenkonto',
   guest: 'Ohne Konto',
@@ -251,6 +265,7 @@ const de: Text = {
     rejected: { label: 'Ablehnen', hint: 'der Kunde erhält eine E-Mail mit der Einladung, eine andere Zeit zu wählen. Kein Bestand bewegt sich.' },
     cancelled: { label: 'Stornieren', hint: 'der Tisch wird frei, die Vorbestellung kommt zurück in den Bestand und der Kunde erhält eine E-Mail.' },
     completed: { label: 'Gäste waren da', hint: 'die Reservierung und ihre Vorbestellung sind abgeschlossen.' },
+    no_show: { label: 'Gäste nicht erschienen (No-Show)', hint: 'die Reservierung wird als „nicht erschienen“ vermerkt, getrennt von Stornierungen, zur Auswertung. Die Vorbestellung wird storniert. Der Kunde erhält keine E-Mail.' },
   },
   decide: {
     confirm: 'Bestätigen',
@@ -274,6 +289,10 @@ const de: Text = {
 };
 
 const pt: Text = {
+  requestedSlot: 'Horário pedido',
+  readySince: 'Pronta desde',
+  readyEarly: (slot: string) => `Mais cedo — horário pedido: ${slot}`,
+  readyEarlyHint: 'o cliente recebe um e-mail: a encomenda está pronta mais cedo do que o previsto, pode vir já ou manter a hora. O horário pedido fica registado.',
   customer: 'Cliente',
   account: 'Conta de cliente',
   guest: 'Sem conta',
@@ -341,6 +360,7 @@ const pt: Text = {
     rejected: { label: 'Recusar', hint: 'o cliente recebe um e-mail a convidá-lo a escolher outra hora. Nada sai do stock.' },
     cancelled: { label: 'Cancelar', hint: 'a mesa fica livre, a pré-encomenda volta ao stock e o cliente recebe um e-mail.' },
     completed: { label: 'Cliente veio', hint: 'a reserva e a sua pré-encomenda ficam fechadas.' },
+    no_show: { label: 'Cliente não compareceu (no-show)', hint: 'a reserva fica registada como «não compareceu», à parte dos cancelamentos, para acompanhamento. A pré-encomenda é cancelada. O cliente não recebe e-mail.' },
   },
   decide: {
     confirm: 'Confirmar',

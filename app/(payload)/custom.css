@@ -2505,3 +2505,103 @@ body:has(.gg-create) .no-results__actions {
 .gg-doc__alert {
   color: var(--gg-danger);
 }
+
+/* ---- Same hours for several days (components/admin/weekday-bulk.tsx, GG-023) ------------------------------- */
+.gg-bulk {
+  margin: 0 0 16px;
+  border: 1px solid var(--gg-line);
+  border-radius: 8px;
+  background: var(--gg-frame);
+}
+.gg-bulk summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gg-primary);
+  cursor: pointer;
+}
+.gg-bulk summary svg {
+  width: 16px;
+  height: 16px;
+}
+.gg-bulk__body {
+  display: grid;
+  gap: 14px;
+  padding: 4px 14px 14px;
+}
+.gg-bulk__days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.gg-bulk__day {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--gg-line);
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.gg-bulk__day[data-on] {
+  border-color: var(--gg-primary);
+  background: var(--gg-primary-tint);
+}
+.gg-bulk__day input {
+  margin: 0;
+  accent-color: var(--gg-primary);
+}
+.gg-bulk__quick {
+  padding: 6px 10px;
+  border: 0;
+  background: none;
+  color: var(--gg-primary);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.gg-bulk__times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.gg-bulk__times label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--gg-text-2);
+}
+.gg-bulk__times select {
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--gg-line-2);
+  border-radius: 6px;
+  background: #ffffff;
+  font: inherit;
+  color: var(--gg-ink);
+}
+.gg-bulk__replace {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--gg-text-2);
+}
+.gg-bulk__replace input {
+  margin-top: 2px;
+  accent-color: var(--gg-primary);
+}
+.gg-bulk__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--gg-text-2);
+}

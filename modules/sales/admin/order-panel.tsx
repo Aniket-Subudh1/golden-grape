@@ -5,7 +5,7 @@ import { DocCard, DocFacts, DocGrid, DocHead, DocHistory, DocPanel } from '@/com
 import { hasRole } from '@/lib/access';
 import { LOCALE_NAMES, type Locale } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
-import { slotLabel, today } from '@/lib/time';
+import { isBeforeSlot, slotLabel, today } from '@/lib/time';
 import type { Order } from '@/payload-types';
 import { dueOf, paymentsOf, refundableOf } from '@/modules/payments/service';
 import { recordOrderPayment, recordOrderRefund, requestOrderRefund, transitionOrder } from '../actions';
@@ -31,7 +31,9 @@ function decisionsFor(order: Order, t: ReturnType<typeof salesText>): Decision[]
     .filter((to) => to !== 'refunded')
     .filter((to) => !(to === 'ready' && order.mode === 'delivery') && !(to === 'out_for_delivery' && order.mode !== 'delivery'))
     .map((to) => {
-      const words = to === 'confirmed' && from === 'awaiting_payment' ? t.orders.paid : t.orders[to as keyof typeof t.orders];
+      const base = to === 'confirmed' && from === 'awaiting_payment' ? t.orders.paid : t.orders[to as keyof typeof t.orders];
+      // Ready before the requested slot (GG-027): still allowed; staff are told what the customer will hear.
+      const words = to === 'ready' && isBeforeSlot(order.slotAt) ? { ...base, hint: t.readyEarlyHint } : base;
       const tone = to === 'cancelled' ? ('danger' as const) : from === 'awaiting_payment' ? undefined : ('primary' as const);
       return { to, ...words, tone, reason: tone === 'danger' };
     });
@@ -108,6 +110,8 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
   const staffName = new Map(staff.docs.map((u) => [u.id, u.name]));
   const when = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Luxembourg' });
   const decisions = reservation || !hasRole(user, ['sales']) ? [] : decisionsFor(order, t);
+  // When the order was made ready, if it was (kept after handover too: the history shows the whole story).
+  const readyAt = [...(order.history ?? [])].reverse().find((h) => h.to === 'ready')?.at ?? null;
   const totals = order.totals;
   const address = order.address;
 
@@ -147,7 +151,8 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
         <DocCard title={t.when}>
           <DocFacts
             rows={[
-              [t.when, slotLabel(order.slot ?? {}, lang)],
+              [t.requestedSlot, slotLabel(order.slot ?? {}, lang)],
+              ...(readyAt ? [[t.readySince, `${when.format(new Date(readyAt))}${isBeforeSlot(order.slotAt, new Date(readyAt)) ? ` · ${t.readyEarly(slotLabel(order.slot ?? {}, lang, 'short'))}` : ''}`] as [string, string]] : []),
               [
                 order.mode === 'delivery' ? t.where : MODE_LABELS[order.mode ?? 'pickup'][lang],
                 order.mode === 'delivery' && address ? [address.line1, address.line2, `${address.postalCode} ${address.city}`].filter(Boolean).join(', ') : t.pickupAt,
@@ -266,7 +271,8 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
                 when: h.at ? when.format(new Date(h.at)) : '',
                 text: ORDER_STATUS_LABELS[(h.to ?? 'pending') as OrderStatus]?.[lang] ?? t.money.history[h.to ?? ''] ?? h.to,
                 by: h.user ? staffName.get(String(h.user)) : null,
-                note: h.reason,
+                // A "ready" earlier than the requested slot says so, with the slot (GG-027).
+                note: h.to === 'ready' && h.at && isBeforeSlot(order.slotAt, new Date(h.at)) ? t.readyEarly(slotLabel(order.slot ?? {}, lang, 'short')) : h.reason,
               })),
             ]}
           />

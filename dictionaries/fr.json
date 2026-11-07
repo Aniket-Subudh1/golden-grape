@@ -690,7 +690,9 @@
       "staffIntro": "Une commande vient d’être passée sur le site. Ouvrez-la dans l’espace gestion pour la traiter.",
       "reference": "Commande {{number}}",
       "transferMissing": "Nos coordonnées bancaires vous seront envoyées par notre équipe. Lors du virement, indiquez la communication ci-dessous.",
-      "staffTransferMissing": "Attention : aucun IBAN n’est renseigné dans Infos de la boutique. Le client n’a pas reçu de coordonnées bancaires : envoyez-les-lui."
+      "staffTransferMissing": "Attention : aucun IBAN n’est renseigné dans Infos de la boutique. Le client n’a pas reçu de coordonnées bancaires : envoyez-les-lui.",
+      "readyEarlyName": "Prête plus tôt que prévu",
+      "readyEarly": "Bonne nouvelle : votre commande est déjà prête, plus tôt que prévu. Vous pouvez venir la retirer dès maintenant, pendant nos heures d’ouverture, ou garder l’heure choisie ({{slot}})."
     },
     "reservation": {
       "pendingSubject": "Votre demande de table {{number}}",
@@ -822,7 +824,7 @@
       "details": "Vos coordonnées",
       "payment": "Paiement"
     },
-    "noDays": "Aucun créneau n’est ouvert pour l’instant. Appelez-nous, nous trouverons une solution.",
+    "noDays": "Aucun créneau n’est disponible en ligne pour le moment : tout est complet ou fermé. Appelez-nous, nous trouverons une solution.",
     "pickTime": "Choisissez une heure",
     "full": "Complet",
     "today": "Aujourd’hui",
@@ -903,7 +905,8 @@
       "saved": "Vos adresses",
       "other": "Autre adresse",
       "save": "Enregistrer cette adresse dans mon compte"
-    }
+    },
+    "noSlots": "La réservation en ligne n’est pas possible : aucun créneau n’est disponible. Appelez-nous pour réserver."
   },
   "order": {
     "eyebrow": "Commande {{number}}",
@@ -917,7 +920,8 @@
       "table": "Nous avons bien reçu votre demande et confirmons votre table très vite.",
       "accepted": "Votre table est confirmée. Au plaisir de vous accueillir.",
       "cancelled": "Cette commande a été annulée.",
-      "rejected": "Nous sommes désolés : nous ne pouvons pas vous accueillir à cette heure-là."
+      "rejected": "Nous sommes désolés : nous ne pouvons pas vous accueillir à cette heure-là.",
+      "noShow": "Nous ne vous avons pas vu à l’heure réservée. Au plaisir de vous accueillir une prochaine fois."
     },
     "status": {
       "pending": "En cours de confirmation",
@@ -934,7 +938,8 @@
       "accepted": "Confirmée",
       "rejected": "Refusée",
       "cancelled": "Annulée",
-      "completed": "Terminée"
+      "completed": "Terminée",
+      "no_show": "Non honorée"
     },
     "modes": {
       "pickup": "À retirer en boutique",

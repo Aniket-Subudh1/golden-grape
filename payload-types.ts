@@ -1002,7 +1002,7 @@ export interface CustomerGroup {
 export interface Reservation {
   id: string;
   number?: string | null;
-  status?: ('pending' | 'accepted' | 'rejected' | 'cancelled' | 'completed') | null;
+  status?: ('pending' | 'accepted' | 'rejected' | 'cancelled' | 'completed' | 'no_show') | null;
   idempotencyKey?: string | null;
   customer?: (string | null) | Customer;
   contact?: {
@@ -1026,6 +1026,7 @@ export interface Reservation {
         from?: string | null;
         to?: string | null;
         user?: (string | null) | User;
+        reason?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -1043,14 +1044,21 @@ export interface SlotRule {
   mode: 'pickup' | 'delivery' | 'table';
   intervalMin: number;
   /**
-   * Orders; for tables: guests.
+   * Pickup and delivery: number of orders per slot. Tables: number of guests (covers) who can arrive in the slot; a table for 2 uses 2, a table for 10 uses 10. How long the meal lasts is not counted.
    */
   capacityPerSlot: number;
   /**
    * Time to prepare.
    */
   leadTimeMin: number;
+  /**
+   * 0: today only. 14: up to the same weekday two weeks from now.
+   */
   maxDaysAhead: number;
+  /**
+   * 0: the last slot ends at closing time. 30: nothing starts less than 30 min before closing (kitchen closing at 14:00 → last arrival 13:30). Tables are still confirmed by the House.
+   */
+  lastCallMin?: number | null;
   /**
    * Empty: the shop’s opening hours. Otherwise, only these days and times.
    */
@@ -2139,6 +2147,7 @@ export interface ReservationsSelect<T extends boolean = true> {
         from?: T;
         to?: T;
         user?: T;
+        reason?: T;
         id?: T;
       };
   updatedAt?: T;
@@ -2154,6 +2163,7 @@ export interface SlotRulesSelect<T extends boolean = true> {
   capacityPerSlot?: T;
   leadTimeMin?: T;
   maxDaysAhead?: T;
+  lastCallMin?: T;
   days?:
     | T
     | {

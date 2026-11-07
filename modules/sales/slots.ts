@@ -4,7 +4,8 @@ import { addDays, fromLocal, toLocal, today } from '@/lib/time';
 // every conversion goes through lib/time.ts.
 
 export type Hours = { day: string | number; open: string; close: string }[];
-export type SlotRule = { intervalMin: number; capacityPerSlot: number; leadTimeMin: number; maxDaysAhead: number; days?: Hours | null };
+/** `lastCallMin` (GG-025): the last start is at least this long before closing (kitchen closes at 14:00, last table 13:30 → 30). */
+export type SlotRule = { intervalMin: number; capacityPerSlot: number; leadTimeMin: number; maxDaysAhead: number; lastCallMin?: number | null; days?: Hours | null };
 export type Slot = { from: string; to: string; available: number };
 
 const minutes = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
@@ -34,6 +35,7 @@ export function generateSlots(input: { date: string; rule: SlotRule; hours: Hour
       const local = toLocal(instant);
       if (local.hour * 60 + local.minute !== start) continue; // skipped by the spring DST change
       if (instant.getTime() < earliest) continue;
+      if (rule.lastCallMin && start > closing(w) - rule.lastCallMin) continue;
       const from = hhmm(start);
       slots.push({ from, to: hhmm(start + rule.intervalMin), available: Math.max(0, rule.capacityPerSlot - (taken[from] ?? 0)) });
     }

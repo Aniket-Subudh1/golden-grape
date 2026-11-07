@@ -17,15 +17,17 @@ export const ORDER_FLOW = {
   refunded: [],
 } as const satisfies Record<OrderStatus, readonly OrderStatus[]>;
 
-export const RESERVATION_STATUSES = ['pending', 'accepted', 'rejected', 'cancelled', 'completed'] as const;
+// `no_show` (GG-019): accepted, and the guests never came. Not a cancellation: kept apart for reporting.
+export const RESERVATION_STATUSES = ['pending', 'accepted', 'rejected', 'cancelled', 'completed', 'no_show'] as const;
 export type ReservationStatus = (typeof RESERVATION_STATUSES)[number];
 
 export const RESERVATION_FLOW = {
   pending: ['accepted', 'rejected', 'cancelled'],
-  accepted: ['completed', 'cancelled'],
+  accepted: ['completed', 'no_show', 'cancelled'],
   rejected: [],
   cancelled: [],
   completed: [],
+  no_show: [],
 } as const satisfies Record<ReservationStatus, readonly ReservationStatus[]>;
 
 export type Effect = 'postSale' | 'returnStock' | 'mailCustomer' | 'mailStaff' | 'outbox';

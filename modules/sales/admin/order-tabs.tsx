@@ -9,13 +9,15 @@ import OrderDay from './order-day';
 // Payload list query (`where[status][in]` + sort), so Payload's own search, filters, columns and paging keep
 // working; the tabs keep the search and the chosen day, and their counts follow both. "All" finds any order.
 
-type Tab = { key: string; label: Label; statuses?: OrderStatus[]; sort: string; empty: Label };
+/** `skipTable`: a table's pre-order waits for its reservation (counted under Table reservations), not for this tab (GG-020). */
+type Tab = { key: string; label: Label; statuses?: OrderStatus[]; skipTable?: boolean; sort: string; empty: Label };
 
 export const ORDER_TABS: Tab[] = [
   {
     key: 'todo',
     label: l('À traiter', 'To do', 'Zu erledigen', 'A tratar'),
     statuses: ['pending', 'awaiting_payment'],
+    skipTable: true,
     sort: 'slotAt',
     empty: l('Rien à confirmer pour le moment.', 'Nothing to confirm right now.', 'Im Moment nichts zu bestätigen.', 'Nada para confirmar de momento.'),
   },
@@ -62,6 +64,12 @@ export const ORDER_TABS: Tab[] = [
   },
 ];
 
+/** A tab's conditions as a Payload `where` (its counts here, the sidebar and bell figures in alerts.ts). */
+export const orderTabWhere = (tab: Tab): Where[] => [
+  ...(tab.statuses ? [{ status: { in: tab.statuses } }] : []),
+  ...(tab.skipTable ? [{ mode: { not_equals: 'table' } }] : []),
+];
+
 /** The list URL's query for a tab, keeping the search and the slot day. The sidebar opens the first tab. */
 export function orderTabQuery(tab: Tab, keep: { search?: string; day?: string } = {}) {
   const params = new URLSearchParams();
@@ -70,6 +78,7 @@ export function orderTabQuery(tab: Tab, keep: { search?: string; day?: string } 
     tab.statuses.forEach((status, n) => params.set(`where[and][${i}][status][in][${n}]`, status));
     i++;
   }
+  if (tab.skipTable) params.set(`where[and][${i++}][mode][not_equals]`, 'table');
   if (keep.day) params.set(`where[and][${i}][slot.date][equals]`, keep.day);
   if (keep.search) params.set('search', keep.search);
   params.set('sort', tab.sort);
@@ -113,7 +122,7 @@ export default async function OrderTabs({ payload, data, searchParams = {}, list
   if (search) base.push({ or: listSearchableFields.map((f) => ({ [f]: { like: search } })) });
   const counts = await Promise.all(
     ORDER_TABS.map((t) =>
-      payload.count({ collection: 'orders', where: { and: [...base, ...(t.statuses ? [{ status: { in: t.statuses } }] : [])] } }).then((r) => r.totalDocs),
+      payload.count({ collection: 'orders', where: { and: [...base, ...orderTabWhere(t)] } }).then((r) => r.totalDocs),
     ),
   );
 
