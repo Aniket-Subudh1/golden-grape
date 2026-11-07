@@ -10,7 +10,7 @@ import { getTestPayload, makeStaff, makeVariant, parallel } from '@/tests/helper
 import { transitionReservation } from './reservations';
 import { signUpFromOrder } from '@/modules/customers/service';
 import { paymentsOf } from '@/modules/payments/service';
-import { checkOrderToken, historyOf, orderToken, type PlaceOrderInput, placeOrder, recordPayment, recordRefund, requestRefund, slotCalendar, transition } from './service';
+import { checkOrderToken, historyOf, orderToken, type PlaceOrderInput, placeOrder, recordPayment, recordRefund, requestRefund, returnItems, slotCalendar, transition } from './service';
 
 const payload = await getTestPayload();
 
@@ -396,5 +396,69 @@ describe('an account from a guest order (GG-010)', () => {
     const placed = await placeOrder(payload, order({ date: DAY3, time: '10:30', email: 'guest.one@example.test' }), { now: NOW });
     await expect(signUpFromOrder(payload, { id: placed.id, token: orderToken(placed.id), password: 'a-good-password', locale: 'fr' })).rejects.toMatchObject({ message: 'emailTaken' });
     expect((await payload.findByID({ collection: 'orders', id: placed.id, overrideAccess: true, depth: 0 })).customer).toBeFalsy();
+  });
+});
+
+describe('stock across the whole order life (GG-042)', () => {
+  const DAY4 = '2026-11-13';
+  const AT = new Date('2026-11-09T12:00:00Z');
+  const sales = async (id: string) => (await movementsOf(id)).map((m) => [m.type, m.qty]);
+
+  it('pickup: placed (paid on site) → out once; ready and handover move nothing more', async () => {
+    const start = await stock();
+    const placed = await placeOrder(payload, order({ date: DAY4, time: '10:00' }), { now: NOW });
+    expect(await stock()).toBe(start - 2);
+    await transition(payload, placed.id, 'ready', { user: staff.id });
+    await transition(payload, placed.id, 'completed', { user: staff.id });
+    expect(await stock()).toBe(start - 2);
+    expect(await sales(placed.id)).toEqual([['sale', -2]]);
+  });
+
+  it('delivery: awaiting the transfer → nothing; paid → out once; on its way and delivered → nothing more', async () => {
+    const start = await stock();
+    const address = { line1: 'Rue Principale 1', postalCode: '7795', city: 'Bissen' };
+    const placed = await placeOrder(payload, order({ date: DAY4, mode: 'delivery', payment: 'transfer', time: '12:00', address }), { now: NOW });
+    expect(await stock()).toBe(start);
+    await recordPayment(payload, placed.id, { amountCents: 3500, at: AT, user: staff.id });
+    expect(await stock()).toBe(start - 2);
+    await transition(payload, placed.id, 'out_for_delivery', { user: staff.id });
+    await transition(payload, placed.id, 'completed', { user: staff.id });
+    expect(await stock()).toBe(start - 2);
+    expect(await sales(placed.id)).toEqual([['sale', -2]]);
+  });
+
+  it('confirmed without payment, then the transfer recorded → still one deduction', async () => {
+    const start = await stock();
+    const placed = await placeOrder(payload, order({ date: DAY4, payment: 'transfer', time: '10:30' }), { now: NOW });
+    await transition(payload, placed.id, 'confirmed', { user: staff.id });
+    await recordPayment(payload, placed.id, { amountCents: 3000, at: AT, user: staff.id });
+    expect(await stock()).toBe(start - 2);
+    expect(await sales(placed.id)).toEqual([['sale', -2]]);
+  });
+
+  it('goods brought back after handover: back in stock line by line, never more than sold, twice at once counted once; no money moves', async () => {
+    const start = await stock();
+    const placed = await placeOrder(payload, order({ date: DAY4, time: '11:00', lines: [{ variant: wine.variant.id, qty: 3 }] }), { now: NOW });
+    await expect(returnItems(payload, placed.id, { lines: [{ id: 'x', qty: 1 }], reason: 'Bouchon', user: staff.id })).rejects.toMatchObject({ code: 'CONFLICT' }); // not handed over yet
+    await transition(payload, placed.id, 'completed', { user: staff.id });
+    const line = (await payload.findByID({ collection: 'orders', id: placed.id, overrideAccess: true, depth: 0 })).lines![0];
+    expect(await stock()).toBe(start - 3);
+
+    await returnItems(payload, placed.id, { lines: [{ id: line.id!, qty: 1 }], reason: 'Bouchon', user: staff.id });
+    expect(await stock()).toBe(start - 2);
+    await expect(returnItems(payload, placed.id, { lines: [{ id: line.id!, qty: 3 }], reason: 'x', user: staff.id })).rejects.toMatchObject({ message: 'tooManyReturned' });
+    await expect(returnItems(payload, placed.id, { lines: [{ id: line.id!, qty: 0 }], reason: 'x', user: staff.id })).rejects.toMatchObject({ message: 'nothingReturned' });
+
+    // The last 2 returned by two staff at once: only one succeeds.
+    const both = await parallel(2, () => returnItems(payload, placed.id, { lines: [{ id: line.id!, qty: 2 }], reason: 'Retour', user: staff.id }));
+    expect(both.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
+    expect(await stock()).toBe(start);
+    expect((await sales(placed.id)).filter(([t]) => t === 'return')).toEqual([
+      ['return', 1],
+      ['return', 2],
+    ]);
+    expect(await paymentsOf(payload, placed.id)).toHaveLength(1); // the on-site payment at handover only
+    const doc = await payload.findByID({ collection: 'orders', id: placed.id, overrideAccess: true, depth: 0 });
+    expect(doc.history?.filter((h) => h.to === 'returned')).toHaveLength(2);
   });
 });

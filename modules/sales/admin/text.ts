@@ -2,6 +2,7 @@
 // the collection labels (collections.ts), so a list column and the summary always say the same thing.
 
 const fr = {
+  returns: { label: 'Retour d’articles en stock', hint: 'notez ce que le client a rapporté : ces articles reviennent en stock. Aucun argent ne bouge (un remboursement se fait à part).', qtyOf: (name: string, max: number) => `${name} (max ${max})` },
   requestedSlot: 'Créneau demandé',
   readySince: 'Prête depuis',
   readyEarly: (slot: string) => `En avance — créneau demandé : ${slot}`,
@@ -58,7 +59,7 @@ const fr = {
     noPayments: 'Aucun paiement enregistré pour l’instant.',
     kinds: { charge: 'Paiement reçu', capture: 'Paiement reçu', refund: 'Remboursement envoyé', void: 'Autorisation annulée', authorization: 'Autorisation' } as Record<string, string>,
     noted: 'noté le',
-    history: { payment: 'Paiement enregistré', refund_requested: 'Remboursement demandé', refund: 'Remboursement envoyé' } as Record<string, string>,
+    history: { payment: 'Paiement enregistré', refund_requested: 'Remboursement demandé', refund: 'Remboursement envoyé', returned: 'Articles rapportés' } as Record<string, string>,
   },
   orders: {
     confirmed: { label: 'Confirmer', hint: 'les articles sortent du stock et le client reçoit un e-mail de confirmation.' },
@@ -79,6 +80,7 @@ const fr = {
     confirm: 'Confirmer',
     back: 'Retour',
     reason: 'Raison (facultatif, gardée dans l’historique)',
+    reasonMandatory: 'Raison (obligatoire, gardée dans l’historique)',
     reasonPh: 'Client absent, rupture…',
     done: 'Enregistré.',
     error: 'Impossible d’enregistrer. Réessayez.',
@@ -91,6 +93,8 @@ const fr = {
       date: 'Saisissez la date.',
       futureDate: 'La date ne peut pas être dans le futur.',
       reasonRequired: 'Indiquez la raison.',
+      nothingReturned: 'Indiquez au moins une quantité.',
+      tooManyReturned: 'Quantité impossible : plus que ce qui reste à rapporter.',
       FORBIDDEN: 'Votre rôle ne permet pas ce changement.',
     } as Record<string, string>,
   },
@@ -99,6 +103,7 @@ const fr = {
 type Text = typeof fr;
 
 const en: Text = {
+  returns: { label: 'Return items to stock', hint: 'record what the customer brought back: these items go back into stock. No money moves (a refund is separate).', qtyOf: (name: string, max: number) => `${name} (max ${max})` },
   requestedSlot: 'Requested slot',
   readySince: 'Ready since',
   readyEarly: (slot: string) => `Early — requested slot: ${slot}`,
@@ -155,7 +160,7 @@ const en: Text = {
     noPayments: 'No payment recorded yet.',
     kinds: { charge: 'Payment received', capture: 'Payment received', refund: 'Refund sent', void: 'Authorisation voided', authorization: 'Authorisation' } as Record<string, string>,
     noted: 'noted on',
-    history: { payment: 'Payment recorded', refund_requested: 'Refund requested', refund: 'Refund sent' } as Record<string, string>,
+    history: { payment: 'Payment recorded', refund_requested: 'Refund requested', refund: 'Refund sent', returned: 'Items brought back' } as Record<string, string>,
   },
   orders: {
     confirmed: { label: 'Confirm', hint: 'the items are taken out of stock and the customer gets a confirmation e-mail.' },
@@ -176,6 +181,7 @@ const en: Text = {
     confirm: 'Confirm',
     back: 'Back',
     reason: 'Reason (optional, kept in the history)',
+    reasonMandatory: 'Reason (required, kept in the history)',
     reasonPh: 'Customer did not come, out of stock…',
     done: 'Saved.',
     error: 'Could not save. Please try again.',
@@ -188,12 +194,15 @@ const en: Text = {
       date: 'Type the date.',
       futureDate: 'The date cannot be in the future.',
       reasonRequired: 'Give the reason.',
+      nothingReturned: 'Enter at least one quantity.',
+      tooManyReturned: 'Quantity not possible: more than what can still come back.',
       FORBIDDEN: 'Your role does not allow this change.',
     },
   },
 };
 
 const de: Text = {
+  returns: { label: 'Artikel zurück in den Bestand', hint: 'erfassen Sie, was der Kunde zurückgebracht hat: diese Artikel kommen zurück in den Bestand. Es fließt kein Geld (eine Erstattung ist ein eigener Schritt).', qtyOf: (name: string, max: number) => `${name} (max. ${max})` },
   requestedSlot: 'Gewünschtes Zeitfenster',
   readySince: 'Bereit seit',
   readyEarly: (slot: string) => `Früher — gewünschtes Zeitfenster: ${slot}`,
@@ -250,7 +259,7 @@ const de: Text = {
     noPayments: 'Noch keine Zahlung erfasst.',
     kinds: { charge: 'Zahlung erhalten', capture: 'Zahlung erhalten', refund: 'Erstattung gesendet', void: 'Autorisierung storniert', authorization: 'Autorisierung' } as Record<string, string>,
     noted: 'erfasst am',
-    history: { payment: 'Zahlung erfasst', refund_requested: 'Erstattung angefordert', refund: 'Erstattung gesendet' } as Record<string, string>,
+    history: { payment: 'Zahlung erfasst', refund_requested: 'Erstattung angefordert', refund: 'Erstattung gesendet', returned: 'Artikel zurückgebracht' } as Record<string, string>,
   },
   orders: {
     confirmed: { label: 'Bestätigen', hint: 'die Artikel werden aus dem Bestand genommen und der Kunde erhält eine Bestätigung.' },
@@ -271,6 +280,7 @@ const de: Text = {
     confirm: 'Bestätigen',
     back: 'Zurück',
     reason: 'Grund (optional, im Verlauf gespeichert)',
+    reasonMandatory: 'Grund (Pflichtfeld, im Verlauf gespeichert)',
     reasonPh: 'Kunde nicht erschienen, ausverkauft…',
     done: 'Gespeichert.',
     error: 'Speichern nicht möglich. Bitte erneut versuchen.',
@@ -283,12 +293,15 @@ const de: Text = {
       date: 'Geben Sie das Datum ein.',
       futureDate: 'Das Datum darf nicht in der Zukunft liegen.',
       reasonRequired: 'Geben Sie den Grund an.',
+      nothingReturned: 'Geben Sie mindestens eine Menge an.',
+      tooManyReturned: 'Menge nicht möglich: mehr als noch zurückkommen kann.',
       FORBIDDEN: 'Ihre Rolle erlaubt diese Änderung nicht.',
     },
   },
 };
 
 const pt: Text = {
+  returns: { label: 'Devolver artigos ao stock', hint: 'registe o que o cliente trouxe de volta: estes artigos voltam ao stock. Nenhum dinheiro se move (um reembolso é à parte).', qtyOf: (name: string, max: number) => `${name} (máx. ${max})` },
   requestedSlot: 'Horário pedido',
   readySince: 'Pronta desde',
   readyEarly: (slot: string) => `Mais cedo — horário pedido: ${slot}`,
@@ -345,7 +358,7 @@ const pt: Text = {
     noPayments: 'Ainda nenhum pagamento registado.',
     kinds: { charge: 'Pagamento recebido', capture: 'Pagamento recebido', refund: 'Reembolso enviado', void: 'Autorização anulada', authorization: 'Autorização' } as Record<string, string>,
     noted: 'registado a',
-    history: { payment: 'Pagamento registado', refund_requested: 'Reembolso pedido', refund: 'Reembolso enviado' } as Record<string, string>,
+    history: { payment: 'Pagamento registado', refund_requested: 'Reembolso pedido', refund: 'Reembolso enviado', returned: 'Artigos devolvidos' } as Record<string, string>,
   },
   orders: {
     confirmed: { label: 'Confirmar', hint: 'os artigos saem do stock e o cliente recebe um e-mail de confirmação.' },
@@ -366,6 +379,7 @@ const pt: Text = {
     confirm: 'Confirmar',
     back: 'Voltar',
     reason: 'Motivo (opcional, guardado no histórico)',
+    reasonMandatory: 'Motivo (obrigatório, guardado no histórico)',
     reasonPh: 'Cliente não veio, esgotado…',
     done: 'Guardado.',
     error: 'Não foi possível guardar. Tente de novo.',
@@ -378,6 +392,8 @@ const pt: Text = {
       date: 'Escreva a data.',
       futureDate: 'A data não pode ser no futuro.',
       reasonRequired: 'Indique o motivo.',
+      nothingReturned: 'Indique pelo menos uma quantidade.',
+      tooManyReturned: 'Quantidade impossível: mais do que ainda pode voltar.',
       FORBIDDEN: 'O seu papel não permite esta alteração.',
     },
   },

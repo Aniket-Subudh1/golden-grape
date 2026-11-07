@@ -3,6 +3,7 @@
 import { after } from 'next/server';
 import type { Payload } from 'payload';
 import { z } from 'zod';
+import { audit } from '@/lib/audit';
 import { action, clientIp, publicAction } from '@/lib/action';
 import { LOCALES } from '@/lib/i18n';
 import { rateLimit } from '@/lib/rate-limit';
@@ -45,10 +46,11 @@ export const bookEventAction = publicAction(schema, async ({ website, ...input }
 
 /** Staff confirm a booking paid on site, or cancel it (the seats go back). */
 export const setBookingStatusAction = action(
-  z.object({ booking: z.string().min(1), to: z.enum(['confirmed', 'cancelled']) }),
+  z.object({ booking: z.string().min(1), to: z.enum(['confirmed', 'cancelled']), reason: z.string().trim().max(300).optional() }),
   { roles: ['sales'] },
-  async ({ booking, to }, { payload }) => {
+  async ({ booking, to, reason }, { payload, user }) => {
     const updated = await setBookingStatus(payload, booking, to);
+    await audit(payload, { user: user.id, action: 'booking.status', collection: 'eventBookings', id: booking, ref: updated.contact?.name, reason: reason || undefined, after: { status: to, guests: updated.guests } });
     if (to === 'cancelled') after(() => sendBookingMail(payload, updated, false).catch(logMail));
     return { status: updated.status };
   },

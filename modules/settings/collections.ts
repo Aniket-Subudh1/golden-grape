@@ -1,6 +1,7 @@
+import { AUDIT_ACTIONS, type AuditAction } from '@/lib/audit';
 import { APIError, type CollectionConfig, type FieldAccess } from 'payload';
 import { hasRole, hiddenUnless, isStaff, none, ROLES } from '@/lib/access';
-import { addButton, l } from '@/lib/admin';
+import { addButton, l, type Label } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 
 const adminOnly: FieldAccess = ({ req }) => hasRole(req.user, ['admin']);
@@ -98,25 +99,52 @@ const users: CollectionConfig = {
   ],
 };
 
+// GG-046: the activity log, written only by lib/audit.ts. Managers can read it (who changed what, and why).
+export const AUDIT_LABELS: Record<AuditAction, Label> = {
+  'order.status': l('Commande : statut', 'Order: status', 'Bestellung: Status', 'Encomenda: estado'),
+  'order.payment': l('Commande : paiement reçu', 'Order: payment received', 'Bestellung: Zahlung erhalten', 'Encomenda: pagamento recebido'),
+  'order.refundRequest': l('Commande : remboursement demandé', 'Order: refund requested', 'Bestellung: Erstattung angefordert', 'Encomenda: reembolso pedido'),
+  'order.refund': l('Commande : remboursement envoyé', 'Order: refund sent', 'Bestellung: Erstattung gesendet', 'Encomenda: reembolso enviado'),
+  'order.return': l('Commande : articles rapportés', 'Order: items returned', 'Bestellung: Artikel zurück', 'Encomenda: artigos devolvidos'),
+  'reservation.status': l('Réservation : statut', 'Reservation: status', 'Reservierung: Status', 'Reserva: estado'),
+  'booking.status': l('Place d’événement : statut', 'Event seat: status', 'Veranstaltungsplatz: Status', 'Lugar de evento: estado'),
+  'stock.adjust': l('Stock : correction', 'Stock: adjustment', 'Bestand: Korrektur', 'Stock: correção'),
+  'stock.count': l('Stock : inventaire validé', 'Stock: count posted', 'Bestand: Inventur gebucht', 'Stock: inventário validado'),
+  'doc.create': l('Ajout', 'Created', 'Erstellt', 'Criado'),
+  'doc.update': l('Modification', 'Changed', 'Geändert', 'Alterado'),
+  'doc.delete': l('Suppression', 'Deleted', 'Gelöscht', 'Eliminado'),
+};
+
 const auditLogs: CollectionConfig = {
   slug: 'auditLogs',
   labels: { singular: l('Action', 'Action', 'Aktion', 'Ação'), plural: l('Historique', 'Activity history', 'Verlauf', 'Histórico') },
   admin: {
-    useAsTitle: 'action',
-    defaultColumns: ['createdAt', 'user', 'action', 'targetCollection'],
-    hidden: hiddenUnless('admin'),
+    useAsTitle: 'ref',
+    defaultColumns: ['createdAt', 'user', 'action', 'ref', 'reason', 'targetCollection'],
+    listSearchableFields: ['ref', 'reason'],
+    hidden: hiddenUnless('manager'),
     description: l(
-      'Qui a changé quoi et quand. Lecture seule.',
-      'Who changed what, and when. Read only.',
-      'Wer was wann geändert hat. Nur lesen.',
-      'Quem mudou o quê e quando. Só leitura.',
+      'Qui a fait quoi, quand et pourquoi : paiements, remboursements, statuts, annulations, stock et modifications faites ici. Lecture seule.',
+      'Who did what, when and why: payments, refunds, statuses, cancellations, stock and changes made here. Read only.',
+      'Wer was wann und warum getan hat: Zahlungen, Erstattungen, Status, Stornierungen, Bestand und Änderungen hier. Nur lesen.',
+      'Quem fez o quê, quando e porquê: pagamentos, reembolsos, estados, cancelamentos, stock e alterações feitas aqui. Só leitura.',
     ),
   },
-  access: { read: isStaff('admin'), create: none, update: none, delete: none },
+  access: { read: isStaff('manager'), create: none, update: none, delete: none },
+  defaultSort: '-createdAt',
   fields: [
     { name: 'user', type: 'relationship', relationTo: 'users', label: l('Personne', 'Person', 'Person', 'Pessoa') },
-    { name: 'action', type: 'text', required: true, index: true, label: l('Action', 'Action', 'Aktion', 'Ação') },
-    { name: 'targetCollection', type: 'text', required: true, label: l('Où', 'Where', 'Wo', 'Onde') },
+    {
+      name: 'action',
+      type: 'select',
+      required: true,
+      index: true,
+      label: l('Action', 'Action', 'Aktion', 'Ação'),
+      options: AUDIT_ACTIONS.map((value) => ({ value, label: AUDIT_LABELS[value] })),
+    },
+    { name: 'ref', type: 'text', index: true, label: l('Référence', 'Reference', 'Referenz', 'Referência') },
+    { name: 'reason', type: 'text', label: l('Raison', 'Reason', 'Grund', 'Motivo') },
+    { name: 'targetCollection', type: 'text', required: true, label: l('Où', 'Where', 'Wo', 'Onde'), admin: { components: { Cell: '@/components/admin/cells#CollectionCell' } } },
     { name: 'docId', type: 'text', required: true, index: true, admin: { hidden: true } },
     { name: 'before', type: 'json', label: l('Avant', 'Before', 'Vorher', 'Antes') },
     { name: 'after', type: 'json', label: l('Après', 'After', 'Nachher', 'Depois') },

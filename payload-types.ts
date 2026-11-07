@@ -237,7 +237,7 @@ export interface User {
   collection: 'users';
 }
 /**
- * Who changed what, and when. Read only.
+ * Who did what, when and why: payments, refunds, statuses, cancellations, stock and changes made here. Read only.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "auditLogs".
@@ -245,7 +245,21 @@ export interface User {
 export interface AuditLog {
   id: string;
   user?: (string | null) | User;
-  action: string;
+  action:
+    | 'order.status'
+    | 'order.payment'
+    | 'order.refundRequest'
+    | 'order.refund'
+    | 'order.return'
+    | 'reservation.status'
+    | 'booking.status'
+    | 'stock.adjust'
+    | 'stock.count'
+    | 'doc.create'
+    | 'doc.update'
+    | 'doc.delete';
+  ref?: string | null;
+  reason?: string | null;
   targetCollection: string;
   docId: string;
   before?:
@@ -789,6 +803,7 @@ export interface StockMovement {
         relationTo: 'orders';
         value: string | Order;
       } | null);
+  lineId?: string | null;
   user?: (string | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -1277,7 +1292,7 @@ export interface DeliveryZone {
   name: string;
   active?: boolean | null;
   /**
-   * Type a code and press Enter. “L-7795” and “7795” are the same.
+   * Type a code and press Enter, or paste several in the box above. “L-7795” and “7795” are the same.
    */
   postalCodes: string[];
   feeCents: number;
@@ -1555,6 +1570,8 @@ export interface UsersSelect<T extends boolean = true> {
 export interface AuditLogsSelect<T extends boolean = true> {
   user?: T;
   action?: T;
+  ref?: T;
+  reason?: T;
   targetCollection?: T;
   docId?: T;
   before?: T;
@@ -1938,6 +1955,7 @@ export interface StockMovementsSelect<T extends boolean = true> {
   reason?: T;
   channel?: T;
   ref?: T;
+  lineId?: T;
   user?: T;
   updatedAt?: T;
   createdAt?: T;

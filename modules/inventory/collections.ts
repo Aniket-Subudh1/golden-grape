@@ -123,6 +123,8 @@ export const stockMovements: CollectionConfig = {
     },
     // Purchase orders and POS imports join this list when their milestones create them.
     { name: 'ref', type: 'relationship', relationTo: ['stockCounts', 'orders'], label: l('Origine', 'Source', 'Ursprung', 'Origem') },
+    // The order line a return belongs to (GG-042): technical, never shown.
+    { name: 'lineId', type: 'text', admin: { hidden: true, disableListColumn: true, disableListFilter: true } },
     { name: 'user', type: 'relationship', relationTo: 'users', label: l('Par', 'By', 'Von', 'Por') },
   ],
   custom: { indexes: [{ fields: { variant: 1, createdAt: -1 } }, { fields: { 'ref.value': 1 } }] },

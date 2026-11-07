@@ -2635,3 +2635,41 @@ body:has(.gg-create) .no-results__actions {
   font-size: 13px;
   color: var(--gg-text-2);
 }
+
+/* ---- Dashboard action counters (components/admin/dashboard.tsx, GG-045) --------------------------------- */
+.gg-counters {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+  margin: 0 0 20px;
+}
+.gg-counter {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--gg-line);
+  border-radius: 10px;
+  background: var(--gg-frame);
+  color: var(--gg-text-2);
+  text-decoration: none;
+}
+.gg-counter:hover {
+  border-color: var(--gg-line-2);
+}
+.gg-counter__count {
+  font: 600 26px/1 var(--font-body);
+  color: var(--gg-line-2);
+  font-variant-numeric: tabular-nums;
+}
+.gg-counter__label {
+  font-size: 13px;
+  line-height: 1.3;
+}
+.gg-counter[data-waiting] {
+  border-color: var(--gg-gold);
+  background: var(--gg-primary-tint);
+  color: var(--gg-ink);
+}
+.gg-counter[data-waiting] .gg-counter__count {
+  color: var(--gg-primary);
+}

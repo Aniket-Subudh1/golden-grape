@@ -1,5 +1,6 @@
 import { default as default_a796cb25c6bc2ffa9d5afcf05b4d9b1b } from '@/components/admin/save-button'
 import { default as default_2d5f4fd041422560436061dbcc885ca0 } from '@/components/admin/create-button'
+import { CollectionCell as CollectionCell_e05f6ac9ede25467f55f09817b54f69f } from '@/components/admin/cells'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -26,6 +27,7 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { default as default_fe401d340ce00cc899cf727d6137f487 } from '@/components/admin/row-label'
 import { NumberCell as NumberCell_f2a5de4e6cd5b225ec768dfc00185072 } from '@/components/admin/number-field'
 import { default as default_f2a5de4e6cd5b225ec768dfc00185072 } from '@/components/admin/number-field'
+import { default as default_a5d8806efdc56df6c24d184bfb005004 } from '@/components/admin/audit-trail'
 import { BadgeCell as BadgeCell_e05f6ac9ede25467f55f09817b54f69f } from '@/components/admin/cells'
 import { default as default_ea5aef8a9a35ef0cb8d9e90a51957cfa } from '@/components/admin/empty-list'
 import { CategoryCell as CategoryCell_e9bb4d3db189c5a7e4368b00cc26eb11 } from '@/modules/catalogue/admin/product-cells'
@@ -65,6 +67,7 @@ import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc056
 export const importMap = {
   "@/components/admin/save-button#default": default_a796cb25c6bc2ffa9d5afcf05b4d9b1b,
   "@/components/admin/create-button#default": default_2d5f4fd041422560436061dbcc885ca0,
+  "@/components/admin/cells#CollectionCell": CollectionCell_e05f6ac9ede25467f55f09817b54f69f,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -91,6 +94,7 @@ export const importMap = {
   "@/components/admin/row-label#default": default_fe401d340ce00cc899cf727d6137f487,
   "@/components/admin/number-field#NumberCell": NumberCell_f2a5de4e6cd5b225ec768dfc00185072,
   "@/components/admin/number-field#default": default_f2a5de4e6cd5b225ec768dfc00185072,
+  "@/components/admin/audit-trail#default": default_a5d8806efdc56df6c24d184bfb005004,
   "@/components/admin/cells#BadgeCell": BadgeCell_e05f6ac9ede25467f55f09817b54f69f,
   "@/components/admin/empty-list#default": default_ea5aef8a9a35ef0cb8d9e90a51957cfa,
   "@/modules/catalogue/admin/product-cells#CategoryCell": CategoryCell_e9bb4d3db189c5a7e4368b00cc26eb11,

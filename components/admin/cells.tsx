@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslation } from '@payloadcms/ui';
+import { useConfig, useTranslation } from '@payloadcms/ui';
 import { getTranslation } from '@payloadcms/translations';
 import type { DefaultCellComponentProps } from 'payload';
 
@@ -33,4 +33,15 @@ export function PageLinkCell({ cellData, rowData, collectionSlug }: DefaultCellC
       {String(cellData ?? '—')}
     </a>
   );
+}
+
+/** A collection or global slug ("eventBookings") as its name in the admin language ("Places d’événements"). */
+export function CollectionCell({ cellData }: DefaultCellComponentProps) {
+  const { i18n } = useTranslation();
+  const { config } = useConfig();
+  if (typeof cellData !== 'string') return null;
+  const collection = config.collections.find((c) => c.slug === cellData);
+  const global = config.globals.find((g) => g.slug === cellData);
+  const label = collection?.labels?.plural ?? global?.label;
+  return <span>{label ? String(getTranslation(label as never, i18n)) : cellData}</span>;
 }

@@ -9,8 +9,9 @@ import { fr } from '@payloadcms/translations/languages/fr';
 import { pt } from '@payloadcms/translations/languages/pt';
 import { s3Storage } from '@payloadcms/storage-s3';
 import type { CreateIndexesOptions, IndexSpecification } from 'mongodb';
-import { buildConfig } from 'payload';
+import { buildConfig, type CollectionConfig, type GlobalConfig } from 'payload';
 import sharp from 'sharp';
+import { auditGlobalHook, auditHooks } from '@/lib/audit';
 import { env, isBuildPhase, s3Configured, smtpConfigured } from '@/lib/env';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { cmsCollections } from '@/modules/cms/collections';
@@ -32,6 +33,16 @@ const from = () => {
   const match = /^(.*)<(.+)>$/.exec(env.MAIL_FROM);
   return { defaultFromName: match?.[1].trim() || 'Golden Grape', defaultFromAddress: (match?.[2] ?? env.MAIL_FROM).trim() };
 };
+
+// GG-046: every edit made by staff in the admin forms goes to the activity log (lib/audit.ts). Not the log itself, the
+// technical collections, nor what only the services write (they keep their own history and log their actions).
+const NOT_AUDITED = new Set(['auditLogs', 'rateLimits', 'counters', 'orders', 'reservations', 'eventBookings', 'payments', 'stockMovements', 'stockLevels']);
+const withAudit = (c: CollectionConfig): CollectionConfig => {
+  if (NOT_AUDITED.has(c.slug)) return c;
+  const hooks = auditHooks();
+  return { ...c, hooks: { ...c.hooks, afterChange: [...(c.hooks?.afterChange ?? []), ...hooks.afterChange], afterDelete: [...(c.hooks?.afterDelete ?? []), ...hooks.afterDelete] } };
+};
+const withGlobalAudit = (g: GlobalConfig): GlobalConfig => ({ ...g, hooks: { ...g.hooks, afterChange: [...(g.hooks?.afterChange ?? []), auditGlobalHook()] } });
 
 export default buildConfig({
   admin: {
@@ -64,8 +75,8 @@ export default buildConfig({
     ...salesCollections,
     eventBookings,
     payments,
-  ],
-  globals: [businessSettings, ...cmsGlobals],
+  ].map(withAudit),
+  globals: [businessSettings, ...cmsGlobals].map(withGlobalAudit),
   db: mongooseAdapter({
     url: isBuildPhase ? false : env.DATABASE_URL,
     transactionOptions: {},

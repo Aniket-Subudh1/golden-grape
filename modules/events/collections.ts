@@ -140,6 +140,7 @@ export const eventBookings: CollectionConfig = {
   defaultSort: '-createdAt',
   fields: [
     { name: 'panel', type: 'ui', admin: { disableListColumn: true, components: { Field: '@/modules/events/admin/booking-panel' } } },
+    { name: 'trail', type: 'ui', admin: { disableListColumn: true, components: { Field: '@/components/admin/audit-trail' } } },
     ...(
       [
         { name: 'event', type: 'relationship', relationTo: 'events', required: true, index: true, label: l('Événement', 'Event', 'Veranstaltung', 'Evento') },

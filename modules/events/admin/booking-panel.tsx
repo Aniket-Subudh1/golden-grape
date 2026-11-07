@@ -67,10 +67,10 @@ const TEXT = {
 
 const TONES = { pending: 'warning', confirmed: 'success', cancelled: 'danger' } as const;
 const DECIDE = {
-  fr: { confirm: 'Confirmer', back: 'Retour', reason: '', reasonPh: '', done: 'Enregistré.', error: 'Impossible d’enregistrer. Réessayez.', errors: { transition: 'Quelqu’un vient de la modifier : la page se rafraîchit.' } },
-  en: { confirm: 'Confirm', back: 'Back', reason: '', reasonPh: '', done: 'Saved.', error: 'Could not save. Please try again.', errors: { transition: 'Someone just changed it: the page refreshes.' } },
-  de: { confirm: 'Bestätigen', back: 'Zurück', reason: '', reasonPh: '', done: 'Gespeichert.', error: 'Speichern nicht möglich.', errors: { transition: 'Jemand hat sie gerade geändert: die Seite wird neu geladen.' } },
-  pt: { confirm: 'Confirmar', back: 'Voltar', reason: '', reasonPh: '', done: 'Guardado.', error: 'Não foi possível guardar.', errors: { transition: 'Alguém acabou de a alterar: a página vai atualizar.' } },
+  fr: { confirm: 'Confirmer', back: 'Retour', reason: 'Raison (facultatif, gardée dans l’historique)', reasonPh: 'Client malade, erreur de date…', done: 'Enregistré.', error: 'Impossible d’enregistrer. Réessayez.', errors: { transition: 'Quelqu’un vient de la modifier : la page se rafraîchit.' } },
+  en: { confirm: 'Confirm', back: 'Back', reason: 'Reason (optional, kept in the history)', reasonPh: 'Customer ill, wrong date…', done: 'Saved.', error: 'Could not save. Please try again.', errors: { transition: 'Someone just changed it: the page refreshes.' } },
+  de: { confirm: 'Bestätigen', back: 'Zurück', reason: 'Grund (optional, im Verlauf gespeichert)', reasonPh: 'Kunde krank, falsches Datum…', done: 'Gespeichert.', error: 'Speichern nicht möglich.', errors: { transition: 'Jemand hat sie gerade geändert: die Seite wird neu geladen.' } },
+  pt: { confirm: 'Confirmar', back: 'Voltar', reason: 'Motivo (opcional, guardado no histórico)', reasonPh: 'Cliente doente, data errada…', done: 'Guardado.', error: 'Não foi possível guardar.', errors: { transition: 'Alguém acabou de a alterar: a página vai atualizar.' } },
 };
 
 export default async function BookingPanel({ id, payload, i18n, user }: UIFieldServerProps) {
@@ -84,7 +84,8 @@ export default async function BookingPanel({ id, payload, i18n, user }: UIFieldS
   const decisions: Decision[] = hasRole(user, ['sales'])
     ? [
         ...(status === 'pending' ? [{ to: 'confirmed', ...t.confirmed, tone: 'primary' as const }] : []),
-        ...(status !== 'cancelled' ? [{ to: 'cancelled', ...t.cancelled, tone: 'danger' as const }] : []),
+        // GG-046: an optional reason, kept in the activity log.
+        ...(status !== 'cancelled' ? [{ to: 'cancelled', ...t.cancelled, tone: 'danger' as const, reason: true }] : []),
       ]
     : [];
   const when = event ? eventDate(event.startsAt, event.endsAt, lang) : null;

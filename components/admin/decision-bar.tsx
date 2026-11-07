@@ -11,11 +11,11 @@ import type { ActionResult } from '@/lib/action';
 
 type Action = (prev: unknown, input: FormData) => Promise<ActionResult<unknown>>;
 
-/** A detail typed before confirming. `money` is typed in € ("12,50"), `date` is a day. */
+/** A detail typed before confirming. `money` is typed in € ("12,50"), `date` is a day, `qty` a whole number up to `max`. */
 export type DecisionField = {
   name: string;
   label: string;
-  kind: 'money' | 'date' | 'text' | 'select';
+  kind: 'money' | 'date' | 'text' | 'select' | 'qty';
   value?: string;
   required?: boolean;
   max?: string;
@@ -36,7 +36,8 @@ export type Decision = {
   action?: Action;
 };
 
-export type DecisionText = { confirm: string; back: string; reason: string; reasonPh: string; done: string; errors: Record<string, string>; error: string };
+/** `reasonMandatory`: the label when a reason is required (refunds, returns); without it the optional label is used. */
+export type DecisionText = { confirm: string; back: string; reason: string; reasonMandatory?: string; reasonPh: string; done: string; errors: Record<string, string>; error: string };
 
 type Props = {
   action: Action;
@@ -107,8 +108,10 @@ export default function DecisionBar({ action, target, decisions, text }: Props) 
                     name={f.name}
                     defaultValue={f.value}
                     required={f.required}
-                    type={f.kind === 'date' ? 'date' : 'text'}
-                    max={f.kind === 'date' ? f.max : undefined}
+                    type={f.kind === 'date' ? 'date' : f.kind === 'qty' ? 'number' : 'text'}
+                    min={f.kind === 'qty' ? 0 : undefined}
+                    step={f.kind === 'qty' ? 1 : undefined}
+                    max={f.kind === 'date' || f.kind === 'qty' ? f.max : undefined}
                     inputMode={f.kind === 'money' ? 'decimal' : undefined}
                     pattern={f.kind === 'money' ? '\\s*\\d+([.,]\\d{1,2})?\\s*€?\\s*' : undefined}
                     maxLength={f.kind === 'text' ? 80 : undefined}
@@ -120,7 +123,7 @@ export default function DecisionBar({ action, target, decisions, text }: Props) 
         )}
         {open.reason && (
           <label className="gg-decide__reason">
-            <span>{text.reason}</span>
+            <span>{open.reason === 'required' ? (text.reasonMandatory ?? text.reason) : text.reason}</span>
             <input name="reason" defaultValue={open.reasonValue} required={open.reason === 'required'} minLength={open.reason === 'required' ? 3 : undefined} placeholder={text.reasonPh} maxLength={300} />
           </label>
         )}

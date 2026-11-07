@@ -16,6 +16,7 @@ import { hasRole } from '@/lib/access';
 import { formatMoney } from '@/lib/money';
 import { REQUEST_STATUS } from '@/modules/catering/collections';
 import CreateButton from './create-button';
+import { actionCounts } from './alerts';
 import { adminText, type AdminLanguage } from './text';
 import { eventDate, toLocal, TZ } from '@/lib/time';
 
@@ -69,7 +70,8 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
   const firstName = (user.name ?? '').split(' ')[0];
   const greeting = t.home.greeting[toLocal(now).hour < 12 ? 0 : toLocal(now).hour < 18 ? 1 : 2];
 
-  const [requests, newCount, upcoming, drafts, legalDrafts, media, settings, lowStock] = await Promise.all([
+  const [counters, requests, newCount, upcoming, drafts, legalDrafts, media, settings, lowStock] = await Promise.all([
+    actionCounts(payload, user),
     sales ? payload.find({ collection: 'cateringRequests', sort: '-createdAt', limit: 5, depth: 1, overrideAccess: true }) : null,
     sales ? payload.count({ collection: 'cateringRequests', where: { status: { equals: 'new' } }, overrideAccess: true }) : null,
     editor
@@ -157,6 +159,18 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
           </a>
         ))}
       </nav>
+
+      {/* GG-045: what waits for a decision, one tile per kind; each opens the matching list. Same figures as the sidebar and bell. */}
+      {counters.length > 0 && (
+        <section className="gg-counters" aria-label={t.home.counters.title}>
+          {counters.map((c) => (
+            <a key={c.key} href={c.href} className="gg-counter" data-waiting={c.count > 0 || undefined}>
+              <span className="gg-counter__count">{c.count}</span>
+              <span className="gg-counter__label">{t.home.counters[c.key as keyof typeof t.home.counters]}</span>
+            </a>
+          ))}
+        </section>
+      )}
 
       <div className="gg-home__grid">
         <div className="gg-home__col">

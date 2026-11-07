@@ -4,14 +4,14 @@ import { withTx } from './tx';
 
 const payload = await getTestPayload();
 
-const count = async (action: string) =>
-  (await payload.count({ collection: 'auditLogs', where: { action: { equals: action } } })).totalDocs;
+// The activity log is a convenient collection to write to; the test rows are told apart by `ref`.
+const count = async (ref: string) => (await payload.count({ collection: 'auditLogs', where: { ref: { equals: ref } } })).totalDocs;
 
 describe('withTx', () => {
   it('commits both writes when the function succeeds', async () => {
     await withTx(payload, async ({ req }) => {
-      await payload.create({ collection: 'auditLogs', data: { action: 'tx-ok', targetCollection: 'users', docId: '1' }, req });
-      await payload.create({ collection: 'auditLogs', data: { action: 'tx-ok', targetCollection: 'users', docId: '2' }, req });
+      await payload.create({ collection: 'auditLogs', data: { action: 'doc.update', ref: 'tx-ok', targetCollection: 'users', docId: '1' }, req });
+      await payload.create({ collection: 'auditLogs', data: { action: 'doc.update', ref: 'tx-ok', targetCollection: 'users', docId: '2' }, req });
     });
     expect(await count('tx-ok')).toBe(2);
   });
@@ -19,9 +19,9 @@ describe('withTx', () => {
   it('rolls back the first write when the second throws', async () => {
     await expect(
       withTx(payload, async ({ req }) => {
-        await payload.create({ collection: 'auditLogs', data: { action: 'tx-fail', targetCollection: 'users', docId: '1' }, req });
+        await payload.create({ collection: 'auditLogs', data: { action: 'doc.update', ref: 'tx-fail', targetCollection: 'users', docId: '1' }, req });
         // Missing required `action` → ValidationError.
-        await payload.create({ collection: 'auditLogs', data: { targetCollection: 'users', docId: '2' } as never, req });
+        await payload.create({ collection: 'auditLogs', data: { ref: 'tx-fail', targetCollection: 'users', docId: '2' } as never, req });
       }),
     ).rejects.toThrow();
     expect(await count('tx-fail')).toBe(0);

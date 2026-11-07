@@ -475,6 +475,63 @@ export function recordRefund(payload: Payload, orderId: string, input: MoneyInpu
 }
 
 // ---------------------------------------------------------------------------------------------------------------
+// Goods brought back (GG-042). A refund never moves stock (GG-004); what physically comes back is recorded here,
+// line by line, as `return` movements on the order. Never more than was sold minus what already came back.
+
+/** Units (of each line's own unit) already returned, by order line id. */
+async function returnedOf(payload: Payload, order: Order, tx?: Tx) {
+  const { docs } = await payload.find({
+    collection: 'stockMovements',
+    where: { and: [{ 'ref.value': { equals: order.id } }, { 'ref.relationTo': { equals: 'orders' } }, { type: { equals: 'return' } }] },
+    limit: 0,
+    depth: 0,
+    ...(tx ? { req: tx.req } : {}),
+    overrideAccess: true,
+  });
+  const byLine = new Map<string, number>();
+  for (const m of docs) if (m.lineId) byLine.set(m.lineId, (byLine.get(m.lineId) ?? 0) + (m.unitQty ?? 0));
+  return byLine;
+}
+
+/** What each line of a handed-over order can still take back (sold minus returned); for the order page. */
+export async function returnableLines(payload: Payload, order: Order) {
+  const back = await returnedOf(payload, order);
+  return (order.lines ?? []).map((l) => ({ id: l.id ?? '', name: l.name, detail: l.detail, sold: l.unitQty, left: l.unitQty - (back.get(l.id ?? '') ?? 0) }));
+}
+
+export function returnItems(payload: Payload, orderId: string, input: { lines: { id: string; qty: number }[]; reason: string; user?: string }) {
+  return withTx(payload, async (tx) => {
+    const order = await loadOrder(tx, orderId);
+    if (order.status !== 'completed' && order.status !== 'refunded') throw new AppError('CONFLICT', 'transition', 'status');
+    const wanted = input.lines.filter((l) => l.qty > 0);
+    if (wanted.length === 0) throw new AppError('VALIDATION', 'nothingReturned', 'lines');
+    const back = await returnedOf(tx.req.payload, order, tx);
+    const lines = wanted.map((w) => {
+      const line = (order.lines ?? []).find((l) => l.id === w.id);
+      if (!line || !Number.isInteger(w.qty) || w.qty > line.unitQty - (back.get(w.id) ?? 0)) throw new AppError('VALIDATION', 'tooManyReturned', 'lines');
+      return { line, qty: w.qty };
+    });
+    await postMovements(
+      tx,
+      lines.map(({ line, qty }) => ({
+        variant: idOf(line.variant),
+        unit: line.unit ? idOf(line.unit) : undefined,
+        unitQty: qty,
+        type: 'return' as const,
+        reason: input.reason,
+        channel: order.channel ?? 'webshop',
+        ref: { relationTo: 'orders' as const, value: order.id },
+        lineId: line.id ?? undefined,
+        user: input.user,
+      })),
+    );
+    // Rewriting the order makes two returns at once conflict: the later one is retried and re-counts.
+    const note = lines.map(({ line, qty }) => `${qty} × ${line.name}`).join(', ');
+    return setOrder(tx, order.id, { history: [...(order.history ?? []), historyRow('returned', input.user, `${note} — ${input.reason}`)] });
+  });
+}
+
+// ---------------------------------------------------------------------------------------------------------------
 // Reading
 
 export async function getOrder(payload: Payload, id: string) {

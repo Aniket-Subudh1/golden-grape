@@ -184,5 +184,7 @@ export const cateringRequests: CollectionConfig = {
         },
       ],
     },
+    // GG-046: who changed the status, the estimate or the details, and when.
+    { name: 'trail', type: 'ui', admin: { disableListColumn: true, components: { Field: '@/components/admin/audit-trail' } } },
   ],
 };

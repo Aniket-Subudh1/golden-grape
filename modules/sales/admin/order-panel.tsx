@@ -8,7 +8,8 @@ import { formatMoney } from '@/lib/money';
 import { isBeforeSlot, slotLabel, today } from '@/lib/time';
 import type { Order } from '@/payload-types';
 import { dueOf, paymentsOf, refundableOf } from '@/modules/payments/service';
-import { recordOrderPayment, recordOrderRefund, requestOrderRefund, transitionOrder } from '../actions';
+import { recordOrderPayment, recordOrderRefund, requestOrderRefund, returnOrderItems, transitionOrder } from '../actions';
+import { returnableLines } from '../service';
 import { MODE_LABELS, ORDER_STATUS_LABELS, ORDER_STATUS_TONES, PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS } from '../collections';
 import { ORDER_FLOW, type OrderStatus } from '../order-states';
 import { langOf, salesText } from './text';
@@ -25,7 +26,9 @@ const euros = (cents: number) => (cents / 100).toFixed(2).replace('.', ',');
  * never a button), then the money forms (GG-003/004): record a payment while something is due, ask for a refund
  * while money can go back, record the refund once one is asked for.
  */
-function decisionsFor(order: Order, t: ReturnType<typeof salesText>): Decision[] {
+type Returnable = Awaited<ReturnType<typeof returnableLines>>;
+
+function decisionsFor(order: Order, t: ReturnType<typeof salesText>, returnable: Returnable): Decision[] {
   const from = (order.status ?? 'pending') as OrderStatus;
   const moves: Decision[] = (ORDER_FLOW[from] as readonly OrderStatus[])
     .filter((to) => to !== 'refunded')
@@ -82,6 +85,19 @@ function decisionsFor(order: Order, t: ReturnType<typeof salesText>): Decision[]
       fields: [{ name: 'amount', label: m.amount, kind: 'money', value: euros(refundableOf(f)), required: true }],
     });
   }
+  // Goods brought back after the handover (GG-042): per line, at most what can still come back. No money moves.
+  const left = returnable.filter((l) => l.left > 0);
+  if ((from === 'completed' || from === 'refunded') && left.length > 0) {
+    money.push({
+      to: 'return',
+      // Only the texts: a function (qtyOf) cannot be sent to the browser component.
+      label: t.returns.label,
+      hint: t.returns.hint,
+      action: returnOrderItems,
+      reason: 'required',
+      fields: left.map((l) => ({ name: `line_${l.id}`, label: t.returns.qtyOf(l.detail ? `${l.name} · ${l.detail}` : l.name, l.left), kind: 'qty' as const, value: '0', max: String(l.left) })),
+    });
+  }
   // The main next step first, the ways back last.
   const rank = (d: Decision) => (d.tone === 'primary' ? 0 : d.tone === 'danger' ? 2 : 1);
   return [...money, ...moves].sort((a, b) => rank(a) - rank(b));
@@ -109,7 +125,8 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
   const due = dueOf({ totalCents: order.totals?.totalCents ?? 0, paidCents: pay?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 });
   const staffName = new Map(staff.docs.map((u) => [u.id, u.name]));
   const when = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Luxembourg' });
-  const decisions = reservation || !hasRole(user, ['sales']) ? [] : decisionsFor(order, t);
+  const returnable = order.status === 'completed' || order.status === 'refunded' ? await returnableLines(payload, order) : [];
+  const decisions = reservation || !hasRole(user, ['sales']) ? [] : decisionsFor(order, t, returnable);
   // When the order was made ready, if it was (kept after handover too: the history shows the whole story).
   const readyAt = [...(order.history ?? [])].reverse().find((h) => h.to === 'ready')?.at ?? null;
   const totals = order.totals;

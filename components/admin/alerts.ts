@@ -135,3 +135,28 @@ export async function getAlerts(payload: Payload, user: TypedUser | null, now = 
   }
   return { counts, items: [...items, ...done] };
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// The dashboard's action counters (GG-045): one number per thing staff can act on, each with the list it opens.
+// The same conditions as the tabs, the sidebar and the bell above, so every place shows the same figure.
+
+export type ActionCount = { key: string; count: number; href: string };
+
+const listUrl = (collection: string, query: Record<string, string>) => `/admin/collections/${collection}?${new URLSearchParams(query)}`;
+
+export async function actionCounts(payload: Payload, user: TypedUser | null): Promise<ActionCount[]> {
+  if (!hasRole(user, ['sales'])) return [];
+  const count = (collection: Collection, where: object) => payload.count({ collection, where: where as never, overrideAccess: true }).then((r) => r.totalDocs);
+  const rows: [string, Collection, object, string][] = [
+    // Orders split by what staff do next: confirm, check the bank for the transfer, prepare.
+    ['toConfirm', 'orders', { and: [{ status: { equals: 'pending' } }, { mode: { not_equals: 'table' } }] }, listUrl('orders', { 'where[and][0][status][in][0]': 'pending', 'where[and][1][mode][not_equals]': 'table', sort: 'slotAt' })],
+    ['awaitingPayment', 'orders', { status: { equals: 'awaiting_payment' } }, listUrl('orders', { 'where[and][0][status][in][0]': 'awaiting_payment', sort: 'slotAt' })],
+    ['toPrepare', 'orders', { and: orderTabWhere(ORDER_TABS[1]) }, listUrl('orders', { 'where[and][0][status][in][0]': 'confirmed', sort: 'slotAt' })],
+    ['reservations', 'reservations', { status: { equals: 'pending' } }, listUrl('reservations', { 'where[status][equals]': 'pending', sort: 'slotAt' })],
+    ['catering', 'cateringRequests', { status: { equals: 'new' } }, listUrl('cateringRequests', { 'where[status][equals]': 'new' })],
+    ['eventBookings', 'eventBookings', { status: { equals: 'pending' } }, listUrl('eventBookings', { 'where[status][equals]': 'pending' })],
+    ['refunds', 'orders', { 'payment.status': { equals: 'refund_pending' } }, listUrl('orders', { 'where[payment.status][equals]': 'refund_pending' })],
+  ];
+  const counts = await Promise.all(rows.map(([, collection, where]) => count(collection, where)));
+  return rows.map(([key, , , href], i) => ({ key, count: counts[i], href }));
+}

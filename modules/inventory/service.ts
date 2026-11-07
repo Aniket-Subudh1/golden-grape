@@ -16,6 +16,8 @@ export type MovementLine = {
   reason?: string;
   channel: MovementChannel;
   ref?: { relationTo: 'stockCounts' | 'orders'; value: string };
+  /** The order line a return belongs to (GG-042), so a line is never returned twice. */
+  lineId?: string;
   user?: string;
 };
 
@@ -87,6 +89,7 @@ export async function postMovements(tx: Tx, lines: MovementLine[]): Promise<void
         reason: row.reason,
         channel: row.channel,
         ref: row.ref,
+        lineId: row.lineId,
         user: row.user,
       },
     });

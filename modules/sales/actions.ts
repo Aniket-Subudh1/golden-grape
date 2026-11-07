@@ -3,6 +3,8 @@
 import { after } from 'next/server';
 import { z } from 'zod';
 import { action, clientIp, publicAction } from '@/lib/action';
+import { audit } from '@/lib/audit';
+import { AppError } from '@/lib/errors';
 import { LOCALES } from '@/lib/i18n';
 import { parseDecimal } from '@/lib/money';
 import { fromLocal, today } from '@/lib/time';
@@ -13,7 +15,7 @@ import { SLOT_MODES } from './collections';
 import { mailOrderPlaced, mailOrderStatus, mailReservation } from './mail';
 import { ORDER_STATUSES } from './order-states';
 import { transitionReservation } from './reservations';
-import { getOrder, getReservation, type MoneyResult, orderToken, placeOrder, recordPayment, recordRefund, requestRefund, slotCalendar, transition, zoneFor } from './service';
+import { getOrder, getReservation, type MoneyResult, returnItems, orderToken, placeOrder, recordPayment, recordRefund, requestRefund, slotCalendar, transition, zoneFor } from './service';
 import { deliveryFee } from './zones';
 
 // Checkout (public) and order / reservation decisions (staff). Error messages are dictionary keys (`form.fields.*`).
@@ -120,6 +122,7 @@ export const transitionOrder = action(
   { roles: ['sales'] },
   async ({ order, to, reason }, { payload, user }) => {
     const result = await transition(payload, order, to, { user: user.id, reason });
+    await audit(payload, { user: user.id, action: 'order.status', collection: 'orders', id: order, ref: result.order.number, reason, before: { status: result.from }, after: { status: to } });
     if (result.effects.includes('mailCustomer')) after(() => mailOrderStatus(result.order).catch(logMail('order status')));
     return { status: result.order.status };
   },
@@ -146,6 +149,7 @@ export const recordOrderPayment = action(
   { roles: ['sales'] },
   async ({ order, amount, at, reference }, { payload, user }) => {
     const result = await recordPayment(payload, order, { amountCents: amount, at, reference, user: user.id });
+    await audit(payload, { user: user.id, action: 'order.payment', collection: 'orders', id: order, ref: result.order.number, after: { amountCents: amount, at: at.toISOString().slice(0, 10), reference, payment: result.order.payment?.status, status: result.order.status } });
     mailMoved(result);
     return { status: result.order.status };
   },
@@ -157,6 +161,7 @@ export const requestOrderRefund = action(
   { roles: ['sales'] },
   async ({ order, amount, reason }, { payload, user }) => {
     const result = await requestRefund(payload, order, { amountCents: amount, reason, user: user.id });
+    await audit(payload, { user: user.id, action: 'order.refundRequest', collection: 'orders', id: order, ref: result.order.number, reason, after: { amountCents: amount } });
     return { status: result.order.status };
   },
 );
@@ -167,8 +172,29 @@ export const recordOrderRefund = action(
   { roles: ['sales'] },
   async ({ order, amount, at, method, reference, reason }, { payload, user }) => {
     const result = await recordRefund(payload, order, { amountCents: amount, at, method, reference, reason, user: user.id });
+    await audit(payload, { user: user.id, action: 'order.refund', collection: 'orders', id: order, ref: result.order.number, reason, after: { amountCents: amount, at: at.toISOString().slice(0, 10), method, reference, payment: result.order.payment?.status } });
     mailMoved(result);
     return { status: result.order.status };
+  },
+);
+
+/**
+ * Goods brought back to the shop (GG-042): one quantity per order line (`line_<id>`), at most what was sold minus what
+ * already came back. Puts them back in stock; touches no money (a refund is its own step).
+ */
+export const returnOrderItems = action(
+  z.looseObject({ order: z.string().min(1), reason: reasonText }),
+  { roles: ['sales'] },
+  async (input, { payload, user }) => {
+    const lines = Object.entries(input)
+      .filter(([key]) => key.startsWith('line_'))
+      .map(([key, value]) => ({ id: key.slice(5), qty: Number(value) }))
+      .filter((l) => l.qty !== 0);
+    if (lines.some((l) => !Number.isInteger(l.qty) || l.qty < 0)) throw new AppError('VALIDATION', 'tooManyReturned', 'lines');
+    const updated = await returnItems(payload, input.order, { lines, reason: input.reason, user: user.id });
+    const items = lines.map((l) => `${l.qty} × ${(updated.lines ?? []).find((x) => x.id === l.id)?.name ?? l.id}`).join(', ');
+    await audit(payload, { user: user.id, action: 'order.return', collection: 'orders', id: input.order, ref: updated.number, reason: input.reason, after: { items } });
+    return {};
   },
 );
 
@@ -178,6 +204,7 @@ export const decideReservation = action(
   { roles: ['sales'] },
   async ({ reservation, to, reason }, { payload, user }) => {
     const result = await transitionReservation(payload, reservation, to, { user: user.id, reason });
+    await audit(payload, { user: user.id, action: 'reservation.status', collection: 'reservations', id: reservation, ref: result.reservation.number, reason, before: { status: result.from }, after: { status: to } });
     // No e-mail for a visit (completed) or a no-show: the customer is not told they did not come.
     if (to !== 'completed' && to !== 'no_show') after(() => mailReservation(payload, result.reservation, to).catch(logMail('reservation status')));
     return { status: result.reservation.status };
