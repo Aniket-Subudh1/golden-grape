@@ -677,8 +677,11 @@
         "ready": "Ihre Bestellung ist bereit. Bis gleich im Laden!",
         "out_for_delivery": "Ihre Bestellung ist unterwegs zu Ihnen.",
         "cancelled": "Ihre Bestellung wurde storniert. Falls Sie bereits bezahlt haben, erstatten wir den Betrag.",
-        "refunded": "Ihre Bestellung wurde erstattet."
+        "refunded": "Ihre Bestellung wurde erstattet.",
+        "completed": "Ihre Bestellung wurde abgeholt. Vielen Dank und bis bald bei Golden Grape!",
+        "delivered": "Ihre Bestellung wurde geliefert. Vielen Dank und viel Genuss!"
       },
+      "handedOver": { "completed": "Abgeholt", "delivered": "Geliefert" },
       "staffSubject": "Neue Bestellung {{number}} — {{name}}"
     },
     "reservation": {

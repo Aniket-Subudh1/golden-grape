@@ -4,6 +4,8 @@ import { after } from 'next/server';
 import { z } from 'zod';
 import { action, clientIp, publicAction } from '@/lib/action';
 import { LOCALES } from '@/lib/i18n';
+import { parseDecimal } from '@/lib/money';
+import { fromLocal, today } from '@/lib/time';
 import { rateLimit } from '@/lib/rate-limit';
 import { currentCustomer } from '@/modules/customers/service';
 import { quoteCart } from '@/modules/promotions/service';
@@ -11,7 +13,7 @@ import { SLOT_MODES } from './collections';
 import { mailOrderPlaced, mailOrderStatus, mailReservation } from './mail';
 import { ORDER_STATUSES } from './order-states';
 import { transitionReservation } from './reservations';
-import { getOrder, getReservation, orderToken, placeOrder, slotCalendar, transition, zoneFor } from './service';
+import { getOrder, getReservation, type MoneyResult, orderToken, placeOrder, recordPayment, recordRefund, requestRefund, slotCalendar, transition, zoneFor } from './service';
 import { deliveryFee } from './zones';
 
 // Checkout (public) and order / reservation decisions (staff). Error messages are dictionary keys (`form.fields.*`).
@@ -108,6 +110,53 @@ export const transitionOrder = action(
   async ({ order, to, reason }, { payload, user }) => {
     const result = await transition(payload, order, to, { user: user.id, reason });
     if (result.effects.includes('mailCustomer')) after(() => mailOrderStatus(result.order).catch(logMail('order status')));
+    return { status: result.order.status };
+  },
+);
+
+// Money staff record (GG-003/004). Amounts are typed in € ("12,50"), dates are the bank's day (not in the future).
+const euros = z.string().transform((v, ctx) => {
+  const cents = parseDecimal(v);
+  if (!Number.isInteger(cents) || cents <= 0) ctx.addIssue({ code: 'custom', message: 'amount' });
+  return cents;
+});
+const bankDay = z.iso.date('date').refine((d) => d <= today(), 'futureDate').transform((d) => {
+  const [y, m, day] = d.split('-').map(Number);
+  return fromLocal(y, m, day, 12);
+});
+const reasonText = z.string().trim().min(3, 'reasonRequired').max(300, 'tooLong');
+const mailMoved = (result: MoneyResult) => {
+  if (result.effects.includes('mailCustomer')) after(() => mailOrderStatus(result.order).catch(logMail('order status')));
+};
+
+/** Money received for an order: a transfer, a deposit or the rest. Paid in full → a waiting order is confirmed. */
+export const recordOrderPayment = action(
+  z.object({ order: z.string().min(1), amount: euros, at: bankDay, reference: optionalText(80) }),
+  { roles: ['sales'] },
+  async ({ order, amount, at, reference }, { payload, user }) => {
+    const result = await recordPayment(payload, order, { amountCents: amount, at, reference, user: user.id });
+    mailMoved(result);
+    return { status: result.order.status };
+  },
+);
+
+/** A refund decided (amount and reason); nothing is sent yet. */
+export const requestOrderRefund = action(
+  z.object({ order: z.string().min(1), amount: euros, reason: reasonText }),
+  { roles: ['sales'] },
+  async ({ order, amount, reason }, { payload, user }) => {
+    const result = await requestRefund(payload, order, { amountCents: amount, reason, user: user.id });
+    return { status: result.order.status };
+  },
+);
+
+/** A refund actually sent; once everything is paid back, a handed-over order becomes "refunded" (customer e-mail). */
+export const recordOrderRefund = action(
+  z.object({ order: z.string().min(1), amount: euros, at: bankDay, method: z.enum(['transfer', 'onsite', 'card']), reference: optionalText(80), reason: reasonText }),
+  { roles: ['sales'] },
+  async ({ order, amount, at, method, reference, reason }, { payload, user }) => {
+    const result = await recordRefund(payload, order, { amountCents: amount, at, method, reference, reason, user: user.id });
+    mailMoved(result);
     return { status: result.order.status };
   },
 );

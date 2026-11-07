@@ -7,9 +7,11 @@ export type OrderStatus = (typeof ORDER_STATUSES)[number];
 export const ORDER_FLOW = {
   pending: ['confirmed', 'cancelled'],
   awaiting_payment: ['confirmed', 'cancelled'],
-  confirmed: ['ready', 'out_for_delivery', 'completed', 'cancelled', 'refunded'],
+  // An order not handed over is cancelled (stock back), never "refunded"; its money becomes a refund to send (GG-004).
+  confirmed: ['ready', 'out_for_delivery', 'completed', 'cancelled'],
   ready: ['completed', 'cancelled'],
   out_for_delivery: ['completed', 'cancelled'],
+  // Reached only when a refund is recorded as sent in full (recordRefund), never from a button: no stock moves.
   completed: ['refunded'],
   cancelled: [],
   refunded: [],
@@ -33,8 +35,8 @@ export const canTransitionReservation = (from: ReservationStatus, to: Reservatio
 
 /** Goods have left the shelves (sale movements posted) in these states. */
 const STOCK_OUT: OrderStatus[] = ['confirmed', 'ready', 'out_for_delivery'];
-/** The customer is told about these new states (03 T7: confirmed, ready, out for delivery, cancelled, refunded). */
-const TOLD: OrderStatus[] = ['confirmed', 'ready', 'out_for_delivery', 'cancelled', 'refunded'];
+/** The customer is told about these new states (03 T7, and the handover since GG-005). */
+const TOLD: OrderStatus[] = ['confirmed', 'ready', 'out_for_delivery', 'completed', 'cancelled', 'refunded'];
 
 /** The side effects of an allowed order transition, in the order they run. */
 export function effects(from: OrderStatus, to: OrderStatus): Effect[] {

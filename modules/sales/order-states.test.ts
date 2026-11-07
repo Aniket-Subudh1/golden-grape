@@ -15,6 +15,8 @@ describe('order flow', () => {
     ['completed', 'cancelled'],
     ['ready', 'confirmed'],
     ['confirmed', 'confirmed'],
+    ['confirmed', 'refunded'],
+    ['ready', 'refunded'],
   ] as [OrderStatus, OrderStatus][])('%s → %s is refused', (from, to) => {
     expect(canTransition(from, to)).toBe(false);
     expect(effects(from, to)).toEqual([]);
@@ -34,11 +36,12 @@ describe('effects', () => {
     ['out_for_delivery', 'cancelled', ['returnStock', 'mailCustomer', 'outbox']],
     ['pending', 'cancelled', ['mailCustomer', 'outbox']],
     ['awaiting_payment', 'cancelled', ['mailCustomer', 'outbox']],
-    ['confirmed', 'refunded', ['returnStock', 'mailCustomer', 'outbox']],
     ['completed', 'refunded', ['mailCustomer', 'outbox']],
     ['confirmed', 'ready', ['mailCustomer']],
     ['confirmed', 'out_for_delivery', ['mailCustomer']],
-    ['ready', 'completed', []],
+    ['ready', 'completed', ['mailCustomer']],
+    ['out_for_delivery', 'completed', ['mailCustomer']],
+    ['confirmed', 'completed', ['mailCustomer']],
   ] as [OrderStatus, OrderStatus, string[]][])('%s → %s', (from, to, expected) => expect(effects(from, to)).toEqual(expected));
 });
 

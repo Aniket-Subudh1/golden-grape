@@ -46,7 +46,7 @@ export default buildConfig({
       graphics: { Logo: '@/components/admin/logo', Icon: '@/components/admin/icon' },
       beforeLogin: ['@/components/admin/login-brand'],
       Nav: '@/components/admin/nav',
-      actions: ['@/components/admin/language-menu'],
+      actions: ['@/components/admin/alerts-client', '@/components/admin/language-menu'],
       providers: ['@/components/admin/row-links', '@/components/admin/password-toggle'],
       views: { dashboard: { Component: '@/components/admin/dashboard' } },
     },

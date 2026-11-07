@@ -73,15 +73,18 @@ export async function mailOrderPlaced(order: Order) {
   ]);
 }
 
-const TOLD = ['confirmed', 'ready', 'out_for_delivery', 'cancelled', 'refunded'] as const;
+const TOLD = ['confirmed', 'ready', 'out_for_delivery', 'completed', 'cancelled', 'refunded'] as const;
 
 /** The customer is told about a new state of their order (the state machine says which ones). */
 export async function mailOrderStatus(order: Order) {
-  const status = order.status as StatusMail['status'];
-  if (!(TOLD as readonly string[]).includes(status)) return;
+  if (!(TOLD as readonly string[]).includes(order.status ?? '')) return;
   const locale = localeOf(order);
   const ctx = await mailContext(locale);
-  const data: StatusMail = { ...(await orderMail(order, locale, pageUrl(order.id, locale))), status, statusName: ctx.customerT.status[status] };
+  // The handover (GG-005) says "collected" or "delivered", by mode.
+  const handedOver = order.status === 'completed' ? (order.mode === 'delivery' ? 'delivered' : 'completed') : null;
+  const status = (handedOver ?? order.status) as StatusMail['status'];
+  const statusName = handedOver ? ctx.customerT.order.handedOver[handedOver] : ctx.customerT.status[order.status as keyof typeof ctx.customerT.status];
+  const data: StatusMail = { ...(await orderMail(order, locale, pageUrl(order.id, locale))), status, statusName };
   await send(
     data.email,
     interpolate(ctx.customerT.order.statusSubject, { number: data.number, status: data.statusName }),

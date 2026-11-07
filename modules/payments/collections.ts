@@ -9,7 +9,7 @@ export const payments: CollectionConfig = {
   slug: 'payments',
   labels: { singular: l('Paiement', 'Payment', 'Zahlung', 'Pagamento'), plural: l('Paiements', 'Payments', 'Zahlungen', 'Pagamentos') },
   admin: {
-    defaultColumns: ['createdAt', 'order', 'kind', 'amountCents', 'status', 'provider'],
+    defaultColumns: ['at', 'order', 'kind', 'amountCents', 'method', 'reference', 'user'],
     hidden: hiddenUnless('manager'),
     description: l(
       'Chaque encaissement et remboursement enregistré sur une commande. Rien ne peut y être modifié.',
@@ -40,7 +40,11 @@ export const payments: CollectionConfig = {
     { name: 'amountCents', type: 'number', required: true, label: l('Montant', 'Amount', 'Betrag', 'Montante'), admin: { components: scaledNumber('€') } },
     { name: 'method', type: 'text', label: l('Moyen', 'Method', 'Art', 'Meio') },
     { name: 'status', type: 'text', required: true, label: l('État', 'State', 'Stand', 'Estado') },
-    { name: 'providerRef', type: 'text', label: l('Référence', 'Reference', 'Referenz', 'Referência') },
+    // When the money actually arrived or left the bank (GG-003/004), as staff typed it; `createdAt` is when it was noted.
+    { name: 'at', type: 'date', label: l('Date réelle', 'Actual date', 'Tatsächliches Datum', 'Data real'), admin: { date: { pickerAppearance: 'dayOnly' } } },
+    { name: 'reference', type: 'text', label: l('Réf. bancaire', 'Bank reference', 'Bankreferenz', 'Ref. bancária') },
+    { name: 'reason', type: 'text', label: l('Motif', 'Reason', 'Grund', 'Motivo') },
+    { name: 'providerRef', type: 'text', label: l('Référence prestataire', 'Provider reference', 'Anbieterreferenz', 'Referência do prestador') },
     { name: 'user', type: 'relationship', relationTo: 'users', label: l('Par', 'By', 'Von', 'Por') },
     { name: 'raw', type: 'json', admin: { hidden: true } },
   ],

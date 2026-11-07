@@ -677,8 +677,11 @@
         "ready": "A sua encomenda está pronta. Até já na loja!",
         "out_for_delivery": "A sua encomenda está a caminho.",
         "cancelled": "A sua encomenda foi cancelada. Se já tinha pago, reembolsamos.",
-        "refunded": "A sua encomenda foi reembolsada."
+        "refunded": "A sua encomenda foi reembolsada.",
+        "completed": "A sua encomenda foi levantada. Obrigado e até breve na Golden Grape!",
+        "delivered": "A sua encomenda foi entregue. Obrigado e bom proveito!"
       },
+      "handedOver": { "completed": "Levantada", "delivered": "Entregue" },
       "staffSubject": "Nova encomenda {{number}} — {{name}}"
     },
     "reservation": {

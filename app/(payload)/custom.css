@@ -2145,7 +2145,12 @@ body:has(.gg-create) .no-results__actions {
   font-size: 12px;
   color: var(--gg-text-2);
 }
-.gg-decide__reason input {
+.gg-decide__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+.gg-decide__reason :is(input, select) {
   height: 36px;
   padding: 0 10px;
   border: 1px solid var(--gg-line-2);
@@ -2218,4 +2223,223 @@ body:has(.gg-create) .no-results__actions {
 .collection-list--reservations td,
 .collection-list--eventBookings td {
   vertical-align: middle;
+}
+
+/* ---- Order stage tabs and slot-day filter (modules/sales/admin/order-tabs.tsx) --------------------------- */
+.gg-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--gg-line);
+}
+.gg-tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid var(--gg-line);
+  border-radius: 999px;
+  background: var(--gg-frame);
+  color: var(--gg-text-2);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.gg-tabs__tab:hover {
+  border-color: var(--gg-line-2);
+  color: var(--gg-ink);
+}
+.gg-tabs__tab[data-active] {
+  border-color: var(--gg-primary);
+  background: var(--gg-primary-tint);
+  color: var(--gg-ink);
+}
+.gg-tabs__count {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--gg-accent);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.gg-tabs__tab[data-urgent] .gg-tabs__count {
+  background: var(--gg-warning-tint);
+  color: var(--gg-warning);
+  font-weight: 600;
+}
+.gg-tabs__day {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--gg-text-2);
+}
+.gg-tabs__day label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.gg-tabs__day input {
+  padding: 5px 8px;
+  border: 1px solid var(--gg-line);
+  border-radius: 6px;
+  background: var(--gg-frame);
+  color: var(--gg-ink);
+  font: inherit;
+}
+.gg-tabs__day button {
+  border: 0;
+  background: none;
+  color: var(--gg-primary);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---- What waits: sidebar counters and the header bell (components/admin/alerts-client.tsx) ---------------- */
+.gg-nav__count {
+  margin-left: auto;
+  min-width: 22px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--gg-warning-tint);
+  color: var(--gg-warning);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.gg-bell {
+  position: relative;
+  z-index: 2;
+}
+.gg-bell__button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--gg-line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--gg-primary);
+  cursor: pointer;
+}
+.gg-bell__button:hover {
+  border-color: var(--gg-gold);
+  background: var(--gg-accent);
+}
+.gg-bell__button svg {
+  width: 16px;
+  height: 16px;
+}
+.gg-bell__count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: var(--gg-danger);
+  color: #ffffff;
+  font: 600 11px/14px var(--font-body);
+  text-align: center;
+}
+.gg-bell__panel {
+  position: absolute;
+  z-index: 120;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 340px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--gg-line);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 16px 44px rgb(26 23 18 / 0.16);
+}
+.gg-bell__panel ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.gg-bell__title {
+  margin: 0;
+  padding: 8px 10px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gg-text-2);
+}
+.gg-bell__empty {
+  margin: 0;
+  padding: 10px;
+  font-size: 13px;
+  color: var(--gg-text-2);
+}
+.gg-bell__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: var(--gg-ink);
+  text-decoration: none;
+}
+.gg-bell__item:hover {
+  background: var(--gg-accent);
+}
+.gg-bell__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--gg-primary-tint);
+  color: var(--gg-primary);
+}
+.gg-bell__icon svg {
+  width: 15px;
+  height: 15px;
+}
+.gg-bell__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 13px;
+}
+.gg-bell__text b {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gg-bell__text small {
+  color: var(--gg-text-2);
+  font-size: 12px;
+}
+.gg-bell__new {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--gg-danger-tint);
+  color: var(--gg-danger);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* A refund still to send, in the order's payment card (GG-004). */
+.gg-doc__alert {
+  color: var(--gg-danger);
 }

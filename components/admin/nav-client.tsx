@@ -38,8 +38,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useLayoutEffect } from 'react';
+import type { Alerts } from './alerts';
+import { useAlerts } from './alerts-client';
 
-export type NavItem = { label: string; icon: string; href: string };
+export type NavItem = { label: string; icon: string; href: string; slug?: string };
 export type NavGroup = { label: string; items: NavItem[] };
 type Text = Record<'main' | 'dashboard' | 'viewSite' | 'account' | 'signOut' | 'closeMenu' | 'brandSub', string>;
 
@@ -76,7 +78,7 @@ const ICONS = {
   groups: Contact,
 };
 
-function Item({ item, active, external }: { item: NavItem; active: boolean; external?: boolean }) {
+function Item({ item, active, external, count }: { item: NavItem; active: boolean; external?: boolean; count?: number }) {
   const Icon = ICONS[item.icon as keyof typeof ICONS] ?? FileText;
   return (
     <Link
@@ -90,14 +92,16 @@ function Item({ item, active, external }: { item: NavItem; active: boolean; exte
         <Icon />
       </span>
       <span className="gg-nav__label">{item.label}</span>
+      {count ? <span className="gg-nav__count">{count}</span> : null}
     </Link>
   );
 }
 
 const SCROLL_KEY = 'gg_nav_scroll';
 
-export function NavClient({ groups, text }: { groups: NavGroup[]; text: Text }) {
+export function NavClient({ groups, alerts: fresh, text }: { groups: NavGroup[]; alerts: Alerts; text: Text }) {
   const pathname = usePathname();
+  const alerts = useAlerts(fresh);
   const { hydrated, navOpen, navRef, setNavOpen, shouldAnimate } = useNav();
   // Payload renders the sidebar again on every page, which would put it back at the top and hide the item just
   // clicked. Its scroll position is kept for the visit and restored before the page paints; the active item is then
@@ -152,7 +156,7 @@ export function NavClient({ groups, text }: { groups: NavGroup[]; text: Text }) 
             <div key={group.label} className="gg-nav__group">
               <p className="gg-nav__group-label">{group.label}</p>
               {group.items.map((item) => (
-                <Item key={item.href} item={item} active={isActive(item.href)} />
+                <Item key={item.href} item={item} active={isActive(item.href)} count={item.slug ? alerts?.counts[item.slug] : undefined} />
               ))}
             </div>
           ))}

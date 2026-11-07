@@ -1,12 +1,14 @@
 import type { UIFieldServerProps } from 'payload';
+import type { ReactNode } from 'react';
 import DecisionBar, { type Decision } from '@/components/admin/decision-bar';
 import { DocCard, DocFacts, DocGrid, DocHead, DocHistory, DocPanel } from '@/components/admin/doc-panel';
 import { hasRole } from '@/lib/access';
 import { LOCALE_NAMES, type Locale } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
-import { slotLabel } from '@/lib/time';
+import { slotLabel, today } from '@/lib/time';
 import type { Order } from '@/payload-types';
-import { transitionOrder } from '../actions';
+import { dueOf, paymentsOf, refundableOf } from '@/modules/payments/service';
+import { recordOrderPayment, recordOrderRefund, requestOrderRefund, transitionOrder } from '../actions';
 import { MODE_LABELS, ORDER_STATUS_LABELS, ORDER_STATUS_TONES, PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS } from '../collections';
 import { ORDER_FLOW, type OrderStatus } from '../order-states';
 import { langOf, salesText } from './text';
@@ -16,19 +18,71 @@ import { langOf, salesText } from './text';
 
 const percent = (bp: number, locale: string) => new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(bp / 100);
 
-/** The moves offered for an order: ORDER_FLOW, minus those that do not fit its mode. */
+const euros = (cents: number) => (cents / 100).toFixed(2).replace('.', ',');
+
+/**
+ * The moves offered for an order: ORDER_FLOW minus those that do not fit its mode ("refunded" follows the money,
+ * never a button), then the money forms (GG-003/004): record a payment while something is due, ask for a refund
+ * while money can go back, record the refund once one is asked for.
+ */
 function decisionsFor(order: Order, t: ReturnType<typeof salesText>): Decision[] {
   const from = (order.status ?? 'pending') as OrderStatus;
-  return (ORDER_FLOW[from] as readonly OrderStatus[])
+  const moves: Decision[] = (ORDER_FLOW[from] as readonly OrderStatus[])
+    .filter((to) => to !== 'refunded')
     .filter((to) => !(to === 'ready' && order.mode === 'delivery') && !(to === 'out_for_delivery' && order.mode !== 'delivery'))
-    .filter((to) => !(to === 'refunded' && order.payment?.status !== 'paid'))
     .map((to) => {
       const words = to === 'confirmed' && from === 'awaiting_payment' ? t.orders.paid : t.orders[to as keyof typeof t.orders];
-      const tone = to === 'cancelled' || to === 'refunded' ? ('danger' as const) : ('primary' as const);
+      const tone = to === 'cancelled' ? ('danger' as const) : from === 'awaiting_payment' ? undefined : ('primary' as const);
       return { to, ...words, tone, reason: tone === 'danger' };
-    })
-    // The main next step first, the way back last.
-    .sort((a, b) => Number(a.tone === 'danger') - Number(b.tone === 'danger'));
+    });
+
+  const f = { totalCents: order.totals?.totalCents ?? 0, paidCents: order.payment?.paidCents ?? 0, refundedCents: order.payment?.refundedCents ?? 0, refundDueCents: order.payment?.refundDueCents ?? 0 };
+  const day = today();
+  const m = t.money;
+  const money: Decision[] = [];
+  const open = from !== 'cancelled' && from !== 'refunded';
+  if (open && dueOf(f) > 0) {
+    money.push({
+      to: 'payment',
+      ...m.payment,
+      tone: 'primary',
+      action: recordOrderPayment,
+      fields: [
+        { name: 'amount', label: m.amount, kind: 'money', value: euros(dueOf(f)), required: true },
+        { name: 'at', label: m.date, kind: 'date', value: day, max: day, required: true },
+        { name: 'reference', label: m.bankRef, kind: 'text' },
+      ],
+    });
+  }
+  if (f.refundDueCents > 0) {
+    money.push({
+      to: 'refund',
+      ...m.refund,
+      tone: 'primary',
+      action: recordOrderRefund,
+      reason: 'required',
+      reasonValue: order.payment?.refundReason ?? undefined,
+      fields: [
+        { name: 'amount', label: m.amount, kind: 'money', value: euros(Math.min(f.refundDueCents, refundableOf(f))), required: true },
+        { name: 'at', label: m.date, kind: 'date', value: day, max: day, required: true },
+        { name: 'method', label: m.method, kind: 'select', value: order.payment?.method === 'onsite' ? 'onsite' : 'transfer', options: (['transfer', 'onsite', 'card'] as const).map((v) => ({ value: v, label: m.methods[v] })) },
+        { name: 'reference', label: m.bankRef, kind: 'text' },
+      ],
+    });
+  } else if (refundableOf(f) > 0 && from !== 'cancelled') {
+    // A cancelled order's refund is asked for by the cancel itself.
+    money.push({
+      to: 'refund_request',
+      ...m.refundRequest,
+      tone: 'danger',
+      action: requestOrderRefund,
+      reason: 'required',
+      fields: [{ name: 'amount', label: m.amount, kind: 'money', value: euros(refundableOf(f)), required: true }],
+    });
+  }
+  // The main next step first, the ways back last.
+  const rank = (d: Decision) => (d.tone === 'primary' ? 0 : d.tone === 'danger' ? 2 : 1);
+  return [...money, ...moves].sort((a, b) => rank(a) - rank(b));
 }
 
 export default async function OrderPanel({ id, payload, i18n, user }: UIFieldServerProps) {
@@ -40,13 +94,17 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
   const money = (cents: number | null | undefined) => formatMoney(cents ?? 0, lang);
   const status = (order.status ?? 'pending') as OrderStatus;
 
-  const [reservation, staff, customer] = await Promise.all([
+  const [reservation, staff, customer, payments] = await Promise.all([
     order.mode === 'table'
       ? payload.find({ collection: 'reservations', where: { preorder: { equals: order.id } }, limit: 1, depth: 0, overrideAccess: true }).then((r) => r.docs[0] ?? null)
       : null,
     payload.find({ collection: 'users', limit: 0, depth: 0, overrideAccess: true, select: { name: true } }),
     order.customer ? payload.findByID({ collection: 'customers', id: String(order.customer), depth: 0, overrideAccess: true, disableErrors: true, select: { name: true } }) : null,
+    paymentsOf(payload, order.id),
   ]);
+  const day = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeZone: 'Europe/Luxembourg' });
+  const pay = order.payment;
+  const due = dueOf({ totalCents: order.totals?.totalCents ?? 0, paidCents: pay?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 });
   const staffName = new Map(staff.docs.map((u) => [u.id, u.name]));
   const when = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Luxembourg' });
   const decisions = reservation || !hasRole(user, ['sales']) ? [] : decisionsFor(order, t);
@@ -104,9 +162,45 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
               [t.method, order.payment?.method ? PAYMENT_METHOD_LABELS[order.payment.method][lang] : '—'],
               [t.state, PAYMENT_STATUS_LABELS[order.payment?.status ?? 'none'][lang]],
               [t.total, <b key="total">{money(totals?.totalCents)}</b>],
-              ...(order.payment?.method === 'transfer' ? [[t.reference, order.number] as [string, string | null | undefined]] : []),
+              [t.money.paid, money(pay?.paidCents)],
+              ...(due > 0 && status !== 'cancelled' ? [[t.money.due, <b key="due">{money(due)}</b>] as [string, ReactNode]] : []),
+              ...(pay?.refundedCents ? [[t.money.refunded, money(pay.refundedCents)] as [string, ReactNode]] : []),
+              ...(pay?.refundDueCents
+                ? [[t.money.refundDue, <b key="refund" className="gg-doc__alert">{`${money(pay.refundDueCents)}${pay.refundReason ? ` — ${pay.refundReason}` : ''}`}</b>] as [string, ReactNode]]
+                : []),
+              ...(order.payment?.method === 'transfer' ? [[t.reference, order.number] as [string, ReactNode]] : []),
             ]}
           />
+        </DocCard>
+
+        <DocCard title={t.money.payments} wide>
+          {payments.length === 0 ? (
+            <p className="gg-doc__muted">{t.money.noPayments}</p>
+          ) : (
+            <table className="gg-doc__lines">
+              <tbody>
+                {payments.map((p) => (
+                  <tr key={p.id}>
+                    <td>
+                      {t.money.kinds[p.kind] ?? p.kind}
+                      <small>
+                        {[
+                          p.method ? (PAYMENT_METHOD_LABELS[p.method as keyof typeof PAYMENT_METHOD_LABELS]?.[lang] ?? p.method) : null,
+                          p.reference,
+                          p.reason ? `« ${p.reason} »` : null,
+                          [p.user ? staffName.get(String(p.user)) : null, `${t.money.noted} ${when.format(new Date(p.createdAt))}`].filter(Boolean).join(', '),
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </small>
+                    </td>
+                    <td>{day.format(new Date(p.at ?? p.createdAt))}</td>
+                    <td>{money(p.amountCents)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </DocCard>
 
         <DocCard title={t.items} wide>
@@ -170,7 +264,7 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
               { when: when.format(new Date(order.createdAt)), text: t.placed },
               ...(order.history ?? []).map((h) => ({
                 when: h.at ? when.format(new Date(h.at)) : '',
-                text: ORDER_STATUS_LABELS[(h.to ?? 'pending') as OrderStatus]?.[lang] ?? h.to,
+                text: ORDER_STATUS_LABELS[(h.to ?? 'pending') as OrderStatus]?.[lang] ?? t.money.history[h.to ?? ''] ?? h.to,
                 by: h.user ? staffName.get(String(h.user)) : null,
                 note: h.reason,
               })),

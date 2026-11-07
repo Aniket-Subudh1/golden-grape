@@ -129,7 +129,7 @@ Session (M2.2): Payload's auth cookie name is shared by every auth collection, s
 | `lines` | array `{ variant, unit?, unitQty, baseQty, name (snapshot, in the customer's locale), unitPriceCents, discountCents, vatBp, totalCents }` | |
 | `totals` | `{ subtotalCents, discountCents, deliveryCents, vatCents, totalCents, vatBreakdown: [{ rateBp, baseCents, vatCents }] }` | from `quote` |
 | `pricing` | `{ promotions: [ids], code, loyaltyPointsUsed, giftCards: [{ code, amountCents }] }` | snapshot (M3.2) |
-| `payment` | `{ provider: 'manual' \| 'wallee', method: 'onsite' \| 'transfer' \| 'invoice' \| 'card', status: 'none' \| 'pending' \| 'authorized' \| 'paid' \| 'refunded' \| 'voided', ref }` | |
+| `payment` | `{ provider: 'manual' \| 'wallee', method: 'onsite' \| 'transfer' \| 'invoice' \| 'card', status: 'none' \| 'pending' \| 'partial' \| 'authorized' \| 'paid' \| 'refund_pending' \| 'partially_refunded' \| 'refunded' \| 'voided', ref, paidCents, refundedCents, refundDueCents, refundReason }` | GG-003/004: `paidCents`/`refundedCents` = sums of the order's `payments` rows; `status` from `modules/payments/balance.ts`. Nothing is paid until a row records it; "refunded" (order) only after the refund is recorded sent in full |
 | `locale` | fr/en/de/pt | used for e-mails and PDFs |
 | `staff` | rel users | mobile and POS |
 | `stockPosted` | checkbox | set in the same transaction as the sale movements; guards against posting twice |
@@ -158,7 +158,7 @@ Indexes: `{ status, createdAt: -1 }`, `{ customer, createdAt: -1 }`, `{ channel,
 Packages: `name` L, `tagline` L, `includes` L (array), `pricePerGuestCents`, `minGuests`, `image`, `order`. These are the prototype's `convivio`, `mesa` and `prestige`. Requests: `number` (unique, `REQ-{YYYY}-{0000}` via `nextNumber`), `package` (rel), `guests`, `date`, `time`, `location`, `contact` {`name`, `email`, `phone`}, `notes`, `estimateCents` (server-computed), `status` (`new`, `quoted`, `accepted`, `declined`, index), `locale`. API create is closed: only the `requestCatering` service writes requests.
 
 ### `payments` (module `payments`)
-`order` (rel, index), `provider`, `kind` (`charge`, `refund`, `authorization`, `capture`, `void`), `amountCents`, `status`, `providerRef` (unique, sparse), `raw` (json, the webhook payload, M4.1). Append-only.
+`order` (rel, index), `provider`, `kind` (`charge`, `refund`, `authorization`, `capture`, `void`), `amountCents` (refunds negative), `method`, `status`, `at` (the bank's actual date, GG-003), `reference` (bank reference), `reason` (refunds), `user`, `providerRef` (unique, sparse), `raw` (json, the webhook payload, M4.1). Append-only.
 
 ## 5. Back-office modules (M3.x)
 

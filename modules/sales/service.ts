@@ -8,6 +8,7 @@ import { addDays, today } from '@/lib/time';
 import { model, type Tx, withTx } from '@/lib/tx';
 import { postMovements } from '@/modules/inventory/service';
 import { provider } from '@/modules/payments/provider';
+import { dueOf, type Figures, paymentState, refundableOf } from '@/modules/payments/service';
 import { quoteCart } from '@/modules/promotions/service';
 import { getSettingsPrivate } from '@/modules/settings/service';
 import type { Customer, Order, Reservation, SlotRule as SlotRuleDoc } from '@/payload-types';
@@ -336,25 +337,33 @@ export async function applyTransition(tx: Tx, orderId: string, to: OrderStatus, 
   if (list.includes('postSale')) await postSale(tx, order, user);
   if (list.includes('returnStock')) await returnStock(tx, order, user, reason);
 
-  // Money (manual provider in Phase 1): a transfer marked received, or on-site payment at handover, is recorded once.
+  // Money (GG-003/004). A move never invents a payment: a transfer counts only once recorded (recordPayment). Two
+  // exceptions, both staff confirming money in hand: handing over an order paid on site records what was still due;
+  // cancelling an order that was (partly) paid leaves that amount as a refund to send, with the cancel's reason.
   const pay = provider(order.payment?.provider);
+  const money = figuresOf(order);
   let paymentStatus = order.payment?.status ?? 'none';
-  if ((from === 'awaiting_payment' && to === 'confirmed') || (to === 'completed' && paymentStatus === 'pending')) {
-    await pay.capture(tx, order, user);
-    paymentStatus = 'paid';
-  } else if (to === 'refunded' && paymentStatus === 'paid') {
-    await pay.refund(tx, order, order.totals?.totalCents ?? 0, user);
-    paymentStatus = 'refunded';
+  if (to === 'completed' && order.payment?.method === 'onsite' && dueOf(money) > 0) {
+    await pay.capture(tx, order, { amountCents: dueOf(money), at: new Date(), user });
+    money.paidCents += dueOf(money);
   } else if (to === 'cancelled' && paymentStatus === 'authorized') {
     await pay.void(tx, order, user);
     paymentStatus = 'voided';
-  } else if (to === 'confirmed' && paymentStatus === 'none') {
-    paymentStatus = 'pending';
   }
+  if (to === 'cancelled' && refundableOf(money) > 0) {
+    money.refundDueCents = refundableOf(money);
+  }
+  if (paymentStatus !== 'voided' && paymentStatus !== 'authorized' && (paymentStatus !== 'none' || to === 'confirmed')) paymentStatus = paymentState(money);
 
   const updated = await setOrder(tx, order.id, {
     status: to,
-    payment: { ...order.payment, status: paymentStatus },
+    payment: {
+      ...order.payment,
+      status: paymentStatus,
+      paidCents: money.paidCents,
+      refundDueCents: money.refundDueCents,
+      refundReason: to === 'cancelled' && money.refundDueCents > 0 ? (reason ?? order.payment?.refundReason) : order.payment?.refundReason,
+    },
     history: [...(order.history ?? []), { at: new Date().toISOString(), from, to, user, reason }],
   });
   return { order: updated, from, effects: list };
@@ -364,11 +373,102 @@ export async function applyTransition(tx: Tx, orderId: string, to: OrderStatus, 
  * Staff move an order (admin buttons). A table's pre-order follows its reservation (reservations.ts), never alone.
  * The e-mail goes out after commit, from the action.
  */
-export function transition(payload: Payload, orderId: string, to: OrderStatus, ctx: { user?: string; reason?: string } = {}) {
+export async function transition(payload: Payload, orderId: string, to: OrderStatus, ctx: { user?: string; reason?: string } = {}) {
+  // "Refunded" follows the money (recordRefund), never a button (GG-004).
+  if (to === 'refunded') throw new AppError('CONFLICT', 'transition', 'status');
   return withTx(payload, async (tx) => {
     const { totalDocs } = await payload.count({ collection: 'reservations', where: { preorder: { equals: orderId } }, req: tx.req, overrideAccess: true });
     if (totalDocs > 0) throw new AppError('CONFLICT', 'followsReservation', 'status');
     return applyTransition(tx, orderId, to, ctx);
+  });
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Money staff record (GG-003, GG-004). Each runs in one transaction that rewrites the order, so two clicks at once
+// conflict and the later one is retried against the new figures (and refused if the amount no longer fits).
+
+const figuresOf = (order: Order): Figures => ({
+  totalCents: order.totals?.totalCents ?? 0,
+  paidCents: order.payment?.paidCents ?? 0,
+  refundedCents: order.payment?.refundedCents ?? 0,
+  refundDueCents: order.payment?.refundDueCents ?? 0,
+});
+
+async function loadOrder(tx: Tx, id: string) {
+  const order = await tx.req.payload.findByID({ collection: 'orders', id, depth: 0, req: tx.req, overrideAccess: true, disableErrors: true });
+  if (!order) throw new AppError('NOT_FOUND', 'order');
+  return order;
+}
+
+const historyRow = (to: string, user?: string, reason?: string) => ({ at: new Date().toISOString(), from: null, to, user, reason });
+
+export type MoneyInput = { amountCents: number; at: Date; reference?: string; user?: string };
+export type MoneyResult = { order: Order; effects: Effect[] };
+
+/**
+ * Money received from the customer (a transfer, a deposit, the rest). Refused above what is still due. Once the
+ * whole amount is in, an order still waiting for its transfer is confirmed (stock out, e-mail).
+ */
+export function recordPayment(payload: Payload, orderId: string, input: MoneyInput): Promise<MoneyResult> {
+  return withTx(payload, async (tx) => {
+    const order = await loadOrder(tx, orderId);
+    if (order.status === 'cancelled' || order.status === 'refunded') throw new AppError('CONFLICT', 'transition', 'status');
+    const money = figuresOf(order);
+    if (input.amountCents <= 0 || input.amountCents > dueOf(money)) throw new AppError('VALIDATION', 'amountTooHigh', 'amount');
+    await provider(order.payment?.provider).capture(tx, order, { ...input, method: order.payment?.method ?? undefined });
+    money.paidCents += input.amountCents;
+    let updated = await setOrder(tx, order.id, {
+      payment: { ...order.payment, status: paymentState(money), paidCents: money.paidCents },
+      history: [...(order.history ?? []), historyRow('payment', input.user, input.reference)],
+    });
+    let list: Effect[] = [];
+    if (dueOf(money) === 0 && order.status === 'awaiting_payment') {
+      const moved = await applyTransition(tx, order.id, 'confirmed', { user: input.user });
+      updated = moved.order;
+      list = moved.effects;
+    }
+    return { order: updated, effects: list };
+  });
+}
+
+/** Staff decide to pay money back (amount and reason). Nothing is sent and no stock moves: it becomes a refund to do. */
+export function requestRefund(payload: Payload, orderId: string, input: { amountCents: number; reason: string; user?: string }): Promise<MoneyResult> {
+  return withTx(payload, async (tx) => {
+    const order = await loadOrder(tx, orderId);
+    const money = figuresOf(order);
+    if (input.amountCents <= 0 || input.amountCents > refundableOf(money)) throw new AppError('VALIDATION', 'amountTooHigh', 'amount');
+    money.refundDueCents = input.amountCents;
+    const updated = await setOrder(tx, order.id, {
+      payment: { ...order.payment, status: paymentState(money), refundDueCents: money.refundDueCents, refundReason: input.reason },
+      history: [...(order.history ?? []), historyRow('refund_requested', input.user, input.reason)],
+    });
+    return { order: updated, effects: [] };
+  });
+}
+
+/**
+ * A refund actually sent (amount, the bank's date, method, reference, reason). Never moves stock: goods that come
+ * back are a separate stock entry. Once everything received has gone back, a handed-over order becomes "refunded".
+ */
+export function recordRefund(payload: Payload, orderId: string, input: MoneyInput & { method: string; reason: string }): Promise<MoneyResult> {
+  return withTx(payload, async (tx) => {
+    const order = await loadOrder(tx, orderId);
+    const money = figuresOf(order);
+    if (input.amountCents <= 0 || input.amountCents > refundableOf(money)) throw new AppError('VALIDATION', 'amountTooHigh', 'amount');
+    await provider(order.payment?.provider).refund(tx, order, input);
+    money.refundedCents += input.amountCents;
+    money.refundDueCents = Math.max(0, money.refundDueCents - input.amountCents);
+    let updated = await setOrder(tx, order.id, {
+      payment: { ...order.payment, status: paymentState(money), refundedCents: money.refundedCents, refundDueCents: money.refundDueCents },
+      history: [...(order.history ?? []), historyRow('refund', input.user, input.reason)],
+    });
+    let list: Effect[] = [];
+    if (refundableOf(money) === 0 && order.status === 'completed') {
+      const moved = await applyTransition(tx, order.id, 'refunded', { user: input.user, reason: input.reason });
+      updated = moved.order;
+      list = moved.effects;
+    }
+    return { order: updated, effects: list };
   });
 }
 

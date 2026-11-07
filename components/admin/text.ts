@@ -5,6 +5,16 @@ import { LOCALE_NAMES } from '@/lib/i18n';
 
 const fr = {
   brandSub: 'Espace gestion',
+  alerts: {
+    bell: 'Notifications',
+    title: 'À traiter',
+    empty: 'Rien en attente : tout est à jour.',
+    new: 'Nouveau',
+    kinds: { order: 'Commande', reservation: 'Table', booking: 'Place d’événement', catering: 'Demande traiteur', lowStock: 'Stock bas' },
+    detail: { order: 'à confirmer', reservation: 'à accepter ou refuser', booking: 'à confirmer', catering: 'nouvelle demande', lowStock: '', transfer: 'attend le virement' },
+    lowStock: (count: number) => (count === 1 ? '1 produit sous son seuil' : `${count} produits sous leur seuil`),
+    arrived: (what: string) => `Nouveau : ${what}`,
+  },
   nav: {
     main: 'Menu principal',
     dashboard: 'Tableau de bord',
@@ -109,6 +119,16 @@ type Text = typeof fr;
 
 const en: Text = {
   brandSub: 'Back office',
+  alerts: {
+    bell: 'Notifications',
+    title: 'To do',
+    empty: 'Nothing waiting: you are up to date.',
+    new: 'New',
+    kinds: { order: 'Order', reservation: 'Table', booking: 'Event seat', catering: 'Catering request', lowStock: 'Low stock' },
+    detail: { order: 'to confirm', reservation: 'to accept or decline', booking: 'to confirm', catering: 'new request', lowStock: '', transfer: 'awaiting transfer' },
+    lowStock: (count: number) => (count === 1 ? '1 product below its threshold' : `${count} products below their threshold`),
+    arrived: (what: string) => `New: ${what}`,
+  },
   nav: {
     main: 'Main menu',
     dashboard: 'Dashboard',
@@ -211,6 +231,16 @@ const en: Text = {
 
 const de: Text = {
   brandSub: 'Verwaltung',
+  alerts: {
+    bell: 'Benachrichtigungen',
+    title: 'Zu erledigen',
+    empty: 'Nichts offen: alles erledigt.',
+    new: 'Neu',
+    kinds: { order: 'Bestellung', reservation: 'Tisch', booking: 'Veranstaltungsplatz', catering: 'Catering-Anfrage', lowStock: 'Niedriger Bestand' },
+    detail: { order: 'zu bestätigen', reservation: 'annehmen oder ablehnen', booking: 'zu bestätigen', catering: 'neue Anfrage', lowStock: '', transfer: 'wartet auf Überweisung' },
+    lowStock: (count: number) => (count === 1 ? '1 Produkt unter seinem Mindestbestand' : `${count} Produkte unter ihrem Mindestbestand`),
+    arrived: (what: string) => `Neu: ${what}`,
+  },
   nav: {
     main: 'Hauptmenü',
     dashboard: 'Übersicht',
@@ -313,6 +343,16 @@ const de: Text = {
 
 const pt: Text = {
   brandSub: 'Gestão',
+  alerts: {
+    bell: 'Notificações',
+    title: 'A tratar',
+    empty: 'Nada pendente: está tudo em dia.',
+    new: 'Novo',
+    kinds: { order: 'Encomenda', reservation: 'Mesa', booking: 'Lugar de evento', catering: 'Pedido de catering', lowStock: 'Stock baixo' },
+    detail: { order: 'por confirmar', reservation: 'aceitar ou recusar', booking: 'por confirmar', catering: 'novo pedido', lowStock: '', transfer: 'a aguardar transferência' },
+    lowStock: (count: number) => (count === 1 ? '1 produto abaixo do mínimo' : `${count} produtos abaixo do mínimo`),
+    arrived: (what: string) => `Novo: ${what}`,
+  },
   nav: {
     main: 'Menu principal',
     dashboard: 'Painel',

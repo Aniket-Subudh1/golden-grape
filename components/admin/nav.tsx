@@ -1,6 +1,8 @@
 import type { I18nClient } from '@payloadcms/translations';
-import type { VisibleEntities } from 'payload';
+import type { Payload, TypedUser, VisibleEntities } from 'payload';
 import { today } from '@/lib/time';
+import { ORDER_TABS, orderTabQuery } from '@/modules/sales/admin/order-tabs';
+import { getAlerts } from './alerts';
 import { type NavGroup, NavClient } from './nav-client';
 import { adminText } from './text';
 
@@ -36,8 +38,8 @@ const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean;
   {
     label: 'sales',
     items: [
-      // Opened on today and what is coming (staff can clear the filter to see the past).
-      { label: 'orders', slug: 'orders', icon: 'orders', query: '?where[slotAt][greater_than_equal]={today}&sort=slotAt' },
+      // Orders open on their "To do" tab; reservations on today and what is coming (the filter can be cleared).
+      { label: 'orders', slug: 'orders', icon: 'orders', query: orderTabQuery(ORDER_TABS[0]) },
       { label: 'reservations', slug: 'reservations', icon: 'reservations', query: '?where[slotAt][greater_than_equal]={today}&sort=slotAt' },
       { label: 'eventBookings', slug: 'eventBookings', icon: 'bookings' },
     ],
@@ -64,13 +66,17 @@ const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean;
   },
 ];
 
-export default function AdminNav({ visibleEntities, i18n }: { visibleEntities: VisibleEntities; i18n: I18nClient }) {
+type Props = { visibleEntities: VisibleEntities; i18n: I18nClient; payload: Payload; user?: TypedUser | null };
+
+export default async function AdminNav({ visibleEntities, i18n, payload, user }: Props) {
   const t = adminText(i18n.language);
   const groups: NavGroup[] = GROUPS.map((g) => ({
     label: t.nav[g.label],
     items: g.items
       .filter((i) => ((i.global ? visibleEntities.globals : visibleEntities.collections) as string[]).includes(i.slug))
-      .map((i) => ({ label: t.nav[i.label], icon: i.icon, href: `/admin/${i.global ? 'globals' : 'collections'}/${i.slug}${(i.query ?? '').replace('{today}', today())}` })),
+      .map((i) => ({ label: t.nav[i.label], icon: i.icon, slug: i.slug, href: `/admin/${i.global ? 'globals' : 'collections'}/${i.slug}${(i.query ?? '').replace('{today}', today())}` })),
   })).filter((g) => g.items.length > 0);
-  return <NavClient groups={groups} text={{ ...t.nav, brandSub: t.brandSub }} />;
+  // What waits beside each item (GG-002); the client keeps it fresh while the page stays open (alerts-client.tsx).
+  const alerts = await getAlerts(payload, user ?? null);
+  return <NavClient groups={groups} alerts={alerts} text={{ ...t.nav, brandSub: t.brandSub }} />;
 }

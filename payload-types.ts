@@ -820,7 +820,7 @@ export interface StockCount {
   createdAt: string;
 }
 /**
- * Website orders, soonest first. Open one to confirm, prepare or cancel it.
+ * Website orders, by stage. Open one to confirm, prepare or cancel it.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders".
@@ -895,8 +895,24 @@ export interface Order {
   payment?: {
     provider?: ('manual' | 'wallee') | null;
     method?: ('onsite' | 'transfer' | 'invoice' | 'card') | null;
-    status?: ('none' | 'pending' | 'authorized' | 'paid' | 'refunded' | 'voided') | null;
+    status?:
+      | (
+          | 'none'
+          | 'pending'
+          | 'partial'
+          | 'authorized'
+          | 'paid'
+          | 'refund_pending'
+          | 'partially_refunded'
+          | 'refunded'
+          | 'voided'
+        )
+      | null;
     ref?: string | null;
+    paidCents?: number | null;
+    refundedCents?: number | null;
+    refundDueCents?: number | null;
+    refundReason?: string | null;
   };
   locale?: ('fr' | 'en' | 'de' | 'pt') | null;
   staff?: (string | null) | User;
@@ -1300,6 +1316,9 @@ export interface Payment {
   amountCents: number;
   method?: string | null;
   status: string;
+  at?: string | null;
+  reference?: string | null;
+  reason?: string | null;
   providerRef?: string | null;
   user?: (string | null) | User;
   raw?:
@@ -2063,6 +2082,10 @@ export interface OrdersSelect<T extends boolean = true> {
         method?: T;
         status?: T;
         ref?: T;
+        paidCents?: T;
+        refundedCents?: T;
+        refundDueCents?: T;
+        refundReason?: T;
       };
   locale?: T;
   staff?: T;
@@ -2191,6 +2214,9 @@ export interface PaymentsSelect<T extends boolean = true> {
   amountCents?: T;
   method?: T;
   status?: T;
+  at?: T;
+  reference?: T;
+  reason?: T;
   providerRef?: T;
   user?: T;
   raw?: T;
@@ -2267,6 +2293,9 @@ export interface BusinessSetting {
      * Places the shop on Google. Right-click the shop in Google Maps to copy them.
      */
     longitude?: number | null;
+    /**
+     * Shown to customers who pay by transfer, with the order number as the reference.
+     */
     iban?: string | null;
     bic?: string | null;
   };

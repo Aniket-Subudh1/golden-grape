@@ -55,14 +55,19 @@ export const PAYMENT_METHOD_LABELS = {
   invoice: l('Sur facture', 'On invoice', 'Auf Rechnung', 'Por fatura'),
   card: l('Carte', 'Card', 'Karte', 'Cartão'),
 };
+// GG-003/004: nothing is "paid" until staff record the money; a refund is "to do" until staff record it sent.
 export const PAYMENT_STATUS_LABELS = {
   none: l('—', '—', '—', '—'),
-  pending: l('À payer', 'To be paid', 'Offen', 'Por pagar'),
+  pending: l('En attente de paiement', 'Awaiting payment', 'Zahlung ausstehend', 'A aguardar pagamento'),
+  partial: l('Partiellement payé', 'Partially paid', 'Teilweise bezahlt', 'Parcialmente pago'),
   authorized: l('Autorisé', 'Authorised', 'Autorisiert', 'Autorizado'),
   paid: l('Payé', 'Paid', 'Bezahlt', 'Pago'),
+  refund_pending: l('Remboursement à effectuer', 'Refund pending', 'Erstattung ausstehend', 'Reembolso pendente'),
+  partially_refunded: l('Partiellement remboursé', 'Partially refunded', 'Teilweise erstattet', 'Parcialmente reembolsado'),
   refunded: l('Remboursé', 'Refunded', 'Erstattet', 'Reembolsado'),
   voided: l('Annulé', 'Voided', 'Storniert', 'Anulado'),
 };
+export type PaymentStatus = keyof typeof PAYMENT_STATUS_LABELS;
 
 const options = <K extends string>(labels: Record<K, Label>) => (Object.keys(labels) as K[]).map((value) => ({ value, label: labels[value] }));
 
@@ -109,22 +114,13 @@ export const orders: CollectionConfig = {
     hidden: hiddenUnless('sales'),
     listSearchableFields: ['number', 'contact.name', 'contact.email', 'contact.phone'],
     description: l(
-      'Les commandes du site, de la plus proche à la plus lointaine. Ouvrez-en une pour la confirmer, la préparer ou l’annuler.',
-      'Website orders, soonest first. Open one to confirm, prepare or cancel it.',
-      'Bestellungen der Website, die nächste zuerst. Öffnen Sie eine, um sie zu bestätigen, vorzubereiten oder zu stornieren.',
-      'As encomendas do site, da mais próxima à mais distante. Abra uma para a confirmar, preparar ou cancelar.',
+      'Les commandes du site, rangées par étape. Ouvrez-en une pour la confirmer, la préparer ou l’annuler.',
+      'Website orders, by stage. Open one to confirm, prepare or cancel it.',
+      'Bestellungen der Website, nach Schritt sortiert. Öffnen Sie eine, um sie zu bestätigen, vorzubereiten oder zu stornieren.',
+      'As encomendas do site, por etapa. Abra uma para a confirmar, preparar ou cancelar.',
     ),
-    components: emptyList({
-      icon: 'orders',
-      title: l('Aucune commande à venir', 'No upcoming orders', 'Keine anstehenden Bestellungen', 'Sem encomendas futuras'),
-      text: l(
-        'Les commandes passées sur le site apparaissent ici, avec leur créneau. Retirez le filtre pour voir les anciennes.',
-        'Orders placed on the website appear here with their time slot. Remove the filter to see past ones.',
-        'Auf der Website aufgegebene Bestellungen erscheinen hier mit ihrem Zeitfenster. Entfernen Sie den Filter für ältere.',
-        'As encomendas feitas no site aparecem aqui, com o horário. Retire o filtro para ver as antigas.',
-      ),
-      evenFiltered: true,
-    }),
+    // The stage tabs, the slot-day filter and each tab's empty state (GG-001).
+    components: { beforeListTable: ['@/modules/sales/admin/order-tabs'] },
   },
   // Written only by the sales services, which run with overrideAccess (02 §6; status through transition()).
   access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
@@ -211,6 +207,11 @@ export const orders: CollectionConfig = {
           { name: 'method', type: 'select', options: options(PAYMENT_METHOD_LABELS), label: l('Moyen', 'Method', 'Art', 'Meio') },
           { name: 'status', type: 'select', defaultValue: 'none', options: options(PAYMENT_STATUS_LABELS), label: l('État', 'State', 'Stand', 'Estado') },
           { name: 'ref', type: 'text' },
+          // Kept equal to the sums of the order's `payments` rows (service.ts), plus the refund staff asked for.
+          { name: 'paidCents', type: 'number', defaultValue: 0 },
+          { name: 'refundedCents', type: 'number', defaultValue: 0 },
+          { name: 'refundDueCents', type: 'number', defaultValue: 0 },
+          { name: 'refundReason', type: 'text' },
         ],
       },
       localeField,

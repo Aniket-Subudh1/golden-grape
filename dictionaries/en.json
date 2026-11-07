@@ -677,8 +677,11 @@
         "ready": "Your order is ready. See you at the shop!",
         "out_for_delivery": "Your order is on its way to you.",
         "cancelled": "Your order has been cancelled. If you had already paid, we will refund you.",
-        "refunded": "Your order has been refunded."
+        "refunded": "Your order has been refunded.",
+        "completed": "Your order has been collected. Thank you, and see you soon at Golden Grape!",
+        "delivered": "Your order has been delivered. Thank you, and enjoy!"
       },
+      "handedOver": { "completed": "Collected", "delivered": "Delivered" },
       "staffSubject": "New order {{number}} — {{name}}"
     },
     "reservation": {
