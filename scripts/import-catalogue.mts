@@ -1,16 +1,18 @@
-// Imports the client's catalogue spreadsheet (exported as CSV, columns as docs/templates/catalogue-template.csv).
-// Idempotent by sku. Every row is checked first: with one invalid row, nothing is written and the row numbers and
-// reasons are printed. Writes `<file>.log` next to the CSV, and the supplier columns to `<file>.suppliers.json`
-// until the purchasing module (M3.1) has a collection for them.
-// Run: npm run import:catalogue -- path/to/catalogue.csv
+// Imports a catalogue spreadsheet (.xlsx or .csv, columns as docs/templates/catalogue-template.csv; only the columns
+// present are written). Upserts by sku, else barcode; new products are drafts. Every row is checked first: with one
+// invalid row, nothing is written and the row numbers and reasons are printed. Writes `<file>.log` next to the file,
+// and the supplier columns to `<file>.suppliers.json` until the purchasing module (M3.1) has a collection for them.
+// Run: npm run import:catalogue -- path/to/catalogue.xlsx [--dry-run]
 import { readFile, writeFile } from 'node:fs/promises';
 import { getPayload } from 'payload';
-import { importCatalogue, parseCatalogueCsv, validateCatalogue } from '@/modules/catalogue/import';
+import { readTable } from '@/lib/table';
 import { indexesReady } from '@/lib/tx';
+import { importCatalogue, parseCatalogue, previewCatalogue } from '@/modules/catalogue/import';
 
 const file = process.argv[2];
+const dryRun = process.argv.includes('--dry-run');
 if (!file) {
-  console.error('Usage: npm run import:catalogue -- path/to/catalogue.csv');
+  console.error('Usage: npm run import:catalogue -- path/to/catalogue.xlsx [--dry-run]');
   process.exit(2);
 }
 
@@ -20,22 +22,25 @@ const log = (message: string) => {
   console.info(message);
 };
 
-const parsed = parseCatalogueCsv(await readFile(file, 'utf8'));
+const parsed = parseCatalogue(await readTable(await readFile(file), file));
 // Dynamic import: payload.config.ts compiles as CommonJS (see scripts/seed.mts).
 const { default: config } = await import('@payload-config');
 const payload = await getPayload({ config });
 await indexesReady(payload);
 
 // Format and database checks are reported together, so one run lists every problem in the file.
-const errors = [...parsed.errors, ...(await validateCatalogue(payload, parsed.rows))];
-const result = errors.length ? { errors, created: 0, updated: 0 } : await importCatalogue(payload, parsed.rows);
+const preview = await previewCatalogue(payload, parsed.rows);
+const errors = [...parsed.errors, ...preview.errors];
 const stamp = new Date().toISOString();
-if (result.errors.length) {
-  log(`[import] ${stamp} ${file}: ${result.errors.length} error(s), nothing was written`);
-  for (const e of result.errors.sort((a, b) => a.row - b.row || a.column.localeCompare(b.column))) log(`  row ${e.row} · ${e.column}: ${e.message}`);
+if (errors.length) {
+  log(`[import] ${stamp} ${file}: ${errors.length} error(s), nothing was written`);
+  for (const e of errors.sort((a, b) => a.row - b.row || a.column.localeCompare(b.column))) log(`  row ${e.row} · ${e.column}: ${e.message}`);
+} else if (dryRun) {
+  log(`[import] ${stamp} ${file}: ${parsed.rows.length} rows OK (dry run): ${preview.create} to create, ${preview.update} to update`);
 } else {
+  const result = await importCatalogue(payload, parsed.rows);
   log(`[import] ${stamp} ${file}: ${parsed.rows.length} rows, ${result.created} created, ${result.updated} updated`);
-  const suppliers = parsed.rows.filter((r) => r.supplier).map((r) => ({ sku: r.sku, supplier: r.supplier, supplierRef: r.supplier_ref, costCents: r.cost_eur }));
+  const suppliers = parsed.rows.filter((r) => r.supplier).map((r) => ({ sku: r.sku, barcode: r.barcode, supplier: r.supplier, supplierRef: r.supplier_ref, costCents: r.cost_eur }));
   if (suppliers.length) {
     await writeFile(`${file}.suppliers.json`, `${JSON.stringify(suppliers, null, 2)}\n`);
     log(`[import] ${suppliers.length} supplier references kept in ${file}.suppliers.json for M3.1`);
@@ -43,4 +48,4 @@ if (result.errors.length) {
 }
 await writeFile(`${file}.log`, `${lines.join('\n')}\n`, { flag: 'a' });
 await payload.destroy();
-process.exit(result.errors.length ? 1 : 0);
+process.exit(errors.length ? 1 : 0);

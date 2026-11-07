@@ -7,6 +7,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { type CollectionSlug, getPayload } from 'payload';
 import { interpolate, type Locale } from '@/lib/i18n';
+import { richNode as node, richText } from '@/lib/rich-text';
 import { nextWeekly } from '@/lib/time';
 import { indexesReady } from '@/lib/tx';
 import { type CatalogueRow, importCatalogue } from '@/modules/catalogue/import';
@@ -38,20 +39,6 @@ function withIds(data: unknown, saved: unknown): unknown {
   }
   return data;
 }
-
-const text = (value: string) => ({ type: 'text', text: value, version: 1, format: 0, mode: 'normal', style: '', detail: 0 });
-const node = (type: 'paragraph' | 'quote', value: string) => ({
-  type,
-  version: 1,
-  children: [text(value)],
-  direction: 'ltr' as const,
-  format: '' as const,
-  indent: 0,
-  ...(type === 'paragraph' ? { textFormat: 0 } : {}),
-});
-const richText = (...children: ReturnType<typeof node>[]) => ({
-  root: { type: 'root', version: 1, children, direction: 'ltr' as const, format: '' as const, indent: 0 },
-});
 
 // ---- data --------------------------------------------------------------------------------------------
 
@@ -117,10 +104,10 @@ const MIN_GUESTS = 10; // assumption A-11 until Golden Grape confirms
 // photo, category, tag) with the texts that were in the dictionaries. VAT classes are assumption A-12 (DEP-07).
 // No barcodes and no opening stock: the real spreadsheet sets them, and its opening stock is posted only for a
 // size with no movement yet.
-const SHOP_CATEGORIES = ['wines', 'port', 'beers', 'cheese', 'charcuterie', 'grocery', 'gifts'] as const;
+const SHOP_CATEGORIES = ['wines', 'port', 'beers', 'cheese', 'charcuterie', 'grocery', 'gifts', 'spirits', 'soft-drinks', 'accessories'] as const;
 type ShopCategory = (typeof SHOP_CATEGORIES)[number];
-const KIND: Record<ShopCategory, CatalogueRow['kind']> = { wines: 'wine', port: 'wine', beers: 'wine', cheese: 'grocery', charcuterie: 'grocery', grocery: 'grocery', gifts: 'gift' };
-const VAT: Record<ShopCategory, CatalogueRow['vat_class']> = { wines: 'intermediate', port: 'standard', beers: 'standard', cheese: 'superReduced', charcuterie: 'superReduced', grocery: 'superReduced', gifts: 'standard' };
+const KIND: Record<ShopCategory, CatalogueRow['kind']> = { wines: 'wine', port: 'wine', beers: 'wine', cheese: 'grocery', charcuterie: 'grocery', grocery: 'grocery', gifts: 'gift', spirits: 'other', 'soft-drinks': 'grocery', accessories: 'other' };
+const VAT: Record<ShopCategory, CatalogueRow['vat_class']> = { wines: 'intermediate', port: 'standard', beers: 'standard', cheese: 'superReduced', charcuterie: 'superReduced', grocery: 'superReduced', gifts: 'standard', spirits: 'standard', 'soft-drinks': 'superReduced', accessories: 'standard' };
 const SHOP: [id: keyof Content['catalogue']['products'], price: number, photo: string, category: ShopCategory, badge?: string][] = [
   ['douro-reserva', 3200, 'wines', 'wines', 'signature'],
   ['alentejo-tinto', 2100, 'board', 'wines'],
@@ -421,7 +408,7 @@ const rows: CatalogueRow[] = [
     description: Object.fromEntries(LOCALES.map((l) => [l, richText(node('paragraph', c(l).catalogue.menu[id].desc))])),
   } as CatalogueRow)),
 ];
-const imported = await importCatalogue(payload, rows);
+const imported = await importCatalogue(payload, rows, { newStatus: 'active' });
 if (imported.errors.length) throw new Error(`catalogue: ${imported.errors.map((e) => `row ${e.row} ${e.column}: ${e.message}`).join('; ')}`);
 log(`catalogue: ${SHOP_CATEGORIES.length + 1} categories, ${imported.created} products created, ${imported.updated} updated`);
 

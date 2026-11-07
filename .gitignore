@@ -50,3 +50,8 @@ next-env.d.ts
 # Playwright
 /test-results/
 /playwright-report/
+
+# client files (product exports, reports): never committed
+/*.xlsx
+/*.docx
+/*.xlsx.*

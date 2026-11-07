@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { model, withTx } from '@/lib/tx';
-import { importCatalogue, parseCatalogueCsv, TEMPLATE_COLUMNS } from '@/modules/catalogue/import';
+import { plainText } from '@/lib/rich-text';
+import { readTable } from '@/lib/table';
+import { importCatalogue, parseCatalogue, previewCatalogue, TEMPLATE_COLUMNS } from '@/modules/catalogue/import';
 import { findByBarcode, findSellable, listProducts } from '@/modules/catalogue/service';
 import { getTestPayload, makeStaff, makeVariant, parallel } from '@/tests/helpers';
 import { adjust, availability, onHand, postCount, postMovements, rebuildStock, setLowStockThreshold } from './service';
@@ -235,12 +237,15 @@ describe('catalogue import', () => {
   const header = TEMPLATE_COLUMNS.join(',');
   const line = (values: Partial<Record<(typeof TEMPLATE_COLUMNS)[number], string>>) => TEMPLATE_COLUMNS.map((c) => values[c] ?? '').join(',');
   const good = { sku: 'IMP-1', name_fr: 'Vinho Verde', name_en: 'Green wine', kind: 'wine', category_slug: 'import-wines', vat_class: 'intermediate', price_eur: '14.00', box6_barcode: '5600000000061', opening_stock: '12', low_stock: '4' };
+  const parse = async (csv: string) => parseCatalogue(await readTable(Buffer.from(csv), 'catalogue.csv'));
+  const variantBy = async (where: Record<string, { equals: string }>) => (await payload.find({ collection: 'variants', where, limit: 1, depth: 0, overrideAccess: true })).docs[0];
+  const productOf = async (variant: { product: string | { id: string } }) =>
+    payload.findByID({ collection: 'products', id: typeof variant.product === 'object' ? variant.product.id : variant.product, depth: 0, overrideAccess: true });
 
   it('AC-M2.1-07: one invalid row → nothing written, and the row number and reason are reported', async () => {
     await payload.create({ collection: 'categories', data: { name: 'Vins import', slug: 'import-wines', kind: 'shop' }, overrideAccess: true });
     const before = await payload.count({ collection: 'products', overrideAccess: true });
-    const csv = [header, line(good), line({ ...good, sku: 'IMP-2', price_eur: 'abc' }), line({ ...good, sku: 'IMP-3', box6_barcode: '5600000000061', category_slug: 'nope' })].join('\n');
-    const parsed = parseCatalogueCsv(csv);
+    const parsed = await parse([header, line(good), line({ ...good, sku: 'IMP-2', price_eur: 'abc' }), line({ ...good, sku: 'IMP-3', box6_barcode: '5600000000061', category_slug: 'nope' })].join('\n'));
     expect(parsed.errors).toEqual([{ row: 3, column: 'price_eur', message: '"abc" is not an amount in euros' }]);
     const result = await importCatalogue(payload, parsed.rows);
     expect(result.errors).toEqual(
@@ -253,12 +258,14 @@ describe('catalogue import', () => {
     expect(await payload.count({ collection: 'products', overrideAccess: true })).toEqual(before);
   });
 
-  it('imports, posts opening stock once and upserts by sku on a second run', async () => {
-    const csv = [header, line(good)].join('\n');
-    expect(await importCatalogue(payload, parseCatalogueCsv(csv).rows)).toMatchObject({ errors: [], created: 1, updated: 0 });
-    const [variant] = (await payload.find({ collection: 'variants', where: { sku: { equals: 'IMP-1' } }, overrideAccess: true })).docs;
+  it('imports as a draft, posts opening stock once and upserts by sku on a second run', async () => {
+    const { rows } = await parse([header, line(good)].join('\n'));
+    expect(await previewCatalogue(payload, rows)).toMatchObject({ errors: [], create: 1, update: 0 });
+    expect(await importCatalogue(payload, rows)).toMatchObject({ errors: [], created: 1, updated: 0 });
+    const variant = await variantBy({ sku: { equals: 'IMP-1' } });
     expect(variant.priceCents).toBe(1400);
     expect(variant.title).toBe('Vinho Verde'); // the English label does not leak into the French title
+    expect((await productOf(variant)).status).toBe('draft');
     const labels = await payload.findByID({ collection: 'variants', id: variant.id, locale: 'all', overrideAccess: true });
     expect(labels.label).toMatchObject({ fr: 'Vinho Verde', en: 'Green wine' });
     expect(await level(variant.id)).toMatchObject({ onHand: 12, lowStockThreshold: 4, lowStock: false });
@@ -267,10 +274,48 @@ describe('catalogue import', () => {
     const en = await payload.findByID({ collection: 'products', id: typeof variant.product === 'object' ? variant.product.id : variant.product, locale: 'en', overrideAccess: true });
     expect(en.name).toBe('Green wine');
 
-    const again = [header, line({ ...good, price_eur: '15', opening_stock: '99' })].join('\n');
-    expect(await importCatalogue(payload, parseCatalogueCsv(again).rows)).toMatchObject({ errors: [], created: 0, updated: 1 });
+    const again = await parse([header, line({ ...good, price_eur: '15', opening_stock: '99' })].join('\n'));
+    expect(await importCatalogue(payload, again.rows)).toMatchObject({ errors: [], created: 0, updated: 1 });
     expect((await payload.findByID({ collection: 'variants', id: variant.id, overrideAccess: true })).priceCents).toBe(1500);
     expect((await movementsOf(variant.id)).map((m) => [m.type, m.qty, m.reason])).toEqual([['adjustment', 12, 'opening stock']]);
+  });
+
+  it('a file with only some columns changes only those; a row without sku finds its size by barcode; nothing is duplicated', async () => {
+    const full = await parse('sku;barcode;name_fr;kind;category_slug;vat_class;price_eur;cost_eur;region_fr;vintage;description_fr\nIMP-P;5600000000214;Douro Tinto;wine;import-wines;intermediate;20;9,50;Douro;2019;"Encorpado.\n\nServir a 16 °C."');
+    expect(await importCatalogue(payload, full.rows, { newStatus: 'active' })).toMatchObject({ errors: [], created: 1 });
+    const variant = await variantBy({ sku: { equals: 'IMP-P' } });
+    expect(plainText((await productOf(variant)).description)).toBe('Encorpado.\n\nServir a 16 °C.');
+    const products = await payload.count({ collection: 'products', overrideAccess: true });
+
+    // A supplier's price list: barcode, price, an empty cost (cleared) and a status.
+    const prices = await parse('barcode;price_eur;cost_eur;status\n5600000000214;21,90;;archived\n');
+    expect(await previewCatalogue(payload, prices.rows)).toMatchObject({ errors: [], create: 0, update: 1 });
+    for (let run = 0; run < 2; run++) expect(await importCatalogue(payload, prices.rows)).toMatchObject({ errors: [], created: 0, updated: 1 });
+    expect(await payload.count({ collection: 'products', overrideAccess: true })).toEqual(products);
+    const after = await payload.findByID({ collection: 'variants', id: variant.id, depth: 0, overrideAccess: true });
+    expect(after).toMatchObject({ priceCents: 2190, costCents: null, barcode: '5600000000214', label: 'Douro Tinto' });
+    const product = await productOf(variant);
+    expect(product).toMatchObject({ name: 'Douro Tinto', status: 'archived', kind: 'wine', wine: { region: 'Douro', vintage: 2019 } });
+    expect(plainText(product.description)).toBe('Encorpado.\n\nServir a 16 °C.');
+  });
+
+  it('a new product needs its required fields and a sku or barcode; another product\'s barcode is refused; batches write only their rows', async () => {
+    const missing = await parse('sku;barcode;name_fr;price_eur\nIMP-NEW;;Novo;5\n;;Sem chave;5\nIMP-X;5600000000214;Outro;5\n');
+    expect((await previewCatalogue(payload, missing.rows)).errors).toEqual(
+      expect.arrayContaining([
+        { row: 2, column: 'kind', message: 'required to create a product' },
+        { row: 2, column: 'category_slug', message: 'required to create a product' },
+        { row: 2, column: 'vat_class', message: 'required to create a product' },
+        { row: 3, column: 'sku', message: 'a sku or a barcode is needed to find the product again' },
+        { row: 4, column: 'barcode', message: 'barcode 5600000000214 belongs to sku IMP-P' },
+      ]),
+    );
+    expect(parseCatalogue({ headers: ['name_fr', 'price_eur'], rows: [{ name_fr: 'x', price_eur: '1' }] }).errors[0]).toMatchObject({ row: 1, column: 'sku, barcode' });
+
+    const two = await parse([header, line({ ...good, sku: 'IMP-B1', box6_barcode: '' }), line({ ...good, sku: 'IMP-B2', box6_barcode: '' })].join('\n'));
+    expect(await importCatalogue(payload, two.rows, { from: 1, to: 2 })).toMatchObject({ errors: [], created: 1, updated: 0 });
+    expect(await variantBy({ sku: { equals: 'IMP-B1' } })).toBeUndefined();
+    expect(await variantBy({ sku: { equals: 'IMP-B2' } })).toBeDefined();
   });
 });
 

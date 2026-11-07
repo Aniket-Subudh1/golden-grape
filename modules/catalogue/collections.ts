@@ -214,6 +214,7 @@ const ALLERGENS: [string, Label][] = [
 export const VAT_CLASSES = ['standard', 'intermediate', 'reduced', 'superReduced'] as const;
 export const BADGES = ['signature', 'rare', 'dop', 'bestseller', 'homemade', 'new'] as const;
 export const PRODUCT_KINDS = ['wine', 'grocery', 'snack', 'gift', 'other'] as const;
+export const PRODUCT_STATUSES = ['active', 'draft', 'archived'] as const;
 export const WINE_COLOURS = ['red', 'white', 'rose', 'sparkling', 'fortified'] as const;
 
 /** Default variant: created with the product, labelled with its name (02 §5.1: every sale line points at a variant). */

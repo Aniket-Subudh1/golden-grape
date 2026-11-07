@@ -34,7 +34,7 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 |---|---|---|---|---|
 | Q-01 | Confirm D-01: MongoDB + Payload auth + S3 storage instead of Supabase PostgreSQL/Auth/Storage, to be written into the Rev 2.2 addendum | APPLUX | M1.1 (proceeding at risk) | Open |
 | Q-02 | Original brand photos (DEP-01): **recovered** from the published Lovable app (45 files, sizes match the repo's records) and now in `public/brand/`. Still to confirm with Ivo that these are the final photos | APPLUX / Ivo | — | Answered, confirm |
-| Q-03 | Staging host and MongoDB Atlas project (DEP-02). An Atlas cluster now exists in `.env`; use a dedicated `golden_grape` database (the cluster is shared with other projects) | APPLUX | M1.1 T5 (staging deploy only: `Blocked: DEP-02`) | Open |
+| Q-03 | Staging host and MongoDB Atlas project (DEP-02). **Answered 7 Nov:** APPLUX's own Atlas cluster (AWS Frankfurt), database `goldengrape`, user `goldengrape_dev`, the server's IP allow-listed. The host is `cluster0.1d99gcs.mongodb.net` (the message read `id99gcs`, which does not exist; to confirm). The server moves to it once the password is on the server (settings and content copied, test orders left behind) | APPLUX | — | Answered, switch pending |
 | Q-04 | Promotions do not apply to B2B list prices (A-03)? | APPLUX | M3.2 T4 | Open |
 | Q-05 | Loyalty points earned on `completed`, reversed on refund (A-08)? | APPLUX | M3.2 T3 | Open |
 | Q-06 | Voucher VAT treatment and invoice legal mentions (DEP-07) | Golden Grape accountant | M3.2 T5 | Open |
@@ -47,6 +47,9 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | Q-13 | GG-031 deposits on an accepted catering quotation (amount, date, balance): part of the GG-030 change request (the order payments of GG-003 already record deposits; catering bookings would reuse that pattern) | APPLUX | change request | Open |
 | Q-14 | GG-041 HR: in scope = M3.3 R11 (staff with the Attendance role, daily QR check-in/out on their own phone, history, manager view and corrections with audit, monthly hours + CSV). Out of scope (Q§13): leave requests and approvals, geolocation, payroll; not specified: a dedicated break button, a fast-rotating QR, HR employee files. Change request for the extras? Agora/Ancora reuse: the developer wrote Ancora and has its code base (7 Nov 2026), so M3.3 T3 reuses its attendance logic and screens | APPLUX | M3.3 / change request | Open |
 
+| Q-15 | Stock quantities: the POS export has none, so the 410 tracked products are at 0 and show "Rupture" once published. A CashMag stock export (POS id + quantity), or a first stock count in the back office? | Golden Grape / APPLUX | publishing the catalogue | Open |
+| Q-16 | VAT on wine: A-13 files every wine at 14 %. Luxembourg's 14 % rate may only cover wines up to 13 % vol, with stronger wines at 17 %; confirm per product (DEP-07) | Golden Grape accountant | invoices (M3.2) | Open |
+
 ## 3. Assumptions in force
 
 | ID | Assumption | Made in | Confirmed |
@@ -58,8 +61,17 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-10 | Until a real sample: CashMag CSV columns are mapped through configurable settings | M3.3 | — |
 | A-11 | Catering packages have a minimum of 10 guests (the prototype set none) | M1.3 T7 seed | — |
 | A-12 | Until DEP-07, the seeded catalogue's VAT classes: wines intermediate (14 %); port, beer, gift boxes and the glass of wine standard (17 %); cheese, charcuterie, groceries and counter dishes super-reduced (3 %). The client's spreadsheet sets each product's class | M2.1 T6 seed | — |
+| A-13 | Until Golden Grape and the accountant confirm (DEP-07): the POS `Rubrique` decides category, kind, VAT and producer (`scripts/import-pos-products.mts` RUBRIQUES): wine producers and countries → Vins, 14 %; Martha's → Porto, 17 %; spirits and Maison Velvet → Spiritueux, 17 %; soft drinks, grocery, Tricentenaire → 3 %; gadgets, baskets → Accessoires, 17 %; Battin → Bières, 17 %; counter food and hot drinks → Comptoir, 3 %; other counter items (glass of wine, cocktails…) 17 %. Staff correct per product in the admin | DEP-04 import | — |
 
 ## 4. Log
+
+### 2026-11-07 · DEP-04 · The POS product export, partial-column imports (client request, M2.1 T6)
+- **The file** (`export_produits_2026-11-07 …xlsx`, CashMag): 473 products, 35 `Rubrique` values that mix categories (EPICERIE, SPIRITUEUX…), wine producers and countries (ITALIA also holds French wines). No VAT, no stock, no descriptions; 4 prices missing, 3 at 0 €; 10 till lines that are not products; 7 barcode cells with several codes or URLs; 6 names marked "(1)". Kept out of Git (`.gitignore`).
+- **Importer** (`modules/catalogue/import.ts`): reads `.xlsx` too (`lib/table.ts`, new dependency `read-excel-file` 9.3.14: numbers kept as written, so an EAN keeps its leading 0; CSV `,`/`;` from the header, Windows-1252 decoded). Only the columns a file has are written; rows match by SKU, else barcode; required columns only to create; new products are drafts (`status` column, seed passes `active`); `description_*` columns (plain text ↔ Lexical, `lib/rich-text.ts`, now also used by the seed and the product page); one barcode query instead of two per code; rows `from`–`to` for batches. `listCategories` offers only categories with a product on sale (imported drafts never show as empty filters).
+- **POS import** (`scripts/import-pos-products.mts`, `npm run import:pos`): SKU = POS `#ID`; mapping A-13; POS-only lines archived; missing categories created from `seed-content.json` (new: Spiritueux, Boissons sans alcool, Accessoires, also in the seed); wine colour and vintage from the name when clear; `<file>.review.csv` lists per product what to check. A re-run creates what is new and updates price, cost and a missing barcode only, never the review.
+- **Checked on a throwaway replica set** (:27018): dry run 0 errors; import 473 created in about 10 s (463 drafts, 10 archived, 410 tracked sizes at 0, no movement, 22 producers, 8 categories in 4 languages); after a staff-style edit (category, status, producer, price) a re-run gave 0 created, 473 updated, the edit kept and the price back to the POS's; `rebuild-stock --check` 0 differences; 149 lines flagged in the review file. Tests: `lib/table.test.ts` (xlsx fixture, `;`, decimal comma, BOM, quoted line breaks, blank row numbering, Windows-1252), int tests for partial files, barcode matching, required fields, drafts, descriptions and batches. Unit 228, int (inventory) 22.
+- **Not done yet:** the live database (waits for the new cluster, Q-03), the back-office Import/Export page (next), Q-15 and Q-16.
+
 
 ### 2026-11-07 · GG-045, GG-046 · Dashboard counters, activity log (client feedback)
 - **GG-045:** a row of tiles on the dashboard (sales role): Commandes à confirmer, Virements à vérifier, Commandes à préparer, Tables à accepter, Demandes traiteur à chiffrer, Places d'événement à confirmer, Remboursements à effectuer. Gold when something waits, grey at 0; each opens the matching list. `actionCounts()` in `components/admin/alerts.ts`, beside the sidebar/bell figures and on the same conditions (`orderTabWhere`), so the numbers agree everywhere.

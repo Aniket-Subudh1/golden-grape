@@ -129,10 +129,15 @@ export async function shopFacets(payload: Payload, locale: Locale) {
   return { regions, colours };
 }
 
-/** Categories of the shop or the counter, in their order. */
+/** Categories of the shop or the counter that have something on sale, in their order (an imported category whose
+ * products are still drafts is not offered as an empty filter). */
 export async function listCategories(payload: Payload, kind: 'shop' | 'snack', locale: Locale) {
-  const { docs } = await payload.find({ collection: 'categories', where: { kind: { equals: kind } }, sort: 'order', locale, limit: 50, depth: 0, overrideAccess: true });
-  return docs;
+  const [{ docs }, { docs: onSale }] = await Promise.all([
+    payload.find({ collection: 'categories', where: { kind: { equals: kind } }, sort: 'order', locale, limit: 50, depth: 0, overrideAccess: true }),
+    payload.find({ collection: 'products', where: { status: { equals: 'active' } }, limit: 0, depth: 0, overrideAccess: true, select: { category: true } }),
+  ]);
+  const used = new Set(onSale.map((p) => idOf(p.category)));
+  return docs.filter((c) => used.has(c.id));
 }
 
 /** One active product by slug, with its category, producer and photos. */

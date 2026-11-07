@@ -8,6 +8,7 @@ import { Container } from '@/components/site/container';
 import { JsonLd } from '@/components/site/json-ld';
 import { alternates, getDictionary, interpolate, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { getPayloadClient } from '@/lib/payload';
+import { plainText } from '@/lib/rich-text';
 import { BuyBox } from '@/modules/catalogue/components/buy-box';
 import { Gallery } from '@/modules/catalogue/components/gallery';
 import { ProductCard } from '@/modules/catalogue/components/product-card';
@@ -21,14 +22,6 @@ async function load(locale: Locale, slug: string) {
   return productPage(await getPayloadClient(), slug, locale);
 }
 
-/** Plain text of a Lexical rich-text value, for meta descriptions. */
-function plain(value: unknown): string {
-  const node = value as { root?: unknown; text?: string; children?: unknown[] } | null;
-  if (!node || typeof node !== 'object') return '';
-  if (node.root) return plain(node.root);
-  return [node.text ?? '', ...(node.children ?? []).map(plain)].join(' ').replace(/\s+/g, ' ').trim();
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   if (!isLocale(locale)) notFound();
@@ -36,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!data) return { title: meta.shop.title };
   const { product, photos } = data;
   const title = product.seo?.title || interpolate(meta.product.title, { name: product.name });
-  const description = product.seo?.description || plain(product.description).slice(0, 160) || interpolate(meta.product.description, { name: product.name });
+  const description = product.seo?.description || plainText(product.description).replace(/\s+/g, ' ').slice(0, 160) || interpolate(meta.product.description, { name: product.name });
   return {
     title,
     description,
@@ -75,7 +68,7 @@ async function Product({ params }: Pick<Props, 'params'>) {
           data={[
             productJsonLd({
               name: product.name,
-              description: product.seo?.description || plain(product.description) || null,
+              description: product.seo?.description || plainText(product.description).replace(/\s+/g, ' ') || null,
               url: localePath(locale, path),
               images: photos.map((p) => p.src),
               brand: brand?.name,

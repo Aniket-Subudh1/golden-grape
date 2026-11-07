@@ -173,7 +173,10 @@
         "cheese": "Fromages",
         "charcuterie": "Charcuterie",
         "grocery": "Épicerie",
-        "gifts": "Coffrets"
+        "gifts": "Coffrets",
+        "spirits": "Spiritueux",
+        "soft-drinks": "Boissons sans alcool",
+        "accessories": "Accessoires"
       },
       "counter": "Comptoir",
       "products": {
@@ -452,7 +455,10 @@
         "cheese": "Cheeses",
         "charcuterie": "Charcuterie",
         "grocery": "Grocery",
-        "gifts": "Gift boxes"
+        "gifts": "Gift boxes",
+        "spirits": "Spirits",
+        "soft-drinks": "Soft drinks",
+        "accessories": "Accessories"
       },
       "counter": "Counter",
       "products": {
@@ -731,7 +737,10 @@
         "cheese": "Käse",
         "charcuterie": "Charcuterie",
         "grocery": "Feinkost",
-        "gifts": "Geschenkboxen"
+        "gifts": "Geschenkboxen",
+        "spirits": "Spirituosen",
+        "soft-drinks": "Alkoholfreie Getränke",
+        "accessories": "Zubehör"
       },
       "counter": "Theke",
       "products": {
@@ -1010,7 +1019,10 @@
         "cheese": "Queijos",
         "charcuterie": "Charcutaria",
         "grocery": "Mercearia",
-        "gifts": "Caixas"
+        "gifts": "Caixas",
+        "spirits": "Bebidas espirituosas",
+        "soft-drinks": "Bebidas sem álcool",
+        "accessories": "Acessórios"
       },
       "counter": "Balcão",
       "products": {
