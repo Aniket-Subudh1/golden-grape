@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import { type Dictionary, interpolate } from '@/lib/i18n';
-import { colors, Details, heading, MailLayout, type MailBusiness } from './layout';
+import { colors, Details, heading, MailLayout, type MailBusiness, Reference } from './layout';
 
 // Order e-mails: what the customer receives when the order is placed, the staff copy, and the shared pieces
 // (items and totals, transfer details, the button to the order page) reused by order-status and reservation.
@@ -23,9 +23,10 @@ export type OrderMail = {
   total: string;
   vat: { label: string; amount: string }[];
   payment: string;
-  /** Waiting for a bank transfer (the transfer details may still be missing from the settings). */
+  /** Waiting for a bank transfer. */
   awaiting: boolean;
-  transfer?: { beneficiary: string; iban: string; bic?: string | null; reference: string; amount: string } | null;
+  /** How to pay by transfer. Without an IBAN in the settings, only the reference and amount (staff send the bank details: GG-014). */
+  transfer?: { beneficiary: string; iban?: string | null; bic?: string | null; reference: string; amount: string } | null;
   notes?: string | null;
   url: string;
 };
@@ -85,14 +86,18 @@ export function TransferDetails({ t, transfer }: { t: T; transfer: NonNullable<O
       <p style={{ margin: '0 0 8px', fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: colors.goldDeep }}>{t.order.transferTitle}</p>
       <Details
         rows={[
-          [t.labels.beneficiary, transfer.beneficiary],
-          [t.labels.iban, transfer.iban],
-          ...(transfer.bic ? [[t.labels.bic, transfer.bic] as [string, string]] : []),
+          ...(transfer.iban
+            ? ([
+                [t.labels.beneficiary, transfer.beneficiary],
+                [t.labels.iban, transfer.iban],
+                ...(transfer.bic ? [[t.labels.bic, transfer.bic]] : []),
+              ] as [string, string][])
+            : []),
           [t.labels.reference, <b key="ref">{transfer.reference}</b>],
           [t.labels.amount, <b key="amount">{transfer.amount}</b>],
         ]}
       />
-      <p style={{ margin: 0, fontSize: 13, color: colors.muted }}>{t.order.transferNote}</p>
+      <p style={{ margin: 0, fontSize: 13, color: colors.muted }}>{transfer.iban ? t.order.transferNote : t.order.transferMissing}</p>
     </div>
   );
 }
@@ -119,6 +124,7 @@ export function OrderReceived({ t, business, logoUrl, data }: Props) {
   return (
     <MailLayout business={business} logoUrl={logoUrl}>
       <h1 style={heading}>{t.order.title}</h1>
+      <Reference>{interpolate(t.order.reference, { number: data.number })}</Reference>
       <p>{interpolate(t.greeting, { name: data.name })}</p>
       <p>{data.awaiting ? t.order.awaitingBody : t.order.confirmedBody}</p>
       <Details rows={summaryRows(t, data)} />
@@ -130,10 +136,14 @@ export function OrderReceived({ t, business, logoUrl, data }: Props) {
   );
 }
 
+/** The shop's copy (GG-012): marked internal, its own title and wording, sent to the shop's inbox only. */
 export function OrderStaff({ t, business, logoUrl, data }: Props) {
   return (
-    <MailLayout business={business} logoUrl={logoUrl}>
-      <h1 style={heading}>{interpolate(t.order.staffSubject, { number: data.number, name: data.name })}</h1>
+    <MailLayout business={business} logoUrl={logoUrl} staff={t.staffBanner}>
+      <h1 style={heading}>{t.order.staffTitle}</h1>
+      <Reference>{interpolate(t.order.reference, { number: data.number })}</Reference>
+      <p>{t.order.staffIntro}</p>
+      {data.awaiting && !data.transfer?.iban && <p style={{ padding: '12px 16px', background: colors.champagne, fontWeight: 700 }}>{t.order.staffTransferMissing}</p>}
       <Details
         rows={[
           ...summaryRows(t, data),

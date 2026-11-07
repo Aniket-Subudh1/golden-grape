@@ -1,7 +1,7 @@
 'use client';
 
 import { toast, useTranslation } from '@payloadcms/ui';
-import { Bell as BellIcon, CalendarCheck, ClipboardList, ShoppingBag, Ticket, TriangleAlert } from 'lucide-react';
+import { Bell as BellIcon, CalendarCheck, ClipboardList, RotateCcw, ShoppingBag, Ticket, TriangleAlert } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { slotLabel } from '@/lib/time';
@@ -71,10 +71,15 @@ const ICONS = {
   reservation: CalendarCheck,
   booking: Ticket,
   catering: ClipboardList,
+  refund: RotateCcw,
   lowStock: TriangleAlert,
 };
 
-/** The header bell (Payload `admin.components.actions`): what waits, newest first; items since it was last opened are new. */
+/**
+ * The header bell (Payload `admin.components.actions`), GG-017. "To do": what needs a decision, newest first, marked
+ * "New" until the bell is opened after it arrived, then "Pending" until someone handles it. "Handled in the last 24 h":
+ * greyed, with the status it ended in. The red badge counts only new arrivals: never something already handled.
+ */
 export default function Bell() {
   const { i18n } = useTranslation();
   const t = adminText(i18n.language).alerts;
@@ -102,17 +107,19 @@ export default function Bell() {
   }, []);
 
   const items = alerts?.items ?? [];
+  const waiting = items.filter((i) => i.state !== 'done');
+  const handled = items.filter((i) => i.state === 'done');
   const title = (item: AlertItem) =>
     item.kind === 'lowStock'
       ? t.lowStock(item.count ?? 0)
       : [t.kinds[item.kind], item.ref, item.name].filter(Boolean).join(' · ');
 
-  // A toast for each order, table or request that arrives while the page is open (not for those already there).
+  // A toast for each order, table, request or seat that arrives while the page is open (never for a handled one).
   useEffect(() => {
     if (!alerts) return;
     const keys = new Set(alerts.items.map((i) => i.key));
     if (known.current)
-      for (const item of alerts.items) if (item.at && !known.current.has(item.key)) toast.info(t.arrived(title(item)));
+      for (const item of alerts.items) if (item.at && item.state !== 'done' && !known.current.has(item.key)) toast.info(t.arrived(title(item)));
     known.current = keys;
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs per new set of figures only
   }, [alerts]);
@@ -130,16 +137,44 @@ export default function Bell() {
     };
   }, [open]);
 
-  const unseen = items.filter((i) => i.at && i.at > seen).length;
+  const unseen = waiting.filter((i) => i.at && i.at > seen).length;
   function toggle() {
     if (!open) {
-      const latest = items.reduce((max, i) => (i.at > max ? i.at : max), seen);
+      const latest = waiting.reduce((max, i) => (i.at > max ? i.at : max), seen);
       localStorage.setItem(SEEN_KEY, latest);
       setSince(seen);
       setOpened(latest);
     }
     setOpen(!open);
   }
+
+  const lang = i18n.language as keyof NonNullable<AlertItem['status']>;
+  const line = (item: AlertItem) => {
+    const Icon = ICONS[item.kind];
+    const isNew = item.state !== 'done' && Boolean(item.at && item.at > since);
+    const detail =
+      item.state === 'done' ? '' : item.state === 'info' ? t.detail.info : item.awaitingTransfer ? t.detail.transfer : t.detail[item.kind];
+    return (
+      <li key={item.key}>
+        <Link href={item.href} className="gg-bell__item" data-state={item.state} onClick={() => setOpen(false)}>
+          <span className="gg-bell__icon">
+            <Icon />
+          </span>
+          <span className="gg-bell__text">
+            <b>{title(item)}</b>
+            <small>{[detail, item.slot ? slotLabel(item.slot, i18n.language, 'short') : ''].filter(Boolean).join(' · ')}</small>
+          </span>
+          {isNew ? (
+            <span className="gg-bell__tag gg-bell__tag--new">{t.new}</span>
+          ) : item.state === 'pending' ? (
+            <span className="gg-bell__tag">{t.pending}</span>
+          ) : item.state === 'done' && item.status ? (
+            <span className="gg-bell__tag gg-bell__tag--done">{item.status[lang] ?? item.status.fr}</span>
+          ) : null}
+        </Link>
+      </li>
+    );
+  };
 
   return (
     <div className="gg-bell" ref={box}>
@@ -150,36 +185,12 @@ export default function Bell() {
       {open && (
         <div className="gg-bell__panel" role="dialog" aria-label={t.bell}>
           <p className="gg-bell__title">{t.title}</p>
-          {items.length === 0 ? (
-            <p className="gg-bell__empty">{t.empty}</p>
-          ) : (
-            <ul>
-              {items.map((item) => {
-                const Icon = ICONS[item.kind];
-                const isNew = Boolean(item.at && item.at > since);
-                return (
-                  <li key={item.key}>
-                    <Link href={item.href} className="gg-bell__item" onClick={() => setOpen(false)}>
-                      <span className="gg-bell__icon">
-                        <Icon />
-                      </span>
-                      <span className="gg-bell__text">
-                        <b>{title(item)}</b>
-                        <small>
-                          {[
-                            item.awaitingTransfer ? t.detail.transfer : t.detail[item.kind],
-                            item.slot ? slotLabel(item.slot, i18n.language, 'short') : '',
-                          ]
-                            .filter(Boolean)
-                            .join(' · ')}
-                        </small>
-                      </span>
-                      {isNew && <span className="gg-bell__new">{t.new}</span>}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+          {waiting.length === 0 ? <p className="gg-bell__empty">{t.empty}</p> : <ul>{waiting.map(line)}</ul>}
+          {handled.length > 0 && (
+            <>
+              <p className="gg-bell__title">{t.recent}</p>
+              <ul>{handled.map(line)}</ul>
+            </>
           )}
         </div>
       )}

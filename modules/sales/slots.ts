@@ -8,6 +8,8 @@ export type SlotRule = { intervalMin: number; capacityPerSlot: number; leadTimeM
 export type Slot = { from: string; to: string; available: number };
 
 const minutes = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
+/** A closing time at or before the opening (00:00, 01:00 after a 17:00 opening) runs to midnight: slots never cross into the next day. */
+const closing = (w: { open: string; close: string }) => (minutes(w.close) <= minutes(w.open) ? 24 * 60 : minutes(w.close));
 const hhmm = (total: number) => `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
 
 /**
@@ -27,7 +29,7 @@ export function generateSlots(input: { date: string; rule: SlotRule; hours: Hour
 
   const slots: Slot[] = [];
   for (const w of windows) {
-    for (let start = minutes(w.open); start + rule.intervalMin <= minutes(w.close); start += rule.intervalMin) {
+    for (let start = minutes(w.open); start + rule.intervalMin <= closing(w); start += rule.intervalMin) {
       const instant = fromLocal(y, m, d, Math.floor(start / 60), start % 60);
       const local = toLocal(instant);
       if (local.hour * 60 + local.minute !== start) continue; // skipped by the spring DST change

@@ -109,6 +109,9 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
     ...(legalDrafts?.totalDocs
       ? [{ key: 'legal', href: '/admin/collections/legal', title: t.home.legalTitle(legalDrafts.totalDocs), detail: t.home.legalText, badge: t.home.draftBadge, tone: 'warning' as const }]
       : []),
+    ...(settings && !settings.business.iban
+      ? [{ key: 'iban', href: '/admin/globals/BusinessSettings', title: t.home.ibanTitle, detail: t.home.ibanText, badge: t.home.settingsBadge, tone: 'danger' as const }]
+      : []),
     ...(settings && !settings.business.facebook
       ? [{ key: 'facebook', href: '/admin/globals/BusinessSettings', title: t.home.facebookTitle, detail: t.home.facebookText, badge: t.home.settingsBadge, tone: 'warning' as const }]
       : []),

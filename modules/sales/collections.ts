@@ -376,7 +376,15 @@ export const slotRules: CollectionConfig = {
           min: 0,
           defaultValue: 14,
           label: l('Jusqu’à (jours à l’avance)', 'Up to (days ahead)', 'Bis zu (Tage im Voraus)', 'Até (dias de antecedência)'),
-          admin: { width: '33%' },
+          admin: {
+            width: '33%',
+            description: l(
+              '0 : aujourd’hui seulement. 14 : jusqu’au même jour dans deux semaines.',
+              '0: today only. 14: up to the same weekday two weeks from now.',
+              '0: nur heute. 14: bis zum selben Wochentag in zwei Wochen.',
+              '0: só hoje. 14: até ao mesmo dia daqui a duas semanas.',
+            ),
+          },
         },
       ],
     },

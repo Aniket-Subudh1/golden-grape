@@ -40,7 +40,7 @@ export function EventBookingCustomer({ t, business, logoUrl, data }: Props) {
 
 export function EventBookingStaff({ t, business, logoUrl, data }: Props) {
   return (
-    <MailLayout business={business} logoUrl={logoUrl}>
+    <MailLayout business={business} logoUrl={logoUrl} staff={t.staffBanner}>
       <h1 style={heading}>{interpolate(t.eventBooking.staffSubject, { title: data.title, name: data.name, guests: data.guests })}</h1>
       <Details
         rows={[

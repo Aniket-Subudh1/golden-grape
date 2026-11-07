@@ -9,7 +9,7 @@ export async function mailContext(locale: Locale) {
     business,
     staffT: staff.mail,
     customerT: customer.mail,
-    logoUrl: `${appUrl()}/brand/logo-light.png`,
+    logoUrl: `${appUrl()}/brand/logo-mail.png`,
     staffTo: env.MAIL_STAFF_TO ?? business.email ?? undefined,
   };
 }

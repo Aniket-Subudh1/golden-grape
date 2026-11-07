@@ -5,6 +5,7 @@ import { AppError } from '@/lib/errors';
 import type { Locale } from '@/lib/i18n';
 import { getPayloadClient } from '@/lib/payload';
 import type { Customer } from '@/payload-types';
+import { attachToCustomer, checkOrderToken, getOrder, getReservation } from '@/modules/sales/service';
 import { normalizeVat } from './vat';
 
 // Shop accounts. The session is Payload's customer token in our own cookie, so the website session never replaces
@@ -170,4 +171,29 @@ export async function setDefaultAddress(payload: Payload, customer: Customer, id
 
 function writeAddresses(payload: Payload, customer: Customer, addresses: Partial<CustomerAddress>[]) {
   return payload.update({ collection: 'customers', id: customer.id, overrideAccess: true, data: { addresses: addresses as CustomerAddress[] } });
+}
+
+/**
+ * "Save my details" on a guest's confirmation page (GG-010): an account made from the order's name, e-mail and
+ * phone with the password typed, signed in, the order (or table) given to it and its delivery address saved. The
+ * confirmation link proves the order is theirs; the e-mail cannot be changed here, so nobody claims someone else's.
+ */
+export async function signUpFromOrder(payload: Payload, input: { id: string; token: string; password: string; locale: Locale }) {
+  if (!checkOrderToken(input.id, input.token)) throw new AppError('FORBIDDEN', 'attach');
+  const doc = (await getOrder(payload, input.id)) ?? (await getReservation(payload, input.id));
+  if (!doc?.contact?.email || doc.customer) throw new AppError('FORBIDDEN', 'attach');
+  const customer = await signUp(payload, {
+    name: doc.contact.name ?? '',
+    email: doc.contact.email,
+    password: input.password,
+    phone: doc.contact.phone ?? undefined,
+    type: 'private',
+    marketingConsent: false,
+    locale: input.locale,
+  });
+  const { address } = await attachToCustomer(payload, input.id, customer);
+  if (address?.line1 && address.postalCode && address.city) {
+    await saveAddress(payload, customer, { line1: address.line1, line2: address.line2 ?? undefined, postalCode: address.postalCode, city: address.city, country: 'LU', isDefault: true });
+  }
+  return customer;
 }

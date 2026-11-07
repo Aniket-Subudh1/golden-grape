@@ -26,7 +26,15 @@ async function Checkout({ locale, searchParams }: { locale: Locale; searchParams
     <CheckoutForm
       locale={locale}
       initialMode={mode}
-      customer={customer && { name: customer.name, email: customer.email, phone: customer.phone, address: address && { line1: address.line1, line2: address.line2, postalCode: address.postalCode, city: address.city } }}
+      customer={
+        customer && {
+          name: customer.name,
+          email: customer.email,
+          phone: customer.phone,
+          address: address && { line1: address.line1, line2: address.line2, postalCode: address.postalCode, city: address.city },
+          addresses: (customer.addresses ?? []).map((a) => ({ id: a.id ?? a.line1, label: a.label, line1: a.line1, line2: a.line2, postalCode: a.postalCode, city: a.city })),
+        }
+      }
       t={checkout}
       cartT={{ modes: cart.modes, hints: cart.hints, minus: cart.minus, plus: cart.plus, toShop: cart.toShop, toCounter: cart.toCounter, vatIncluded: cart.vatIncluded }}
       formT={form}

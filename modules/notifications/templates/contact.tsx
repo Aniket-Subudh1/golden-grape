@@ -8,7 +8,7 @@ type Props = { t: Dictionary['mail']; business: MailBusiness; logoUrl: string; d
 /** To the team, in French (one shared staff inbox). */
 export function ContactStaff({ t, business, logoUrl, data }: Props) {
   return (
-    <MailLayout business={business} logoUrl={logoUrl}>
+    <MailLayout business={business} logoUrl={logoUrl} staff={t.staffBanner}>
       <h1 style={heading}>{interpolate(t.contact.staffSubject, { subject: data.subject, name: data.name })}</h1>
       <Details
         rows={[

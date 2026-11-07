@@ -17,6 +17,8 @@ import { canTransition, effects as effectsOf, type Effect, type OrderStatus, PAY
 import { generateSlots, type Hours, type Slot } from './slots';
 import { deliveryFee, resolveZone } from './zones';
 
+export { normalizePostalCode } from './zones';
+
 // Checkout, orders and their state changes (02 §6, M2.3 T4). The action layer validates input with zod and sends
 // the e-mails after commit; everything that must be true at once (slot capacity, zone, prices, stock, numbering)
 // happens here, inside one transaction.
@@ -481,6 +483,22 @@ export async function getOrder(payload: Payload, id: string) {
 
 export async function getReservation(payload: Payload, id: string): Promise<Reservation | null> {
   return payload.findByID({ collection: 'reservations', id, depth: 0, overrideAccess: true, disableErrors: true });
+}
+
+/**
+ * Gives a guest order or table reservation (and its pre-order) to the account just created from it (GG-010). Only
+ * a document without an account and with the same e-mail; the caller has checked the confirmation link.
+ */
+export async function attachToCustomer(payload: Payload, id: string, customer: { id: string; email: string }) {
+  const order = await getOrder(payload, id);
+  const reservation = order ? null : await getReservation(payload, id);
+  const doc = order ?? reservation;
+  if (!doc || doc.customer || doc.contact?.email?.toLowerCase() !== customer.email.toLowerCase()) throw new AppError('FORBIDDEN', 'attach');
+  const ids = { orders: [order?.id, reservation?.preorder ? String(reservation.preorder) : null].filter(Boolean) as string[], reservations: reservation ? [reservation.id] : [] };
+  for (const collection of ['orders', 'reservations'] as const) {
+    for (const docId of ids[collection]) await payload.update({ collection, id: docId, data: { customer: customer.id }, overrideAccess: true, depth: 0 });
+  }
+  return { address: order?.mode === 'delivery' ? order.address : null };
 }
 
 /** A customer's own orders and reservations, read with their access (never anyone else's). */

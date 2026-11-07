@@ -1,5 +1,5 @@
 import { type Dictionary, interpolate } from '@/lib/i18n';
-import { Details, heading, MailLayout, type MailBusiness } from './layout';
+import { Details, heading, MailLayout, type MailBusiness, Reference } from './layout';
 import { type OrderMail, OrderLines, TransferDetails, ViewButton } from './order-received';
 
 export type StatusMail = OrderMail & { status: keyof Dictionary['mail']['order']['statusBody']; statusName: string };
@@ -8,7 +8,8 @@ export type StatusMail = OrderMail & { status: keyof Dictionary['mail']['order']
 export function OrderStatusMail({ t, business, logoUrl, data }: { t: Dictionary['mail']; business: MailBusiness; logoUrl: string; data: StatusMail }) {
   return (
     <MailLayout business={business} logoUrl={logoUrl}>
-      <h1 style={heading}>{interpolate(t.order.statusSubject, { number: data.number, status: data.statusName })}</h1>
+      <h1 style={heading}>{data.statusName}</h1>
+      <Reference>{interpolate(t.order.reference, { number: data.number })}</Reference>
       <p>{interpolate(t.greeting, { name: data.name })}</p>
       <p>{t.order.statusBody[data.status]}</p>
       <Details

@@ -7,7 +7,7 @@ import { LOCALES } from '@/lib/i18n';
 import { parseDecimal } from '@/lib/money';
 import { fromLocal, today } from '@/lib/time';
 import { rateLimit } from '@/lib/rate-limit';
-import { currentCustomer } from '@/modules/customers/service';
+import { currentCustomer, saveAddress } from '@/modules/customers/service';
 import { quoteCart } from '@/modules/promotions/service';
 import { SLOT_MODES } from './collections';
 import { mailOrderPlaced, mailOrderStatus, mailReservation } from './mail';
@@ -70,6 +70,7 @@ const checkout = z
     city: optionalText(80),
     guests: z.preprocess((v) => (v === '' || v == null ? undefined : v), z.coerce.number('required').int('invalid').min(1, 'required').max(40, 'invalid').optional()),
     preorder: z.literal('on').optional(),
+    saveAddress: z.literal('on').optional(),
     payment: z.enum(['onsite', 'transfer'], 'required'),
     notes: optionalText(2000),
     locale: z.enum(LOCALES),
@@ -81,14 +82,24 @@ const checkout = z
   });
 
 /** Places the order or table request; the e-mails go out after commit, only the first time a key is seen. */
-export const placeOrderAction = publicAction(checkout, async ({ website, line1, line2, postalCode, city, preorder, ...input }, { payload }) => {
+export const placeOrderAction = publicAction(checkout, async ({ website, line1, line2, postalCode, city, preorder, saveAddress: keep, ...input }, { payload }) => {
   if (website) return { kind: 'order' as const, id: '', number: '', token: '', created: false };
   await rateLimit(`order:${await clientIp()}`, 20, 10 * 60_000);
+  const customer = await currentCustomer();
   const placed = await placeOrder(
     payload,
     { ...input, preorder: preorder === 'on', address: input.mode === 'delivery' ? { line1: line1!, line2, postalCode: postalCode!, city: city! } : undefined },
-    { customer: await currentCustomer() },
+    { customer },
   );
+  // A signed-in customer's new delivery address goes to their account when they ask (GG-010). Never blocks the order.
+  if (placed.created && customer && keep === 'on' && input.mode === 'delivery') {
+    const known = (customer.addresses ?? []).some((a) => a.line1.trim() === line1!.trim() && a.postalCode.trim() === postalCode!.trim());
+    if (!known) {
+      await saveAddress(payload, customer, { line1: line1!, line2, postalCode: postalCode!, city: city!, country: 'LU', isDefault: false }).catch((error) =>
+        console.error('[checkout] address not saved', error),
+      );
+    }
+  }
   if (placed.created) {
     after(async () => {
       if (placed.kind === 'order') {

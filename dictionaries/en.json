@@ -665,8 +665,8 @@
     },
     "view": "View my order",
     "order": {
-      "subject": "Your order {{number}}",
-      "title": "Thank you for your order",
+      "subject": "Your order {{number}} has been received",
+      "title": "Your order has been received",
       "confirmedBody": "Your order is confirmed. We will have everything ready for the time you chose.",
       "awaitingBody": "Your order is reserved. As soon as your transfer arrives, we confirm it and prepare it.",
       "transferTitle": "Bank transfer details",
@@ -681,8 +681,16 @@
         "completed": "Your order has been collected. Thank you, and see you soon at Golden Grape!",
         "delivered": "Your order has been delivered. Thank you, and enjoy!"
       },
-      "handedOver": { "completed": "Collected", "delivered": "Delivered" },
-      "staffSubject": "New order {{number}} — {{name}}"
+      "handedOver": {
+        "completed": "Collected",
+        "delivered": "Delivered"
+      },
+      "staffSubject": "New order received — {{number}} — {{name}}",
+      "staffTitle": "New order received",
+      "staffIntro": "An order has just been placed on the website. Open it in the back office to handle it.",
+      "reference": "Order {{number}}",
+      "transferMissing": "Our team will send you our bank details. When you pay, please use the reference below.",
+      "staffTransferMissing": "Warning: no IBAN is set in Shop details. The customer did not receive bank details: please send them."
     },
     "reservation": {
       "pendingSubject": "Your table request {{number}}",
@@ -694,7 +702,9 @@
       "cancelledSubject": "Your reservation {{number}} is cancelled",
       "cancelledBody": "Your reservation has been cancelled. We hope to see you another time.",
       "staffSubject": "New table request {{number}} — {{name}} ({{guests}})",
-      "preorder": "Your pre-order"
+      "preorder": "Your pre-order",
+      "reference": "Reservation {{number}}",
+      "staffTitle": "New table request"
     },
     "eventBooking": {
       "subject": "Your booking — {{title}}",
@@ -703,6 +713,13 @@
       "cancelledSubject": "Your booking for {{title}} is cancelled",
       "cancelledBody": "Your booking has been cancelled.",
       "staffSubject": "New booking: {{title}} — {{name}} ({{guests}})"
+    },
+    "staffBanner": "Internal notification — for the Golden Grape team (do not forward to the customer)",
+    "welcome": {
+      "subject": "Welcome to Golden Grape: your account has been created",
+      "title": "Your account has been created",
+      "body": "Your customer account has been created with the address {{email}}. Your details and addresses are saved for your next orders, and you can follow your orders from your account.",
+      "button": "My account"
     }
   },
   "cookies": {
@@ -864,7 +881,29 @@
     "emptyTitle": "Your bag is empty",
     "emptyText": "Add a few treasures from the shop or the counter, or book a table.",
     "bookTable": "Book a table",
-    "when": "When"
+    "when": "When",
+    "requiredNote": "* required",
+    "missing": "To place the order, add: {{fields}}.",
+    "check": {
+      "time": "a time",
+      "name": "your name",
+      "email": "a valid e-mail",
+      "phone": "a phone number",
+      "line1": "the street and number",
+      "postalCode": "the postcode",
+      "city": "the town"
+    },
+    "moreDates": "See more dates",
+    "fewerDates": "Fewer dates",
+    "address": {
+      "hint": "Type your street: we suggest official Luxembourg addresses. You can correct anything.",
+      "searching": "Searching…",
+      "pick": "Addresses found",
+      "cityFound": "Town filled in from the postcode (you can change it).",
+      "saved": "Your addresses",
+      "other": "Another address",
+      "save": "Save this address to my account"
+    }
   },
   "order": {
     "eyebrow": "Order {{number}}",
@@ -920,12 +959,23 @@
       "reference": "Reference",
       "amount": "Amount",
       "note": "Please use the reference so we can match your payment.",
-      "missing": "We will send you our bank details by e-mail."
+      "missing": "Our team will send you our bank details. When you pay, please use the reference and amount below."
     },
     "invalidTitle": "This link is not valid",
     "invalidText": "Open the link from your confirmation e-mail, or sign in to see your orders.",
     "continue": "Continue shopping",
     "myOrders": "My orders",
-    "print": "Print"
+    "print": "Print",
+    "account": {
+      "title": "Save time next time",
+      "text": "Just choose a password: your details and address will be ready for your next order, and you can follow this one from your account.",
+      "note": "Optional: you can always order without an account.",
+      "password": "Password",
+      "submit": "Create my account",
+      "sending": "Creating…",
+      "done": "Account created: you are signed in.",
+      "exists": "An account already exists with this e-mail.",
+      "signIn": "Sign in"
+    }
   }
 }

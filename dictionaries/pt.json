@@ -665,8 +665,8 @@
     },
     "view": "Ver a minha encomenda",
     "order": {
-      "subject": "A sua encomenda {{number}}",
-      "title": "Obrigado pela sua encomenda",
+      "subject": "A sua encomenda {{number}} foi recebida",
+      "title": "A sua encomenda foi recebida",
       "confirmedBody": "A sua encomenda está confirmada. Tudo estará pronto à hora escolhida.",
       "awaitingBody": "A sua encomenda está reservada. Assim que a transferência chegar, confirmamos e preparamos.",
       "transferTitle": "Dados para a transferência",
@@ -681,8 +681,16 @@
         "completed": "A sua encomenda foi levantada. Obrigado e até breve na Golden Grape!",
         "delivered": "A sua encomenda foi entregue. Obrigado e bom proveito!"
       },
-      "handedOver": { "completed": "Levantada", "delivered": "Entregue" },
-      "staffSubject": "Nova encomenda {{number}} — {{name}}"
+      "handedOver": {
+        "completed": "Levantada",
+        "delivered": "Entregue"
+      },
+      "staffSubject": "Nova encomenda recebida — {{number}} — {{name}}",
+      "staffTitle": "Nova encomenda recebida",
+      "staffIntro": "Acabou de ser feita uma encomenda no site. Abra-a na área de gestão para a tratar.",
+      "reference": "Encomenda {{number}}",
+      "transferMissing": "A nossa equipa vai enviar-lhe os nossos dados bancários. Na transferência, indique a referência abaixo.",
+      "staffTransferMissing": "Atenção: não há IBAN nos Dados da loja. O cliente não recebeu dados bancários: envie-lhos."
     },
     "reservation": {
       "pendingSubject": "O seu pedido de mesa {{number}}",
@@ -694,7 +702,9 @@
       "cancelledSubject": "A sua reserva {{number}} foi cancelada",
       "cancelledBody": "A sua reserva foi cancelada. Esperamos vê-lo noutra ocasião.",
       "staffSubject": "Novo pedido de mesa {{number}} — {{name}} ({{guests}})",
-      "preorder": "A sua pré-encomenda"
+      "preorder": "A sua pré-encomenda",
+      "reference": "Reserva {{number}}",
+      "staffTitle": "Novo pedido de mesa"
     },
     "eventBooking": {
       "subject": "A sua reserva — {{title}}",
@@ -703,6 +713,13 @@
       "cancelledSubject": "A sua reserva para {{title}} foi cancelada",
       "cancelledBody": "A sua reserva foi cancelada.",
       "staffSubject": "Nova reserva: {{title}} — {{name}} ({{guests}})"
+    },
+    "staffBanner": "Notificação interna — para a equipa Golden Grape (não reencaminhar ao cliente)",
+    "welcome": {
+      "subject": "Bem-vindo à Golden Grape: a sua conta foi criada",
+      "title": "A sua conta foi criada",
+      "body": "A sua conta de cliente foi criada com o endereço {{email}}. Os seus dados e moradas ficam guardados para as próximas encomendas, e acompanha as suas encomendas na sua conta.",
+      "button": "A minha conta"
     }
   },
   "cookies": {
@@ -864,7 +881,29 @@
     "emptyTitle": "O seu saco está vazio",
     "emptyText": "Junte alguns tesouros da loja ou do balcão, ou reserve uma mesa.",
     "bookTable": "Reservar mesa",
-    "when": "Quando"
+    "when": "Quando",
+    "requiredNote": "* obrigatório",
+    "missing": "Para concluir, falta: {{fields}}.",
+    "check": {
+      "time": "uma hora",
+      "name": "o seu nome",
+      "email": "um e-mail válido",
+      "phone": "um número de telefone",
+      "line1": "a rua e o número",
+      "postalCode": "o código postal",
+      "city": "a localidade"
+    },
+    "moreDates": "Ver mais datas",
+    "fewerDates": "Menos datas",
+    "address": {
+      "hint": "Escreva a sua rua: sugerimos moradas oficiais do Luxemburgo. Pode corrigir tudo.",
+      "searching": "A procurar…",
+      "pick": "Moradas encontradas",
+      "cityFound": "Localidade preenchida a partir do código postal (pode alterar).",
+      "saved": "As suas moradas",
+      "other": "Outra morada",
+      "save": "Guardar esta morada na minha conta"
+    }
   },
   "order": {
     "eyebrow": "Encomenda {{number}}",
@@ -920,12 +959,23 @@
       "reference": "Referência",
       "amount": "Montante",
       "note": "Indique a referência para identificarmos o seu pagamento.",
-      "missing": "Enviamos-lhe os nossos dados bancários por e-mail."
+      "missing": "A nossa equipa vai enviar-lhe os nossos dados bancários. Na transferência, indique a referência e o montante abaixo."
     },
     "invalidTitle": "Este link não é válido",
     "invalidText": "Abra o link do seu e-mail de confirmação, ou entre na sua conta para ver as suas encomendas.",
     "continue": "Continuar a comprar",
     "myOrders": "As minhas encomendas",
-    "print": "Imprimir"
+    "print": "Imprimir",
+    "account": {
+      "title": "Ganhe tempo da próxima vez",
+      "text": "Escolha apenas uma palavra-passe: os seus dados e a sua morada ficam prontos para a próxima encomenda, e acompanha esta na sua conta.",
+      "note": "Opcional: pode sempre encomendar sem conta.",
+      "password": "Palavra-passe",
+      "submit": "Criar a minha conta",
+      "sending": "A criar…",
+      "done": "Conta criada: tem sessão iniciada.",
+      "exists": "Já existe uma conta com este e-mail.",
+      "signIn": "Iniciar sessão"
+    }
   }
 }

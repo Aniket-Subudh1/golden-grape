@@ -4,6 +4,8 @@ import type { Media, Product } from '@/payload-types';
 import { getProduct, listCategories, listProducts, type ProductFilters, shopFacets, sizesOf } from '@/modules/catalogue/service';
 import { availability } from '@/modules/inventory/service';
 import { unitPrices } from '@/modules/promotions/service';
+import { normalizePostalCode } from '@/modules/sales/service';
+import { type AddressSuggestion, localitiesOf, parseAddressLabel } from './address';
 
 // What the shop and counter pages show, assembled from the catalogue, stock and pricing services. Prices come from
 // `quote` (via unitPrices), stock from `availability` (never the raw count).
@@ -111,4 +113,43 @@ export async function productPage(payload: Payload, slug: string, locale: Locale
     related: await cards(payload, related, locale),
     categoryId: idOf(product.category),
   };
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Luxembourg addresses (GG-007): Geoportail's public search, called from the server only. A slow or failing answer
+// gives no suggestion (the customer types the address), never an error. Answers are kept in memory for the process.
+
+const ADDRESS_SEARCH = 'https://map.geoportail.lu/fulltextsearch';
+const POSTCODE_SEARCH = 'https://apiv3.geoportail.lu/geocode/search';
+const remembered = new Map<string, unknown>();
+
+async function geoportail<T>(url: string, empty: T): Promise<T> {
+  if (remembered.has(url)) return remembered.get(url) as T;
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(3000), headers: { Accept: 'application/json' } });
+    if (!res.ok) return empty;
+    const body = (await res.json()) as T;
+    if (remembered.size > 2000) remembered.clear();
+    remembered.set(url, body);
+    return body;
+  } catch {
+    return empty;
+  }
+}
+
+/** Up to 6 official addresses matching what was typed (street, number, town…). */
+export async function addressSuggestions(query: string): Promise<AddressSuggestion[]> {
+  const q = query.trim().replace(/\s+/g, ' ');
+  if (q.length < 3) return [];
+  const body = await geoportail<{ features?: { properties?: { label?: string } }[] }>(`${ADDRESS_SEARCH}?${new URLSearchParams({ query: q, limit: '6', layer: 'Adresse' })}`, {});
+  return (body.features ?? []).map((f) => parseAddressLabel(f.properties?.label ?? '')).filter((a): a is AddressSuggestion => a !== null);
+}
+
+/** The locality of a Luxembourg postcode ("7795" → "Bissen"), or null when unknown or ambiguous. */
+export async function localityFor(postalCode: string): Promise<string | null> {
+  const code = normalizePostalCode(postalCode);
+  if (!/^\d{4}$/.test(code)) return null;
+  const body = await geoportail<{ results?: Parameters<typeof localitiesOf>[0] }>(`${POSTCODE_SEARCH}?${new URLSearchParams({ zip: code })}`, {});
+  const names = localitiesOf(body.results ?? [], code);
+  return names.length === 1 ? names[0] : null;
 }

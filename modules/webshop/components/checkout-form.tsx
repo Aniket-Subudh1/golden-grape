@@ -1,6 +1,6 @@
 'use client';
 
-import { Bike, Info, Landmark, ShoppingBag, Store, TriangleAlert, UtensilsCrossed } from 'lucide-react';
+import { Bike, Info, Landmark, MapPin, ShoppingBag, Store, TriangleAlert, UtensilsCrossed } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -14,6 +14,8 @@ import { type Dictionary, interpolate, type Locale, localePath } from '@/lib/i18
 import { formatMoney } from '@/lib/money';
 import { slotLabel } from '@/lib/time';
 import { checkoutQuote, placeOrderAction, slotsFor } from '@/modules/sales/actions';
+import { localityAction, suggestAddressAction } from '../actions';
+import type { AddressSuggestion } from '../address';
 import { PAYMENT_CHOICES, type PaymentChoice } from '@/modules/sales/order-states';
 import type { SlotDay } from '@/modules/sales/service';
 import { type CartMode, useCart } from '../cart';
@@ -23,11 +25,16 @@ import { SlotPicker } from './slot-picker';
 // Every number comes from the server (checkoutQuote); the order is placed by placeOrderAction with an idempotency key
 // kept in sessionStorage, so a reload or a double click never places it twice.
 
+type Address = { line1: string; line2?: string | null; postalCode: string; city: string };
+
 export type CheckoutCustomer = {
   name: string;
   email: string;
   phone?: string | null;
-  address?: { line1: string; line2?: string | null; postalCode: string; city: string } | null;
+  /** The default address, filled in first. */
+  address?: Address | null;
+  /** Every saved address, to pick from (GG-010). */
+  addresses?: (Address & { id: string; label?: string | null })[];
 } | null;
 
 type Props = {
@@ -112,6 +119,72 @@ function LinesError() {
   ) : null;
 }
 
+/** The same rule as the server's `z.email` for what can be typed here: something@domain.tld. */
+const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value.trim());
+const sameAddress = (a: Address, b: Address) => a.line1.trim() === b.line1.trim() && a.postalCode.trim() === b.postalCode.trim();
+
+/**
+ * Street and number with official Luxembourg suggestions (GG-007): typing 3 characters or more asks the server
+ * (Geoportail), picking one fills street, postcode and town. Nothing is forced: the fields stay editable.
+ */
+function StreetField({ value, onChange, onPick, label, t }: { value: string; onChange: (v: string) => void; onPick: (a: AddressSuggestion) => void; label: string; t: Dictionary['checkout']['address'] }) {
+  const [focused, setFocused] = useState(false);
+  const [found, setFound] = useState<AddressSuggestion[]>([]);
+  const [searching, setSearching] = useState(false);
+  // The street just picked: no new search until the customer types again.
+  const [picked, setPicked] = useState('');
+  useEffect(() => {
+    const query = value.trim();
+    if (!focused || query.length < 3 || query === picked) return;
+    let stale = false;
+    const timer = window.setTimeout(async () => {
+      setSearching(true);
+      const result = await suggestAddressAction(null, { query });
+      if (stale) return;
+      setSearching(false);
+      setFound(result.ok ? result.data : []);
+    }, 300);
+    return () => {
+      stale = true;
+      window.clearTimeout(timer);
+    };
+  }, [value, focused, picked]);
+  const open = focused && value.trim().length >= 3 && value.trim() !== picked && (found.length > 0 || searching);
+  return (
+    <div className="relative sm:col-span-2" onFocus={() => setFocused(true)} onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setFocused(false)}>
+      <Field name="line1" label={label} autoComplete="address-line1" value={value} onChange={(e) => onChange(e.target.value)} required aria-autocomplete="list" aria-expanded={open} />
+      {open && (
+        <ul role="listbox" aria-label={t.pick} className="absolute inset-x-0 top-full z-20 mt-1 max-h-72 overflow-auto rounded-xl border border-border bg-bone py-1 shadow-lg">
+          {searching && found.length === 0 && <li className="px-4 py-2 text-xs text-ink/50">{t.searching}</li>}
+          {found.map((a) => (
+            <li key={`${a.line1}-${a.postalCode}`}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={false}
+                className="flex w-full items-start gap-3 px-4 py-2 text-left text-sm hover:bg-champagne/60 focus:bg-champagne/60 focus:outline-none"
+                onClick={() => {
+                  setPicked(a.line1);
+                  setFound([]);
+                  onPick(a);
+                }}
+              >
+                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold-deep" />
+                <span>
+                  {a.line1}
+                  <span className="block text-xs text-ink/50">
+                    L-{a.postalCode} {a.city}
+                  </span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, signInHref }: Props) {
   const router = useRouter();
   const cart = useCart();
@@ -121,7 +194,14 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
   const [slot, setSlot] = useState({ date: '', time: '' });
   const [guests, setGuests] = useState(2);
   const [preorder, setPreorder] = useState(true);
-  const [postalCode, setPostalCode] = useState(customer?.address?.postalCode ?? '');
+  const [contact, setContact] = useState({ name: customer?.name ?? '', email: customer?.email ?? '', phone: customer?.phone ?? '' });
+  const start = customer?.address;
+  // `cityFromCode`: the town was filled from the postcode (GG-007), so a new postcode may replace it; typed by hand, never.
+  const [addr, setAddr] = useState({ line1: start?.line1 ?? '', line2: start?.line2 ?? '', postalCode: start?.postalCode ?? '', city: start?.city ?? '', cityFromCode: false });
+  const [keepAddress, setKeepAddress] = useState(true);
+  const postalCode = addr.postalCode;
+  const saved = customer?.addresses ?? [];
+  const savedMatch = saved.find((a) => sameAddress(a, addr)) ?? null;
   const [choice, setChoice] = useState<PaymentChoice>('onsite');
   const [summary, setSummary] = useState<Summary | null>(null);
   const [pricing, setPricing] = useState(false);
@@ -149,7 +229,34 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
   useEffect(() => {
     // Reload when the mode changes; a failed submit reloads explicitly.
     void loadDays(mode);
+    // A page left open must not offer times that have passed or filled up meanwhile (GG-009): fresh every minute and
+    // when the customer comes back to the tab. The server checks again when the order is placed.
+    const tick = () => {
+      if (document.visibilityState === 'visible') void loadDays(mode);
+    };
+    const timer = window.setInterval(tick, 60_000);
+    window.addEventListener('focus', tick);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener('focus', tick);
+    };
   }, [mode]);
+
+  // The town from a Luxembourg postcode (GG-007), only while the town is empty or was filled this way.
+  useEffect(() => {
+    if (mode !== 'delivery' || !/^\s*(L[\s-]*)?\d{4}\s*$/i.test(postalCode)) return;
+    let stale = false;
+    const timer = window.setTimeout(async () => {
+      const result = await localityAction(null, { postalCode });
+      if (stale || !result.ok || !result.data) return;
+      const town = result.data;
+      setAddr((a) => (a.city.trim() && !a.cityFromCode ? a : { ...a, city: town, cityFromCode: true }));
+    }, 350);
+    return () => {
+      stale = true;
+      window.clearTimeout(timer);
+    };
+  }, [postalCode, mode]);
 
   const withLines = mode !== 'table' || preorder;
   const lines = withLines ? items : [];
@@ -211,15 +318,21 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
     );
   }
 
-  const blocker = !slot.time
-    ? t.pickTime
-    : withLines && lines.length === 0
-      ? t.preorder.empty
-      : outside
-        ? t.zone.outside
-        : zone?.belowMinimum
-          ? interpolate(t.zone.belowMin, { missing: money(zone.minOrderCents - (quote?.subtotalCents ?? 0)), min: money(zone.minOrderCents) })
-          : null;
+  // What still stops the order (GG-006): the same checks as the server, so the button only works when it can succeed.
+  const missing = [
+    !slot.time && t.check.time,
+    !contact.name.trim() && t.check.name,
+    !isEmail(contact.email) && t.check.email,
+    contact.phone.trim().length < 5 && t.check.phone,
+    ...(mode === 'delivery' ? [!addr.line1.trim() && t.check.line1, !addr.postalCode.trim() && t.check.postalCode, !addr.city.trim() && t.check.city] : []),
+  ].filter((m): m is string => Boolean(m));
+  const blockers = [
+    withLines && lines.length === 0 ? t.preorder.empty : null,
+    outside ? t.zone.outside : null,
+    zone?.belowMinimum ? interpolate(t.zone.belowMin, { missing: money(zone.minOrderCents - (quote?.subtotalCents ?? 0)), min: money(zone.minOrderCents) }) : null,
+    missing.length > 0 ? interpolate(t.missing, { fields: missing.join(', ') }) : null,
+  ].filter((b): b is string => Boolean(b));
+  const req = (label: string) => `${label} *`;
 
   let n = 0;
   return (
@@ -304,12 +417,65 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
 
         {mode === 'delivery' && (
           <Step n={++n} title={t.steps.address}>
+            {saved.length > 0 && (
+              <div className="mb-6 flex flex-wrap gap-2" role="radiogroup" aria-label={t.address.saved}>
+                {saved.map((a) => (
+                  <Button
+                    key={a.id}
+                    type="button"
+                    variant="chip"
+                    size="sm"
+                    role="radio"
+                    aria-checked={savedMatch?.id === a.id}
+                    active={savedMatch?.id === a.id}
+                    onClick={() => setAddr({ line1: a.line1, line2: a.line2 ?? '', postalCode: a.postalCode, city: a.city, cityFromCode: false })}
+                  >
+                    {a.label || a.line1}
+                  </Button>
+                ))}
+                <Button
+                  type="button"
+                  variant="chip"
+                  size="sm"
+                  role="radio"
+                  aria-checked={!savedMatch}
+                  active={!savedMatch}
+                  onClick={() => setAddr({ line1: '', line2: '', postalCode: '', city: '', cityFromCode: false })}
+                >
+                  {t.address.other}
+                </Button>
+              </div>
+            )}
             <div className="grid gap-6 sm:grid-cols-2">
-              <Field name="line1" label={t.fields.line1} autoComplete="address-line1" defaultValue={customer?.address?.line1 ?? ''} className="sm:col-span-2" />
-              <Field name="line2" label={t.fields.line2} autoComplete="address-line2" defaultValue={customer?.address?.line2 ?? ''} className="sm:col-span-2" />
-              <Field name="postalCode" label={t.fields.postalCode} autoComplete="postal-code" inputMode="numeric" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder="L-7795" />
-              <Field name="city" label={t.fields.city} autoComplete="address-level2" defaultValue={customer?.address?.city ?? ''} />
+              <StreetField
+                value={addr.line1}
+                onChange={(line1) => setAddr((a) => ({ ...a, line1 }))}
+                onPick={(found) => setAddr((a) => ({ ...a, ...found, cityFromCode: false }))}
+                label={req(t.fields.line1)}
+                t={t.address}
+              />
+              <Field name="line2" label={t.fields.line2} autoComplete="address-line2" value={addr.line2} onChange={(e) => setAddr((a) => ({ ...a, line2: e.target.value }))} className="sm:col-span-2" />
+              <Field name="postalCode" label={req(t.fields.postalCode)} autoComplete="postal-code" inputMode="numeric" value={addr.postalCode} onChange={(e) => setAddr((a) => ({ ...a, postalCode: e.target.value }))} placeholder="L-7795" required />
+              <div>
+                <Field
+                  name="city"
+                  label={req(t.fields.city)}
+                  autoComplete="address-level2"
+                  value={addr.city}
+                  onChange={(e) => setAddr((a) => ({ ...a, city: e.target.value, cityFromCode: false }))}
+                  required
+                />
+                {addr.cityFromCode && <p className="mt-1 text-xs text-ink/50">{t.address.cityFound}</p>}
+              </div>
             </div>
+            <p className="mt-3 text-xs text-ink/50">{t.address.hint}</p>
+            {customer && !savedMatch && (
+              <label className="mt-4 flex items-center gap-3 text-sm">
+                <input type="checkbox" checked={keepAddress} onChange={(e) => setKeepAddress(e.target.checked)} className="h-4 w-4 accent-ink" />
+                {t.address.save}
+              </label>
+            )}
+            {customer && !savedMatch && keepAddress && <input type="hidden" name="saveAddress" value="on" />}
             <div className="mt-6">
               {!postalCode.trim() ? (
                 <Notice>{t.zone.enterCode}</Notice>
@@ -357,11 +523,12 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
           }
         >
           <div className="grid gap-6 sm:grid-cols-2">
-            <Field name="name" label={t.fields.name} autoComplete="name" defaultValue={customer?.name ?? ''} className="sm:col-span-2" />
-            <Field name="email" type="email" label={t.fields.email} autoComplete="email" defaultValue={customer?.email ?? ''} />
-            <Field name="phone" type="tel" label={t.fields.phone} autoComplete="tel" defaultValue={customer?.phone ?? ''} placeholder="+352 …" />
+            <Field name="name" label={req(t.fields.name)} autoComplete="name" value={contact.name} onChange={(e) => setContact((c) => ({ ...c, name: e.target.value }))} required className="sm:col-span-2" />
+            <Field name="email" type="email" label={req(t.fields.email)} autoComplete="email" value={contact.email} onChange={(e) => setContact((c) => ({ ...c, email: e.target.value }))} required />
+            <Field name="phone" type="tel" label={req(t.fields.phone)} autoComplete="tel" value={contact.phone} onChange={(e) => setContact((c) => ({ ...c, phone: e.target.value }))} required placeholder="+352 …" />
             <Field as="textarea" name="notes" label={t.fields.notes} placeholder={t.fields.notesPh} className="sm:col-span-2" />
           </div>
+          <p className="mt-4 text-xs text-ink/50">{t.requiredNote}</p>
           {!customer && (
             <p className="mt-6 text-xs text-ink/55 sm:hidden">
               {t.signedOut}{' '}
@@ -479,8 +646,13 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
           )}
 
           <LinesError />
-          {blocker && <p className="text-xs text-ink/60">{blocker}</p>}
-          <SubmitButton label={mode === 'table' ? t.submitTable : t.submit} pendingLabel={t.sending} className="w-full" disabled={Boolean(blocker) || !key || pricing} />
+          {blockers.map((b) => (
+            <p key={b} className="flex items-start gap-2 text-xs text-ink/70" role="status">
+              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold-deep" />
+              {b}
+            </p>
+          ))}
+          <SubmitButton label={mode === 'table' ? t.submitTable : t.submit} pendingLabel={t.sending} className="w-full" disabled={blockers.length > 0 || !key || pricing} />
           <p className="text-center text-[11px] leading-relaxed text-ink/45">{t.footnote}</p>
         </div>
       </aside>

@@ -665,8 +665,8 @@
     },
     "view": "Meine Bestellung ansehen",
     "order": {
-      "subject": "Ihre Bestellung {{number}}",
-      "title": "Danke für Ihre Bestellung",
+      "subject": "Ihre Bestellung {{number}} ist eingegangen",
+      "title": "Ihre Bestellung ist eingegangen",
       "confirmedBody": "Ihre Bestellung ist bestätigt. Zur gewählten Zeit ist alles bereit.",
       "awaitingBody": "Ihre Bestellung ist reserviert. Sobald Ihre Überweisung eingeht, bestätigen und bereiten wir sie vor.",
       "transferTitle": "Bankverbindung für die Überweisung",
@@ -681,8 +681,16 @@
         "completed": "Ihre Bestellung wurde abgeholt. Vielen Dank und bis bald bei Golden Grape!",
         "delivered": "Ihre Bestellung wurde geliefert. Vielen Dank und viel Genuss!"
       },
-      "handedOver": { "completed": "Abgeholt", "delivered": "Geliefert" },
-      "staffSubject": "Neue Bestellung {{number}} — {{name}}"
+      "handedOver": {
+        "completed": "Abgeholt",
+        "delivered": "Geliefert"
+      },
+      "staffSubject": "Neue Bestellung eingegangen — {{number}} — {{name}}",
+      "staffTitle": "Neue Bestellung eingegangen",
+      "staffIntro": "Auf der Website wurde gerade eine Bestellung aufgegeben. Öffnen Sie sie in der Verwaltung, um sie zu bearbeiten.",
+      "reference": "Bestellung {{number}}",
+      "transferMissing": "Unser Team sendet Ihnen unsere Bankverbindung. Bitte geben Sie bei der Überweisung den unten stehenden Verwendungszweck an.",
+      "staffTransferMissing": "Achtung: In den Shop-Angaben ist keine IBAN eingetragen. Der Kunde hat keine Bankverbindung erhalten: bitte senden Sie sie ihm."
     },
     "reservation": {
       "pendingSubject": "Ihre Tischanfrage {{number}}",
@@ -694,7 +702,9 @@
       "cancelledSubject": "Ihre Reservierung {{number}} ist storniert",
       "cancelledBody": "Ihre Reservierung wurde storniert. Wir hoffen, Sie ein anderes Mal zu sehen.",
       "staffSubject": "Neue Tischanfrage {{number}} — {{name}} ({{guests}})",
-      "preorder": "Ihre Vorbestellung"
+      "preorder": "Ihre Vorbestellung",
+      "reference": "Reservierung {{number}}",
+      "staffTitle": "Neue Tischanfrage"
     },
     "eventBooking": {
       "subject": "Ihre Buchung — {{title}}",
@@ -703,6 +713,13 @@
       "cancelledSubject": "Ihre Buchung für {{title}} ist storniert",
       "cancelledBody": "Ihre Buchung wurde storniert.",
       "staffSubject": "Neue Buchung: {{title}} — {{name}} ({{guests}})"
+    },
+    "staffBanner": "Interne Benachrichtigung — für das Golden-Grape-Team (nicht an den Kunden weiterleiten)",
+    "welcome": {
+      "subject": "Willkommen bei Golden Grape: Ihr Konto wurde erstellt",
+      "title": "Ihr Konto wurde erstellt",
+      "body": "Ihr Kundenkonto wurde mit der Adresse {{email}} erstellt. Ihre Daten und Adressen sind für Ihre nächsten Bestellungen gespeichert, und Sie verfolgen Ihre Bestellungen in Ihrem Konto.",
+      "button": "Mein Konto"
     }
   },
   "cookies": {
@@ -864,7 +881,29 @@
     "emptyTitle": "Ihr Warenkorb ist leer",
     "emptyText": "Fügen Sie einige Schätze aus dem Shop oder von der Theke hinzu, oder reservieren Sie einen Tisch.",
     "bookTable": "Tisch reservieren",
-    "when": "Wann"
+    "when": "Wann",
+    "requiredNote": "* Pflichtfeld",
+    "missing": "Zum Bestellen fehlt noch: {{fields}}.",
+    "check": {
+      "time": "eine Uhrzeit",
+      "name": "Ihr Name",
+      "email": "eine gültige E-Mail",
+      "phone": "eine Telefonnummer",
+      "line1": "Straße und Hausnummer",
+      "postalCode": "die Postleitzahl",
+      "city": "der Ort"
+    },
+    "moreDates": "Weitere Termine",
+    "fewerDates": "Weniger Termine",
+    "address": {
+      "hint": "Geben Sie Ihre Straße ein: Wir schlagen offizielle luxemburgische Adressen vor. Alles bleibt änderbar.",
+      "searching": "Suche…",
+      "pick": "Gefundene Adressen",
+      "cityFound": "Ort aus der Postleitzahl ergänzt (änderbar).",
+      "saved": "Ihre Adressen",
+      "other": "Andere Adresse",
+      "save": "Diese Adresse in meinem Konto speichern"
+    }
   },
   "order": {
     "eyebrow": "Bestellung {{number}}",
@@ -920,12 +959,23 @@
       "reference": "Verwendungszweck",
       "amount": "Betrag",
       "note": "Bitte geben Sie den Verwendungszweck an, damit wir Ihre Zahlung zuordnen können.",
-      "missing": "Wir senden Ihnen unsere Bankverbindung per E-Mail."
+      "missing": "Unser Team sendet Ihnen unsere Bankverbindung. Bitte geben Sie bei der Überweisung den Verwendungszweck und den Betrag unten an."
     },
     "invalidTitle": "Dieser Link ist ungültig",
     "invalidText": "Öffnen Sie den Link aus Ihrer Bestätigungs-E-Mail oder melden Sie sich an, um Ihre Bestellungen zu sehen.",
     "continue": "Weiter einkaufen",
     "myOrders": "Meine Bestellungen",
-    "print": "Drucken"
+    "print": "Drucken",
+    "account": {
+      "title": "Beim nächsten Mal schneller",
+      "text": "Wählen Sie einfach ein Passwort: Ihre Daten und Ihre Adresse sind bei der nächsten Bestellung bereit, und Sie verfolgen diese Bestellung in Ihrem Konto.",
+      "note": "Freiwillig: Sie können immer ohne Konto bestellen.",
+      "password": "Passwort",
+      "submit": "Konto erstellen",
+      "sending": "Wird erstellt…",
+      "done": "Konto erstellt: Sie sind angemeldet.",
+      "exists": "Mit dieser E-Mail gibt es bereits ein Konto.",
+      "signIn": "Anmelden"
+    }
   }
 }

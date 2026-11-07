@@ -56,6 +56,34 @@ describe('generateSlots', () => {
     expect(run({ date: '2026-11-24' })).toEqual([]); // today + 15
   });
 
+  it('closing at midnight (00:00) or later runs to midnight: the last slot ends at 24:00, none crosses into the next day (GG-009)', () => {
+    const late: Hours = [{ day: '2', open: '17:00', close: '00:00' }];
+    const slots = run({ hours: late });
+    expect(slots[0].from).toBe('17:00');
+    expect(slots.at(-1)).toEqual({ from: '23:30', to: '24:00', available: 6 });
+    expect(run({ hours: [{ day: '2', open: '17:00', close: '01:00' }] })).toHaveLength(14);
+  });
+
+  it('today after the last slot minus the lead time: nothing left today (GG-009)', () => {
+    // 17:05 local: 18:05 earliest, after the last 17:30 start.
+    expect(run({ date: '2026-11-09', now: new Date('2026-11-09T16:05:00Z') })).toEqual([]);
+  });
+
+  it('every rule at once, as configured by the shop: 30 min, 4 per slot, 60 min notice, 14 days, closed Sunday and on a holiday (GG-009)', () => {
+    const shop: SlotRule = { intervalMin: 30, capacityPerSlot: 4, leadTimeMin: 60, maxDaysAhead: 14 };
+    const week: Hours = [1, 2, 3, 4, 5, 6].map((day) => ({ day: String(day), open: '10:00', close: '18:00' }));
+    // Saturday 7 Nov 2026, 13:02 local.
+    const now = new Date('2026-11-07T12:02:00Z');
+    const day = (date: string, over: Partial<Parameters<typeof generateSlots>[0]> = {}) => generateSlots({ date, rule: shop, hours: week, closedDates: ['2026-11-11'], now, taken: {}, ...over });
+    expect(day('2026-11-06')).toEqual([]); // yesterday
+    expect(day('2026-11-07')[0].from).toBe('14:30'); // 13:02 + 60 min → the next half hour
+    expect(day('2026-11-08')).toEqual([]); // Sunday
+    expect(day('2026-11-11')).toEqual([]); // holiday
+    expect(day('2026-11-21')).toHaveLength(16); // today + 14
+    expect(day('2026-11-22')).toEqual([]); // beyond the window
+    expect(day('2026-11-09', { taken: { '10:00': 4, '10:30': 3 } }).slice(0, 2).map((s) => s.available)).toEqual([0, 1]);
+  });
+
   it('a past date is empty', () => {
     expect(run({ date: '2026-11-06' })).toEqual([]);
   });

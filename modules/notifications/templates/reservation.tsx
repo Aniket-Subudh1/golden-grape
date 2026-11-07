@@ -1,5 +1,5 @@
 import { type Dictionary, interpolate } from '@/lib/i18n';
-import { colors, Details, heading, MailLayout, type MailBusiness } from './layout';
+import { colors, Details, heading, MailLayout, type MailBusiness, Reference } from './layout';
 import { type OrderMail, OrderLines, ViewButton } from './order-received';
 
 export type ReservationMailKind = 'pending' | 'accepted' | 'rejected' | 'cancelled';
@@ -51,8 +51,9 @@ export function ReservationCustomer({ t, business, logoUrl, data, kind }: Props 
 
 export function ReservationStaff({ t, business, logoUrl, data }: Props) {
   return (
-    <MailLayout business={business} logoUrl={logoUrl}>
-      <h1 style={heading}>{interpolate(t.reservation.staffSubject, { number: data.number, name: data.name, guests: data.guests })}</h1>
+    <MailLayout business={business} logoUrl={logoUrl} staff={t.staffBanner}>
+      <h1 style={heading}>{t.reservation.staffTitle}</h1>
+      <Reference>{interpolate(t.reservation.reference, { number: data.number })}</Reference>
       <Details
         rows={[
           ...rows(t, data),

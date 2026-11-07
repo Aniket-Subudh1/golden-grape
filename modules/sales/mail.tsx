@@ -8,7 +8,8 @@ import { mailContext } from '@/modules/notifications/context';
 import { type OrderMail, OrderReceived, OrderStaff } from '@/modules/notifications/templates/order-received';
 import { OrderStatusMail, type StatusMail } from '@/modules/notifications/templates/order-status';
 import { type ReservationMail, type ReservationMailKind, ReservationCustomer, ReservationStaff } from '@/modules/notifications/templates/reservation';
-import { getSettingsPrivate } from '@/modules/settings/service';
+import { dueOf } from '@/modules/payments/service';
+import { formatIban, getSettingsPrivate } from '@/modules/settings/service';
 import type { Order, Reservation } from '@/payload-types';
 import { orderToken } from './service';
 
@@ -43,10 +44,16 @@ async function orderMail(order: Order, locale: Locale, url: string): Promise<Ord
     vat: (totals.vatBreakdown ?? []).map((v) => ({ label: interpolate(t.labels.vat, { rate: percent(v.rateBp ?? 0, locale) }), amount: money(v.vatCents ?? 0) })),
     payment: t.payments[order.payment?.method ?? 'onsite'],
     awaiting,
-    transfer:
-      awaiting && business.iban
-        ? { beneficiary: business.legalName || business.name, iban: business.iban, bic: business.bic, reference: order.number ?? '', amount: money(totals.totalCents) }
-        : null,
+    // GG-014: the reference and what is still due always; the bank details only when a real IBAN is saved.
+    transfer: awaiting
+      ? {
+          beneficiary: business.legalName || business.name,
+          iban: business.iban ? formatIban(business.iban) : null,
+          bic: business.bic,
+          reference: order.number ?? '',
+          amount: money(dueOf({ totalCents: totals.totalCents, paidCents: order.payment?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 })),
+        }
+      : null,
     notes: order.notes,
     url,
   };

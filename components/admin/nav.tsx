@@ -71,6 +71,7 @@ type Props = { visibleEntities: VisibleEntities; i18n: I18nClient; payload: Payl
 export default async function AdminNav({ visibleEntities, i18n, payload, user }: Props) {
   const t = adminText(i18n.language);
   const groups: NavGroup[] = GROUPS.map((g) => ({
+    id: g.label,
     label: t.nav[g.label],
     items: g.items
       .filter((i) => ((i.global ? visibleEntities.globals : visibleEntities.collections) as string[]).includes(i.slug))

@@ -30,7 +30,7 @@ const rows = (t: Dictionary['mail'], d: CateringMail): [string, string | number]
 
 export function CateringStaff({ t, business, logoUrl, data }: Props) {
   return (
-    <MailLayout business={business} logoUrl={logoUrl}>
+    <MailLayout business={business} logoUrl={logoUrl} staff={t.staffBanner}>
       <h1 style={heading}>{interpolate(t.catering.staffSubject, { number: data.number, name: data.name })}</h1>
       <Details
         rows={[

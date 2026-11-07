@@ -1,6 +1,7 @@
-import type { Field, GlobalConfig } from 'payload';
+import type { PayloadRequest, Field, GlobalConfig } from 'payload';
 import { hiddenUnless, isStaff } from '@/lib/access';
-import { type Label, l, timeOfDay, WEEKDAYS } from '@/lib/admin';
+import { type Label, l, say, timeOfDay, WEEKDAYS } from '@/lib/admin';
+import { isBic, isIban } from './iban';
 import { revalidateTagHook } from '@/lib/revalidate';
 
 export const MODULES = ['b2b', 'purchasing', 'promotions', 'loyalty', 'giftCards', 'reviews', 'attendance', 'pos'] as const;
@@ -114,9 +115,22 @@ export const businessSettings: GlobalConfig = {
                     name: 'iban',
                     type: 'text',
                     label: l('IBAN (pour les virements)', 'IBAN (for bank transfers)', 'IBAN (für Überweisungen)', 'IBAN (para transferências)'),
+                    // GG-014: only a real IBAN (check digits verified, published examples refused) reaches customers.
+                    validate: (value: string | null | undefined, { req }: { req: PayloadRequest }) =>
+                      !value ||
+                      isIban(value) ||
+                      say(
+                        req,
+                        l(
+                          'IBAN invalide : vérifiez-le sur votre relevé bancaire (LU suivi de 18 chiffres).',
+                          'Invalid IBAN: check it on your bank statement (LU followed by 18 digits).',
+                          'Ungültige IBAN: Bitte auf dem Kontoauszug prüfen (LU gefolgt von 18 Ziffern).',
+                          'IBAN inválido: verifique-o no extrato bancário (LU seguido de 18 algarismos).',
+                        ),
+                      ),
                     admin: {
                       width: '60%',
-                      placeholder: 'LU28 0019 4006 4475 0000',
+                      placeholder: 'LU.. .... .... .... ....',
                       description: l(
                         'Affiché aux clients qui paient par virement, avec le numéro de commande comme communication.',
                         'Shown to customers who pay by transfer, with the order number as the reference.',
@@ -125,7 +139,16 @@ export const businessSettings: GlobalConfig = {
                       ),
                     },
                   },
-                  { name: 'bic', type: 'text', label: l('BIC', 'BIC', 'BIC', 'BIC'), admin: { width: '40%', placeholder: 'BCEELULL' } },
+                  {
+                    name: 'bic',
+                    type: 'text',
+                    label: l('BIC', 'BIC', 'BIC', 'BIC'),
+                    validate: (value: string | null | undefined, { req }: { req: PayloadRequest }) =>
+                      !value ||
+                      isBic(value) ||
+                      say(req, l('BIC invalide : 8 ou 11 caractères.', 'Invalid BIC: 8 or 11 characters.', 'Ungültiger BIC: 8 oder 11 Zeichen.', 'BIC inválido: 8 ou 11 caracteres.')),
+                    admin: { width: '40%', placeholder: 'XXXXLULL' },
+                  },
                 ),
               ],
             },

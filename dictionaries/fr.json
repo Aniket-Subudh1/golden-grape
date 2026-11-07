@@ -665,8 +665,8 @@
     },
     "view": "Voir ma commande",
     "order": {
-      "subject": "Votre commande {{number}}",
-      "title": "Merci pour votre commande",
+      "subject": "Votre commande {{number}} a bien été reçue",
+      "title": "Votre commande a bien été reçue",
       "confirmedBody": "Votre commande est confirmée. Tout sera prêt pour l’heure choisie.",
       "awaitingBody": "Votre commande est réservée. Dès réception de votre virement, nous la confirmons et la préparons.",
       "transferTitle": "Coordonnées pour le virement",
@@ -681,8 +681,16 @@
         "completed": "Votre commande a bien été retirée. Merci et à très bientôt chez Golden Grape !",
         "delivered": "Votre commande vous a été livrée. Merci et bonne dégustation !"
       },
-      "handedOver": { "completed": "Retirée", "delivered": "Livrée" },
-      "staffSubject": "Nouvelle commande {{number}} — {{name}}"
+      "handedOver": {
+        "completed": "Retirée",
+        "delivered": "Livrée"
+      },
+      "staffSubject": "Nouvelle commande reçue — {{number}} — {{name}}",
+      "staffTitle": "Nouvelle commande reçue",
+      "staffIntro": "Une commande vient d’être passée sur le site. Ouvrez-la dans l’espace gestion pour la traiter.",
+      "reference": "Commande {{number}}",
+      "transferMissing": "Nos coordonnées bancaires vous seront envoyées par notre équipe. Lors du virement, indiquez la communication ci-dessous.",
+      "staffTransferMissing": "Attention : aucun IBAN n’est renseigné dans Infos de la boutique. Le client n’a pas reçu de coordonnées bancaires : envoyez-les-lui."
     },
     "reservation": {
       "pendingSubject": "Votre demande de table {{number}}",
@@ -694,7 +702,9 @@
       "cancelledSubject": "Votre réservation {{number}} est annulée",
       "cancelledBody": "Votre réservation a été annulée. Au plaisir de vous voir une prochaine fois.",
       "staffSubject": "Nouvelle demande de table {{number}} — {{name}} ({{guests}})",
-      "preorder": "Votre pré-commande"
+      "preorder": "Votre pré-commande",
+      "reference": "Réservation {{number}}",
+      "staffTitle": "Nouvelle demande de table"
     },
     "eventBooking": {
       "subject": "Votre réservation — {{title}}",
@@ -703,6 +713,13 @@
       "cancelledSubject": "Votre réservation pour {{title}} est annulée",
       "cancelledBody": "Votre réservation a été annulée.",
       "staffSubject": "Nouvelle réservation : {{title}} — {{name}} ({{guests}})"
+    },
+    "staffBanner": "Notification interne — pour l’équipe Golden Grape (ne pas transférer au client)",
+    "welcome": {
+      "subject": "Bienvenue chez Golden Grape : votre compte est créé",
+      "title": "Votre compte est créé",
+      "body": "Votre compte client a bien été créé avec l’adresse {{email}}. Vos coordonnées et vos adresses sont enregistrées pour vos prochaines commandes, et vous suivez vos commandes depuis votre compte.",
+      "button": "Mon compte"
     }
   },
   "cookies": {
@@ -864,7 +881,29 @@
     "emptyTitle": "Votre panier est vide",
     "emptyText": "Ajoutez quelques trésors de la boutique ou du comptoir, ou réservez une table.",
     "bookTable": "Réserver une table",
-    "when": "Quand"
+    "when": "Quand",
+    "requiredNote": "* obligatoire",
+    "missing": "Pour valider, il manque : {{fields}}.",
+    "check": {
+      "time": "une heure",
+      "name": "votre nom",
+      "email": "un e-mail valide",
+      "phone": "un numéro de téléphone",
+      "line1": "la rue et le numéro",
+      "postalCode": "le code postal",
+      "city": "la localité"
+    },
+    "moreDates": "Voir plus de dates",
+    "fewerDates": "Moins de dates",
+    "address": {
+      "hint": "Tapez votre rue : nous proposons les adresses officielles du Luxembourg. Vous pouvez tout corriger.",
+      "searching": "Recherche…",
+      "pick": "Adresses trouvées",
+      "cityFound": "Localité remplie d’après le code postal (modifiable).",
+      "saved": "Vos adresses",
+      "other": "Autre adresse",
+      "save": "Enregistrer cette adresse dans mon compte"
+    }
   },
   "order": {
     "eyebrow": "Commande {{number}}",
@@ -920,12 +959,23 @@
       "reference": "Communication",
       "amount": "Montant",
       "note": "Indiquez la communication pour que nous retrouvions votre paiement.",
-      "missing": "Nous vous envoyons nos coordonnées bancaires par e-mail."
+      "missing": "Nos coordonnées bancaires vous seront envoyées par notre équipe. Lors du virement, indiquez la communication et le montant ci-dessous."
     },
     "invalidTitle": "Ce lien n’est pas valide",
     "invalidText": "Ouvrez le lien de votre e-mail de confirmation, ou connectez-vous pour voir vos commandes.",
     "continue": "Continuer mes achats",
     "myOrders": "Mes commandes",
-    "print": "Imprimer"
+    "print": "Imprimer",
+    "account": {
+      "title": "Gagnez du temps la prochaine fois",
+      "text": "Choisissez simplement un mot de passe : vos coordonnées et votre adresse seront prêtes pour votre prochaine commande, et vous suivrez celle-ci depuis votre compte.",
+      "note": "Facultatif : vous pouvez toujours commander sans compte.",
+      "password": "Mot de passe",
+      "submit": "Créer mon compte",
+      "sending": "Création…",
+      "done": "Compte créé : vous êtes connecté(e).",
+      "exists": "Un compte existe déjà avec cet e-mail.",
+      "signIn": "Se connecter"
+    }
   }
 }

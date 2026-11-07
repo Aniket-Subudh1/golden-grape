@@ -576,11 +576,53 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   padding-top: 10px;
 }
 .gg-nav__group-label {
-  margin: 0 0 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 30px;
+  margin: 0;
   padding: 0 6px;
-  font-size: 13px;
-  font-weight: 500;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font: 500 13px/1 var(--font-body);
   color: rgb(26 23 18 / 0.6);
+  text-align: left;
+  cursor: pointer;
+}
+.gg-nav__group-label:hover {
+  color: var(--gg-ink);
+  background: var(--gg-accent);
+}
+.gg-nav__group-label > span:first-child {
+  flex: 1;
+}
+.gg-nav__group-label .gg-nav__count {
+  margin-left: 0;
+}
+.gg-nav__chevron {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.2s;
+}
+.gg-nav__group[data-open] .gg-nav__chevron {
+  transform: rotate(180deg);
+}
+/* Accordion (GG-016): the rows animate from 0 to their height. */
+.gg-nav__group-items {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.2s ease;
+}
+.gg-nav__group[data-open] .gg-nav__group-items {
+  grid-template-rows: 1fr;
+}
+.gg-nav__group-items > div {
+  display: grid;
+  gap: 2px;
+  min-height: 0;
+  overflow: hidden;
 }
 .gg-nav__item {
   display: flex;
@@ -2429,14 +2471,34 @@ body:has(.gg-create) .no-results__actions {
   color: var(--gg-text-2);
   font-size: 12px;
 }
-.gg-bell__new {
+.gg-bell__tag {
   flex: none;
   padding: 2px 7px;
   border-radius: 999px;
-  background: var(--gg-danger-tint);
-  color: var(--gg-danger);
+  background: var(--gg-warning-tint);
+  color: var(--gg-warning);
   font-size: 11px;
   font-weight: 600;
+}
+.gg-bell__tag--new {
+  background: var(--gg-danger-tint);
+  color: var(--gg-danger);
+}
+.gg-bell__tag--done {
+  background: var(--gg-accent);
+  color: var(--gg-text-2);
+  font-weight: 500;
+}
+/* Handled in the last 24 h (GG-017): still openable, visibly finished. */
+.gg-bell__item[data-state='done'] {
+  opacity: 0.6;
+}
+.gg-bell__item[data-state='done']:hover {
+  opacity: 1;
+}
+.gg-bell__panel > * + .gg-bell__title {
+  margin-top: 6px;
+  border-top: 1px solid var(--gg-line);
 }
 
 /* A refund still to send, in the order's payment card (GG-004). */

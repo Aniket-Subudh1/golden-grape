@@ -10,10 +10,12 @@ import { cn } from '@/lib/cn';
 import { type Dictionary, getDictionary, interpolate, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { slotLabel } from '@/lib/time';
+import { OrderAccount } from '@/modules/customers/components/order-account';
 import { currentCustomer } from '@/modules/customers/service';
 import { getPayloadClient } from '@/lib/payload';
 import { checkOrderToken, getOrder, getReservation } from '@/modules/sales/service';
-import { getSettingsPrivate } from '@/modules/settings/service';
+import { dueOf } from '@/modules/payments/service';
+import { formatIban, getSettingsPrivate } from '@/modules/settings/service';
 import type { Order } from '@/payload-types';
 
 type Props = PageProps<'/[locale]/order/[id]'>;
@@ -171,27 +173,29 @@ async function Confirmation({ params, searchParams }: Pick<Props, 'params' | 'se
           <p className="eyebrow mb-4 flex items-center gap-2 text-gold-deep">
             <Landmark className="h-3.5 w-3.5" /> {t.transfer.title}
           </p>
-          {business?.iban ? (
-            <dl className="grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
-              {(
-                [
-                  [t.transfer.beneficiary, business.legalName || business.name],
-                  [t.transfer.iban, business.iban],
-                  ...(business.bic ? [[t.transfer.bic, business.bic]] : []),
-                  [t.transfer.reference, order.number],
-                  [t.transfer.amount, money(order.totals?.totalCents)],
-                ] as [string, string][]
-              ).map(([label, value]) => (
-                <div key={label}>
-                  <dt className="text-[10px] tracking-[0.22em] text-ink/50 uppercase">{label}</dt>
-                  <dd className="mt-1 font-medium break-all tabular-nums select-all">{value}</dd>
-                </div>
-              ))}
-            </dl>
-          ) : (
-            <p className="text-sm">{t.transfer.missing}</p>
-          )}
-          <p className="mt-5 text-xs text-ink/60">{t.transfer.note}</p>
+          {/* GG-014: the reference and what is still due always; the bank details only once a real IBAN is saved. */}
+          {!business?.iban && <p className="mb-5 text-sm">{t.transfer.missing}</p>}
+          <dl className="grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
+            {(
+              [
+                ...(business?.iban
+                  ? [
+                      [t.transfer.beneficiary, business.legalName || business.name],
+                      [t.transfer.iban, formatIban(business.iban)],
+                      ...(business.bic ? [[t.transfer.bic, business.bic]] : []),
+                    ]
+                  : []),
+                [t.transfer.reference, order.number],
+                [t.transfer.amount, money(dueOf({ totalCents: order.totals?.totalCents ?? 0, paidCents: order.payment?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 }))],
+              ] as [string, string][]
+            ).map(([label, value]) => (
+              <div key={label}>
+                <dt className="text-[10px] tracking-[0.22em] text-ink/50 uppercase">{label}</dt>
+                <dd className="mt-1 font-medium break-all tabular-nums select-all">{value}</dd>
+              </div>
+            ))}
+          </dl>
+          {business?.iban && <p className="mt-5 text-xs text-ink/60">{t.transfer.note}</p>}
         </section>
       )}
 
@@ -233,6 +237,18 @@ async function Confirmation({ params, searchParams }: Pick<Props, 'params' | 'se
           <h2 className="eyebrow mb-4 text-ink/60">{reservation ? t.preorder : t.items}</h2>
           <Lines order={shown} locale={locale} t={dict.checkout} vatIncluded={dict.cart.vatIncluded} />
         </section>
+      )}
+
+      {!customer && !doc.customer && typeof sp.t === 'string' && (
+        <OrderAccount
+          id={id}
+          token={sp.t}
+          locale={locale}
+          t={t.account}
+          m={dict.form}
+          errors={dict.auth.errors}
+          signInHref={`${localePath(locale, '/auth')}?next=${encodeURIComponent(localePath(locale, '/account/orders'))}`}
+        />
       )}
 
       <div className="mt-16 flex flex-wrap justify-center gap-3">

@@ -1,4 +1,4 @@
-import type { CollectionSlug, Field, FieldHook, TextField } from 'payload';
+import type { CollectionSlug, Field, FieldHook, PayloadRequest, TextField } from 'payload';
 
 // Admin building blocks shared by several collections and globals. The admin is used by non-technical staff
 // (docs/03-CODING-LAWS.md): everyday words in the four languages, no codes, cents, paths or IDs on screen.
@@ -7,6 +7,9 @@ export type Label = { fr: string; en: string; de: string; pt: string };
 
 /** A label in the four admin languages, in the order fr, en, de, pt (Payload picks the user's language). */
 export const l = (fr: string, en: string, de: string, pt: string): Label => ({ fr, en, de, pt });
+
+/** A validation message in the language of the person saving (Payload `validate` returns the text to show). */
+export const say = (req: PayloadRequest | undefined, label: Label) => label[(req?.i18n?.language ?? 'fr') as keyof Label] ?? label.fr;
 
 /** The list page's "Add …" button, opening the create page (components/admin/create-button.tsx). */
 export const addButton = (collectionSlug: string, label: Label) => ({

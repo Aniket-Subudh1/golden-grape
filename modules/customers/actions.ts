@@ -1,5 +1,6 @@
 'use server';
 
+import { after } from 'next/server';
 import { z } from 'zod';
 import { clientIp, publicAction } from '@/lib/action';
 import { AppError } from '@/lib/errors';
@@ -16,8 +17,10 @@ import {
   signIn,
   signOut,
   signUp,
+  signUpFromOrder,
   updateProfile,
 } from './service';
+import { mailWelcome } from './mail';
 import { isVatNumber } from './vat';
 
 // Error messages are dictionary keys (`form.fields.*`), translated by ActionForm.
@@ -65,6 +68,18 @@ export const signUpAction = publicAction(
     // 5 sign-ups per hour from one address (M2.2 T4).
     await rateLimit(`signup:${await clientIp()}`, 5, 60 * 60_000);
     const customer = await signUp(payload, input);
+    after(() => mailWelcome(customer).catch((error) => console.error('[mail] welcome', error)));
+    return { name: customer.name };
+  },
+);
+
+/** Account from a guest's confirmation page (GG-010): only a password to choose; same limit as sign-up. */
+export const signUpFromOrderAction = publicAction(
+  z.object({ id: z.string().regex(/^[a-f0-9]{24}$/, 'invalid'), token: z.string().min(1).max(100), password, locale: z.enum(LOCALES) }),
+  async (input, { payload }) => {
+    await rateLimit(`signup:${await clientIp()}`, 5, 60 * 60_000);
+    const customer = await signUpFromOrder(payload, input);
+    after(() => mailWelcome(customer).catch((error) => console.error('[mail] welcome', error)));
     return { name: customer.name };
   },
 );

@@ -1,6 +1,6 @@
 import { APIError, type CollectionConfig, type Field, type PayloadRequest, type Validate } from 'payload';
 import { hiddenUnless, isStaff } from '@/lib/access';
-import { autoSlug, badgeCell, addButton, emptyList, type Label, l, pageLinkCell, scaledNumber, seoSection } from '@/lib/admin';
+import { autoSlug, badgeCell, addButton, emptyList, type Label, l, pageLinkCell, say, scaledNumber, seoSection } from '@/lib/admin';
 import { validateFactor } from './packaging';
 
 // The catalogue (04-DATA-MODEL §2). Staff-only through the API: the website reads it through service.ts.
@@ -9,7 +9,6 @@ import { validateFactor } from './packaging';
 // service), which imports this file, and the cycle breaks `next build`.
 const inventory = () => import('@/modules/inventory/service');
 
-const say = (req: PayloadRequest | undefined, label: Label) => label[(req?.i18n?.language ?? 'fr') as keyof Label] ?? label.fr;
 const row = (...fields: Field[]): Field => ({ type: 'row', fields });
 const editors = isStaff('manager', 'stock');
 

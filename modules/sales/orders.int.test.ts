@@ -1,10 +1,14 @@
 import { randomUUID } from 'node:crypto';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
+
+// signUpFromOrder signs the new account in (a cookie): outside a request there is no cookie jar.
+vi.mock('next/headers', () => ({ cookies: async () => ({ set: () => {}, get: () => undefined, delete: () => {} }), headers: async () => new Headers() }));
 import { model } from '@/lib/tx';
 import { bookEvent } from '@/modules/events/service';
 import { onHand } from '@/modules/inventory/service';
 import { getTestPayload, makeStaff, makeVariant, parallel } from '@/tests/helpers';
 import { transitionReservation } from './reservations';
+import { signUpFromOrder } from '@/modules/customers/service';
 import { paymentsOf } from '@/modules/payments/service';
 import { checkOrderToken, historyOf, orderToken, type PlaceOrderInput, placeOrder, recordPayment, recordRefund, requestRefund, slotCalendar, transition } from './service';
 
@@ -352,5 +356,31 @@ describe('who can see an order', () => {
     const { docs } = await payload.find({ collection: 'orders', overrideAccess: false, user: a, limit: 0 });
     expect(docs.map((d) => d.id)).toEqual([mine.id]);
     await expect(payload.update({ collection: 'orders', id: mine.id, data: { status: 'completed' }, overrideAccess: false, user: a })).rejects.toThrow();
+  });
+});
+
+describe('an account from a guest order (GG-010)', () => {
+  const DAY3 = '2026-11-12';
+  const address = { line1: '36, Route de Roost', postalCode: '7795', city: 'Bissen' };
+
+  it('needs the confirmation link; gives the account this order and its address; a second try is refused', async () => {
+    const placed = await placeOrder(payload, order({ date: DAY3, mode: 'delivery', payment: 'transfer', time: '10:00', email: 'guest.one@example.test', address, lines: [{ variant: wine.variant.id, qty: 3 }] }), { now: NOW });
+    const base = { id: placed.id, password: 'a-good-password', locale: 'fr' as const };
+    await expect(signUpFromOrder(payload, { ...base, token: 'forged' })).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    expect((await payload.count({ collection: 'customers', where: { email: { equals: 'guest.one@example.test' } }, overrideAccess: true })).totalDocs).toBe(0);
+
+    const customer = await signUpFromOrder(payload, { ...base, token: orderToken(placed.id) });
+    expect(customer).toMatchObject({ email: 'guest.one@example.test', name: 'Ana Silva' });
+    const doc = await payload.findByID({ collection: 'orders', id: placed.id, overrideAccess: true, depth: 0 });
+    expect(String(doc.customer)).toBe(customer.id);
+    const saved = await payload.findByID({ collection: 'customers', id: customer.id, overrideAccess: true, depth: 0 });
+    expect(saved.addresses).toMatchObject([{ line1: address.line1, postalCode: '7795', city: 'Bissen', isDefault: true }]);
+    await expect(signUpFromOrder(payload, { ...base, token: orderToken(placed.id) })).rejects.toMatchObject({ code: 'FORBIDDEN' });
+  });
+
+  it('an e-mail that already has an account → refused, the order stays a guest order', async () => {
+    const placed = await placeOrder(payload, order({ date: DAY3, time: '10:30', email: 'guest.one@example.test' }), { now: NOW });
+    await expect(signUpFromOrder(payload, { id: placed.id, token: orderToken(placed.id), password: 'a-good-password', locale: 'fr' })).rejects.toMatchObject({ message: 'emailTaken' });
+    expect((await payload.findByID({ collection: 'orders', id: placed.id, overrideAccess: true, depth: 0 })).customer).toBeFalsy();
   });
 });

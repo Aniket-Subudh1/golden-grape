@@ -12,6 +12,7 @@ import {
   ClipboardCheck,
   Contact,
   CalendarDays,
+  ChevronDown,
   ClipboardList,
   ExternalLink,
   FileText,
@@ -37,12 +38,13 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect, useSyncExternalStore } from 'react';
 import type { Alerts } from './alerts';
 import { useAlerts } from './alerts-client';
 
 export type NavItem = { label: string; icon: string; href: string; slug?: string };
-export type NavGroup = { label: string; items: NavItem[] };
+/** `id`: a stable key (the group's text key), so a section's open/closed choice survives a language change. */
+export type NavGroup = { id: string; label: string; items: NavItem[] };
 type Text = Record<'main' | 'dashboard' | 'viewSite' | 'account' | 'signOut' | 'closeMenu' | 'brandSub', string>;
 
 const ICONS = {
@@ -99,6 +101,34 @@ function Item({ item, active, external, count }: { item: NavItem; active: boolea
 
 const SCROLL_KEY = 'gg_nav_scroll';
 
+// Collapsible sections (GG-016). Each section's open/closed choice is kept in this browser; without a choice, only the
+// section of the page being viewed is open. The store is localStorage itself, read through useSyncExternalStore.
+const GROUPS_KEY = 'gg_nav_groups';
+const groupListeners = new Set<() => void>();
+const readGroups = () => localStorage.getItem(GROUPS_KEY) ?? '{}';
+/** A damaged value only loses the choices (every section back to its default), never the sidebar. */
+function parseChoices(raw: string): Record<string, boolean> {
+  try {
+    const value: unknown = JSON.parse(raw);
+    return value && typeof value === 'object' ? (value as Record<string, boolean>) : {};
+  } catch {
+    return {};
+  }
+}
+function subscribeGroups(listener: () => void) {
+  groupListeners.add(listener);
+  window.addEventListener('storage', listener);
+  return () => {
+    groupListeners.delete(listener);
+    window.removeEventListener('storage', listener);
+  };
+}
+function setGroupOpen(id: string, open: boolean) {
+  const choices = parseChoices(readGroups());
+  localStorage.setItem(GROUPS_KEY, JSON.stringify({ ...choices, [id]: open }));
+  groupListeners.forEach((l) => l());
+}
+
 export function NavClient({ groups, alerts: fresh, text }: { groups: NavGroup[]; alerts: Alerts; text: Text }) {
   const pathname = usePathname();
   const alerts = useAlerts(fresh);
@@ -127,6 +157,13 @@ export function NavClient({ groups, alerts: fresh, text }: { groups: NavGroup[];
     const href = link.split('?')[0];
     return pathname === href || pathname.startsWith(`${href}/`);
   };
+  const choices = parseChoices(useSyncExternalStore(subscribeGroups, readGroups, () => '{}'));
+  const activeGroup = groups.find((g) => g.items.some((i) => isActive(i.href)))?.id;
+  const isOpen = (id: string) => choices[id] ?? id === activeGroup;
+  // Opening a page inside a closed section opens it: the current page is never hidden.
+  useEffect(() => {
+    if (activeGroup && choices[activeGroup] === false) setGroupOpen(activeGroup, true);
+  }, [activeGroup, choices]);
   // Payload's own classes keep its open/close behaviour; `gg-nav` restyles everything inside.
   const classes = ['nav', 'gg-nav', navOpen && 'nav--nav-open', shouldAnimate && 'nav--nav-animate', hydrated && 'nav--nav-hydrated'];
 
@@ -152,14 +189,28 @@ export function NavClient({ groups, alerts: fresh, text }: { groups: NavGroup[];
 
         <nav className="gg-nav__groups" aria-label={text.main}>
           <Item item={{ label: text.dashboard, icon: 'dashboard', href: '/admin' }} active={pathname === '/admin'} />
-          {groups.map((group) => (
-            <div key={group.label} className="gg-nav__group">
-              <p className="gg-nav__group-label">{group.label}</p>
-              {group.items.map((item) => (
-                <Item key={item.href} item={item} active={isActive(item.href)} count={item.slug ? alerts?.counts[item.slug] : undefined} />
-              ))}
-            </div>
-          ))}
+          {groups.map((group) => {
+            const open = isOpen(group.id);
+            const count = (item: NavItem) => (item.slug ? alerts?.counts[item.slug] : undefined);
+            // A closed section still says how much waits inside it.
+            const waiting = group.items.reduce((sum, i) => sum + (count(i) ?? 0), 0);
+            return (
+              <div key={group.id} className="gg-nav__group" data-open={open || undefined}>
+                <button type="button" className="gg-nav__group-label" aria-expanded={open} aria-controls={`gg-nav-${group.id}`} onClick={() => setGroupOpen(group.id, !open)}>
+                  <span>{group.label}</span>
+                  {!open && waiting > 0 && <span className="gg-nav__count">{waiting}</span>}
+                  <ChevronDown className="gg-nav__chevron" aria-hidden />
+                </button>
+                <div id={`gg-nav-${group.id}`} className="gg-nav__group-items" inert={!open || undefined}>
+                  <div>
+                    {group.items.map((item) => (
+                      <Item key={item.href} item={item} active={isActive(item.href)} count={count(item)} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </nav>
 
         <div className="gg-nav__foot">
