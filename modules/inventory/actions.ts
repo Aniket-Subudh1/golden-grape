@@ -3,9 +3,10 @@
 import { z } from 'zod';
 import { action } from '@/lib/action';
 import { audit } from '@/lib/audit';
+import { readTable, toCsv } from '@/lib/table';
 import { withTx } from '@/lib/tx';
 import { ADJUST_REASONS } from './labels';
-import { adjust, postCount, setLowStockThreshold } from './service';
+import { adjust, countFromTable, exportMovements, postCount, setLowStockThreshold } from './service';
 
 const roles = { roles: ['manager' as const, 'stock' as const] };
 
@@ -42,3 +43,25 @@ export const postStockCount = action(z.object({ count: z.string().min(1) }), rol
   }
   return result;
 });
+
+/** A stock count from a file (back-office Import / Export page): creates an open count to check and post as usual. */
+export const importStockCount = action(
+  z.object({ file: z.instanceof(File).refine((f) => f.size > 0 && f.size <= 10 * 1024 * 1024, 'size') }),
+  roles,
+  async ({ file }, { payload, user }) => {
+    const table = await readTable(Buffer.from(await file.arrayBuffer()), file.name);
+    const result = await countFromTable(payload, table, { user: user.id, note: file.name.replace(/\.[^.]+$/, '') });
+    if (result.count) await audit(payload, { user: user.id, action: 'doc.create', collection: 'stockCounts', id: result.count, ref: file.name, after: { lines: result.lines } });
+    return result;
+  },
+);
+
+const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+export const exportStockMovements = action(
+  z.object({ from: day, to: day, lang: z.enum(['fr', 'en', 'de', 'pt']) }).refine((i) => i.from <= i.to, { path: ['to'], message: 'order' }),
+  roles,
+  async (input, { payload }) => {
+    const { headers, rows } = await exportMovements(payload, input);
+    return { name: `golden-grape-stock-movements-${input.from}-${input.to}.csv`, csv: toCsv(headers, rows), rows: rows.length };
+  },
+);

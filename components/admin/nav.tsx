@@ -1,5 +1,6 @@
 import type { I18nClient } from '@payloadcms/translations';
 import type { Payload, TypedUser, VisibleEntities } from 'payload';
+import { hasRole, type Role } from '@/lib/access';
 import { today } from '@/lib/time';
 import { ORDER_TABS, orderTabQuery } from '@/modules/sales/admin/order-tabs';
 import { getAlerts } from './alerts';
@@ -10,7 +11,9 @@ type Key = keyof ReturnType<typeof adminText>['nav'];
 
 // The admin sidebar (Payload `admin.components.Nav`), laid out like the CUTM LMS sidebar: brand block, grouped
 // icon items in everyday words, then account links. Only what the user's role may open is listed.
-const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean; icon: string; query?: string }[] }[] = [
+// An item opens a collection or global (`slug`, listed when the role may see it) or one of our admin pages (`path`, listed
+// for `roles`).
+const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean; path?: string; roles?: Role[]; icon: string; query?: string }[] }[] = [
   {
     label: 'website',
     items: [
@@ -33,6 +36,7 @@ const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean;
       { label: 'lowStock', slug: 'stockLevels', icon: 'lowStock', query: '?where[lowStock][equals]=true' },
       { label: 'stockCounts', slug: 'stockCounts', icon: 'counts' },
       { label: 'stockMovements', slug: 'stockMovements', icon: 'movements' },
+      { label: 'importExport', slug: 'importExport', path: '/admin/import-export', roles: ['manager', 'stock'], icon: 'importExport' },
     ],
   },
   {
@@ -74,8 +78,8 @@ export default async function AdminNav({ visibleEntities, i18n, payload, user }:
     id: g.label,
     label: t.nav[g.label],
     items: g.items
-      .filter((i) => ((i.global ? visibleEntities.globals : visibleEntities.collections) as string[]).includes(i.slug))
-      .map((i) => ({ label: t.nav[i.label], icon: i.icon, slug: i.slug, href: `/admin/${i.global ? 'globals' : 'collections'}/${i.slug}${(i.query ?? '').replace('{today}', today())}` })),
+      .filter((i) => (i.path ? hasRole(user, i.roles ?? []) : ((i.global ? visibleEntities.globals : visibleEntities.collections) as string[]).includes(i.slug)))
+      .map((i) => ({ label: t.nav[i.label], icon: i.icon, slug: i.slug, href: i.path ?? `/admin/${i.global ? 'globals' : 'collections'}/${i.slug}${(i.query ?? '').replace('{today}', today())}` })),
   })).filter((g) => g.items.length > 0);
   // What waits beside each item (GG-002); the client keeps it fresh while the page stays open (alerts-client.tsx).
   const alerts = await getAlerts(payload, user ?? null);

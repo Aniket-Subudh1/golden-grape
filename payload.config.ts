@@ -59,7 +59,11 @@ export default buildConfig({
       Nav: '@/components/admin/nav',
       actions: ['@/components/admin/alerts-client', '@/components/admin/language-menu'],
       providers: ['@/components/admin/row-links', '@/components/admin/password-toggle'],
-      views: { dashboard: { Component: '@/components/admin/dashboard' } },
+      views: {
+        dashboard: { Component: '@/components/admin/dashboard' },
+        // Products, stock counts and movements as spreadsheets (client request, 7 Nov).
+        importExport: { Component: '@/components/admin/import-export', path: '/import-export' },
+      },
     },
   },
   collections: [

@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   images: { minimumCacheTTL: 60 * 60 * 24 * 7 },
   cacheComponents: true,
   partialPrefetching: true,
+  // The back office's Import / Export page sends spreadsheets to server actions (default limit 1 MB).
+  experimental: { serverActions: { bodySizeLimit: '10mb' } },
   turbopack: {
     rules: {
       '*.css': { loaders: ['@tailwindcss/turbopack'], as: '*.css' },

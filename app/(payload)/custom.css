@@ -2673,3 +2673,74 @@ body:has(.gg-create) .no-results__actions {
 .gg-counter[data-waiting] .gg-counter__count {
   color: var(--gg-primary);
 }
+
+/* ---- Import / export page (components/admin/import-export.tsx) ----------------------------------------- */
+.gg-io__body {
+  display: grid;
+  gap: 14px;
+  padding: 0 16px 16px;
+}
+.gg-io__map {
+  max-height: 560px;
+  overflow-y: auto;
+}
+.gg-io__map th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.gg-io__map tr:not(.gg-io__on) td:first-child {
+  color: var(--gg-text-2);
+}
+.gg-io__on td:first-child {
+  font-weight: 600;
+}
+.gg-io__map select,
+.gg-io__map input,
+.gg-io__date input {
+  width: 100%;
+  min-width: 220px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--gg-line-2);
+  border-radius: 6px;
+  background: #ffffff;
+  font: 400 13px var(--font-body);
+  color: var(--gg-ink);
+}
+.gg-io__note {
+  margin: 0;
+  font-size: 13px;
+}
+.gg-io__note--bad {
+  color: var(--gg-danger);
+  font-weight: 600;
+}
+.gg-io__wrap {
+  white-space: normal !important;
+}
+.gg-io__progress {
+  display: grid;
+  gap: 8px;
+}
+.gg-io__bar {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--gg-line);
+}
+.gg-io__bar span {
+  display: block;
+  height: 100%;
+  background: var(--gg-primary);
+  transition: width 0.3s;
+}
+.gg-io__date {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--gg-text-2);
+}
+.gg-io__date input {
+  min-width: 160px;
+}

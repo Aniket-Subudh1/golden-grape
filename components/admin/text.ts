@@ -17,6 +17,11 @@ const fr = {
     pending: 'En attente',
     recent: 'Traité ces dernières 24 h',
   },
+  importExport: {
+    title: 'Import / export',
+    subtitle: 'Produits, inventaires et mouvements de stock en fichiers Excel ou CSV.',
+    forbidden: 'Réservé aux responsables et au personnel du stock.',
+  },
   nav: {
     main: 'Menu principal',
     dashboard: 'Tableau de bord',
@@ -31,6 +36,7 @@ const fr = {
     lowStock: 'Stock bas',
     stockCounts: 'Inventaires',
     stockMovements: 'Mouvements de stock',
+    importExport: 'Import / export',
     settings: 'Réglages',
     homePage: "Page d'accueil",
     events: 'Événements',
@@ -145,6 +151,11 @@ const en: Text = {
     pending: 'Pending',
     recent: 'Handled in the last 24 h',
   },
+  importExport: {
+    title: 'Import / export',
+    subtitle: 'Products, stock counts and stock movements as Excel or CSV files.',
+    forbidden: 'For managers and stock staff only.',
+  },
   nav: {
     main: 'Main menu',
     dashboard: 'Dashboard',
@@ -159,6 +170,7 @@ const en: Text = {
     lowStock: 'Low stock',
     stockCounts: 'Stock counts',
     stockMovements: 'Stock movements',
+    importExport: 'Import / export',
     settings: 'Settings',
     homePage: 'Home page',
     events: 'Events',
@@ -271,6 +283,11 @@ const de: Text = {
     pending: 'Offen',
     recent: 'In den letzten 24 Std. erledigt',
   },
+  importExport: {
+    title: 'Import / Export',
+    subtitle: 'Produkte, Inventuren und Lagerbewegungen als Excel- oder CSV-Dateien.',
+    forbidden: 'Nur für Leitung und Lagerpersonal.',
+  },
   nav: {
     main: 'Hauptmenü',
     dashboard: 'Übersicht',
@@ -285,6 +302,7 @@ const de: Text = {
     lowStock: 'Niedriger Bestand',
     stockCounts: 'Inventuren',
     stockMovements: 'Lagerbewegungen',
+    importExport: 'Import / Export',
     settings: 'Einstellungen',
     homePage: 'Startseite',
     events: 'Veranstaltungen',
@@ -397,6 +415,11 @@ const pt: Text = {
     pending: 'Pendente',
     recent: 'Tratado nas últimas 24 h',
   },
+  importExport: {
+    title: 'Importar / exportar',
+    subtitle: 'Produtos, inventários e movimentos de stock em ficheiros Excel ou CSV.',
+    forbidden: 'Reservado aos responsáveis e ao pessoal do stock.',
+  },
   nav: {
     main: 'Menu principal',
     dashboard: 'Painel',
@@ -411,6 +434,7 @@ const pt: Text = {
     lowStock: 'Stock baixo',
     stockCounts: 'Inventários',
     stockMovements: 'Movimentos de stock',
+    importExport: 'Importar / exportar',
     settings: 'Definições',
     homePage: 'Página inicial',
     events: 'Eventos',

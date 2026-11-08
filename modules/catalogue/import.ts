@@ -3,10 +3,10 @@ import { z } from 'zod';
 import type { Label } from '@/lib/admin';
 import { LOCALES, type Locale } from '@/lib/i18n';
 import { parseDecimal } from '@/lib/money';
-import { fromPlainText } from '@/lib/rich-text';
-import type { Table } from '@/lib/table';
+import { fromPlainText, plainText } from '@/lib/rich-text';
+import { headerKey, type Table, toCsv } from '@/lib/table';
 import { type Tx, withTx } from '@/lib/tx';
-import { hasMovements, postMovements, setLowStockThreshold } from '@/modules/inventory/service';
+import { hasMovements, postMovements, setLowStockThreshold, stockOf } from '@/modules/inventory/service';
 import { PRODUCT_KINDS, PRODUCT_STATUSES, VAT_CLASSES, WINE_COLOURS } from './collections';
 
 // Catalogue import (M2.1 T6, DEP-04): a spreadsheet (CSV or XLSX, see lib/table.ts) upserted by `sku`, else by
@@ -89,6 +89,28 @@ export type CatalogueRow = Omit<z.output<typeof rowSchema>, `description_${Local
 };
 export type RowError = { row: number; column: string; message: string };
 
+/** Where each template field comes from: a column of the file, or the same value for every row (a supplier's file
+ * gives no category: "Vins" for all). A field left out is not written. */
+export type Mapping = Partial<Record<Column, { column: string } | { value: string }>>;
+
+/** The file's columns named like a template column (case, accents, spaces and punctuation ignored). */
+export function suggestMapping(headers: string[]): Mapping {
+  const byKey = new Map(headers.map((h) => [headerKey(h), h]));
+  return Object.fromEntries(TEMPLATE_COLUMNS.flatMap((c) => (byKey.has(headerKey(c)) ? [[c, { column: byKey.get(headerKey(c)) as string }]] : [])));
+}
+
+/** The file rewritten in template columns. A blank row of the file stays blank, so row numbers stay the file's. */
+export function applyMapping(table: Table, mapping: Mapping): Table {
+  const entries = Object.entries(mapping) as [Column, { column: string } | { value: string }][];
+  return {
+    headers: entries.map(([c]) => c),
+    rows: table.rows.map((row) => {
+      const blank = Object.values(row).every((v) => !v);
+      return Object.fromEntries(entries.map(([c, m]) => [c, blank ? '' : 'column' in m ? (row[m.column] ?? '') : m.value]));
+    }),
+  };
+}
+
 /** Checks each row's format. Unknown columns are ignored; blank rows are skipped. Row numbers are the spreadsheet's. */
 export function parseCatalogue(table: Table): { rows: CatalogueRow[]; errors: RowError[] } {
   const present = TEMPLATE_COLUMNS.filter((c) => table.headers.includes(c));
@@ -114,7 +136,7 @@ export function parseCatalogue(table: Table): { rows: CatalogueRow[]; errors: Ro
 }
 
 /** The existing size a row updates, its product, and the languages that product already has a name in. */
-type Match = { variant: string; product: string; kind: string; category: string; named: Locale[] };
+type Match = { variant: string; product: string; kind: string; category: string; named: Locale[]; texts: Partial<Record<Locale, string>> };
 
 /** Checks the rows against each other and the database, and finds the existing size each row updates (by sku, else
  * by barcode). Categories exist and fit the kind; a new product has its required fields; barcodes are unique in the
@@ -133,7 +155,7 @@ async function check(payload: Payload, rows: CatalogueRow[]): Promise<{ errors: 
   ]);
   const idOf = (v: unknown) => (typeof v === 'object' && v ? (v as { id: string }).id : String(v));
   const { docs: owners } = await payload.find({ collection: 'variants', ...opts, where: { id: { in: units.map((u) => idOf(u.variant)) } }, select: { sku: true } });
-  const { docs: products } = await payload.find({ collection: 'products', ...opts, locale: 'all', where: { id: { in: variants.map((v) => idOf(v.product)) } }, select: { name: true, kind: true, category: true } });
+  const { docs: products } = await payload.find({ collection: 'products', ...opts, locale: 'all', where: { id: { in: variants.map((v) => idOf(v.product)) } }, select: { name: true, kind: true, category: true, description: true } });
 
   const categoryBySlug = new Map(categories.map((c) => [c.slug, c]));
   const categoryKind = new Map(categories.map((c) => [c.id, c.kind]));
@@ -142,7 +164,9 @@ async function check(payload: Payload, rows: CatalogueRow[]): Promise<{ errors: 
   const match = (v: (typeof variants)[number] | undefined): Match | undefined => {
     const product = v && productById.get(idOf(v.product));
     const names = (product?.name ?? {}) as unknown as Partial<Record<Locale, string>>;
-    return v && product ? { variant: v.id, product: product.id, kind: product.kind, category: idOf(product.category), named: LOCALES.filter((l) => names[l]) } : undefined;
+    const descriptions = (product?.description ?? {}) as unknown as Partial<Record<Locale, unknown>>;
+    const texts = Object.fromEntries(LOCALES.map((l) => [l, plainText(descriptions[l])]));
+    return v && product ? { variant: v.id, product: product.id, kind: product.kind, category: idOf(product.category), named: LOCALES.filter((l) => names[l]), texts } : undefined;
   };
   const bySku = new Map(variants.map((v) => [v.sku, v]));
   const byBarcode = new Map(variants.filter((v) => v.barcode).map((v) => [v.barcode as string, v]));
@@ -210,6 +234,11 @@ async function upsertRow(tx: Tx, row: CatalogueRow, found: Match | undefined, ca
     const existing = await payload.find({ collection: 'brands', where: { name: { equals: row.brand } }, limit: 1, ...opts });
     brand = existing.docs[0]?.id ?? (await payload.create({ collection: 'brands', data: { name: row.brand } as never, ...opts })).id; // slug: autoSlug
   }
+  // A description whose text is already the product's is left alone: a re-imported export keeps its formatting.
+  const description = (l: Locale) => {
+    const value = row.description?.[l];
+    return value !== undefined && found && plainText(value) === (found.texts[l] ?? '') ? undefined : value;
+  };
   const wine = given({ region: row.region_fr, vintage: row.vintage, colour: row.colour });
   const product = given({
     name: row.name_fr,
@@ -221,7 +250,7 @@ async function upsertRow(tx: Tx, row: CatalogueRow, found: Match | undefined, ca
     wine: Object.keys(wine).length ? wine : undefined,
     badges: row.badges,
     images: row.images,
-    description: row.description?.fr,
+    description: description('fr'),
   });
 
   let productId: string;
@@ -248,7 +277,7 @@ async function upsertRow(tx: Tx, row: CatalogueRow, found: Match | undefined, ca
     // A translation cannot be emptied here (the name is required in every language Payload validates): skipped.
     const name = row[`name_${l}`] ?? undefined;
     const named = Boolean(name) || Boolean(found?.named.includes(l));
-    const data = given({ name, description: named ? row.description?.[l] : undefined });
+    const data = given({ name, description: named ? description(l) : undefined });
     if (!Object.keys(data).length) continue;
     await payload.update({ collection: 'products', id: productId, data: data as never, locale: l, ...opts });
     if (name) await payload.update({ collection: 'variants', id: variantId, data: { label: name }, locale: l, ...opts });
@@ -296,4 +325,58 @@ export async function importCatalogue(
     result[await withTx(payload, (tx) => upsertRow(tx, rows[i], matches[i], categoryId, newStatus))] += 1;
   }
   return result;
+}
+
+/** The template columns an export fills: the supplier columns wait for M3.1, opening stock is a one-time import. */
+const EXPORT_COLUMNS = TEMPLATE_COLUMNS.filter((c) => !['supplier', 'supplier_ref', 'opening_stock'].includes(c));
+const euroText = (cents: number | null | undefined) => (cents === null || cents === undefined ? '' : (cents / 100).toFixed(2).replace('.', ','));
+
+/** Every size of the catalogue in the import's format (one row per size), plus `stock_on_hand`, which the import
+ * ignores: export, edit in Excel, import again. */
+export async function exportCatalogue(payload: Payload) {
+  const opts = { limit: 0, depth: 0, overrideAccess: true } as const;
+  const [{ docs: variants }, { docs: products }, { docs: units }, { docs: categories }, { docs: brands }] = await Promise.all([
+    payload.find({ collection: 'variants', ...opts, sort: 'title', select: { product: true, sku: true, barcode: true, priceCents: true, costCents: true } }),
+    payload.find({ collection: 'products', ...opts, locale: 'all' }),
+    payload.find({ collection: 'packagingUnits', ...opts, select: { variant: true, factor: true, barcode: true, priceCents: true } }),
+    payload.find({ collection: 'categories', ...opts, select: { slug: true } }),
+    payload.find({ collection: 'brands', ...opts, select: { name: true } }),
+  ]);
+  const idOf = (v: unknown) => (typeof v === 'object' && v ? (v as { id: string }).id : String(v));
+  const productById = new Map(products.map((p) => [p.id, p]));
+  const slugById = new Map(categories.map((c) => [c.id, c.slug]));
+  const brandById = new Map(brands.map((b) => [b.id, b.name]));
+  const stock = await stockOf(payload, variants.map((v) => v.id));
+  type ByLocale = Partial<Record<Locale, string>>;
+  const rows = variants.map((v) => {
+    const p = productById.get(idOf(v.product));
+    const names = (p?.name ?? {}) as unknown as ByLocale;
+    const region = (p?.wine?.region ?? {}) as unknown as ByLocale;
+    const descriptions = (p?.description ?? {}) as unknown as Partial<Record<Locale, unknown>>;
+    const box = (factor: number) => units.find((u) => idOf(u.variant) === v.id && u.factor === factor);
+    const values: Record<string, string | number | null | undefined> = {
+      sku: v.sku,
+      barcode: v.barcode,
+      ...Object.fromEntries(LOCALES.map((l) => [`name_${l}`, names[l]])),
+      kind: p?.kind,
+      category_slug: p ? slugById.get(idOf(p.category)) : '',
+      brand: p?.brand ? brandById.get(idOf(p.brand)) : '',
+      region_fr: region.fr,
+      vintage: p?.wine?.vintage,
+      colour: p?.wine?.colour,
+      vat_class: p?.vatClass,
+      price_eur: euroText(v.priceCents),
+      cost_eur: euroText(v.costCents),
+      box6_barcode: box(6)?.barcode,
+      box6_price_eur: euroText(box(6)?.priceCents),
+      box12_barcode: box(12)?.barcode,
+      box12_price_eur: euroText(box(12)?.priceCents),
+      low_stock: stock[v.id].threshold,
+      status: p?.status,
+      ...Object.fromEntries(LOCALES.map((l) => [`description_${l}`, plainText(descriptions[l])])),
+      stock_on_hand: stock[v.id].onHand,
+    };
+    return [...EXPORT_COLUMNS, 'stock_on_hand'].map((c) => values[c]);
+  });
+  return toCsv([...EXPORT_COLUMNS, 'stock_on_hand'], rows);
 }

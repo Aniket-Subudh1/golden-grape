@@ -1,4 +1,4 @@
-// Imports a catalogue spreadsheet (.xlsx or .csv, columns as docs/templates/catalogue-template.csv; only the columns
+// Imports a catalogue spreadsheet (.xlsx or .csv, columns as public/catalogue-template.csv; only the columns
 // present are written). Upserts by sku, else barcode; new products are drafts. Every row is checked first: with one
 // invalid row, nothing is written and the row numbers and reasons are printed. Writes `<file>.log` next to the file,
 // and the supplier columns to `<file>.suppliers.json` until the purchasing module (M3.1) has a collection for them.

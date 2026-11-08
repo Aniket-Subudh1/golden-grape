@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { model, withTx } from '@/lib/tx';
 import { plainText } from '@/lib/rich-text';
 import { readTable } from '@/lib/table';
-import { importCatalogue, parseCatalogue, previewCatalogue, TEMPLATE_COLUMNS } from '@/modules/catalogue/import';
+import { applyMapping, exportCatalogue, importCatalogue, parseCatalogue, previewCatalogue, suggestMapping, TEMPLATE_COLUMNS } from '@/modules/catalogue/import';
 import { findByBarcode, findSellable, listProducts } from '@/modules/catalogue/service';
 import { getTestPayload, makeStaff, makeVariant, parallel } from '@/tests/helpers';
-import { adjust, availability, onHand, postCount, postMovements, rebuildStock, setLowStockThreshold } from './service';
+import { adjust, availability, countFromTable, exportMovements, onHand, postCount, postMovements, rebuildStock, setLowStockThreshold } from './service';
 
 const payload = await getTestPayload();
 const staff = await makeStaff(payload, ['stock']);
@@ -316,6 +316,87 @@ describe('catalogue import', () => {
     expect(await importCatalogue(payload, two.rows, { from: 1, to: 2 })).toMatchObject({ errors: [], created: 1, updated: 0 });
     expect(await variantBy({ sku: { equals: 'IMP-B1' } })).toBeUndefined();
     expect(await variantBy({ sku: { equals: 'IMP-B2' } })).toBeDefined();
+  });
+});
+
+describe('catalogue export and mapping', () => {
+  const table = (csv: string) => readTable(Buffer.from(csv), 'file.csv');
+
+  it('an export imported again creates nothing and changes nothing, formatted descriptions and alert levels included', async () => {
+    const variant = (await payload.find({ collection: 'variants', where: { sku: { equals: 'IMP-1' } }, limit: 1, depth: 0, overrideAccess: true })).docs[0];
+    const productId = typeof variant.product === 'object' ? variant.product.id : variant.product;
+    const bold = { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children: [{ type: 'paragraph', version: 1, direction: 'ltr', format: '', indent: 0, textFormat: 0, children: [{ type: 'text', text: 'Fresco', format: 1, version: 1, mode: 'normal', style: '', detail: 0 }] }] } };
+    await payload.update({ collection: 'products', id: productId, data: { description: bold as never }, locale: 'fr', overrideAccess: true });
+    const before = await payload.findByID({ collection: 'products', id: productId, locale: 'all', depth: 0, overrideAccess: true });
+    const products = await payload.count({ collection: 'products', overrideAccess: true });
+
+    const csv = await exportCatalogue(payload);
+    const exported = await table(csv);
+    expect(exported.headers).toContain('stock_on_hand');
+    expect(exported.rows.find((r) => r.sku === 'IMP-1')).toMatchObject({ price_eur: '15,00', low_stock: '4', stock_on_hand: '12', status: 'draft', description_fr: 'Fresco', name_en: 'Green wine' });
+
+    const parsed = parseCatalogue(exported);
+    expect(parsed.errors).toEqual([]);
+    const result = await importCatalogue(payload, parsed.rows);
+    expect(result).toMatchObject({ errors: [], created: 0 });
+    expect(await payload.count({ collection: 'products', overrideAccess: true })).toEqual(products);
+    const after = await payload.findByID({ collection: 'products', id: productId, locale: 'all', depth: 0, overrideAccess: true });
+    expect(after.description).toEqual(before.description); // bold kept: the same text is not rewritten
+    expect(after.name).toEqual(before.name);
+    expect((await payload.findByID({ collection: 'variants', id: variant.id, overrideAccess: true })).priceCents).toBe(1500);
+    expect(await level(variant.id)).toMatchObject({ onHand: 12, lowStockThreshold: 4 });
+  });
+
+  it('a supplier file in its own words: mapped columns plus one value for every row', async () => {
+    const file = await table('Désignation;EAN;Prix TTC;Producteur\nAlvarinho 2023;5600000000771;18,50;Quinta Nova\n\nArinto 2022;5600000000788;12;Quinta Nova\n');
+    expect(suggestMapping(file.headers)).toEqual({});
+    expect(suggestMapping(['SKU', 'Name FR', 'price-eur'])).toEqual({ sku: { column: 'SKU' }, name_fr: { column: 'Name FR' }, price_eur: { column: 'price-eur' } });
+    const mapped = applyMapping(file, {
+      barcode: { column: 'EAN' },
+      name_fr: { column: 'Désignation' },
+      price_eur: { column: 'Prix TTC' },
+      brand: { column: 'Producteur' },
+      kind: { value: 'wine' },
+      category_slug: { value: 'import-wines' },
+      vat_class: { value: 'intermediate' },
+    });
+    expect(mapped.rows[1]).toEqual({ barcode: '', name_fr: '', price_eur: '', brand: '', kind: '', category_slug: '', vat_class: '' }); // the blank line stays blank
+    const parsed = parseCatalogue(mapped);
+    expect(parsed.rows.map((r) => r.row)).toEqual([2, 4]);
+    expect(await importCatalogue(payload, parsed.rows)).toMatchObject({ errors: [], created: 2 });
+    const v = (await payload.find({ collection: 'variants', where: { barcode: { equals: '5600000000771' } }, limit: 1, depth: 1, overrideAccess: true })).docs[0];
+    expect(v).toMatchObject({ priceCents: 1850, sku: 'ALVARINHO-2023' });
+    expect(await importCatalogue(payload, parsed.rows)).toMatchObject({ errors: [], created: 0, updated: 2 });
+  });
+});
+
+describe('stock count from a file', () => {
+  it('makes an open count (boxes × factor, a size twice added up, unknown/untracked/bad rows listed), no movement until posted', async () => {
+    const wine = await makeVariant(payload, { packaging: [6], onHand: 3 });
+    const dish = await makeVariant(payload, { kind: 'snack' });
+    await payload.update({ collection: 'packagingUnits', id: wine.units[6], data: { barcode: '5600000000900' }, overrideAccess: true });
+    const file = await readTable(
+      Buffer.from(`SKU;Code-barre;Quantité\n${wine.variant.sku};;4\n;5600000000900;2\nNOPE;;1\n${dish.variant.sku};;5\n${wine.variant.sku};;x\n`),
+      'count.csv',
+    );
+    const result = await countFromTable(payload, file, { user: staff.id, note: 'Cave' });
+    expect(result.lines).toBe(1);
+    expect(result.skipped).toEqual([
+      { row: 4, code: 'NOPE', reason: 'unknown' },
+      { row: 5, code: dish.variant.sku, reason: 'untracked' },
+      { row: 6, code: wine.variant.sku, reason: 'quantity' },
+    ]);
+    const count = await payload.findByID({ collection: 'stockCounts', id: result.count as string, depth: 0, overrideAccess: true });
+    expect(count).toMatchObject({ status: 'open', note: 'Cave', lines: [{ counted: 16 }] }); // 4 + 2 boxes of 6
+    expect(await movementsOf(wine.variant.id)).toHaveLength(1); // only the opening 3
+    await postCount(payload, result.count as string, staff.id);
+    expect((await onHand(payload, [wine.variant.id]))[wine.variant.id]).toBe(16);
+    await expect(countFromTable(payload, { headers: ['name'], rows: [{ name: 'x' }] }, { user: staff.id, note: '' })).rejects.toThrow('columns');
+
+    const { headers, rows } = await exportMovements(payload, { from: '2000-01-01', to: '2099-12-31', lang: 'fr' });
+    expect(headers[0]).toBe('Date');
+    const mine = rows.filter((r) => r[1] === wine.variant.sku);
+    expect(mine.map((r) => [r[3], r[4], r[9]])).toEqual([['Réception', 3, ''], ['Inventaire', 13, 'Cave']]);
   });
 });
 

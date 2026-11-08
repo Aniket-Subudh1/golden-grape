@@ -44,6 +44,9 @@ export async function readTable(data: Buffer, filename: string): Promise<Table> 
   return { headers, rows: body.map((row) => Object.fromEntries(headers.map((h, i) => [h, row[i] ?? '']))) };
 }
 
+/** A header compared loosely: no case, accents, spaces or punctuation ("Code-barre" = "code barre" = "codebarre"). */
+export const headerKey = (header: string) => header.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
 /** CSV that Excel opens correctly in Luxembourg: UTF-8 BOM (accents), `;` between cells, CRLF line ends. */
 export const toCsv = (headers: string[], rows: (string | number | null | undefined)[][]) =>
   `﻿${Papa.unparse({ fields: headers, data: rows.map((r) => r.map((v) => v ?? '')) }, { delimiter: ';', newline: '\r\n' })}\r\n`;

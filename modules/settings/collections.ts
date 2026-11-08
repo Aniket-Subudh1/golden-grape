@@ -110,6 +110,7 @@ export const AUDIT_LABELS: Record<AuditAction, Label> = {
   'booking.status': l('Place d’événement : statut', 'Event seat: status', 'Veranstaltungsplatz: Status', 'Lugar de evento: estado'),
   'stock.adjust': l('Stock : correction', 'Stock: adjustment', 'Bestand: Korrektur', 'Stock: correção'),
   'stock.count': l('Stock : inventaire validé', 'Stock: count posted', 'Bestand: Inventur gebucht', 'Stock: inventário validado'),
+  'catalogue.import': l('Catalogue : import de fichier', 'Catalogue: file import', 'Katalog: Dateiimport', 'Catálogo: importação de ficheiro'),
   'doc.create': l('Ajout', 'Created', 'Erstellt', 'Criado'),
   'doc.update': l('Modification', 'Changed', 'Geändert', 'Alterado'),
   'doc.delete': l('Suppression', 'Deleted', 'Gelöscht', 'Eliminado'),

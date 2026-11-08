@@ -19,6 +19,26 @@ export async function stockRules({ payload, req }: { payload: Payload; req?: Pay
   };
 }
 
+/** Many codes at once (a stock count from a file): sizes by sku, and by barcode with the box factor (a box's barcode
+ * first, as findByBarcode). Each entry says whether the size tracks stock. */
+export async function resolveCodes(payload: Payload, { skus, barcodes }: { skus: string[]; barcodes: string[] }) {
+  const opts = { limit: 0, depth: 0, overrideAccess: true } as const;
+  const [variants, units] = await Promise.all([
+    payload.find({ collection: 'variants', ...opts, where: { or: [{ sku: { in: skus } }, { barcode: { in: barcodes } }] }, select: { sku: true, barcode: true, trackStock: true, title: true } }),
+    payload.find({ collection: 'packagingUnits', ...opts, where: { barcode: { in: barcodes } }, select: { barcode: true, variant: true, factor: true } }),
+  ]);
+  const boxVariants = await payload.find({ collection: 'variants', ...opts, where: { id: { in: units.docs.map((u) => idOf(u.variant) as string) } }, select: { trackStock: true, title: true } });
+  const size = (v: { id: string; trackStock?: boolean | null; title?: string | null }, factor: number) => ({ variant: v.id, factor, tracked: v.trackStock !== false, title: v.title ?? '' });
+  const byId = new Map([...variants.docs, ...boxVariants.docs].map((v) => [v.id, v]));
+  const bySku = new Map(variants.docs.map((v) => [v.sku, size(v, 1)]));
+  const byBarcode = new Map(variants.docs.filter((v) => v.barcode).map((v) => [v.barcode as string, size(v, 1)]));
+  for (const u of units.docs) {
+    const v = byId.get(idOf(u.variant) as string);
+    if (v) byBarcode.set(u.barcode as string, size(v, u.factor));
+  }
+  return { bySku, byBarcode };
+}
+
 /** A scanned code: a packaging unit's barcode first (a box of 6 → factor 6), then a variant's (factor 1). */
 export async function findByBarcode(payload: Payload, code: string) {
   const unit = await payload.find({ collection: 'packagingUnits', where: { barcode: { equals: code } }, limit: 1, depth: 0, overrideAccess: true });

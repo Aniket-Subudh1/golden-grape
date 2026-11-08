@@ -1,10 +1,13 @@
 import type { Payload, PayloadRequest, Where } from 'payload';
 import { AppError } from '@/lib/errors';
 import { model, type Tx, withTx } from '@/lib/tx';
-import { stockRules } from '@/modules/catalogue/service';
+import { headerKey, type Table } from '@/lib/table';
+import { addDays, fromLocal, localStamp } from '@/lib/time';
+import { resolveCodes, stockRules } from '@/modules/catalogue/service';
 import { toBaseQty } from '@/modules/catalogue/packaging';
 import { getSettingsPrivate } from '@/modules/settings/service';
 import type { MovementChannel, MovementType } from './collections';
+import { REASON_LABELS, TYPE_LABELS } from './labels';
 
 export type MovementLine = {
   variant: string;
@@ -237,4 +240,91 @@ export async function rebuildStock(payload: Payload, { fix = false } = {}) {
     }
   }
   return differences;
+}
+
+/** Units on hand and the alert level of each variant (null = the settings default): the catalogue export. */
+export async function stockOf(payload: Payload, variantIds: string[]): Promise<Record<string, { onHand: number; threshold: number | null }>> {
+  const { docs } = await payload.find({ collection: 'stockLevels', where: { variant: { in: variantIds } }, limit: 0, depth: 0, overrideAccess: true });
+  const byVariant = new Map(docs.map((d) => [String(d.variant), { onHand: d.onHand, threshold: d.lowStockThreshold ?? null }]));
+  return Object.fromEntries(variantIds.map((id) => [id, byVariant.get(id) ?? { onHand: 0, threshold: null }]));
+}
+
+const COUNT_COLUMNS = { sku: ['sku', 'reference', 'ref'], barcode: ['barcode', 'ean', 'codebarre', 'codesbarre'], counted: ['counted', 'quantity', 'qty', 'quantite', 'stock', 'compte'] };
+
+/**
+ * A stock count from a file (columns: sku or barcode, and the counted quantity): an **open** count, checked and posted
+ * by staff like any other, so stock still moves only through postCount → postMovements. A box's barcode counts boxes
+ * (× its factor); a size listed twice is added up. Rows that match no tracked size are returned with the reason.
+ */
+export async function countFromTable(payload: Payload, table: Table, { user, note }: { user: string; note: string }) {
+  const column = (names: string[]) => table.headers.find((h) => names.includes(headerKey(h)));
+  const [sku, barcode, counted] = [column(COUNT_COLUMNS.sku), column(COUNT_COLUMNS.barcode), column(COUNT_COLUMNS.counted)];
+  if ((!sku && !barcode) || !counted) throw new AppError('VALIDATION', 'columns');
+  const rows = table.rows.map((r, i) => ({ row: i + 2, sku: sku ? r[sku] : '', barcode: barcode ? r[barcode] : '', counted: r[counted] })).filter((r) => r.sku || r.barcode || r.counted);
+  const { bySku, byBarcode } = await resolveCodes(payload, { skus: rows.flatMap((r) => (r.sku ? [r.sku] : [])), barcodes: rows.flatMap((r) => (r.barcode ? [r.barcode] : [])) });
+
+  const totals = new Map<string, number>();
+  const skipped: { row: number; code: string; reason: 'quantity' | 'unknown' | 'untracked' }[] = [];
+  for (const r of rows) {
+    const code = r.sku || r.barcode;
+    if (!/^\d+$/.test(r.counted)) {
+      skipped.push({ row: r.row, code, reason: 'quantity' });
+      continue;
+    }
+    const size = (r.sku ? bySku.get(r.sku) : undefined) ?? (r.barcode ? byBarcode.get(r.barcode) : undefined);
+    if (!size) skipped.push({ row: r.row, code, reason: 'unknown' });
+    else if (!size.tracked) skipped.push({ row: r.row, code, reason: 'untracked' });
+    else totals.set(size.variant, (totals.get(size.variant) ?? 0) + Number(r.counted) * size.factor);
+  }
+  if (totals.size === 0) return { count: null, lines: 0, skipped };
+  const count = await payload.create({
+    collection: 'stockCounts',
+    data: { note, user, status: 'open', lines: [...totals].map(([variant, qty]) => ({ variant, counted: qty })) },
+    overrideAccess: true,
+    depth: 0,
+  });
+  return { count: count.id, lines: totals.size, skipped };
+}
+
+const midnight = (date: string) => {
+  const [y, m, d] = date.split('-').map(Number);
+  return fromLocal(y, m, d);
+};
+
+const MOVEMENT_HEADERS = {
+  fr: ['Date', 'Référence', 'Produit', 'Type', 'Quantité (unités)', 'Carton', 'Raison', 'Par', 'Canal', 'Origine'],
+  en: ['Date', 'SKU', 'Product', 'Type', 'Quantity (units)', 'Box', 'Reason', 'By', 'Channel', 'Source'],
+  de: ['Datum', 'Artikelnummer', 'Produkt', 'Art', 'Menge (Einheiten)', 'Karton', 'Grund', 'Von', 'Kanal', 'Ursprung'],
+  pt: ['Data', 'Referência', 'Produto', 'Tipo', 'Quantidade (unidades)', 'Caixa', 'Motivo', 'Por', 'Canal', 'Origem'],
+};
+
+/** Stock movements from `from` to `to` (dates, Luxembourg time, both included) for a CSV, headers in `lang`. */
+export async function exportMovements(payload: Payload, { from, to, lang }: { from: string; to: string; lang: 'fr' | 'en' | 'de' | 'pt' }) {
+  const { docs } = await payload.find({
+    collection: 'stockMovements',
+    where: { and: [{ createdAt: { greater_than_equal: midnight(from).toISOString() } }, { createdAt: { less_than: midnight(addDays(to, 1)).toISOString() } }] },
+    sort: 'createdAt',
+    limit: 0,
+    depth: 1,
+    locale: lang,
+    overrideAccess: true,
+  });
+  const name = (v: unknown, key: string) => (v && typeof v === 'object' ? String((v as Record<string, unknown>)[key] ?? '') : '');
+  const label = (labels: Record<string, Record<string, string>>, key?: string | null) => (key ? (labels[key]?.[lang] ?? key) : '');
+  const rows = docs.map((m) => {
+    const ref = m.ref?.value;
+    return [
+      localStamp(new Date(m.createdAt)).replace('T', ' '),
+      name(m.variant, 'sku'),
+      name(m.variant, 'title'),
+      label(TYPE_LABELS, m.type),
+      m.qty,
+      m.unit && typeof m.unit === 'object' ? `${m.unitQty ?? ''} × ${m.unit.label ?? ''}` : '',
+      label(REASON_LABELS, m.reason),
+      name(m.user, 'name'),
+      m.channel ?? '',
+      name(ref, 'number') || name(ref, 'note'),
+    ];
+  });
+  return { headers: MOVEMENT_HEADERS[lang], rows };
 }

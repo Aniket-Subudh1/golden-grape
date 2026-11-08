@@ -15,6 +15,7 @@ import {
   ChevronDown,
   ClipboardList,
   ExternalLink,
+  FileSpreadsheet,
   FileText,
   House,
   Images,
@@ -77,6 +78,7 @@ const ICONS = {
   lowStock: TriangleAlert,
   counts: ClipboardCheck,
   movements: ArrowLeftRight,
+  importExport: FileSpreadsheet,
   groups: Contact,
 };
 

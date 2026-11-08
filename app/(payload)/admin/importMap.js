@@ -60,6 +60,7 @@ import { default as default_003a18697aceb07c0741f5f3fa2a6be8 } from '@/component
 import { default as default_53edbba2deecf14dde23d037e9db9140 } from '@/components/admin/row-links'
 import { default as default_6bcd1c2d18bda2e25f236d9cca5fccfd } from '@/components/admin/password-toggle'
 import { default as default_7215358aebef2f123662c81dc8a03dd2 } from '@/components/admin/dashboard'
+import { default as default_47394fc398fbb6257bef21c65839433a } from '@/components/admin/import-export'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 
@@ -127,6 +128,7 @@ export const importMap = {
   "@/components/admin/row-links#default": default_53edbba2deecf14dde23d037e9db9140,
   "@/components/admin/password-toggle#default": default_6bcd1c2d18bda2e25f236d9cca5fccfd,
   "@/components/admin/dashboard#default": default_7215358aebef2f123662c81dc8a03dd2,
+  "@/components/admin/import-export#default": default_47394fc398fbb6257bef21c65839433a,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24
 }

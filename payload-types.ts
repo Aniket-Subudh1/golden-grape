@@ -255,6 +255,7 @@ export interface AuditLog {
     | 'booking.status'
     | 'stock.adjust'
     | 'stock.count'
+    | 'catalogue.import'
     | 'doc.create'
     | 'doc.update'
     | 'doc.delete';
