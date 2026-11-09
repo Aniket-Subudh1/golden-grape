@@ -135,12 +135,7 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
   return (
     <div className="gg-page gg-home">
       <div className="gg-home__title">
-        <h1>
-          <span className="gg-home__title-icon">
-            <LayoutDashboard />
-          </span>
-          {firstName ? `${greeting}, ${firstName}` : greeting}
-        </h1>
+        <h1>{firstName ? `${greeting}, ${firstName}` : greeting}</h1>
         <p>{dateFmt.format(now)}</p>
       </div>
 

@@ -1,6 +1,5 @@
 import { DefaultTemplate } from '@payloadcms/next/templates';
 import { Gutter } from '@payloadcms/ui';
-import { FileSpreadsheet } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import type { AdminViewServerProps, Field } from 'payload';
 import { hasRole } from '@/lib/access';
@@ -71,12 +70,7 @@ export default async function ImportExportView({ initPageResult, params, searchP
       <Gutter>
         <div className="gg-home">
           <div className="gg-home__title">
-            <h1>
-              <span className="gg-home__title-icon">
-                <FileSpreadsheet />
-              </span>
-              {t.title}
-            </h1>
+            <h1>{t.title}</h1>
             <p>{t.subtitle}</p>
           </div>
           {options ? (

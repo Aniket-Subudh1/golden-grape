@@ -1,19 +1,24 @@
 /*
- * Golden Grape admin, laid out like the CUTM LMS dashboard: a white frame (sidebar + header) around a grey content
- * panel with a round top-left corner; crisp pages with hairline cards and small corners; Golden Grape colours.
+ * Golden Grape admin, laid out after the Ancora back office: a cool slate canvas, a sidebar one step darker, a sticky
+ * translucent header, flat white cards with hairline borders, and Golden Grape gold as the only accent.
  * Only Payload's CSS variables and its stable BEM classes are touched (Payload is pinned to 3.92.1).
  * The sidebar (components/admin/nav*.tsx) and the dashboard (components/admin/dashboard.tsx) are our own components.
  */
 
 /* ---- Tokens ---------------------------------------------------------------------------------- */
 :root {
-  --gg-ink: #1a1712;
-  --gg-text-2: #6b6457;
-  --gg-panel: #f4f2ee;
+  --gg-ink: #1a1c20;
+  --gg-text-2: #5b6879;
+  --gg-panel: #eaeef5;
   --gg-frame: #ffffff;
-  --gg-line: #e7e2d8;
-  --gg-line-2: #d9d2c4;
-  --gg-accent: #f6f3ec;
+  --gg-sidebar: #e1e7f0;
+  --gg-sidebar-hover: #d2dae6;
+  --gg-line: #d5dce7;
+  --gg-line-2: #c9d2e0;
+  --gg-accent: #e7ecf3;
+  --gg-head: #f7f8fb;
+  --gg-stripe: #fafbfd;
+  --gg-shadow-pop: 0 16px 44px rgb(26 28 32 / 0.16);
   --gg-gold: #c9a24a;
   --gg-primary: #8f6a24;
   --gg-primary-tint: #f6eedb;
@@ -22,28 +27,28 @@
   --gg-warning: #9a5b00;
   --gg-warning-tint: #fdf2df;
 
-  /* Payload's neutral scale, warm, from white (0) to ink (1000). */
+  /* Payload's neutral scale, cool slate, from white (0) to ink (1000). base-150 = --gg-line. */
   --color-base-0: #ffffff;
-  --color-base-50: #f8f6f2;
-  --color-base-100: #f0ece5;
-  --color-base-150: #e7e2d8;
-  --color-base-200: #d9d2c4;
-  --color-base-250: #cbc3b3;
-  --color-base-300: #bbb2a0;
-  --color-base-350: #aaa08d;
-  --color-base-400: #988e7b;
-  --color-base-450: #867c69;
-  --color-base-500: #746b59;
-  --color-base-550: #645b4a;
-  --color-base-600: #554d3e;
-  --color-base-650: #473f32;
-  --color-base-700: #3a3328;
-  --color-base-750: #2f2920;
-  --color-base-800: #26211a;
-  --color-base-850: #1e1a14;
-  --color-base-900: #1a1712;
-  --color-base-950: #120f0c;
-  --color-base-1000: #0b0907;
+  --color-base-50: #f3f5f9;
+  --color-base-100: #e7ecf3;
+  --color-base-150: #d5dce7;
+  --color-base-200: #c9d2e0;
+  --color-base-250: #b6c0cf;
+  --color-base-300: #a3aec0;
+  --color-base-350: #919db0;
+  --color-base-400: #808ca1;
+  --color-base-450: #6f7c91;
+  --color-base-500: #647186;
+  --color-base-550: #5b6879;
+  --color-base-600: #4d5868;
+  --color-base-650: #404a58;
+  --color-base-700: #343c48;
+  --color-base-750: #2a3039;
+  --color-base-800: #22262d;
+  --color-base-850: #1e2126;
+  --color-base-900: #1a1c20;
+  --color-base-950: #121417;
+  --color-base-1000: #0a0b0d;
 
   /* "Success" drives links, selections and highlights in Payload: the brand gold. */
   --color-success-50: #fbf7ee;
@@ -66,17 +71,24 @@
   --color-success-900: #251908;
   --color-success-950: #181005;
 
-  --style-radius-s: 4px;
-  --style-radius-m: 6px;
-  --style-radius-l: 10px;
+  --style-radius-s: 6px;
+  --style-radius-m: 8px;
+  --style-radius-l: 12px;
   --font-body: var(--gg-font-sans), ui-sans-serif, system-ui, sans-serif;
   --nav-width: 264px;
-  --app-header-height: 64px;
+  --app-header-height: 56px;
+  --gutter-h: 32px;
+}
+@media (max-width: 1024px) {
+  :root {
+    --gutter-h: 24px;
+  }
 }
 /* Phones: the menu covers the screen, as Payload intends. */
 @media (max-width: 768px) {
   :root {
     --nav-width: 100vw;
+    --gutter-h: 16px;
   }
 }
 
@@ -88,7 +100,11 @@ html[data-theme='light'] {
 
 html,
 body {
-  background: var(--gg-frame);
+  background: var(--gg-panel);
+}
+/* Payload's field help text (base-400) is too faint to read. */
+.field-description {
+  color: var(--gg-text-2);
 }
 
 ::selection {
@@ -101,7 +117,7 @@ body {
   outline-offset: 2px;
 }
 
-/* Titles in the sans, semibold and tight, like the LMS. */
+/* Titles in the sans, semibold and tight; page titles carry Ancora's gold bar. */
 h1,
 h2,
 h3,
@@ -113,8 +129,16 @@ h3,
 }
 .doc-header__title,
 .list-header__title {
-  font-size: 22px;
+  padding-left: 10px;
+  border-left: 3px solid var(--gg-gold);
+  font-size: 19px;
   line-height: 1.3;
+}
+.list-header .custom-view-description,
+.list-header__description {
+  max-width: 760px;
+  font-size: 13px;
+  color: var(--gg-text-2);
 }
 
 /* ---- Buttons --------------------------------------------------------------------------------- */
@@ -134,9 +158,10 @@ h3,
   gap: 8px;
   height: 36px;
   padding: 0 14px;
-  border: 1px solid var(--gg-line-2);
-  border-radius: 6px;
+  border: 1px solid var(--gg-line);
+  border-radius: var(--style-radius-m);
   background: #ffffff;
+  box-shadow: 0 1px 2px rgb(26 28 32 / 0.04);
   color: var(--gg-ink);
   font: 500 13px/1 var(--font-body);
   text-decoration: none;
@@ -148,12 +173,12 @@ h3,
 }
 .gg-btn:hover {
   background: var(--gg-accent);
-  border-color: var(--gg-gold);
+  border-color: var(--gg-line-2);
 }
 .gg-btn svg {
   width: 16px;
   height: 16px;
-  color: var(--gg-primary);
+  color: var(--gg-text-2);
 }
 .gg-btn--primary {
   border-color: var(--gg-ink);
@@ -172,9 +197,9 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   display: none;
 }
 
-/* ---- Frame: white sidebar and header, grey panel with a round corner ------------------------- */
+/* ---- Frame: slate sidebar, sticky translucent header with a gold hairline, slate canvas ------- */
 .template-default {
-  background: var(--gg-frame);
+  background: var(--gg-panel);
 }
 .template-default__wrap {
   min-height: 100vh;
@@ -182,21 +207,21 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 }
 
 .app-header {
+  position: sticky;
+  top: 0;
   height: var(--app-header-height);
-  background: var(--gg-frame);
+  border-bottom: 1px solid var(--gg-line);
+  background: rgb(255 255 255 / 0.85);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
 }
-/* The panel's round top-left corner under the header. */
-@media (min-width: 769px) {
-  .app-header::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 28px;
-    height: 28px;
-    background: radial-gradient(circle at 100% 100%, transparent 27.5px, var(--gg-frame) 28px);
-    pointer-events: none;
-  }
+.app-header::before {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(201 162 74 / 0.55) 30%, rgb(201 162 74 / 0.55) 70%, transparent);
+  pointer-events: none;
 }
 .app-header__bg {
   display: none;
@@ -302,10 +327,12 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   color: var(--gg-ink);
 }
 .localizer-button {
-  height: 40px;
-  padding: 0 14px;
+  height: 36px;
+  padding: 0 12px;
   border: 1px solid var(--gg-line);
-  border-radius: 999px;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(26 28 32 / 0.04);
   font-size: 13px;
 }
 .gg-admin-icon {
@@ -325,20 +352,21 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   height: 36px;
   padding: 0 11px;
   border: 1px solid var(--gg-line);
-  border-radius: 999px;
+  border-radius: 10px;
   background: #ffffff;
+  box-shadow: 0 1px 2px rgb(26 28 32 / 0.04);
   color: var(--gg-ink);
   font: 500 13px/1 var(--font-body);
   cursor: pointer;
 }
 .gg-menu__button:hover {
-  border-color: var(--gg-gold);
+  border-color: var(--gg-line-2);
   background: var(--gg-accent);
 }
 .gg-menu__button svg {
   width: 15px;
   height: 15px;
-  color: var(--gg-primary);
+  color: var(--gg-text-2);
 }
 .gg-menu__chevron {
   width: 12px !important;
@@ -352,9 +380,9 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   width: 220px;
   padding: 6px;
   border: 1px solid var(--gg-line);
-  border-radius: 8px;
+  border-radius: 12px;
   background: #ffffff;
-  box-shadow: 0 16px 44px rgb(26 23 18 / 0.16);
+  box-shadow: var(--gg-shadow-pop);
 }
 .gg-menu__title {
   margin: 0;
@@ -373,14 +401,16 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   height: 34px;
   padding: 0 10px;
   border: 0;
-  border-radius: 5px;
+  border-radius: 8px;
   background: transparent;
   color: var(--gg-ink);
   font: 500 13px/1 var(--font-body);
   text-align: left;
   cursor: pointer;
 }
-.gg-menu__item:hover,
+.gg-menu__item:hover {
+  background: var(--gg-accent);
+}
 .gg-menu__item[aria-checked='true'] {
   background: var(--gg-primary-tint);
   color: var(--gg-primary);
@@ -416,16 +446,16 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 }
 .app-header__mobile-nav-toggler {
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   box-shadow: inset 0 0 0 1px var(--gg-line);
   background: #ffffff;
 }
 .app-header__mobile-nav-toggler .hamburger {
   display: grid;
   place-items: center;
-  border-radius: 999px;
+  border-radius: 10px;
   background: transparent;
   box-shadow: none;
 }
@@ -500,31 +530,37 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 }
 
 /* ---- Sidebar (components/admin/nav-client.tsx) ---------------------------------------------- */
+/* Ancora: one step darker than the canvas, uppercase section labels, items on an indented rail, the active item
+   filled gold-deep with a white pill marker. */
 .gg-nav {
   border: 0 !important;
-  background: var(--gg-frame);
+  border-right: 1px solid var(--gg-line-2) !important;
+  background: var(--gg-sidebar);
 }
 .gg-nav__scroll {
   display: flex;
   flex-direction: column;
   gap: 0;
   height: 100%;
-  padding: 16px 12px 12px !important;
+  padding: 0 12px 12px !important;
+  background: linear-gradient(180deg, rgb(201 162 74 / 0.1), transparent 120px);
 }
 .gg-nav__top {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-height: 72px;
+  margin: 0 -12px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--gg-line-2);
 }
 .gg-nav__brand {
   display: flex;
   flex: 1;
   align-items: center;
   gap: 12px;
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgb(201 162 74 / 0.05), rgb(201 162 74 / 0.16));
-  box-shadow: inset 0 0 0 1px rgb(201 162 74 / 0.22);
+  padding: 6px 4px;
+  border-radius: 10px;
   color: var(--gg-ink);
   text-decoration: none;
 }
@@ -533,10 +569,12 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   flex-shrink: 0;
   place-items: center;
   width: 40px;
-  height: 46px;
+  height: 44px;
   border-radius: 10px;
   background: #ffffff;
-  box-shadow: inset 0 0 0 1px rgb(201 162 74 / 0.22);
+  box-shadow:
+    inset 0 0 0 1px var(--gg-line-2),
+    0 1px 2px rgb(26 28 32 / 0.06);
 }
 .gg-nav__brand-tile img {
   width: auto;
@@ -558,7 +596,10 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   font-weight: 700;
 }
 .gg-nav__brand-sub {
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--gg-text-2);
 }
 .gg-nav__close {
@@ -568,38 +609,44 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   display: grid;
   align-content: start;
   gap: 2px;
-  padding: 16px 0 12px;
+  padding: 14px 0 12px;
 }
 .gg-nav__group {
   display: grid;
   gap: 2px;
-  padding-top: 10px;
+  padding-top: 12px;
 }
 .gg-nav__group-label {
   display: flex;
   align-items: center;
   gap: 8px;
   width: 100%;
-  height: 30px;
+  height: 28px;
   margin: 0;
   padding: 0 6px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 8px;
   background: none;
-  font: 500 13px/1 var(--font-body);
-  color: rgb(26 23 18 / 0.6);
+  font: 600 11px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gg-text-2);
   text-align: left;
   cursor: pointer;
 }
 .gg-nav__group-label:hover {
   color: var(--gg-ink);
-  background: var(--gg-accent);
+  background: var(--gg-sidebar-hover);
+}
+.gg-nav__group:has([data-active]) .gg-nav__group-label {
+  color: var(--gg-primary);
 }
 .gg-nav__group-label > span:first-child {
   flex: 1;
 }
 .gg-nav__group-label .gg-nav__count {
   margin-left: 0;
+  letter-spacing: 0;
 }
 .gg-nav__chevron {
   width: 14px;
@@ -622,73 +669,110 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   display: grid;
   gap: 2px;
   min-height: 0;
+  margin-left: 12px;
+  padding-left: 10px;
+  border-left: 1px solid var(--gg-line-2);
   overflow: hidden;
 }
+/* The bottom padding keeps the active item's shadow inside the clipped rows; a closed section shows no rail. */
+.gg-nav__group[data-open] .gg-nav__group-items > div {
+  padding-block: 2px 4px;
+}
+.gg-nav__group:not([data-open]) .gg-nav__group-items > div {
+  border-left-color: transparent;
+}
 .gg-nav__item {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
-  height: 36px;
+  gap: 10px;
+  height: 34px;
   padding: 0 6px;
-  border-radius: 8px;
-  color: rgb(26 23 18 / 0.82);
-  font-size: 14px;
+  border-radius: 10px;
+  color: rgb(26 28 32 / 0.72);
+  font-size: 13px;
   font-weight: 500;
   text-decoration: none;
-  transition: background-color 0.15s;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
 }
 .gg-nav__item:hover {
-  background: var(--gg-accent);
+  background: var(--gg-sidebar-hover);
   color: var(--gg-ink);
 }
 .gg-nav__chip {
   display: grid;
   flex-shrink: 0;
   place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  background: var(--gg-accent);
-  transition: background-color 0.15s;
-}
-.gg-nav__item:hover .gg-nav__chip {
-  background: var(--gg-line);
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: transparent;
+  color: rgb(26 28 32 / 0.6);
+  transition:
+    background-color 0.15s,
+    color 0.15s;
 }
 .gg-nav__chip svg {
   width: 16px;
   height: 16px;
+  stroke-width: 1.75;
 }
 .gg-nav__label {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .gg-nav__item[data-active] {
-  color: var(--gg-primary);
+  background: var(--gg-primary);
+  box-shadow: 0 1px 2px rgb(26 28 32 / 0.12);
+  color: #ffffff;
   font-weight: 600;
 }
+.gg-nav__item[data-active]::before {
+  content: '';
+  position: absolute;
+  top: 18%;
+  left: 0;
+  width: 3px;
+  height: 64%;
+  border-radius: 0 3px 3px 0;
+  background: rgb(255 255 255 / 0.8);
+}
 .gg-nav__item[data-active] .gg-nav__chip {
-  background: var(--gg-primary-tint);
-  box-shadow: inset 0 0 0 1px rgb(143 106 36 / 0.3);
-  color: var(--gg-primary);
+  background: rgb(255 255 255 / 0.16);
+  color: #ffffff;
+}
+.gg-nav__item[data-active] .gg-nav__count {
+  background: rgb(255 255 255 / 0.22);
+  color: #ffffff;
 }
 .gg-nav__foot {
   display: grid;
   gap: 2px;
   margin-top: auto;
   padding-top: 12px;
-  border-top: 1px solid var(--gg-line);
+  border-top: 1px solid var(--gg-line-2);
 }
 @media (max-width: 1024px) {
+  .gg-nav__item {
+    height: 44px;
+  }
+  .gg-nav__group-label {
+    height: 40px;
+  }
   .gg-nav__close {
     display: grid;
     place-items: center;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border: 0;
-    border-radius: 999px;
-    background: transparent;
-    box-shadow: inset 0 0 0 1px var(--gg-line);
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: inset 0 0 0 1px var(--gg-line-2);
     cursor: pointer;
   }
   .gg-nav__close svg {
@@ -698,29 +782,45 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 }
 
 /* ---- Lists ----------------------------------------------------------------------------------- */
+/* Ancora tables: a white card, a muted 11px uppercase head row, zebra rows, tabular numbers. */
 .collection-list__wrap {
   padding-top: 28px !important;
 }
 .list-controls__wrap,
 .search-filter {
-  border-radius: 6px;
+  border-radius: 10px;
+}
+.list-controls__wrap {
+  border: 1px solid var(--gg-line);
+  background: #ffffff;
 }
 .table table {
   overflow: hidden;
-  border-radius: 6px;
+  border-radius: 12px;
   background: #ffffff;
-  box-shadow: 0 0 0 1px var(--gg-line);
+  box-shadow:
+    0 0 0 1px var(--gg-line),
+    0 1px 2px rgb(26 28 32 / 0.04);
 }
 .table thead th {
-  background: #ffffff;
-  font-size: 12px;
+  height: 38px;
+  padding-block: 0;
+  background: var(--gg-head);
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--gg-text-2);
+  vertical-align: middle;
+}
+.table thead tr {
+  border-bottom: 1px solid var(--gg-line);
 }
 .table tbody tr {
-  border-top: 1px solid var(--gg-line);
+  border-top: 1px solid rgb(213 220 231 / 0.6);
+}
+.table tbody tr:first-child {
+  border-top: 0;
 }
 .table tbody tr:has(a[href*='/admin/collections/']) {
   cursor: pointer;
@@ -728,8 +828,11 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 .table tbody tr:nth-child(odd) td {
   background: transparent;
 }
+.table tbody tr:nth-child(even) td {
+  background: var(--gg-stripe);
+}
 .table tbody tr:hover td {
-  background: var(--gg-accent);
+  background: var(--gg-head);
 }
 .table a {
   color: var(--gg-ink);
@@ -748,9 +851,11 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 .document-fields__fields,
 .document-fields__sidebar-fields > .render-fields:not(:empty) {
   padding: 28px 32px;
-  border-radius: 6px;
+  border-radius: var(--style-radius-l);
   background: #ffffff;
-  box-shadow: 0 0 0 1px var(--gg-line);
+  box-shadow:
+    0 0 0 1px var(--gg-line),
+    0 1px 2px rgb(26 28 32 / 0.04);
 }
 .document-fields__fields {
   max-width: 864px;
@@ -842,7 +947,7 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 @media (min-width: 1025px) {
   .template-default__wrap:has(> main:is([class*='global-edit--'], [class*='collection-edit--'])) > .doc-header {
     position: sticky;
-    top: 0;
+    top: var(--app-header-height);
     z-index: 5;
     display: flex;
     flex-direction: column;
@@ -855,7 +960,7 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   }
   .template-default__wrap > main:is([class*='global-edit--'], [class*='collection-edit--']) .doc-controls {
     position: sticky;
-    top: 0;
+    top: var(--app-header-height);
     z-index: 6;
     height: var(--gg-bar);
     margin-top: calc(-1 * var(--gg-bar) - 1px);
@@ -908,21 +1013,21 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   gap: 8px;
 }
 .collapsible {
-  border-radius: 6px;
+  border-radius: 10px;
   box-shadow: 0 0 0 1px var(--gg-line);
 }
 .collapsible__toggle-wrap {
   padding: 4px 6px 4px 10px;
-  border-radius: 6px 6px 0 0;
-  background: var(--gg-accent);
+  border-radius: 10px 10px 0 0;
+  background: var(--gg-head);
   font-weight: 500;
 }
 .collapsible--collapsed .collapsible__toggle-wrap {
-  border-radius: 6px;
+  border-radius: 10px;
 }
 .collapsible__content {
   padding: 14px 16px 2px;
-  border-radius: 0 0 6px 6px;
+  border-radius: 0 0 10px 10px;
 }
 .tabs-field__tabs::before,
 .tabs-field__tabs::after {
@@ -969,9 +1074,9 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   overflow: hidden;
   min-height: min(240px, calc(100dvh - (var(--gg-dialog-pad) * 2)));
   border: 1px solid var(--gg-line);
-  border-radius: 10px;
+  border-radius: 14px;
   background: var(--gg-panel);
-  box-shadow: 0 24px 80px rgb(26 23 18 / 0.24);
+  box-shadow: 0 24px 80px rgb(26 28 32 / 0.24);
   transform: translateY(16px) scale(0.985);
 }
 .doc-drawer.drawer--is-open > .drawer__content {
@@ -1097,24 +1202,11 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   gap: 4px 16px;
 }
 .gg-home__title h1 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   margin: 0;
-  font-size: 20px;
-}
-.gg-home__title-icon {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: var(--gg-primary-tint);
-  color: var(--gg-primary);
-}
-.gg-home__title-icon svg {
-  width: 18px;
-  height: 18px;
+  padding-left: 10px;
+  border-left: 3px solid var(--gg-gold);
+  font-size: 22px;
+  line-height: 1.25;
 }
 .gg-home__title p {
   margin: 0;
@@ -1133,7 +1225,7 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 }
 @media (min-width: 1100px) {
   .gg-home__grid {
-    grid-template-columns: minmax(0, 1fr) 352px;
+    grid-template-columns: minmax(0, 1fr) 360px;
   }
 }
 .gg-home__col {
@@ -1142,11 +1234,13 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   gap: 16px;
 }
 
+/* Ancora panel: a flat white card, its head separated by a hairline. */
 .gg-card {
   overflow: hidden;
-  border-radius: 6px;
+  border: 1px solid var(--gg-line);
+  border-radius: var(--style-radius-l);
   background: #ffffff;
-  box-shadow: 0 0 0 1px var(--gg-line);
+  box-shadow: 0 1px 2px rgb(26 28 32 / 0.04);
 }
 .gg-card__head {
   display: flex;
@@ -1154,14 +1248,17 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   justify-content: space-between;
   gap: 12px;
   padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--gg-line);
 }
 .gg-card__head h2 {
   margin: 0;
-  font-size: 15px;
+  font-size: 14px;
+  line-height: 1.35;
 }
 .gg-card__head p {
   margin: 2px 0 0;
   font-size: 12px;
+  line-height: 1.4;
   color: var(--gg-text-2);
 }
 .gg-card__more {
@@ -1169,12 +1266,17 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   flex-shrink: 0;
   align-items: center;
   gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--gg-line);
+  border-radius: var(--style-radius-m);
   font-size: 12px;
   font-weight: 500;
   color: var(--gg-text-2);
   text-decoration: none;
 }
 .gg-card__more:hover {
+  background: var(--gg-accent);
   color: var(--gg-ink);
 }
 .gg-card__more svg {
@@ -1184,7 +1286,6 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 .gg-card__empty {
   margin: 0;
   padding: 20px 16px 24px;
-  border-top: 1px solid var(--gg-line);
   font-size: 13px;
   color: var(--gg-text-2);
 }
@@ -1194,8 +1295,8 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   padding: 0;
   list-style: none;
 }
-.gg-list li {
-  border-top: 1px solid var(--gg-line);
+.gg-list li + li {
+  border-top: 1px solid rgb(213 220 231 / 0.7);
 }
 .gg-list__row {
   display: flex;
@@ -1207,7 +1308,7 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   transition: background-color 0.15s;
 }
 .gg-list__row:hover {
-  background: var(--gg-accent);
+  background: var(--gg-head);
 }
 .gg-list__text {
   display: grid;
@@ -1232,7 +1333,7 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 .gg-list__meta {
   flex-shrink: 0;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 .gg-date {
@@ -1241,7 +1342,8 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   place-items: center;
   width: 44px;
   padding: 4px 0;
-  border-radius: 6px;
+  border-radius: 10px;
+  background: var(--gg-head);
   box-shadow: inset 0 0 0 1px var(--gg-line);
   line-height: 1.1;
 }
@@ -1255,33 +1357,46 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 .gg-date b {
   font-size: 17px;
 }
+/* Status pill (Ancora): white outline, a coloured dot, the label in ink. Tones only set the dot colour. */
 .gg-badge {
+  --tone: var(--gg-text-2);
+  display: inline-flex;
   flex-shrink: 0;
-  padding: 3.2px 8.8px;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 9px;
+  border: 1px solid var(--gg-line);
   border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: capitalize;
+  background: #ffffff;
+  color: var(--gg-ink);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+.gg-badge::before {
+  content: '';
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tone);
 }
 .gg-badge--danger {
-  background: var(--gg-danger-tint);
-  color: var(--gg-danger);
+  --tone: #d92d20;
 }
 .gg-badge--warning {
-  background: var(--gg-warning-tint);
-  color: var(--gg-warning);
+  --tone: #e08a00;
 }
 .gg-badge--neutral {
-  background: var(--gg-accent);
-  color: var(--gg-text-2);
+  --tone: #98a2b3;
 }
 .gg-badge--success {
-  background: #e8f3ea;
-  color: #2e6b3a;
+  --tone: #12a150;
 }
 .gg-badge--info {
-  background: #e9f0f7;
-  color: #2f5577;
+  --tone: #2f80ed;
 }
 
 .gg-facts {
@@ -1320,7 +1435,7 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   background:
     radial-gradient(70% 50% at 0% 100%, rgb(201 162 74 / 0.12), transparent 70%),
     radial-gradient(60% 40% at 0% 0%, rgb(201 162 74 / 0.06), transparent 70%),
-    #fbfaf7;
+    #f6f8fb;
 }
 .template-minimal__wrap {
   width: 100%;
@@ -1642,9 +1757,9 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   gap: 8px;
   margin-top: 8px;
   padding: 56px 24px;
-  border-radius: 6px;
+  border: 1px dashed var(--gg-line-2);
+  border-radius: var(--style-radius-l);
   background: #ffffff;
-  box-shadow: 0 0 0 1px var(--gg-line);
   text-align: center;
 }
 .no-results h3 {
@@ -1672,9 +1787,7 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 
 /* ---- List cells: badges sit inline, quantities signed, product photo and offer ---------------------------- */
 .table td .gg-badge {
-  display: inline-block;
-  white-space: nowrap;
-  text-transform: none;
+  vertical-align: middle;
 }
 .gg-qty {
   font-weight: 600;
@@ -1765,28 +1878,28 @@ body:has(.gg-create) .no-results__actions {
   align-items: center;
   margin-top: 8px;
   padding: 64px 24px 72px;
-  border-radius: 6px;
+  border: 1px dashed var(--gg-line-2);
+  border-radius: var(--style-radius-l);
   background: #ffffff;
-  box-shadow: 0 0 0 1px var(--gg-line);
   text-align: center;
 }
 .gg-empty__icon {
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
-  margin-bottom: 20px;
-  border-radius: 14px;
-  background: var(--gg-primary-tint);
-  color: var(--gg-primary);
+  width: 48px;
+  height: 48px;
+  margin-bottom: 18px;
+  border-radius: 50%;
+  background: var(--gg-accent);
+  color: var(--gg-text-2);
 }
 .gg-empty--good .gg-empty__icon {
   background: #e8f3ea;
   color: #2e6b3a;
 }
 .gg-empty__icon svg {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
 }
 .gg-empty h2 {
   margin: 0 0 8px;
@@ -2367,14 +2480,16 @@ body:has(.gg-create) .no-results__actions {
   width: 36px;
   height: 36px;
   border: 1px solid var(--gg-line);
-  border-radius: 999px;
+  border-radius: 10px;
   background: #ffffff;
-  color: var(--gg-primary);
+  box-shadow: 0 1px 2px rgb(26 28 32 / 0.04);
+  color: var(--gg-text-2);
   cursor: pointer;
 }
 .gg-bell__button:hover {
-  border-color: var(--gg-gold);
+  border-color: var(--gg-line-2);
   background: var(--gg-accent);
+  color: var(--gg-ink);
 }
 .gg-bell__button svg {
   width: 16px;
@@ -2404,9 +2519,9 @@ body:has(.gg-create) .no-results__actions {
   overflow-y: auto;
   padding: 6px;
   border: 1px solid var(--gg-line);
-  border-radius: 8px;
+  border-radius: 12px;
   background: #ffffff;
-  box-shadow: 0 16px 44px rgb(26 23 18 / 0.16);
+  box-shadow: var(--gg-shadow-pop);
 }
 .gg-bell__panel ul {
   margin: 0;
@@ -2433,12 +2548,12 @@ body:has(.gg-create) .no-results__actions {
   align-items: center;
   gap: 10px;
   padding: 8px 10px;
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--gg-ink);
   text-decoration: none;
 }
 .gg-bell__item:hover {
-  background: var(--gg-accent);
+  background: var(--gg-head);
 }
 .gg-bell__icon {
   display: grid;
@@ -2447,8 +2562,8 @@ body:has(.gg-create) .no-results__actions {
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: var(--gg-primary-tint);
-  color: var(--gg-primary);
+  background: var(--gg-accent);
+  color: var(--gg-text-2);
 }
 .gg-bell__icon svg {
   width: 15px;

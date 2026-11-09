@@ -65,6 +65,9 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-09 · Admin restyled after the Ancora back office; dashboard key figures (requested by Aniket)
+- **Look** (`app/(payload)/custom.css`, §3.3 of `05-UI-SYSTEM.md`): Ancora's layout with Golden Grape gold as the only accent. Cool slate canvas `#eaeef5`, sidebar `#e1e7f0`, Payload's neutral scale re-tinted to match (lists, forms, dialogs follow); sticky translucent 56 px header with a gold hairline (the edit pages' sticky title row now sits under it); page titles with a 3 px gold bar; uppercase sidebar section labels, links on an indented rail, the active link filled gold-deep; flat 12 px cards; tables with an 11 px uppercase head row and zebra rows; statuses as outline pills with a coloured dot; dashed empty states. The admin no longer loads the unused serif. Public site unchanged.
+
 ### 2026-11-09 · Staff stay signed in for 30 days; Aniket's admin account (requested by Aniket)
 - `users` `auth.tokenExpiration` = 30 days (Payload's default was 2 hours), like shop accounts (`customers`, already 30 days). Signing out still ends the session at once.
 - Production (`goldengrape`): admin account `aniketsubudhi00@gmail.com` created through Payload's local API on the server (password hashed by Payload; nothing logged). Staff accounts: `aniketsubudhi00@gmail.com`, `info@applux.lu` (unchanged, same password as before the database switch). Login checked through `/api/users/login`.

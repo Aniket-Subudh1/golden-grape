@@ -67,12 +67,12 @@ Before adding a component, check this table. If an existing one is 80 % right, a
 
 ### 3.3 Admin (Payload) theme
 
-The admin copies the layout of the CUTM LMS dashboard in Golden Grape colours, with **one light theme** (`admin.theme: 'light'`, no switcher). The frame is a white sidebar and header around a grey content panel with a round top-left corner; pages hold crisp cards with hairlines and small corners. Everything goes through Payload's supported hooks, so nothing in Payload is forked:
+The admin follows the layout of the Ancora back office, with Golden Grape gold as the only accent and **one light theme** (`admin.theme: 'light'`, no switcher). The canvas is cool slate (`#eaeef5`); the sidebar sits one step darker (`#e1e7f0`); the header is a sticky, translucent 56 px bar with a thin gold hairline. Pages hold flat white cards (1 px border, 12 px corners); page titles carry a 3 px gold bar; tables have an 11 px uppercase head row and zebra rows; statuses are outline pills with a coloured dot; empty states are dashed cards. Gold marks only the active menu item, title bars, focus and selection. Everything goes through Payload's supported hooks, so nothing in Payload is forked:
 
 | Piece | File | Payload option |
 |---|---|---|
 | Colours, frame, cards, lists, form cards, tabs, login layout | `app/(payload)/custom.css` (fonts loaded in `app/(payload)/layout.tsx`) | its CSS variables and BEM classes |
-| Sidebar: brand block, grouped links with icon chips, account links; stays open on every desktop width | `components/admin/nav.tsx` (groups, filtered by the user's visible entities) + `nav-client.tsx` | `components.Nav` |
+| Sidebar: brand block, uppercase section labels, links on an indented rail, the active link filled gold-deep with a white marker, account links; stays open on every desktop width | `components/admin/nav.tsx` (groups, filtered by the user's visible entities) + `nav-client.tsx` | `components.Nav` |
 | Home: greeting, quick actions, needs attention, upcoming events, recent requests, figures (by role); no navigation cards | `components/admin/dashboard.tsx` | `views.dashboard.Component` |
 | "Add …" (list pages, empty lists, the home's quick actions) opens the full create page | `components/admin/create-button.tsx`, wired with `addButton()` in `lib/admin.ts` | `views.list.actions` |
 | A click anywhere on a list row opens the document's page (controls and checkboxes keep their own click; Cmd/Ctrl-click opens a new tab). Join-table titles link to pages (`pageLinkCell`) | `components/admin/row-links.tsx` | `providers` |
@@ -81,7 +81,7 @@ The admin copies the layout of the CUTM LMS dashboard in Golden Grape colours, w
 | Repeating rows titled by their content ("Boutique", "La Maison") | `components/admin/row-label.tsx` | array `admin.components.RowLabel` |
 | Login: lockup top-left, heading and form, photo panel with notes | `components/admin/logo.tsx`, `login-brand.tsx` | `graphics.Logo`, `beforeLogin` |
 | Header icon | `components/admin/icon.tsx` | `graphics.Icon` |
-| Status as a coloured badge, signed quantities (+12 green, −3 red) in list columns | `components/admin/cells.tsx`, wired with `badgeCell()` / `signedCell` in `lib/admin.ts` | field `admin.components.Cell` |
+| Status as an outline pill with a coloured dot, signed quantities (+12 green, −3 red) in list columns | `components/admin/cells.tsx`, wired with `badgeCell()` / `signedCell` in `lib/admin.ts` | field `admin.components.Cell` |
 | First-use state of a list: icon, what the list is for, the "Add …" dialog button. Shown only when nothing exists yet; a search or filter that matches nothing keeps Payload's message, restyled as a card | `components/admin/empty-list.tsx`, wired with `emptyList()` | `beforeListTable` |
 | Product list: photo, category, price and stock at a glance (server cells, so every row renders at once) | `modules/catalogue/admin/product-cells.tsx` | field `admin.components.Cell`, `ui` field `offer` |
 | Stock list cells (quantity with low/out badge, "Default" alert level, reason in words); stock-count lines titled by product | `modules/inventory/admin/cells.tsx`, `count-row-label.tsx` | `Cell`, array `RowLabel` |
