@@ -135,7 +135,7 @@ Session (M2.2): Payload's auth cookie name is shared by every auth collection, s
 | `stockPosted` | checkbox | set in the same transaction as the sale movements; guards against posting twice |
 | `notes` | text | |
 
-Indexes: `{ status, createdAt: -1 }`, `{ customer, createdAt: -1 }`, `{ channel, createdAt: -1 }`, `{ 'slot.date': 1, mode: 1 }`. Access: read via `staffOrSelf('customer')`; create through actions only; update by Staff(admin, manager, sales) **through `transition()` only** (the `status` field is read-only in the admin, and status changes are custom admin buttons calling actions); delete by none.
+Indexes: `{ status, createdAt: -1 }`, `{ customer, createdAt: -1 }`, `{ channel, createdAt: -1 }`, `{ 'slot.date': 1, mode: 1 }`, `{ 'payment.status': 1 }` partial on `refund_pending` (refunds to send: sidebar, bell, dashboard). Access: read via `staffOrSelf('customer')`; create through actions only; update by Staff(admin, manager, sales) **through `transition()` only** (the `status` field is read-only in the admin, and status changes are custom admin buttons calling actions); delete by none.
 
 ### `reservations` (table bookings, with optional pre-order)
 `number`, `idempotencyKey` (unique), `customer?`, `contact`, `date`, `time`, `guests`, `status` (`pending`, `accepted`, `rejected`, `cancelled`, `completed`), `preorder` (rel orders, optional), `notes`, `locale`. Index `{ date, status }`. A pre-order is an `orders` doc with `mode: 'table'` and status `pending`, linked here. Accepting the reservation confirms the order.

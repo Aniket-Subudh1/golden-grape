@@ -229,6 +229,8 @@ export const orders: CollectionConfig = {
       { fields: { customer: 1, createdAt: -1 } },
       { fields: { channel: 1, createdAt: -1 } },
       { fields: { 'slot.date': 1, mode: 1 } },
+      // Refunds still to send: read by the sidebar, the bell and the dashboard on every page.
+      { fields: { 'payment.status': 1 }, options: { name: 'refund_pending', partialFilterExpression: { 'payment.status': 'refund_pending' } } },
     ],
   },
 };
