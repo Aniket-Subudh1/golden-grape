@@ -107,7 +107,7 @@ modules/<name>/
 | `documents` | `quotations`, `invoices`, `deliveryNotes`, `creditNotes` | `issueInvoice(orderId)`, `pdf(docId)` | M3.2 |
 | `reviews` | `ReviewsCache` global | `latestReviews()`, `refreshReviews()` | M3.3 |
 | `attendance` | `attendance`, `attendanceCorrections` | `checkInOut(userId, token)`, `monthlyReport(month)` | M3.3 |
-| `reporting` | none (read-only aggregations) | `salesSummary(range, groupBy)` | M3.3 |
+| `reporting` | none (read-only aggregations) | `salesSummary(range)` (totals; T4 adds `groupBy`), `salesOverview(now)` (the dashboard's comparisons) | M3.3 (totals built early, 9 Nov) |
 | `pos` | `outbox`, `integrationLogs`, `posImports` | `enqueue(event)`, `importCsv(file)`, `connector()` | M3.3, M4.2 |
 
 **Module switches:** `BusinessSettings.modules` (a checkbox per optional module: `b2b`, `purchasing`, `promotions`, `loyalty`, `giftCards`, `reviews`, `attendance`, `pos`). When a module is off, its staff routes return `notFound()`, its admin collections are hidden (`admin.hidden`), and its public UI is not rendered. Core modules (`settings`, `cms`, `catalogue`, `inventory`, `sales`) cannot be switched off.

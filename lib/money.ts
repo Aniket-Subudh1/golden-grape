@@ -1,6 +1,6 @@
 // Integer cents only. Rates are basis points (1700 = 17.00 %). Rounding is half away from zero.
 
-const divRound = (numerator: number, denominator: number) =>
+export const divRound = (numerator: number, denominator: number) =>
   Math.sign(numerator) * Math.floor((Math.abs(numerator) * 2 + denominator) / (denominator * 2));
 
 export const add = (...cents: number[]) => cents.reduce((sum, c) => sum + c, 0);

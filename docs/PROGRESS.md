@@ -14,7 +14,7 @@ Update this file at the end of every task (`00-START-HERE.md` §2). The newest l
 | M2.3 | Checkout, orders, reservations | P2 | Tue 10 Nov | Done (all 8 ACs pass; e-mails checked as logged sends, real delivery and the Mailpit step wait for SMTP; zones and slots are A-05 until DEP-06) | — |
 | M3.1 | Mobile back office + purchasing | P3 $250 | Thu 12 Nov | Not started | — |
 | M3.2 | B2B, documents, pricing, loyalty, gift cards | P3 | Sat 14 Nov | Not started | — |
-| M3.3 | Reviews, attendance, dashboard, POS CSV | P3 | Sun 15 Nov | Not started | — |
+| M3.3 | Reviews, attendance, dashboard, POS CSV | P3 | Sun 15 Nov | Not started (T4's sales totals built early, 9 Nov) | — |
 | M4.1 | wallee | P4 $300 | after authorisation | Not started | — |
 | M4.2 | CashMag + outbox | P4 | after DEP-11 | Not started | — |
 | M4.3 | Hardening + handover | P4 | after M4.1/M4.2 | Not started | — |
@@ -62,11 +62,13 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-11 | Catering packages have a minimum of 10 guests (the prototype set none) | M1.3 T7 seed | — |
 | A-12 | Until DEP-07, the seeded catalogue's VAT classes: wines intermediate (14 %); port, beer, gift boxes and the glass of wine standard (17 %); cheese, charcuterie, groceries and counter dishes super-reduced (3 %). The client's spreadsheet sets each product's class | M2.1 T6 seed | — |
 | A-13 | Until Golden Grape and the accountant confirm (DEP-07): the POS `Rubrique` decides category, kind, VAT and producer (`scripts/import-pos-products.mts` RUBRIQUES): wine producers and countries → Vins, 14 %; Martha's → Porto, 17 %; spirits and Maison Velvet → Spiritueux, 17 %; soft drinks, grocery, Tricentenaire → 3 %; gadgets, baskets → Accessoires, 17 %; Battin → Bières, 17 %; counter food and hot drinks → Comptoir, 3 %; other counter items (glass of wine, cocktails…) 17 %. Staff correct per product in the admin | DEP-04 import | — |
+| A-14 | Until credit notes carry their own VAT (M3.2): a partial refund takes back its order's VAT share pro rata, rounded per order, in the sales figures | M3.3 T4 (built early) | — |
 
 ## 4. Log
 
 ### 2026-11-09 · Admin restyled after the Ancora back office; dashboard key figures (requested by Aniket)
 - **Look** (`app/(payload)/custom.css`, §3.3 of `05-UI-SYSTEM.md`): Ancora's layout with Golden Grape gold as the only accent. Cool slate canvas `#eaeef5`, sidebar `#e1e7f0`, Payload's neutral scale re-tinted to match (lists, forms, dialogs follow); sticky translucent 56 px header with a gold hairline (the edit pages' sticky title row now sits under it); page titles with a 3 px gold bar; uppercase sidebar section labels, links on an indented rail, the active link filled gold-deep; flat 12 px cards; tables with an 11 px uppercase head row and zebra rows; statuses as outline pills with a coloured dot; dashed empty states. The admin no longer loads the unused serif. Public site unchanged.
+- **Sales totals** (`modules/reporting`, M3.3 T4 built early): `salesSummary({ from, to })` = one aggregation over `orders` with status confirmed / ready / out for delivery / completed, by **slot day** (`slot.date`, the order list's day filter, so the figures equal the list: reconciliation test); gross includes VAT, partial refunds deducted with their VAT share (A-14), net = gross − VAT, average basket 0 with no orders. `salesOverview(now)`: today vs yesterday, month so far vs the same days of last month. Docs: in-store, B2B and POS orders must set `slot.date` (M3.1, M3.3 T5, `04-DATA-MODEL.md`). Tests: `summary.test.ts` (12), `service.int.test.ts` (6).
 
 ### 2026-11-09 · Staff stay signed in for 30 days; Aniket's admin account (requested by Aniket)
 - `users` `auth.tokenExpiration` = 30 days (Payload's default was 2 hours), like shop accounts (`customers`, already 30 days). Signing out still ends the session at once.
