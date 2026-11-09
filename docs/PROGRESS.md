@@ -65,6 +65,11 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-09 · Staff stay signed in for 30 days; Aniket's admin account (requested by Aniket)
+- `users` `auth.tokenExpiration` = 30 days (Payload's default was 2 hours), like shop accounts (`customers`, already 30 days). Signing out still ends the session at once.
+- Production (`goldengrape`): admin account `aniketsubudhi00@gmail.com` created through Payload's local API on the server (password hashed by Payload; nothing logged). Staff accounts: `aniketsubudhi00@gmail.com`, `info@applux.lu` (unchanged, same password as before the database switch). Login checked through `/api/users/login`.
+
+
 ### 2026-11-09 · Production database on APPLUX's cluster; the POS catalogue imported (Q-03, DEP-04)
 - **Connection:** `goldengrape_dev` on `cluster0.1d99gcs.mongodb.net` / `goldengrape` (the password that finally worked arrived on 9 Nov; two earlier ones were refused by Atlas). Checked from the server: login, readWrite on `goldengrape` only, empty database, replica set `atlas-jegula-shard-0`, a transaction. This Mac is not on the allow-list: anything against this database runs on the server.
 - **Backups first** (`/root/backups/`, root only): the whole old database `golden_grape` (shared cluster) as `golden_grape-20261109T0952Z.archive.gz`, and `.env` as `env-20261109T0953Z`. MongoDB Database Tools 100.20.1 installed in `/opt/mongodb-tools`.

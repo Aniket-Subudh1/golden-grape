@@ -18,7 +18,8 @@ const ROLE_LABELS: Record<(typeof ROLES)[number], ReturnType<typeof l>> = {
 const users: CollectionConfig = {
   slug: 'users',
   labels: { singular: l('Membre de l’équipe', 'Team member', 'Teammitglied', 'Membro da equipa'), plural: l('Équipe', 'Team', 'Team', 'Equipa') },
-  auth: true,
+  // Staff stay signed in for 30 days, like shop accounts (Payload's default is 2 hours). Signing out ends the session.
+  auth: { tokenExpiration: 60 * 60 * 24 * 30 },
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'email', 'roles', 'active'],
