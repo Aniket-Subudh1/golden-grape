@@ -34,7 +34,7 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 |---|---|---|---|---|
 | Q-01 | Confirm D-01: MongoDB + Payload auth + S3 storage instead of Supabase PostgreSQL/Auth/Storage, to be written into the Rev 2.2 addendum | APPLUX | M1.1 (proceeding at risk) | Open |
 | Q-02 | Original brand photos (DEP-01): **recovered** from the published Lovable app (45 files, sizes match the repo's records) and now in `public/brand/`. Still to confirm with Ivo that these are the final photos | APPLUX / Ivo | — | Answered, confirm |
-| Q-03 | Staging host and MongoDB Atlas project (DEP-02). **Answered 7 Nov:** APPLUX's own Atlas cluster (AWS Frankfurt), database `goldengrape`, user `goldengrape_dev`, the server's IP allow-listed. The host is `cluster0.1d99gcs.mongodb.net` (the message read `id99gcs`, which does not exist; to confirm). The server moves to it once the password is on the server (settings and content copied, test orders left behind) | APPLUX | — | Answered, switch pending |
+| Q-03 | Staging host and MongoDB Atlas project (DEP-02). **Done 9 Nov:** the site runs on APPLUX's own Atlas cluster (AWS Frankfurt, `cluster0.1d99gcs.mongodb.net`, replica set, transactions checked), database `goldengrape`, user `goldengrape_dev` (readWrite on `goldengrape` only), only the server's IP allow-listed. See log 2026-11-09 | APPLUX | — | Done |
 | Q-04 | Promotions do not apply to B2B list prices (A-03)? | APPLUX | M3.2 T4 | Open |
 | Q-05 | Loyalty points earned on `completed`, reversed on refund (A-08)? | APPLUX | M3.2 T3 | Open |
 | Q-06 | Voucher VAT treatment and invoice legal mentions (DEP-07) | Golden Grape accountant | M3.2 T5 | Open |
@@ -64,6 +64,15 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-13 | Until Golden Grape and the accountant confirm (DEP-07): the POS `Rubrique` decides category, kind, VAT and producer (`scripts/import-pos-products.mts` RUBRIQUES): wine producers and countries → Vins, 14 %; Martha's → Porto, 17 %; spirits and Maison Velvet → Spiritueux, 17 %; soft drinks, grocery, Tricentenaire → 3 %; gadgets, baskets → Accessoires, 17 %; Battin → Bières, 17 %; counter food and hot drinks → Comptoir, 3 %; other counter items (glass of wine, cocktails…) 17 %. Staff correct per product in the admin | DEP-04 import | — |
 
 ## 4. Log
+
+### 2026-11-09 · Production database on APPLUX's cluster; the POS catalogue imported (Q-03, DEP-04)
+- **Connection:** `goldengrape_dev` on `cluster0.1d99gcs.mongodb.net` / `goldengrape` (the password that finally worked arrived on 9 Nov; two earlier ones were refused by Atlas). Checked from the server: login, readWrite on `goldengrape` only, empty database, replica set `atlas-jegula-shard-0`, a transaction. This Mac is not on the allow-list: anything against this database runs on the server.
+- **Backups first** (`/root/backups/`, root only): the whole old database `golden_grape` (shared cluster) as `golden_grape-20261109T0952Z.archive.gz`, and `.env` as `env-20261109T0953Z`. MongoDB Database Tools 100.20.1 installed in `/opt/mongodb-tools`.
+- **Copied** (mongorestore, 188 documents, 0 failures): globals (Shop details, home page, menu, footer, Happy Hour), pages, legal texts, events, catering menus, delivery zone, time slots, photos (`media`; the files stay in the same S3 bucket), the staff user and admin preferences, with their version histories. **Left behind:** the test orders (ORD-2026-00001/2), payments, reservation, catering request, stock entries, numbering counters (production starts at …-00001) and the test product.
+- **Switched:** `/opt/golden-grape/.env` `DATABASE_URL` → the new database; the old line is kept above it as a comment (rollback: swap the lines, `pm2 reload /opt/golden-grape/ecosystem.config.cjs --update-env`; the old database was not changed). Then `gg-deploy` (f36091f): healthy, `/api/health` mongo up, `/fr`, `/fr/shop`, `/fr/snack`, `/admin/login` 200.
+- **Imported** on the server (`scripts/import-pos-products.mts`, 100 s): 473 products (463 drafts, 10 POS-only lines archived), 8 categories, 22 producers, 410 stock rows at 0, no movement; `rebuild-stock --check` 0 differences; no draft visible on the shop. Review file (149 lines to check): `/root/gg-import/export_produits_2026-11-07.xlsx.review.csv`, sent to Roberto.
+- **Next for Golden Grape:** review and publish the drafts (Produits → filter on status → select → Edit → Statut « En vente »), stock quantities (Q-15, a count file through Import / export), VAT (Q-16).
+
 
 ### 2026-11-08 · Back-office Import / Export page (client request of 7 Nov, M2.1 T8)
 - **Where:** sidebar "Boutique et stock › Import / export" (`/admin/import-export`), managers and stock staff (admins always); the actions check the role again.
