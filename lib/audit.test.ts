@@ -6,6 +6,11 @@ describe('changedFields (GG-046)', () => {
     const diff = changedFields({ status: 'new', guests: 20, notes: 'x', updatedAt: '1' }, { status: 'contacted', guests: 20, notes: 'x', updatedAt: '2' });
     expect(diff).toEqual({ before: { status: 'new' }, after: { status: 'contacted' }, changed: true });
   });
+  it('a related document returned populated is not a change; another one is, by id', () => {
+    const menu = { id: 'm1', name: 'Convívio', updatedAt: '1' };
+    expect(changedFields({ status: 'new', package: 'm1' }, { status: 'contacted', package: menu }).after).toEqual({ status: 'contacted' });
+    expect(changedFields({ package: 'm1' }, { package: { ...menu, id: 'm2' } }).after).toEqual({ package: 'm2' });
+  });
   it('looks inside a group: an IBAN change says which field', () => {
     const diff = changedFields({ business: { iban: '', phone: '+352' } }, { business: { iban: 'LU12 0010 0012 3456 7891', phone: '+352' } });
     expect(diff.after).toEqual({ 'business.iban': 'LU12 0010 0012 3456 7891' });

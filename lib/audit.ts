@@ -73,13 +73,19 @@ const short = (value: unknown) => (typeof value === 'string' && value.length <= 
 const isGroup = (v: unknown): v is Json => typeof v === 'object' && v !== null && !Array.isArray(v);
 
 /** The fields that differ, as small before/after objects; inside a group, by its own fields ("business.iban"). */
+/** A related document compares by its id: after a save Payload may return it populated, before it was only the id. */
+const asRef = (value: unknown): unknown => {
+  if (Array.isArray(value)) return value.map(asRef);
+  return value && typeof value === 'object' && 'id' in value && 'updatedAt' in value ? (value as Json).id : value;
+};
+
 export function changedFields(before: Json | undefined, after: Json, prefix = ''): { before: Json; after: Json; changed: boolean } {
   const b: Json = {};
   const a: Json = {};
   for (const key of Object.keys({ ...before, ...after })) {
     if (IGNORED.has(key)) continue;
-    const was = before?.[key];
-    const now = after[key];
+    const was = asRef(before?.[key]);
+    const now = asRef(after[key]);
     if (JSON.stringify(was ?? null) === JSON.stringify(now ?? null)) continue;
     if (!prefix && (isGroup(was) || isGroup(now)) && !(was as Json)?.id && !(now as Json)?.id) {
       const inner = changedFields(isGroup(was) ? was : undefined, isGroup(now) ? now : {}, `${key}.`);
