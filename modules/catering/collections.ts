@@ -7,7 +7,8 @@ import { revalidateTagHook } from '@/lib/revalidate';
 /** Request statuses with their everyday names (also shown on the dashboard). */
 export const REQUEST_STATUS = [
   { value: 'new', label: l('Nouvelle', 'New', 'Neu', 'Novo') },
-  { value: 'quoted', label: l('Devis envoyé', 'Quote sent', 'Angebot gesendet', 'Orçamento enviado') },
+  // "Devis envoyé" (`quoted`) returns with catering quotations, set only when a quotation is really sent (APPLUX, §1).
+  { value: 'contacted', label: l('Client contacté', 'Customer contacted', 'Kunde kontaktiert', 'Cliente contactado') },
   { value: 'accepted', label: l('Acceptée', 'Accepted', 'Angenommen', 'Aceite') },
   { value: 'declined', label: l('Refusée', 'Declined', 'Abgelehnt', 'Recusado') },
 ];

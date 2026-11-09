@@ -4,6 +4,7 @@ import { after } from 'next/server';
 import { z } from 'zod';
 import { clientIp, phoneField, publicAction } from '@/lib/action';
 import { LOCALES } from '@/lib/i18n';
+import { audit } from '@/lib/audit';
 import { rateLimit } from '@/lib/rate-limit';
 import { mailCatering } from './mail';
 import { requestCatering as createRequest } from './service';
@@ -29,6 +30,14 @@ export const requestCatering = publicAction(schema, async ({ website, ...input }
   if (website) return { firstName, number: '' };
   await rateLimit(`catering:${await clientIp()}`, 5, 10 * 60_000);
   const { request, packageName } = await createRequest(payload, input);
+  // The request's history starts with its arrival (APPLUX report 2, §2): who = the website, no staff user.
+  await audit(payload, {
+    action: 'doc.create',
+    collection: 'cateringRequests',
+    id: String(request.id),
+    ref: request.number,
+    after: { status: request.status, package: packageName, guests: request.guests, date: input.date, time: input.time },
+  });
   after(() => mailCatering(request, packageName, input.locale).catch((error) => console.error('[mail] catering', error)));
   return { firstName, number: request.number };
 });

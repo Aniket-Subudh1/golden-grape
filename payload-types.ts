@@ -567,7 +567,7 @@ export interface CateringPackage {
 export interface CateringRequest {
   id: string;
   number: string;
-  status: 'new' | 'quoted' | 'accepted' | 'declined';
+  status: 'new' | 'contacted' | 'accepted' | 'declined';
   package: string | CateringPackage;
   guests: number;
   date: string;

@@ -5,7 +5,8 @@ import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, GlobalAfterC
 //   stock adjustments and counts) call `audit()` from their action once the change is committed;
 // - edits made in the admin forms are recorded by `auditHooks` with the fields that changed.
 // Writes made by the website or the services themselves carry no staff user and are not logged here (orders and
-// reservations keep their own history, payments and stock movements their own rows).
+// reservations keep their own history, payments and stock movements their own rows). One exception: a catering
+// request sent from the website logs its arrival with no user, so its history starts with it.
 
 export const AUDIT_ACTIONS = [
   'order.status',

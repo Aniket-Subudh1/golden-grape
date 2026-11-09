@@ -42,6 +42,8 @@ export default async function AuditTrail({ id, payload, i18n, collectionSlug }: 
   const show = (key: string, v: unknown) => (v == null || v === '' ? '—' : (names.get(key)?.options.get(String(v)) ?? String(v)));
   const title = say({ fr: 'Historique', en: 'History', de: 'Verlauf', pt: 'Histórico' }, lang);
   const empty = say({ fr: 'Aucune action enregistrée pour l’instant.', en: 'Nothing recorded yet.', de: 'Noch nichts erfasst.', pt: 'Ainda nada registado.' }, lang);
+  // Staff actions always carry their user; a line without one was written by the website (a customer's request).
+  const website = say({ fr: 'Site web (client)', en: 'Website (customer)', de: 'Website (Kunde)', pt: 'Site (cliente)' }, lang);
 
   return (
     <DocCard title={title} wide>
@@ -56,7 +58,7 @@ export default async function AuditTrail({ id, payload, i18n, collectionSlug }: 
           return {
             when: when.format(new Date(d.createdAt)),
             text: `${say(AUDIT_LABELS[d.action as AuditAction], lang)}${changes ? ` — ${changes}` : ''}`,
-            by: typeof d.user === 'object' && d.user ? d.user.name : null,
+            by: typeof d.user === 'object' && d.user ? d.user.name : website,
             note: d.reason,
           };
         })}
