@@ -91,7 +91,7 @@ export const cateringPackages: CollectionConfig = {
   ],
 };
 
-// Created only by the requestCatering service (server-computed estimate, gapless REQ number).
+// Created only by the requestCatering service (server-computed estimate, gapless DEM number).
 export const cateringRequests: CollectionConfig = {
   slug: 'cateringRequests',
   labels: {

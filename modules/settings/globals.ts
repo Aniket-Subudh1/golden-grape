@@ -7,6 +7,21 @@ import { revalidateTagHook } from '@/lib/revalidate';
 export const MODULES = ['b2b', 'purchasing', 'promotions', 'loyalty', 'giftCards', 'reviews', 'attendance', 'pos'] as const;
 export type ModuleName = (typeof MODULES)[number];
 
+/**
+ * Reference formats, French prefixes everywhere (APPLUX, 9 Nov): DEM request, DEV quotation, FAC invoice, CMD order,
+ * RES reservation, AV credit note, BL delivery note. The defaults of BusinessSettings › numbering and the services'
+ * fallback; a saved format wins. Changing one never renumbers: the counter series stay the same.
+ */
+export const NUMBERING = {
+  invoice: 'FAC-{YYYY}-{00000}',
+  creditNote: 'AV-{YYYY}-{00000}',
+  quotation: 'DEV-{YYYY}-{0000}',
+  deliveryNote: 'BL-{YYYY}-{00000}',
+  order: 'CMD-{YYYY}-{00000}',
+  cateringRequest: 'DEM-{YYYY}-{0000}',
+  reservation: 'RES-{YYYY}-{00000}',
+} as const;
+
 const text = (name: string, label: Label, required = false, width = '50%'): Field => ({ name, type: 'text', required, label, admin: { width } });
 const def = (name: string, defaultValue: string): Field => ({ name, type: 'text', defaultValue });
 const row = (...fields: Field[]): Field => ({ type: 'row', fields });
@@ -220,15 +235,7 @@ export const businessSettings: GlobalConfig = {
       name: 'numbering',
       type: 'group',
       admin: later,
-      fields: [
-        def('invoice', 'INV-{YYYY}-{00000}'),
-        def('creditNote', 'CN-{YYYY}-{00000}'),
-        def('quotation', 'QUO-{YYYY}-{00000}'),
-        def('deliveryNote', 'DN-{YYYY}-{00000}'),
-        def('order', 'ORD-{YYYY}-{00000}'),
-        def('cateringRequest', 'REQ-{YYYY}-{0000}'),
-        def('reservation', 'RES-{YYYY}-{00000}'),
-      ],
+      fields: Object.entries(NUMBERING).map(([name, format]) => def(name, format)),
     },
     {
       name: 'alerts',

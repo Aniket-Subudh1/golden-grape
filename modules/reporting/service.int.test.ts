@@ -12,7 +12,7 @@ let n = 0;
 const order = (date: string, status: string, totalCents: number, vatCents: number, refundedCents = 0) => {
   n += 1;
   return {
-    number: `ORD-2026-${String(n).padStart(5, '0')}`,
+    number: `CMD-2026-${String(n).padStart(5, '0')}`,
     status,
     channel: 'webshop',
     mode: 'pickup',

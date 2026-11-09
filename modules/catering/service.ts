@@ -7,6 +7,7 @@ import { formatNumber, nextNumber } from '@/lib/numbering';
 import { atRequest, getPayloadClient } from '@/lib/payload';
 import { addDays, today } from '@/lib/time';
 import { withTx } from '@/lib/tx';
+import { NUMBERING } from '@/modules/settings/globals';
 import { getSettingsPrivate } from '@/modules/settings/service';
 
 async function packagesCached(locale: Locale) {
@@ -37,7 +38,7 @@ export type CateringInput = {
 
 /**
  * Validates against the package, computes the estimate on the server (any client value is ignored) and
- * stores the request with the next gapless REQ number, in one transaction.
+ * stores the request with the next gapless DEM number, in one transaction.
  */
 export async function requestCatering(payload: Payload, input: CateringInput, now = new Date()) {
   const pkg = await payload.findByID({ collection: 'cateringPackages', id: input.package, locale: input.locale, depth: 0, disableErrors: true });
@@ -54,7 +55,7 @@ export async function requestCatering(payload: Payload, input: CateringInput, no
       req: tx.req,
       overrideAccess: true,
       data: {
-        number: formatNumber(numbering?.cateringRequest ?? 'REQ-{YYYY}-{0000}', year, n),
+        number: formatNumber(numbering?.cateringRequest ?? NUMBERING.cateringRequest, year, n),
         status: 'new',
         package: pkg.id,
         guests: input.guests,

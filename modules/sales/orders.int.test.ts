@@ -56,7 +56,7 @@ describe('placeOrder', () => {
     const placed = await placeOrder(payload, order(), { now: NOW });
     const doc = await payload.findByID({ collection: 'orders', id: placed.id, overrideAccess: true, depth: 0 });
     expect(doc).toMatchObject({ status: 'confirmed', mode: 'pickup', channel: 'webshop', stockPosted: true, locale: 'pt', slot: { date: DATE, from: '14:00', to: '14:30' } });
-    expect(doc.number).toMatch(/^ORD-2026-\d{5}$/);
+    expect(doc.number).toMatch(/^CMD-2026-\d{5}$/);
     expect(doc.totals).toMatchObject({ subtotalCents: 3000, deliveryCents: 0, totalCents: 3000 });
     expect(doc.payment).toMatchObject({ method: 'onsite', status: 'pending' });
     const moves = await movementsOf(placed.id);

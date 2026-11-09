@@ -16,6 +16,7 @@
     "import:catalogue": "node --import tsx --env-file-if-exists=.env scripts/import-catalogue.mts",
     "import:pos": "node --import tsx --env-file-if-exists=.env scripts/import-pos-products.mts",
     "rebuild-stock": "node --import tsx --env-file-if-exists=.env scripts/rebuild-stock.mts",
+    "migrate:2026-11": "node --import tsx --env-file-if-exists=.env scripts/migrate-2026-11.mts",
     "generate:types": "node --import tsx ./node_modules/payload/bin.js generate:types --disable-transpile",
     "generate:importmap": "node --import tsx ./node_modules/payload/bin.js generate:importmap --disable-transpile",
     "payload": "node --import tsx ./node_modules/payload/bin.js",

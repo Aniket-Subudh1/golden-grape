@@ -132,7 +132,7 @@ modules/<name>/
 
 ### 5.3 Gapless document numbers (R5)
 
-`lib/numbering.ts`'s `nextNumber(tx, series, year)` runs `findOneAndUpdate({ series, year }, { $inc: { last: 1 } }, { upsert: true, returnDocument: 'after', session })` on `counters` **inside the same transaction that inserts the document**. If the insert fails, the increment rolls back with it, so numbers stay gapless and never repeat. The format comes from `BusinessSettings.numbering[series]` (for example `INV-{YYYY}-{00000}`). An issued invoice or credit note has no update or delete access; corrections are made by credit note.
+`lib/numbering.ts`'s `nextNumber(tx, series, year)` runs `findOneAndUpdate({ series, year }, { $inc: { last: 1 } }, { upsert: true, returnDocument: 'after', session })` on `counters` **inside the same transaction that inserts the document**. If the insert fails, the increment rolls back with it, so numbers stay gapless and never repeat. The format comes from `BusinessSettings.numbering[series]` (for example `FAC-{YYYY}-{00000}`; the defaults are `NUMBERING` in `modules/settings/globals.ts`). An issued invoice or credit note has no update or delete access; corrections are made by credit note.
 
 ## 6. Request flows
 

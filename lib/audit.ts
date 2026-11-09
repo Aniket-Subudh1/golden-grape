@@ -31,7 +31,7 @@ export type AuditEntry = {
   action: AuditAction;
   collection: string;
   id: string;
-  /** What staff call the document: "ORD-2026-00001", "REQ-2026-0004", a product's name… */
+  /** What staff call the document: "CMD-2026-00001", "DEM-2026-0004", a product's name… */
   ref?: string | null;
   reason?: string | null;
   before?: Json;

@@ -10,6 +10,7 @@ import { postMovements } from '@/modules/inventory/service';
 import { provider } from '@/modules/payments/provider';
 import { dueOf, type Figures, paymentState, refundableOf } from '@/modules/payments/service';
 import { quoteCart } from '@/modules/promotions/service';
+import { NUMBERING } from '@/modules/settings/globals';
 import { getSettingsPrivate } from '@/modules/settings/service';
 import type { Customer, Order, Reservation, SlotRule as SlotRuleDoc } from '@/payload-types';
 import type { SlotMode } from './collections';
@@ -200,7 +201,7 @@ export async function placeOrder(payload: Payload, input: PlaceOrderInput, { cus
           overrideAccess: true,
           depth: 0,
           data: {
-            number: formatNumber(numbering?.order ?? 'ORD-{YYYY}-{00000}', year, n),
+            number: formatNumber(numbering?.order ?? NUMBERING.order, year, n),
             idempotencyKey: input.mode === 'table' ? `${input.idempotencyKey}:preorder` : input.idempotencyKey,
             status: 'pending',
             channel: 'webshop',
@@ -239,7 +240,7 @@ export async function placeOrder(payload: Payload, input: PlaceOrderInput, { cus
           overrideAccess: true,
           depth: 0,
           data: {
-            number: formatNumber(numbering?.reservation ?? 'RES-{YYYY}-{00000}', year, n),
+            number: formatNumber(numbering?.reservation ?? NUMBERING.reservation, year, n),
             idempotencyKey: input.idempotencyKey,
             status: 'pending',
             customer: customer?.id,

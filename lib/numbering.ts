@@ -14,6 +14,6 @@ export async function nextNumber(tx: Tx, series: string, year: number): Promise<
   return counter.last as number;
 }
 
-/** `formatNumber('INV-{YYYY}-{00000}', 2026, 42)` → `INV-2026-00042`. */
+/** `formatNumber('FAC-{YYYY}-{00000}', 2026, 42)` → `FAC-2026-00042`. */
 export const formatNumber = (format: string, year: number, n: number) =>
   format.replace('{YYYY}', String(year)).replace(/\{(0+)\}/, (_, zeros: string) => String(n).padStart(zeros.length, '0'));

@@ -29,14 +29,14 @@ describe('requestCatering', () => {
     const forged = { ...base, estimateCents: 1 } as CateringInput;
     const { request } = await requestCatering(payload, forged, NOW);
     expect(request.estimateCents).toBe(5500 * 20);
-    expect(request.number).toBe('REQ-2026-0001');
+    expect(request.number).toBe('DEM-2026-0001');
     const stored = await payload.findByID({ collection: 'cateringRequests', id: request.id, overrideAccess: true });
     expect(stored.estimateCents).toBe(110000);
   });
 
   it('numbers requests sequentially', async () => {
     const { request } = await requestCatering(payload, base, NOW);
-    expect(request.number).toBe('REQ-2026-0002');
+    expect(request.number).toBe('DEM-2026-0002');
   });
 
   it('rejects fewer guests than the package minimum', async () => {

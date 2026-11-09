@@ -3,10 +3,10 @@ import { formatNumber } from './numbering';
 
 describe('formatNumber', () => {
   it.each([
-    ['INV-{YYYY}-{00000}', 2026, 42, 'INV-2026-00042'],
-    ['REQ-{YYYY}-{0000}', 2026, 1, 'REQ-2026-0001'],
-    ['REQ-{YYYY}-{0000}', 2027, 12345, 'REQ-2027-12345'],
-    ['CN{00}', 2026, 7, 'CN07'],
+    ['FAC-{YYYY}-{00000}', 2026, 42, 'FAC-2026-00042'],
+    ['DEM-{YYYY}-{0000}', 2026, 1, 'DEM-2026-0001'],
+    ['DEM-{YYYY}-{0000}', 2027, 12345, 'DEM-2027-12345'],
+    ['AV{00}', 2026, 7, 'AV07'],
   ])('%s, %i, %i → %s', (format, year, n, expected) => {
     expect(formatNumber(format, year, n)).toBe(expected);
   });

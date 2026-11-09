@@ -71,7 +71,7 @@ export function MailLayout({ business, logoUrl, staff, children }: Props) {
 
 export const heading: CSSProperties = { fontFamily: 'Georgia, serif', fontWeight: 400, fontSize: 26, lineHeight: 1.25, margin: '0 0 20px', color: colors.ink };
 
-/** The order or reservation reference under the heading, in the reader's words ("Commande ORD-2026-00001"). */
+/** The order or reservation reference under the heading, in the reader's words ("Commande CMD-2026-00001"). */
 export function Reference({ children }: { children: ReactNode }) {
   return <p style={{ margin: '-12px 0 20px', fontSize: 12, letterSpacing: 2, textTransform: 'uppercase', color: colors.goldDeep }}>{children}</p>;
 }

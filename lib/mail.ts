@@ -34,7 +34,7 @@ export async function render(template: ReactElement) {
   const text = body
     .replace(/<head[\s\S]*?<\/head>/i, '') // the <style> of the layout is not text
     .replace(/<(br|\/p|\/tr|\/h[1-6]|\/div)[^>]*>/gi, '\n')
-    .replace(/<\/t[dh]>/gi, ' ') // "Référence ORD-…", not "RéférenceORD-…"
+    .replace(/<\/t[dh]>/gi, ' ') // "Référence CMD-…", not "RéférenceCMD-…"
     .replace(/<[^>]+>/g, '')
     .replace(/&[#\w]+;/g, (e) => ENTITIES[e] ?? e)
     .replace(/[ \t]+\n/g, '\n')
