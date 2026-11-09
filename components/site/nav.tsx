@@ -1,10 +1,11 @@
 'use client';
 
-import { Menu, Phone, Search, ShoppingBag, UserRound, X } from 'lucide-react';
+import { CalendarDays, Menu, Phone, Search, ShoppingBag, UserRound, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
 import { type Locale, localePath } from '@/lib/i18n';
 import { useCart } from '@/modules/webshop/cart';
@@ -15,7 +16,9 @@ import { InstagramIcon } from './social-icons';
 type Props = {
   locale: Locale;
   items: NavItem[];
-  labels: { openMenu: string; closeMenu: string; language: string; phone: string; search: string; account: string; bag: string };
+  labels: { openMenu: string; closeMenu: string; language: string; search: string; account: string; bag: string };
+  /** "Réserver une table": opens the table booking form itself (APPLUX report 2, §3). */
+  reserve: { label: string; href: string };
   phone?: string | null;
   instagram?: string | null;
 };
@@ -23,7 +26,7 @@ type Props = {
 const LOGO_ALT = 'Golden Grape · Mäi Wäin';
 
 /** Links either side of the logo. Transparent and tall over the home hero; compact and dark after scrolling and on other pages. */
-export function Nav({ locale, items, labels, phone, instagram }: Props) {
+export function Nav({ locale, items, labels, reserve, phone, instagram }: Props) {
   const pathname = usePathname();
   const isHome = pathname === localePath(locale);
   const [scrolled, setScrolled] = useState(false);
@@ -54,8 +57,7 @@ export function Nav({ locale, items, labels, phone, instagram }: Props) {
         'transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-gold after:transition-transform after:duration-500 hover:text-gold hover:after:scale-x-100',
       isActive(item) && 'text-gold after:scale-x-100',
     );
-  const linkRow = 'hidden items-center gap-4 text-[10px] font-medium tracking-[0.14em] uppercase md:flex lg:gap-7 lg:text-[11px] lg:tracking-[0.24em] xl:gap-9 xl:tracking-[0.28em]';
-  const icon = 'hidden transition-colors hover:text-gold xl:block';
+  const linkRow = 'hidden items-center gap-5 text-[10px] font-medium tracking-[0.2em] uppercase lg:flex xl:gap-7 xl:text-[11px] xl:tracking-[0.24em] 2xl:gap-9 2xl:tracking-[0.28em]';
   const tool = 'relative grid h-9 w-9 place-items-center rounded-full transition-colors hover:text-gold focus-visible:outline-2 focus-visible:outline-gold';
   const bag = (
     <button type="button" onClick={() => cart.setOpen(true)} aria-label={labels.bag} className={tool}>
@@ -80,9 +82,20 @@ export function Nav({ locale, items, labels, phone, instagram }: Props) {
         )}
       >
         <div className="flex items-center">
-          <button onClick={() => setOpen(true)} className="-ml-2 p-2 md:hidden" aria-label={labels.openMenu}>
+          <button onClick={() => setOpen(true)} className="-ml-2 p-2 lg:hidden" aria-label={labels.openMenu}>
             <Menu className="h-5 w-5" />
           </button>
+          {/* First thing on the left at every size, which also balances the tools on the right: the labelled button,
+              or its icon where the row is full (phones, 1024–1279 px). */}
+          <Link href={reserve.href} aria-label={reserve.label} title={reserve.label} className={cn(tool, 'text-gold sm:hidden lg:mr-3 lg:grid xl:hidden')}>
+            <CalendarDays className="h-[18px] w-[18px]" />
+          </Link>
+          <Button asChild variant="goldGlass" size="sm" className="ml-2 hidden px-4 tracking-[0.2em] sm:inline-flex lg:ml-0 lg:hidden xl:mr-7 xl:inline-flex">
+            <Link href={reserve.href}>
+              <CalendarDays className="h-3.5 w-3.5" />
+              {reserve.label}
+            </Link>
+          </Button>
           <nav className={linkRow}>
             {items.slice(0, 3).map((item) => (
               <NavLink key={item.label} item={item} className={linkClass(item)} aria-current={isActive(item) ? 'page' : undefined} />
@@ -101,20 +114,10 @@ export function Nav({ locale, items, labels, phone, instagram }: Props) {
             {items.slice(3).map((item) => (
               <NavLink key={item.label} item={item} className={linkClass(item)} aria-current={isActive(item) ? 'page' : undefined} />
             ))}
-            <span className="hidden h-3 w-px bg-current opacity-25 lg:block" />
+            <span className="h-3 w-px bg-current opacity-25" />
             <LanguageSwitcher locale={locale} label={labels.language} />
-            {phone && (
-              <a href={`tel:${phone.replace(/\s/g, '')}`} aria-label={labels.phone} className={icon}>
-                <Phone className="h-4 w-4" />
-              </a>
-            )}
-            {instagram && (
-              <a href={instagram} aria-label="Instagram" target="_blank" rel="noopener noreferrer" className={icon}>
-                <InstagramIcon className="h-4 w-4" />
-              </a>
-            )}
           </nav>
-          <div className="ml-1 hidden items-center md:flex lg:ml-3">
+          <div className="ml-2 hidden items-center lg:flex xl:ml-3">
             <Link href={`${localePath(locale, '/shop')}#search`} aria-label={labels.search} className={tool}>
               <Search className="h-[18px] w-[18px]" />
             </Link>
@@ -123,7 +126,7 @@ export function Nav({ locale, items, labels, phone, instagram }: Props) {
             </Link>
             {bag}
           </div>
-          <div className="flex items-center md:hidden">
+          <div className="flex items-center lg:hidden">
             <LanguageSwitcher locale={locale} label={labels.language} />
             {bag}
           </div>
@@ -145,6 +148,12 @@ export function Nav({ locale, items, labels, phone, instagram }: Props) {
           </button>
         </div>
         <div className="relative flex flex-col gap-6 px-8 pt-10 pb-10">
+          <Button asChild variant="goldGlass" size="md" className="mb-2 self-start">
+            <Link href={reserve.href} onClick={() => setOpen(false)}>
+              <CalendarDays className="h-4 w-4" />
+              {reserve.label}
+            </Link>
+          </Button>
           {items.map((item) => (
             <NavLink
               key={item.label}

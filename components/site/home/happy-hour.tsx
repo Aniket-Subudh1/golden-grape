@@ -76,7 +76,6 @@ export function HappyHour({ t, locale, content, reserveHref }: { t: Dictionary['
             <span className="min-h-5 text-sm font-light text-bone/60">
               {dateLabel && `${t.nextPour} · ${dateLabel} · ${content.from}`}
             </span>
-            {/* Table reservations arrive in M2.3; until then a request goes through the contact form. */}
             <Button asChild variant="goldGlass" size="lg">
               <Link href={reserveHref}>
                 {t.reserve}

@@ -8,6 +8,11 @@ import fr from '../../dictionaries/fr.json';
 // Needs a seeded database with stock (npm run seed, then stock entered) and SMTP pointed at Mailpit for the e-mails.
 
 const MAILPIT = process.env.MAILPIT_URL;
+
+// The cookie bar is answered first, as a visitor would: on a 1280×720 screen it covers the summary's submit button.
+test.beforeEach(async ({ context, baseURL }) => {
+  await context.addCookies([{ name: 'gg_consent', value: 'essential', url: baseURL! }]);
+});
 const unique = (name: string) => `${name.toLowerCase()}+${Date.now()}${Math.floor(Math.random() * 1000)}@example.test`;
 
 /** Adds Bifanas from the counter: "+" on the card, then the card's stepper for more. */

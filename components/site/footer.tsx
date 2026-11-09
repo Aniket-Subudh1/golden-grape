@@ -36,15 +36,13 @@ export async function Footer({ t, tagline, columns, business, legal, hours, hour
   const external = { target: '_blank', rel: 'noopener noreferrer' };
   return (
     <footer className="relative overflow-hidden bg-ink text-bone/70">
-      <div className="bg-azulejo h-24 border-b border-gold/15 opacity-30" aria-hidden="true" />
+      <div className="bg-azulejo h-14 border-b border-gold/15 opacity-30" aria-hidden="true" />
 
       <div className="mx-auto max-w-[1400px] px-5 md:px-10">
-        {/* "Bem-vindo": the Portuguese welcome that closes the Story quote, in every language of the site. */}
-        <div className="flex flex-col gap-8 border-b border-bone/10 py-14 md:flex-row md:items-end md:justify-between md:py-20">
-          <p lang="pt" className="text-gold-gradient pb-[0.12em] font-serif text-[clamp(3.75rem,10vw,9rem)] leading-none font-light italic">
-            Bem-vindo.
-          </p>
-          <Button asChild variant="goldGlass" size="lg" className="shrink-0 self-start md:mb-6 md:self-auto">
+        {/* The welcome in the visitor's language (APPLUX §5: "Bem-vindo." stays for Portuguese only). */}
+        <div className="flex flex-col gap-6 border-b border-bone/10 py-10 md:flex-row md:items-end md:justify-between md:py-12">
+          <p className="text-gold-gradient pb-[0.12em] font-serif text-[clamp(3rem,7vw,6rem)] leading-none font-light italic">{t.welcome}</p>
+          <Button asChild variant="goldGlass" size="lg" className="shrink-0 self-start md:mb-4 md:self-auto">
             <Link href={reserve.href}>
               {reserve.label}
               <span className="transition-transform group-hover:translate-x-1">→</span>
@@ -52,7 +50,7 @@ export async function Footer({ t, tagline, columns, business, legal, hours, hour
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-8 gap-y-12 border-b border-bone/10 py-16 lg:grid-cols-12">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-10 border-b border-bone/10 py-12 lg:grid-cols-12">
           <div className="col-span-2 lg:col-span-4">
             <Image src="/brand/logo-light.png" alt="Golden Grape · Mäi Wäin" width={1085} height={859} sizes="162px" className="h-24 w-auto md:h-32" />
             {tagline && <p className="mt-6 max-w-xs text-sm leading-relaxed font-light">{tagline}</p>}

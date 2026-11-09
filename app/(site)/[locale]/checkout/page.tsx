@@ -48,14 +48,10 @@ async function Checkout({ locale, searchParams }: { locale: Locale; searchParams
 export default async function CheckoutPage({ params, searchParams }: Props) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const { checkout: t } = await getDictionary(locale);
+  // The heading is drawn by the form: it follows the chosen mode (order or table).
   return (
     <section className="pt-36 pb-32 md:pt-44">
       <Container>
-        <header className="mb-12 md:mb-16">
-          <p className="eyebrow mb-4 text-gold-deep">{t.eyebrow}</p>
-          <h1 className="font-serif text-5xl leading-[0.95] tracking-tight md:text-7xl">{t.title}</h1>
-        </header>
         <Suspense fallback={<div className="min-h-[60vh]" />}>
           <Checkout locale={locale} searchParams={searchParams} />
         </Suspense>

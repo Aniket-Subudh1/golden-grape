@@ -14,6 +14,7 @@ import { type Dictionary, getDictionary, isLocale, type Locale, LOCALES, localeP
 import { groupedHours } from '@/lib/time';
 import { getFooter, getHeader } from '@/modules/cms/service';
 import { directionsUrl, getSettings } from '@/modules/settings/service';
+import { TABLE_BOOKING } from '@/modules/sales/order-states';
 import { CartProvider } from '@/modules/webshop/cart';
 import '../../globals.css';
 
@@ -46,11 +47,11 @@ async function SiteNav({ locale, t }: { locale: Locale; t: Dictionary }) {
         openMenu: t.nav.openMenu,
         closeMenu: t.nav.closeMenu,
         language: t.nav.language,
-        phone: t.contactPage.info.phone,
         search: t.nav.search,
         account: t.nav.account,
         bag: t.nav.bag,
       }}
+      reserve={{ label: t.cart.bookTable, href: localePath(locale, TABLE_BOOKING) }}
       phone={business?.phone}
       instagram={business?.instagram}
     />
@@ -68,7 +69,7 @@ async function SiteFooter({ locale, t }: { locale: Locale; t: Dictionary }) {
       hours={groupedHours(hours, locale)}
       hoursLabel={t.store.hoursLabel}
       directions={{ label: t.store.directions, href: directionsUrl(business) }}
-      reserve={{ label: t.happyHour.reserve, href: localePath(locale, '/contact') }}
+      reserve={{ label: t.happyHour.reserve, href: localePath(locale, TABLE_BOOKING) }}
       // The prototype's two labels stay as plain text until the real legal pages are published (DEP-05).
       legal={
         footer.legal.length > 0

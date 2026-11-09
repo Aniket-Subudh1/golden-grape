@@ -179,7 +179,8 @@
     "moderation": "Bitte trinken Sie verantwortungsvoll.",
     "legal": "Impressum",
     "privacy": "Datenschutz",
-    "backToTop": "Nach oben"
+    "backToTop": "Nach oben",
+    "welcome": "Willkommen."
   },
   "floatingCart": {
     "label": "Warenkorb",
@@ -443,7 +444,7 @@
     "eyebrow": "Kontakt",
     "titleA": "Schreiben Sie uns,",
     "titleB": "besuchen Sie uns.",
-    "subtitle": "Das Haus antwortet binnen 24h. Für alle Fragen, Reservierungen oder Catering-Anfragen.",
+    "subtitle": "Das Haus antwortet binnen 24h. Für alle Fragen, Veranstaltungen oder Catering-Anfragen.",
     "info": {
       "address": "Adresse",
       "phone": "Telefon",
@@ -476,6 +477,7 @@
       "doneSubtitle": "Ihre Nachricht ist eingegangen. Wir antworten binnen 24h."
     },
     "mapCaption": "Uns in Luxemburg finden",
+    "tableNote": "Für einen Tisch wählen Sie Tag, Uhrzeit und Personenzahl direkt online.",
     "closed": "Geschlossen"
   },
   "auth": {
@@ -823,6 +825,7 @@
     "eyebrow": "Kasse",
     "title": "Ihre Bestellung",
     "titleTable": "Ihr Tisch",
+    "eyebrowTable": "Reservierung",
     "steps": {
       "mode": "Wie möchten Sie sie erhalten?",
       "when": "Wann?",

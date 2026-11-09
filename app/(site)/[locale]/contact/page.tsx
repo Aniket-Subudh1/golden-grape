@@ -1,16 +1,19 @@
-import { Clock, Mail, MapPin, Phone } from 'lucide-react';
+import { CalendarDays, Clock, Mail, MapPin, Phone } from 'lucide-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { type ReactNode, Suspense } from 'react';
 import { Container } from '@/components/site/container';
 import { JsonLd } from '@/components/site/json-ld';
 import { PageHero } from '@/components/site/page-hero';
 import { FacebookIcon, InstagramIcon } from '@/components/site/social-icons';
+import { Button } from '@/components/ui/button';
 import { alternates, type Dictionary, getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { weekHours } from '@/lib/time';
 import { ContactForm } from '@/modules/cms/components/contact-form';
 import { getHomePage, mediaOf } from '@/modules/cms/service';
+import { TABLE_BOOKING } from '@/modules/sales/order-states';
 import { localBusinessJsonLd } from '@/modules/settings/seo';
 import { directionsUrl, getSettings } from '@/modules/settings/service';
 
@@ -99,31 +102,46 @@ async function Info({ locale, t }: { locale: Locale; t: Dictionary['contactPage'
   );
 }
 
-async function MapBlock({ caption }: { caption: string }) {
+/** Where to find us: the address and a real directions button, compact (APPLUX §4: no large decorative band). */
+async function Location({ caption, directions }: { caption: string; directions: string }) {
   const { business: b } = await getSettings();
   if (!b?.street) return null;
-  const address = `${b.street} · L-${b.postalCode} ${b.city}`;
-  const href = directionsUrl(b);
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="group relative grid aspect-[21/9] place-items-center overflow-hidden border border-border bg-ink/90 text-center text-bone/80">
+    <div className="relative overflow-hidden border border-border bg-ink text-bone">
       <div className="bg-azulejo pointer-events-none absolute inset-0 opacity-15" aria-hidden="true" />
-      <div className="relative">
-        <MapPin className="mx-auto h-8 w-8 text-gold" />
-        <p className="mt-3 font-serif text-2xl transition group-hover:text-gold">{address}</p>
-        <p className="mt-2 text-[11px] tracking-[0.3em] text-bone/50 uppercase">{caption}</p>
+      <div className="relative flex flex-col gap-6 px-6 py-8 md:flex-row md:items-center md:justify-between md:px-10">
+        <div className="flex items-start gap-4">
+          <MapPin className="mt-1 h-6 w-6 shrink-0 text-gold" />
+          <div>
+            <p className="text-[11px] tracking-[0.3em] text-bone/50 uppercase">{caption}</p>
+            <p className="mt-2 font-serif text-2xl md:text-3xl">
+              {b.street}
+              <span className="hidden md:inline"> · </span>
+              <span className="block whitespace-nowrap md:inline">
+                L-{b.postalCode} {b.city}
+              </span>
+            </p>
+          </div>
+        </div>
+        <Button asChild variant="goldGlass" size="md" className="shrink-0 self-start md:self-auto">
+          <a href={directionsUrl(b)} target="_blank" rel="noopener noreferrer">
+            {directions}
+            <span className="transition-transform group-hover:translate-x-1">→</span>
+          </a>
+        </Button>
       </div>
-    </a>
+    </div>
   );
 }
 
 export default async function ContactPage({ params }: PageProps<'/[locale]/contact'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const { contactPage: t, form } = await getDictionary(locale);
+  const { contactPage: t, form, store, cart } = await getDictionary(locale);
   return (
     <>
       <PageHero eyebrow={t.eyebrow} title={[t.titleA, t.titleB]} subtitle={t.subtitle} />
-      <section className="pb-24 md:pb-32">
+      <section className="pb-12 md:pb-16">
         <Container className="grid gap-10 px-6 md:gap-16 lg:grid-cols-2">
           <div className="space-y-8">
             <div className="relative aspect-[4/3] overflow-hidden bg-ink">
@@ -135,15 +153,27 @@ export default async function ContactPage({ params }: PageProps<'/[locale]/conta
               <Info locale={locale} t={t} />
             </Suspense>
           </div>
-          <div className="border border-border bg-champagne/40 p-8 md:p-12">
-            <ContactForm t={t.form} form={form} locale={locale} />
+          <div className="space-y-6">
+            {/* Table bookings have their own form; this page is for questions (APPLUX §3). */}
+            <div className="flex flex-col gap-4 border border-gold/40 bg-ink px-6 py-5 text-bone sm:flex-row sm:items-center sm:justify-between md:px-8">
+              <p className="text-sm leading-relaxed font-light text-bone/80">{t.tableNote}</p>
+              <Button asChild variant="goldGlass" size="sm" className="shrink-0 self-start px-4 tracking-[0.2em] sm:self-auto">
+                <Link href={localePath(locale, TABLE_BOOKING)}>
+                  <CalendarDays className="h-3.5 w-3.5" />
+                  {cart.bookTable}
+                </Link>
+              </Button>
+            </div>
+            <div className="border border-border bg-champagne/40 p-6 md:p-10">
+              <ContactForm t={t.form} form={form} locale={locale} />
+            </div>
           </div>
         </Container>
       </section>
-      <section className="pb-24">
+      <section className="pb-16">
         <Container className="px-6">
           <Suspense fallback={null}>
-            <MapBlock caption={t.mapCaption} />
+            <Location caption={t.mapCaption} directions={store.directions} />
           </Suspense>
         </Container>
       </section>

@@ -15,6 +15,7 @@ import { JsonLd } from '@/components/site/json-ld';
 import { alternates, type Dictionary, getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { groupedHours } from '@/lib/time';
 import { getHappyHour, getHomePage, mediaOf } from '@/modules/cms/service';
+import { TABLE_BOOKING } from '@/modules/sales/order-states';
 import { localBusinessJsonLd } from '@/modules/settings/seo';
 import { directionsUrl, getSettings } from '@/modules/settings/service';
 
@@ -94,7 +95,7 @@ async function HappyHourSection({ t, locale }: { t: Dictionary['happyHour']; loc
     days: hh.days.map(Number),
     from: hh.from,
   };
-  return <HappyHour t={t} locale={locale} content={content} reserveHref={localePath(locale, '/contact')} />;
+  return <HappyHour t={t} locale={locale} content={content} reserveHref={localePath(locale, TABLE_BOOKING)} />;
 }
 
 async function BusinessJsonLd({ locale }: { locale: Locale }) {
@@ -141,7 +142,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
         <HappyHourSection t={t.happyHour} locale={locale} />
       </Suspense>
       <Story t={t.story} />
-      <Events t={t.eventsHome} calendarHref={localePath(locale, '/events')} reserveHref={localePath(locale, '/contact')} />
+      <Events t={t.eventsHome} calendarHref={localePath(locale, '/events')} reserveHref={localePath(locale, '/events')} />
       <Suspense fallback={null}>
         <SocialSection t={t.socialProof} />
       </Suspense>

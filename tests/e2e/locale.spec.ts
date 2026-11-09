@@ -20,6 +20,7 @@ const samples = (l: Locale) => [
   DICTS[l].cateringPage.subtitle,
   DICTS[l].eventsPage.subtitle,
   DICTS[l].footer.moderation,
+  DICTS[l].footer.welcome, // APPLUX §5: the footer's big welcome follows the language
   seed[l].maison.subtitle,
 ];
 

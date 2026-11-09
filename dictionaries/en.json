@@ -179,7 +179,8 @@
     "moderation": "Please drink responsibly.",
     "legal": "Legal notice",
     "privacy": "Privacy",
-    "backToTop": "Back to top"
+    "backToTop": "Back to top",
+    "welcome": "Welcome."
   },
   "floatingCart": {
     "label": "Bag",
@@ -443,7 +444,7 @@
     "eyebrow": "Contact",
     "titleA": "Write to us,",
     "titleB": "come and see us.",
-    "subtitle": "The House replies within 24h. For any question, reservation, or catering quote.",
+    "subtitle": "The House replies within 24h. For any question, an event or a catering request.",
     "info": {
       "address": "Address",
       "phone": "Phone",
@@ -476,6 +477,7 @@
       "doneSubtitle": "Your message is well received. We'll reply within 24h."
     },
     "mapCaption": "Find us in Luxembourg",
+    "tableNote": "To book a table, choose the day, time and number of guests online.",
     "closed": "Closed"
   },
   "auth": {
@@ -823,6 +825,7 @@
     "eyebrow": "Checkout",
     "title": "Your order",
     "titleTable": "Your table",
+    "eyebrowTable": "Reservation",
     "steps": {
       "mode": "How would you like it?",
       "when": "When?",

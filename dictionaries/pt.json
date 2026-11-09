@@ -179,7 +179,8 @@
     "moderation": "O abuso do álcool é prejudicial à saúde.",
     "legal": "Menções legais",
     "privacy": "Privacidade",
-    "backToTop": "Voltar ao topo"
+    "backToTop": "Voltar ao topo",
+    "welcome": "Bem-vindo."
   },
   "floatingCart": {
     "label": "Cesto",
@@ -443,7 +444,7 @@
     "eyebrow": "Contacto",
     "titleA": "Escreva-nos,",
     "titleB": "venha ver-nos.",
-    "subtitle": "A Casa responde em 24h. Para qualquer questão, reserva ou pedido de catering.",
+    "subtitle": "A Casa responde em 24h. Para qualquer questão, evento ou pedido de catering.",
     "info": {
       "address": "Morada",
       "phone": "Telefone",
@@ -476,6 +477,7 @@
       "doneSubtitle": "A sua mensagem foi recebida. Respondemos em 24h."
     },
     "mapCaption": "Encontre-nos em Luxemburgo",
+    "tableNote": "Para reservar uma mesa, escolha online o dia, a hora e o número de pessoas.",
     "closed": "Fechado"
   },
   "auth": {
@@ -823,6 +825,7 @@
     "eyebrow": "Finalizar",
     "title": "A sua encomenda",
     "titleTable": "A sua mesa",
+    "eyebrowTable": "Reserva",
     "steps": {
       "mode": "Como a prefere?",
       "when": "Quando?",

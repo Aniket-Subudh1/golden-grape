@@ -56,3 +56,6 @@ export type PaymentChoice = 'onsite' | 'transfer';
 
 /** Phase 1 (V-PAY): pay on site for pickup and tables, bank transfer for delivery and as an option for pickup. */
 export const PAYMENT_CHOICES: Record<'pickup' | 'delivery' | 'table', PaymentChoice[]> = { pickup: ['onsite', 'transfer'], delivery: ['transfer'], table: ['onsite'] };
+
+/** The table booking form itself (checkout opened on a table): every "Réserver une table" on the site links here. */
+export const TABLE_BOOKING = '/checkout?mode=table';
