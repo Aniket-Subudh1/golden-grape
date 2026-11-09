@@ -2,7 +2,7 @@
 
 import { after } from 'next/server';
 import { z } from 'zod';
-import { clientIp, publicAction } from '@/lib/action';
+import { clientIp, phoneField, publicAction } from '@/lib/action';
 import { LOCALES } from '@/lib/i18n';
 import { rateLimit } from '@/lib/rate-limit';
 import { mailCatering } from './mail';
@@ -18,7 +18,7 @@ const schema = z.object({
   location: z.string().trim().min(1, 'required').max(200, 'tooLong'),
   name: z.string().trim().min(1, 'required').max(120, 'tooLong'),
   email: z.email('email'),
-  phone: z.string().trim().min(5, 'required').max(40, 'tooLong'),
+  phone: phoneField,
   notes: z.string().trim().max(2000, 'tooLong').optional(),
   locale: z.enum(LOCALES),
   website: z.string().optional(), // honeypot

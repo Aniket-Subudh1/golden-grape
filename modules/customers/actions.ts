@@ -2,7 +2,7 @@
 
 import { after } from 'next/server';
 import { z } from 'zod';
-import { clientIp, publicAction } from '@/lib/action';
+import { clientIp, optionalPhoneField, publicAction } from '@/lib/action';
 import { AppError } from '@/lib/errors';
 import { LOCALES } from '@/lib/i18n';
 import { rateLimit } from '@/lib/rate-limit';
@@ -51,7 +51,7 @@ export const signUpAction = publicAction(
       name: required(120),
       email,
       password,
-      phone: text(40).optional(),
+      phone: optionalPhoneField,
       type: z.enum(['private', 'business']),
       company: text(160).optional(),
       vatNumber: text(40).optional(),
@@ -106,7 +106,7 @@ export const resetPasswordAction = publicAction(
 export const updateProfileAction = publicAction(
   z.object({
     name: required(120),
-    phone: text(40).optional(),
+    phone: optionalPhoneField,
     locale: z.enum(LOCALES),
     marketingConsent: checkbox,
     company: text(160).optional(),

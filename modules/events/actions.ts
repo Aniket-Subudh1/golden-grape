@@ -4,7 +4,7 @@ import { after } from 'next/server';
 import type { Payload } from 'payload';
 import { z } from 'zod';
 import { audit } from '@/lib/audit';
-import { action, clientIp, publicAction } from '@/lib/action';
+import { action, clientIp, phoneField, publicAction } from '@/lib/action';
 import { LOCALES } from '@/lib/i18n';
 import { rateLimit } from '@/lib/rate-limit';
 import { currentCustomer } from '@/modules/customers/service';
@@ -29,7 +29,7 @@ const schema = z.object({
   guests: z.coerce.number('required').int('invalid').min(1, 'required').max(20, 'invalid'),
   name: z.string().trim().min(1, 'required').max(120, 'tooLong'),
   email: z.email('email'),
-  phone: z.string().trim().min(5, 'required').max(40, 'tooLong'),
+  phone: phoneField,
   notes: z.string().trim().max(1000, 'tooLong').optional().transform((v) => v || undefined),
   locale: z.enum(LOCALES),
   website: z.string().optional(), // honeypot

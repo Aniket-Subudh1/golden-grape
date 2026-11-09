@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { hasRole, type Role } from './access';
 import { AppError, type ErrorCode } from './errors';
 import { getPayloadClient } from './payload';
+import { formatPhone, isPhone } from './phone';
 
 export type ActionResult<T> =
   | { ok: true; data: T }
@@ -60,6 +61,11 @@ export const publicAction =
   ) =>
   async (_prev: unknown, input: Input<S>) =>
     run(schema, input, (data, payload, user) => fn(data, { payload, user }), () => true);
+
+// Phone fields of the public forms (error keys `form.fields.*`); stored in international form.
+const phoneText = z.string().trim().max(40, 'tooLong').refine((v) => !v || isPhone(v), 'phone');
+export const phoneField = phoneText.refine((v) => v.length > 0, 'required').transform(formatPhone);
+export const optionalPhoneField = phoneText.transform((v) => v && formatPhone(v)).optional();
 
 /** Client IP for rate limits (first hop of X-Forwarded-For, set by the host's proxy). */
 export async function clientIp() {

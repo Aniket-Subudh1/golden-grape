@@ -2,7 +2,7 @@
 
 import { after } from 'next/server';
 import { z } from 'zod';
-import { clientIp, publicAction } from '@/lib/action';
+import { clientIp, optionalPhoneField, publicAction } from '@/lib/action';
 import { LOCALES } from '@/lib/i18n';
 import { rateLimit } from '@/lib/rate-limit';
 import { mailContact } from './contact-mail';
@@ -11,7 +11,7 @@ import { mailContact } from './contact-mail';
 const schema = z.object({
   name: z.string().trim().min(1, 'required').max(120, 'tooLong'),
   email: z.email('email'),
-  phone: z.string().trim().max(40, 'tooLong').optional(),
+  phone: optionalPhoneField,
   subject: z.enum(['boutique', 'traiteur', 'evenement', 'autre'], 'invalid'),
   message: z.string().trim().min(10, 'tooShort').max(4000, 'tooLong'),
   locale: z.enum(LOCALES),

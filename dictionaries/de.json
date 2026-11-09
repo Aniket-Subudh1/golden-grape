@@ -576,6 +576,7 @@
     "fields": {
       "required": "Dieses Feld ist erforderlich.",
       "email": "Ungültige E-Mail-Adresse.",
+      "phone": "Telefonnummer unvollständig oder ungültig.",
       "tooShort": "Dieser Text ist zu kurz.",
       "tooLong": "Dieser Text ist zu lang.",
       "minGuests": "Weniger Gäste als das Minimum dieses Pakets.",
@@ -896,7 +897,7 @@
       "time": "eine Uhrzeit",
       "name": "Ihr Name",
       "email": "eine gültige E-Mail",
-      "phone": "eine Telefonnummer",
+      "phone": "eine gültige Telefonnummer",
       "line1": "Straße und Hausnummer",
       "postalCode": "die Postleitzahl",
       "city": "der Ort"

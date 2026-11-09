@@ -2,7 +2,7 @@
 
 import { after } from 'next/server';
 import { z } from 'zod';
-import { action, clientIp, publicAction } from '@/lib/action';
+import { action, clientIp, phoneField, publicAction } from '@/lib/action';
 import { audit } from '@/lib/audit';
 import { AppError } from '@/lib/errors';
 import { LOCALES } from '@/lib/i18n';
@@ -65,7 +65,7 @@ const checkout = z
     time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'slotUnavailable'),
     name: z.string().trim().min(1, 'required').max(120, 'tooLong'),
     email: z.email('email'),
-    phone: z.string().trim().min(5, 'required').max(40, 'tooLong'),
+    phone: phoneField,
     line1: optionalText(200),
     line2: optionalText(200),
     postalCode: optionalText(12),

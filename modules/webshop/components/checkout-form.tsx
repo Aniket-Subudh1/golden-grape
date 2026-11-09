@@ -12,6 +12,7 @@ import { Field } from '@/components/ui/field';
 import { cn } from '@/lib/cn';
 import { type Dictionary, interpolate, type Locale, localePath } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
+import { isPhone } from '@/lib/phone';
 import { slotLabel } from '@/lib/time';
 import { checkoutQuote, placeOrderAction, slotsFor } from '@/modules/sales/actions';
 import { localityAction, suggestAddressAction } from '../actions';
@@ -331,7 +332,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
     !slot.time && !noSlots && t.check.time,
     !contact.name.trim() && t.check.name,
     !isEmail(contact.email) && t.check.email,
-    contact.phone.trim().length < 5 && t.check.phone,
+    !isPhone(contact.phone.trim()) && t.check.phone,
     ...(mode === 'delivery' ? [!addr.line1.trim() && t.check.line1, !addr.postalCode.trim() && t.check.postalCode, !addr.city.trim() && t.check.city] : []),
   ].filter((m): m is string => Boolean(m));
   const blockers = [

@@ -576,6 +576,7 @@
     "fields": {
       "required": "Este campo é obrigatório.",
       "email": "Endereço de e-mail inválido.",
+      "phone": "Número de telefone incompleto ou inválido.",
       "tooShort": "Este texto é demasiado curto.",
       "tooLong": "Este texto é demasiado longo.",
       "minGuests": "Menos convidados do que o mínimo desta proposta.",
@@ -896,7 +897,7 @@
       "time": "uma hora",
       "name": "o seu nome",
       "email": "um e-mail válido",
-      "phone": "um número de telefone",
+      "phone": "um número de telefone válido",
       "line1": "a rua e o número",
       "postalCode": "o código postal",
       "city": "a localidade"
