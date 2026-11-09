@@ -1,19 +1,21 @@
 'use client';
 
-import { toast, useDocumentInfo, useFormFields, useFormModified, useTranslation } from '@payloadcms/ui';
+import { ConfirmationModal, toast, useDocumentInfo, useFormFields, useFormModified, useModal, useTranslation } from '@payloadcms/ui';
 import { CircleCheck, ClipboardCheck } from 'lucide-react';
 import { useState } from 'react';
 import { postStockCount } from '../actions';
 
 // "Post this count" on an open stock count (ui field `postPanel`). Posting writes the variances and locks the count,
-// so the page reloads to show it read-only with the expected quantities filled in.
+// so the page reloads to show it read-only with the expected quantities filled in. It asks first in Payload's own
+// confirmation dialog (the one its deletes use), never the browser's (APPLUX report 2, §10).
+
+const MODAL = 'gg-post-count';
 
 const TEXT = {
   fr: {
     post: 'Valider l’inventaire',
     explain: 'Le stock de chaque article prend la quantité comptée. L’inventaire ne pourra plus être modifié.',
     saveFirst: 'Enregistrez d’abord vos changements.',
-    confirm: 'Valider cet inventaire ? Le stock sera remplacé par les quantités comptées.',
     done: 'Inventaire validé.',
     title: 'Prêt à valider ?',
     posted: 'Inventaire validé',
@@ -24,7 +26,6 @@ const TEXT = {
     post: 'Post this count',
     explain: 'Each item’s stock becomes the counted quantity. The count can no longer be changed afterwards.',
     saveFirst: 'Save your changes first.',
-    confirm: 'Post this count? Stock will be replaced by the counted quantities.',
     done: 'Count posted.',
     title: 'Ready to post?',
     posted: 'Count posted',
@@ -35,7 +36,6 @@ const TEXT = {
     post: 'Inventur buchen',
     explain: 'Der Bestand jedes Artikels wird zur gezählten Menge. Danach ist die Inventur nicht mehr änderbar.',
     saveFirst: 'Speichern Sie zuerst Ihre Änderungen.',
-    confirm: 'Diese Inventur buchen? Der Bestand wird durch die gezählten Mengen ersetzt.',
     done: 'Inventur gebucht.',
     title: 'Bereit zum Buchen?',
     posted: 'Inventur gebucht',
@@ -46,7 +46,6 @@ const TEXT = {
     post: 'Validar inventário',
     explain: 'O stock de cada artigo passa a ser a quantidade contada. Depois o inventário já não pode ser alterado.',
     saveFirst: 'Guarde primeiro as suas alterações.',
-    confirm: 'Validar este inventário? O stock será substituído pelas quantidades contadas.',
     done: 'Inventário validado.',
     title: 'Pronto para validar?',
     posted: 'Inventário validado',
@@ -63,6 +62,7 @@ export default function PostCountButton() {
   const postedAt = useFormFields(([fields]) => fields.postedAt?.value) as string | undefined;
   const modified = useFormModified();
   const [busy, setBusy] = useState(false);
+  const { openModal } = useModal();
   if (!id) return null;
   if (status === 'posted') {
     const when = postedAt
@@ -80,7 +80,6 @@ export default function PostCountButton() {
   }
 
   async function post() {
-    if (!window.confirm(t.confirm)) return;
     setBusy(true);
     const res = await postStockCount(null, { count: String(id) });
     if (!res.ok) {
@@ -99,9 +98,10 @@ export default function PostCountButton() {
         <b>{t.title}</b>
         <p>{modified ? t.saveFirst : t.explain}</p>
       </div>
-      <button type="button" className="gg-btn gg-btn--primary" disabled={busy || modified} onClick={post}>
+      <button type="button" className="gg-btn gg-btn--primary" disabled={busy || modified} onClick={() => openModal(MODAL)}>
         {t.post}
       </button>
+      <ConfirmationModal modalSlug={MODAL} heading={t.title} body={t.explain} confirmLabel={t.post} onConfirm={post} />
     </div>
   );
 }

@@ -1082,6 +1082,30 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 .doc-drawer.drawer--is-open > .drawer__content {
   transform: none;
 }
+
+/* Payload's confirmation dialog (deletes, posting a stock count): the same centred card as the dialogs above, not
+ * bare text on the blurred page (APPLUX report 2, §10). Payload keeps focus, Escape and the buttons. */
+.confirmation-modal__wrapper {
+  width: min(480px, calc(100vw - 48px));
+  padding: 24px 28px;
+  border: 1px solid var(--gg-line);
+  border-top: 3px solid var(--gg-gold);
+  border-radius: 14px;
+  background: var(--gg-frame);
+  box-shadow: 0 24px 80px rgb(26 28 32 / 0.24);
+}
+.confirmation-modal__content h1 {
+  font-size: 20px;
+  line-height: 1.3;
+}
+.confirmation-modal__content p {
+  color: var(--gg-text-2);
+  line-height: 1.55;
+}
+.confirmation-modal__controls {
+  justify-content: flex-end;
+  margin-top: 8px;
+}
 .doc-drawer:has(main[class*='collection-edit--media']) > .drawer__content,
 .doc-drawer:has(main[class*='collection-edit--users']) > .drawer__content,
 .doc-drawer:has(main[class*='collection-edit--cateringPackages']) > .drawer__content {
@@ -2899,7 +2923,7 @@ body:has(.gg-create) .no-results__actions {
 .gg-io__body {
   display: grid;
   gap: 14px;
-  padding: 0 16px 16px;
+  padding: 16px; /* the first row of buttons sat on the header's divider (APPLUX report 2, §10) */
 }
 .gg-io__map {
   max-height: 560px;
