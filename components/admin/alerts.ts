@@ -32,6 +32,8 @@ export type AlertItem = {
   slot?: { date: string; from?: string };
   count?: number;
   awaitingTransfer?: boolean;
+  /** A table reservation that carries a pre-order (APPLUX audit 10 Nov, §2). */
+  preorder?: boolean;
   /** The status a handled item ended in, in the four admin languages. */
   status?: Label;
 };
@@ -61,6 +63,7 @@ type Doc = {
   createdAt: string;
   updatedAt: string;
   slot?: { date?: string | null; from?: string | null } | null;
+  preorder?: unknown;
 };
 
 const LABELS: Record<Collection, Record<string, Label>> = {
@@ -81,6 +84,7 @@ const toItems = (kind: AlertKind, collection: Collection, state: AlertState, doc
     at: state === 'done' ? d.updatedAt : d.createdAt,
     slot: d.slot?.date ? { date: d.slot.date, from: d.slot.from ?? undefined } : undefined,
     awaitingTransfer: d.status === 'awaiting_payment' || undefined,
+    preorder: (collection === 'reservations' && Boolean(d.preorder)) || undefined,
     status: state === 'done' && d.status ? LABELS[collection][d.status] : undefined,
   }));
 

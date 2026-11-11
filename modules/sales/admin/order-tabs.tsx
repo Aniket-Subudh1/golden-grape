@@ -9,8 +9,11 @@ import OrderDay from './order-day';
 // Payload list query (`where[status][in]` + sort), so Payload's own search, filters, columns and paging keep
 // working; the tabs keep the search and the chosen day, and their counts follow both. "All" finds any order.
 
-/** `skipTable`: a table's pre-order waits for its reservation (counted under Table reservations), not for this tab (GG-020). */
-type Tab = { key: string; label: Label; statuses?: OrderStatus[]; skipTable?: boolean; sort: string; empty: Label };
+/**
+ * `skipTable`: a table's pre-order waits for its reservation (counted under Table reservations), not for this tab
+ * (GG-020). `onlyTable`: those pre-orders, in a tab of their own so they stay visible (APPLUX audit 10 Nov, §2).
+ */
+type Tab = { key: string; label: Label; statuses?: OrderStatus[]; skipTable?: boolean; onlyTable?: boolean; sort: string; empty: Label };
 
 export const ORDER_TABS: Tab[] = [
   {
@@ -20,6 +23,19 @@ export const ORDER_TABS: Tab[] = [
     skipTable: true,
     sort: 'slotAt',
     empty: l('Rien à confirmer pour le moment.', 'Nothing to confirm right now.', 'Im Moment nichts zu bestätigen.', 'Nada para confirmar de momento.'),
+  },
+  {
+    key: 'tables',
+    label: l('Pré-commandes de table', 'Table pre-orders', 'Tisch-Vorbestellungen', 'Pré-encomendas de mesa'),
+    statuses: ['pending'],
+    onlyTable: true,
+    sort: 'slotAt',
+    empty: l(
+      'Aucune pré-commande en attente. Une pré-commande est acceptée ou refusée avec sa réservation de table.',
+      'No pre-order waiting. A pre-order is accepted or declined with its table reservation.',
+      'Keine Vorbestellung offen. Eine Vorbestellung wird mit ihrer Tischreservierung angenommen oder abgelehnt.',
+      'Nenhuma pré-encomenda à espera. Uma pré-encomenda é aceite ou recusada com a sua reserva de mesa.',
+    ),
   },
   {
     key: 'preparing',
@@ -68,6 +84,7 @@ export const ORDER_TABS: Tab[] = [
 export const orderTabWhere = (tab: Tab): Where[] => [
   ...(tab.statuses ? [{ status: { in: tab.statuses } }] : []),
   ...(tab.skipTable ? [{ mode: { not_equals: 'table' } }] : []),
+  ...(tab.onlyTable ? [{ mode: { equals: 'table' } }] : []),
 ];
 
 /** The list URL's query for a tab, keeping the search and the slot day. The sidebar opens the first tab. */
@@ -79,6 +96,7 @@ export function orderTabQuery(tab: Tab, keep: { search?: string; day?: string } 
     i++;
   }
   if (tab.skipTable) params.set(`where[and][${i++}][mode][not_equals]`, 'table');
+  if (tab.onlyTable) params.set(`where[and][${i++}][mode][equals]`, 'table');
   if (keep.day) params.set(`where[and][${i}][slot.date][equals]`, keep.day);
   if (keep.search) params.set('search', keep.search);
   params.set('sort', tab.sort);

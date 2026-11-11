@@ -153,7 +153,13 @@ export default function Bell() {
     const Icon = ICONS[item.kind];
     const isNew = item.state !== 'done' && Boolean(item.at && item.at > since);
     const detail =
-      item.state === 'done' ? '' : item.state === 'info' ? t.detail.info : item.awaitingTransfer ? t.detail.transfer : t.detail[item.kind];
+      item.state === 'done'
+        ? ''
+        : item.state === 'info'
+          ? t.detail.info
+          : item.awaitingTransfer
+            ? t.detail.transfer
+            : [t.detail[item.kind], item.preorder && t.withPreorder].filter(Boolean).join(' · ');
     return (
       <li key={item.key}>
         <Link href={item.href} className="gg-bell__item" data-state={item.state} onClick={() => setOpen(false)}>
