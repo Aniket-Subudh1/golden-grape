@@ -52,6 +52,9 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
+    /* The scrollbar's room is kept while a panel locks the page's scroll (cart, dialogs): on screens with a classic
+       scrollbar (Windows) the page no longer jumps sideways when the cart opens (APPLUX audit 10 Nov, §4). */
+    scrollbar-gutter: stable;
   }
   body {
     background-color: var(--color-background);
@@ -180,8 +183,8 @@
   background: transparent;
 }
 .gg-sheet::backdrop {
-  background: oklch(0.18 0.01 60 / 0.45);
-  backdrop-filter: blur(2px);
+  /* A plain dim: a blurred backdrop repaints the whole page on every frame of the panel's slide (§4). */
+  background: oklch(0.18 0.01 60 / 0.5);
   animation: gg-fade-in 0.3s ease both;
 }
 .gg-sheet[open] > .gg-sheet__panel {
