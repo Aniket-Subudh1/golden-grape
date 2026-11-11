@@ -34,9 +34,13 @@ async function EventDetail({ params }: Pick<Props, 'params'>) {
   const left = (await seatsLeft([event.id]))[event.id] ?? null;
   const { date, time } = eventDate(event.startsAt, event.endsAt, locale);
   const image = mediaOf(event.image);
+  // The hero carries the first paragraph, shortened; the whole description follows the photo (APPLUX audit 10 Nov, §5).
+  const description = event.description?.trim() ?? '';
+  const first = description.split(/\n\s*\n/)[0];
+  const intro = first.length > 240 ? `${first.slice(0, first.lastIndexOf(' ', 240))}…` : first;
   return (
     <>
-      <PageHero eyebrow={`${date} · ${time}`} title={[event.title]} subtitle={event.description}>
+      <PageHero eyebrow={`${date} · ${time}`} title={[event.title]} subtitle={intro}>
         <div className="mt-8 flex flex-wrap items-center gap-8">
           <p className="font-serif text-3xl">{event.priceCents ? formatMoney(event.priceCents, locale, { compact: true }) : t.free}</p>
           <ReserveDialog
@@ -61,6 +65,9 @@ async function EventDetail({ params }: Pick<Props, 'params'>) {
             <div className="relative aspect-[21/9] overflow-hidden bg-ink">
               <Image src={image.src} alt={image.alt || event.title} fill sizes="100vw" className="object-cover" />
             </div>
+          )}
+          {description !== intro && (
+            <div className="mt-12 max-w-3xl text-lg leading-relaxed font-light whitespace-pre-line text-ink/80">{description}</div>
           )}
           <Link href={localePath(locale, '/events')} className="eyebrow mt-12 inline-block text-ink/60 transition hover:text-gold-deep">
             ← {t.back}

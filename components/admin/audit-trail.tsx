@@ -1,6 +1,7 @@
 import type { Field, UIFieldServerProps } from 'payload';
 import type { Label } from '@/lib/admin';
 import type { AuditAction } from '@/lib/audit';
+import { formatMoney } from '@/lib/money';
 import { AUDIT_LABELS } from '@/modules/settings/collections';
 import { DocCard, DocHistory } from './doc-panel';
 
@@ -39,7 +40,9 @@ export default async function AuditTrail({ id, payload, i18n, collectionSlug }: 
   const config = slug ? (payload.collections as unknown as Record<string, { config: { fields: Field[] } } | undefined>)[slug]?.config : undefined;
   const names = config ? namesOf(config.fields, lang) : new Map<string, Named>();
   const when = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Luxembourg' });
-  const show = (key: string, v: unknown) => (v == null || v === '' ? '—' : (names.get(key)?.options.get(String(v)) ?? String(v)));
+  // Amounts are kept in cents (`…Cents`): shown in euros, in the admin's language (§8).
+  const show = (key: string, v: unknown) =>
+    v == null || v === '' ? '—' : key.endsWith('Cents') && typeof v === 'number' ? formatMoney(v, lang) : (names.get(key)?.options.get(String(v)) ?? String(v));
   const title = say({ fr: 'Historique', en: 'History', de: 'Verlauf', pt: 'Histórico' }, lang);
   const empty = say({ fr: 'Aucune action enregistrée pour l’instant.', en: 'Nothing recorded yet.', de: 'Noch nichts erfasst.', pt: 'Ainda nada registado.' }, lang);
   // Staff actions always carry their user; a line without one was written by the website (a customer's request).

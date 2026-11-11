@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it, vi } from 'vitest';
 // signUpFromOrder signs the new account in (a cookie): outside a request there is no cookie jar.
 vi.mock('next/headers', () => ({ cookies: async () => ({ set: () => {}, get: () => undefined, delete: () => {} }), headers: async () => new Headers() }));
 import { model } from '@/lib/tx';
-import { bookEvent } from '@/modules/events/service';
+import { bookEvent, recordBookingPayment } from '@/modules/events/service';
 import { onHand } from '@/modules/inventory/service';
 import { getTestPayload, makeStaff, makeVariant, parallel } from '@/tests/helpers';
 import { transitionReservation } from './reservations';
@@ -355,6 +355,23 @@ describe('event bookings', () => {
     expect(new Set(results.map((r) => (r.status === 'fulfilled' ? r.value.booking.id : 'x'))).size).toBe(1);
     expect((await model(payload, 'events').findById(event.id).lean<{ booked: number }>())?.booked).toBe(2);
     expect((results[0] as PromiseFulfilledResult<Awaited<ReturnType<typeof bookEvent>>>).value.booking).toMatchObject({ status: 'pending', amountCents: 5000 });
+  });
+
+  it('payment received (APPLUX audit 10 Nov, §8): recorded with amount, day, method and who, the booking confirmed, once', async () => {
+    const event = await payload.create({
+      collection: 'events',
+      data: { title: 'Noite de Fado', slug: 'fado-paid', startsAt: '2030-03-10T19:00:00Z', priceCents: 2400, capacity: 10, _status: 'published' },
+      overrideAccess: true,
+    });
+    const { booking } = await bookEvent(payload, { idempotencyKey: randomUUID(), event: event.id, guests: 2, name: 'Hans Müller', email: 'hans@example.test', phone: '+352 621 123 456', locale: 'de' });
+    expect(booking).toMatchObject({ status: 'pending', label: 'Noite de Fado · Hans Müller (2 places)' });
+    const pay = () => recordBookingPayment(payload, booking.id, { amountCents: 4800, at: new Date('2026-11-10T12:00:00Z'), method: 'transfer', reference: 'FADO-2', user: staff.id });
+    const results = await parallel(2, pay);
+    expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
+    expect((results.find((r) => r.status === 'rejected') as PromiseRejectedResult).reason).toMatchObject({ code: 'CONFLICT' });
+    const stored = await payload.findByID({ collection: 'eventBookings', id: booking.id, depth: 0, overrideAccess: true });
+    expect(stored).toMatchObject({ status: 'confirmed', payment: { amountCents: 4800, method: 'transfer', reference: 'FADO-2', user: staff.id } });
+    expect(stored.payment?.at?.slice(0, 10)).toBe('2026-11-10');
   });
 });
 

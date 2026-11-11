@@ -5,6 +5,8 @@ import { hasRole, type Role } from './access';
 import { AppError, type ErrorCode } from './errors';
 import { getPayloadClient } from './payload';
 import { formatPhone, isPhone } from './contact';
+import { parseDecimal } from './money';
+import { fromLocal, today } from './time';
 
 export type ActionResult<T> =
   | { ok: true; data: T }
@@ -66,6 +68,18 @@ export const publicAction =
 const phoneText = z.string().trim().max(40, 'tooLong').refine((v) => !v || isPhone(v), 'phone');
 export const phoneField = phoneText.refine((v) => v.length > 0, 'required').transform(formatPhone);
 export const optionalPhoneField = phoneText.transform((v) => v && formatPhone(v)).optional();
+
+// Money staff record (GG-003/004; event payments): amounts typed in € ("12,50"), dates are the bank's or the till's
+// day, never in the future (noon in Luxembourg, so the day never shifts).
+export const eurosField = z.string().transform((v, ctx) => {
+  const cents = parseDecimal(v);
+  if (!Number.isInteger(cents) || cents <= 0) ctx.addIssue({ code: 'custom', message: 'amount' });
+  return cents;
+});
+export const bankDayField = z.iso.date('date').refine((d) => d <= today(), 'futureDate').transform((d) => {
+  const [y, m, day] = d.split('-').map(Number);
+  return fromLocal(y, m, day, 12);
+});
 
 /** Client IP for rate limits (first hop of X-Forwarded-For, set by the host's proxy). */
 export async function clientIp() {

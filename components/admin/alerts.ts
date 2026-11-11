@@ -59,6 +59,8 @@ type Doc = {
   id: string;
   status?: string | null;
   number?: string | null;
+  /** Event bookings: "Noite de Fado · Hans Müller (2 places)" (they have no number, §15). */
+  label?: string | null;
   contact?: { name?: string | null } | null;
   createdAt: string;
   updatedAt: string;
@@ -79,8 +81,8 @@ const toItems = (kind: AlertKind, collection: Collection, state: AlertState, doc
     state,
     key: `${kind}-${d.id}`,
     href: `/admin/collections/${collection}/${d.id}`,
-    ref: d.number ?? '',
-    name: d.contact?.name ?? '',
+    ref: d.number ?? d.label ?? '',
+    name: d.label ? '' : (d.contact?.name ?? ''),
     at: state === 'done' ? d.updatedAt : d.createdAt,
     slot: d.slot?.date ? { date: d.slot.date, from: d.slot.from ?? undefined } : undefined,
     awaitingTransfer: d.status === 'awaiting_payment' || undefined,

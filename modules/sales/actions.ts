@@ -2,12 +2,10 @@
 
 import { after } from 'next/server';
 import { z } from 'zod';
-import { action, clientIp, phoneField, publicAction } from '@/lib/action';
+import { action, bankDayField, clientIp, eurosField, phoneField, publicAction } from '@/lib/action';
 import { audit } from '@/lib/audit';
 import { AppError } from '@/lib/errors';
 import { LOCALES } from '@/lib/i18n';
-import { parseDecimal } from '@/lib/money';
-import { fromLocal, today } from '@/lib/time';
 import { rateLimit } from '@/lib/rate-limit';
 import { currentCustomer, saveAddress } from '@/modules/customers/service';
 import { quoteCart } from '@/modules/promotions/service';
@@ -128,16 +126,9 @@ export const transitionOrder = action(
   },
 );
 
-// Money staff record (GG-003/004). Amounts are typed in € ("12,50"), dates are the bank's day (not in the future).
-const euros = z.string().transform((v, ctx) => {
-  const cents = parseDecimal(v);
-  if (!Number.isInteger(cents) || cents <= 0) ctx.addIssue({ code: 'custom', message: 'amount' });
-  return cents;
-});
-const bankDay = z.iso.date('date').refine((d) => d <= today(), 'futureDate').transform((d) => {
-  const [y, m, day] = d.split('-').map(Number);
-  return fromLocal(y, m, day, 12);
-});
+// Money staff record (GG-003/004): amounts in €, the bank's day (lib/action.ts).
+const euros = eurosField;
+const bankDay = bankDayField;
 const reasonText = z.string().trim().min(3, 'reasonRequired').max(300, 'tooLong');
 const mailMoved = (result: MoneyResult) => {
   if (result.effects.includes('mailCustomer')) after(() => mailOrderStatus(result.order).catch(logMail('order status')));

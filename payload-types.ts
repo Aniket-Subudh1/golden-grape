@@ -253,6 +253,7 @@ export interface AuditLog {
     | 'order.return'
     | 'reservation.status'
     | 'booking.status'
+    | 'booking.payment'
     | 'stock.adjust'
     | 'stock.count'
     | 'catalogue.import'
@@ -630,6 +631,9 @@ export interface Brand {
 export interface Product {
   id: string;
   name: string;
+  /**
+   * Counter: on the Counter page, and only these dishes and drinks can be pre-ordered with a table.
+   */
   kind: 'wine' | 'grocery' | 'snack' | 'gift' | 'other';
   status: 'active' | 'draft' | 'archived';
   slug: string;
@@ -1310,6 +1314,7 @@ export interface DeliveryZone {
  */
 export interface EventBooking {
   id: string;
+  label?: string | null;
   event?: (string | null) | Event;
   idempotencyKey?: string | null;
   customer?: (string | null) | Customer;
@@ -1320,6 +1325,13 @@ export interface EventBooking {
   };
   guests?: number | null;
   amountCents?: number | null;
+  payment?: {
+    amountCents?: number | null;
+    at?: string | null;
+    method?: ('onsite' | 'transfer' | 'invoice' | 'card') | null;
+    reference?: string | null;
+    user?: (string | null) | User;
+  };
   status?: ('pending' | 'confirmed' | 'cancelled') | null;
   notes?: string | null;
   locale?: ('fr' | 'en' | 'de' | 'pt') | null;
@@ -2214,6 +2226,7 @@ export interface DeliveryZonesSelect<T extends boolean = true> {
  * via the `definition` "eventBookings_select".
  */
 export interface EventBookingsSelect<T extends boolean = true> {
+  label?: T;
   event?: T;
   idempotencyKey?: T;
   customer?: T;
@@ -2226,6 +2239,15 @@ export interface EventBookingsSelect<T extends boolean = true> {
       };
   guests?: T;
   amountCents?: T;
+  payment?:
+    | T
+    | {
+        amountCents?: T;
+        at?: T;
+        method?: T;
+        reference?: T;
+        user?: T;
+      };
   status?: T;
   notes?: T;
   locale?: T;

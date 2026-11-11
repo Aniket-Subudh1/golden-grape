@@ -439,7 +439,8 @@
       "close": "Fechar"
     },
     "empty": "Sem eventos agendados de momento. Volte em breve — ou escreva-nos para ser o primeiro a saber.",
-    "back": "Todos os eventos"
+    "back": "Todos os eventos",
+    "more": "Ver o evento"
   },
   "contactPage": {
     "eyebrow": "Contacto",
@@ -645,7 +646,9 @@
       "reference": "Referência",
       "amount": "Montante",
       "status": "Estado",
-      "event": "Evento"
+      "event": "Evento",
+      "amountPaid": "Montante pago",
+      "paidOn": "Pago em"
     },
     "reset": {
       "subject": "Escolha uma nova palavra-passe",
@@ -725,7 +728,10 @@
       "pendingBody": "Os seus lugares estão guardados. O montante paga-se no local, no próprio dia.",
       "cancelledSubject": "A sua reserva para {{title}} foi cancelada",
       "cancelledBody": "A sua reserva foi cancelada.",
-      "staffSubject": "Nova reserva: {{title}} — {{name}} ({{guests}})"
+      "staffSubject": "Nova reserva: {{title}} — {{name}} ({{guests}})",
+      "paymentSubject": "Pagamento recebido — a sua reserva para {{title}} está confirmada",
+      "paymentBody": "Recebemos o seu pagamento: a sua reserva está confirmada. Esperamos por si com todo o gosto!",
+      "statusConfirmed": "Confirmada"
     },
     "staffBanner": "Notificação interna — para a equipa Golden Grape (não reencaminhar ao cliente)",
     "welcome": {

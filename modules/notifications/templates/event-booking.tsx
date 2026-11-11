@@ -12,6 +12,8 @@ export type EventBookingMail = {
   amount?: string | null;
   status: 'pending' | 'confirmed' | 'cancelled';
   notes?: string | null;
+  /** Set on the payment e-mail only (§7): what was received and when. */
+  payment?: { amount: string; on: string } | null;
 };
 
 type Props = { t: Dictionary['mail']; business: MailBusiness; logoUrl: string; data: EventBookingMail };
@@ -25,14 +27,18 @@ const rows = (t: Dictionary['mail'], d: EventBookingMail): [string, string | num
 
 export function EventBookingCustomer({ t, business, logoUrl, data }: Props) {
   const e = t.eventBooking;
-  const title = data.status === 'cancelled' ? e.cancelledSubject : e.subject;
-  const body = { pending: e.pendingBody, confirmed: e.confirmedBody, cancelled: e.cancelledBody }[data.status];
+  const title = data.payment ? e.paymentSubject : data.status === 'cancelled' ? e.cancelledSubject : e.subject;
+  const body = data.payment ? e.paymentBody : { pending: e.pendingBody, confirmed: e.confirmedBody, cancelled: e.cancelledBody }[data.status];
+  // The payment e-mail: the event, the guests, what was paid and when, and the booking's final status.
+  const details: [string, string | number][] = data.payment
+    ? [...rows(t, { ...data, amount: null }), [t.labels.amountPaid, data.payment.amount], [t.labels.paidOn, data.payment.on], [t.labels.status, e.statusConfirmed]]
+    : rows(t, data);
   return (
     <MailLayout business={business} logoUrl={logoUrl}>
       <h1 style={heading}>{interpolate(title, { title: data.title })}</h1>
       <p>{interpolate(t.greeting, { name: data.name })}</p>
       <p>{body}</p>
-      <Details rows={rows(t, data)} />
+      <Details rows={details} />
       <p>{t.signature}</p>
     </MailLayout>
   );

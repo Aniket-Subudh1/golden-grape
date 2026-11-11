@@ -3,6 +3,7 @@ import { hiddenUnless, isStaff, none, published, staffOrSelf } from '@/lib/acces
 import { autoSlug, addButton, badgeCell, emptyList, l, listOnly, scaledNumber, seoSection } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { revalidateTagHook } from '@/lib/revalidate';
+import { PAYMENT_METHOD_LABELS } from '@/modules/sales/collections';
 
 const editors = isStaff('manager');
 
@@ -116,9 +117,11 @@ export const eventBookings: CollectionConfig = {
     plural: l('Places réservées', 'Event bookings', 'Veranstaltungsbuchungen', 'Reservas de eventos'),
   },
   admin: {
-    defaultColumns: ['event', 'contact', 'guests', 'status', 'createdAt'],
+    // APPLUX audit 10 Nov, §15: a readable title ("Noite de Fado · Hans Müller (2 places)") instead of the record id.
+    useAsTitle: 'label',
+    defaultColumns: ['label', 'guests', 'status', 'createdAt'],
     hidden: hiddenUnless('sales'),
-    listSearchableFields: ['contact.name', 'contact.email', 'contact.phone'],
+    listSearchableFields: ['label', 'contact.name', 'contact.email', 'contact.phone'],
     description: l(
       'Les places réservées depuis la page Événements. Les événements payants se règlent sur place.',
       'Seats booked from the Events page. Paid events are paid on site.',
@@ -143,6 +146,7 @@ export const eventBookings: CollectionConfig = {
     { name: 'trail', type: 'ui', admin: { disableListColumn: true, components: { Field: '@/components/admin/audit-trail' } } },
     ...(
       [
+        { name: 'label', type: 'text', label: l('Réservation', 'Booking', 'Buchung', 'Reserva') },
         { name: 'event', type: 'relationship', relationTo: 'events', required: true, index: true, label: l('Événement', 'Event', 'Veranstaltung', 'Evento') },
         { name: 'idempotencyKey', type: 'text', required: true, unique: true, admin: { disableListColumn: true, disableListFilter: true } },
         { name: 'customer', type: 'relationship', relationTo: 'customers', label: l('Compte client', 'Customer account', 'Kundenkonto', 'Conta de cliente') },
@@ -159,6 +163,20 @@ export const eventBookings: CollectionConfig = {
         },
         { name: 'guests', type: 'number', required: true, min: 1, label: l('Personnes', 'Guests', 'Personen', 'Pessoas') },
         { name: 'amountCents', type: 'number', defaultValue: 0, label: l('Total', 'Total', 'Summe', 'Total'), admin: { components: scaledNumber('€') } },
+        // §8: the money received for a paid event, as staff recorded it with "Paiement reçu" (recordBookingPayment).
+        {
+          name: 'payment',
+          type: 'group',
+          label: l('Paiement', 'Payment', 'Zahlung', 'Pagamento'),
+          admin: { disableListColumn: true },
+          fields: [
+            { name: 'amountCents', type: 'number', label: l('Montant reçu', 'Amount received', 'Erhaltener Betrag', 'Montante recebido'), admin: { components: scaledNumber('€') } },
+            { name: 'at', type: 'date', label: l('Reçu le', 'Received on', 'Erhalten am', 'Recebido em') },
+            { name: 'method', type: 'select', options: (Object.keys(PAYMENT_METHOD_LABELS) as (keyof typeof PAYMENT_METHOD_LABELS)[]).map((value) => ({ value, label: PAYMENT_METHOD_LABELS[value] })), label: l('Moyen', 'Method', 'Art', 'Meio') },
+            { name: 'reference', type: 'text', label: l('Référence', 'Reference', 'Referenz', 'Referência') },
+            { name: 'user', type: 'relationship', relationTo: 'users', label: l('Enregistré par', 'Recorded by', 'Erfasst von', 'Registado por') },
+          ],
+        },
         {
           name: 'status',
           type: 'select',

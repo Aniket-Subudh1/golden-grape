@@ -24,8 +24,11 @@ async function EventList({ locale, t, dict }: { locale: Locale; t: Dictionary['e
   const events = await upcomingEvents(locale);
   if (events.length === 0) return <p className="max-w-xl text-lg font-light text-ink/60">{t.empty}</p>;
   const left = await seatsLeft(events.map((e) => e.id));
+  // The grid follows how many events there are (APPLUX audit 10 Nov, §5): one or two get wide cards, never a narrow
+  // column with a tall block of text beside an empty page.
+  const cols = events.length >= 4 ? 4 : events.length === 3 ? 3 : 2;
   return (
-    <MediaGrid cols={4} hairline>
+    <MediaGrid cols={cols} hairline className={events.length === 1 ? 'sm:grid-cols-1 max-w-2xl' : undefined}>
       {events.map((e) => {
         const { date, time } = eventDate(e.startsAt, e.endsAt, locale);
         return (
@@ -33,7 +36,7 @@ async function EventList({ locale, t, dict }: { locale: Locale; t: Dictionary['e
             key={e.id}
             image={mediaOf(e.image)?.src}
             alt={e.title}
-            ratio="4/5"
+            ratio={cols === 2 ? '4/3' : '4/5'}
             overlay={
               <>
                 <p className="eyebrow text-gold">{date}</p>
@@ -53,7 +56,11 @@ async function EventList({ locale, t, dict }: { locale: Locale; t: Dictionary['e
             }
           >
             <div className="flex flex-1 flex-col p-6">
-              <p className="flex-1 text-sm font-light text-ink/60">{e.description}</p>
+              {/* A short preview; the whole text is on the event's page. */}
+              <p className="line-clamp-3 text-sm font-light whitespace-pre-line text-ink/60">{e.description}</p>
+              <Link href={localePath(locale, `/events/${e.slug}`)} className="relative z-10 mt-3 mb-auto self-start text-[11px] tracking-[0.22em] text-gold-deep uppercase hover:text-ink">
+                {t.more} →
+              </Link>
               <div className="relative z-10 mt-5 flex items-center justify-between">
                 <span className="font-serif text-xl">{e.priceCents ? formatMoney(e.priceCents, locale, { compact: true }) : t.free}</span>
                 <ReserveDialog

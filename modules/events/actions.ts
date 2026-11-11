@@ -4,23 +4,23 @@ import { after } from 'next/server';
 import type { Payload } from 'payload';
 import { z } from 'zod';
 import { audit } from '@/lib/audit';
-import { action, clientIp, phoneField, publicAction } from '@/lib/action';
+import { action, bankDayField, clientIp, eurosField, phoneField, publicAction } from '@/lib/action';
 import { LOCALES } from '@/lib/i18n';
 import { rateLimit } from '@/lib/rate-limit';
 import { currentCustomer } from '@/modules/customers/service';
 import type { EventBooking } from '@/payload-types';
 import { mailEventBooking } from './mail';
-import { bookEvent as book, setBookingStatus } from './service';
+import { bookEvent as book, recordBookingPayment, setBookingStatus } from './service';
 
 const logMail = (error: unknown) => console.error('[mail] event booking', error);
 
-async function sendBookingMail(payload: Payload, booking: EventBooking, staff: boolean) {
+async function sendBookingMail(payload: Payload, booking: EventBooking, staff: boolean, payment = false) {
   const id = typeof booking.event === 'object' && booking.event ? booking.event.id : String(booking.event);
   const [fr, customer] = await Promise.all([
     payload.findByID({ collection: 'events', id, locale: 'fr', depth: 0, overrideAccess: true }),
     payload.findByID({ collection: 'events', id, locale: booking.locale ?? 'fr', depth: 0, overrideAccess: true }),
   ]);
-  await mailEventBooking(booking, { fr, customer }, { staff });
+  await mailEventBooking(booking, { fr, customer }, { staff, payment });
 }
 
 const schema = z.object({
@@ -50,8 +50,32 @@ export const setBookingStatusAction = action(
   { roles: ['sales'] },
   async ({ booking, to, reason }, { payload, user }) => {
     const updated = await setBookingStatus(payload, booking, to);
-    await audit(payload, { user: user.id, action: 'booking.status', collection: 'eventBookings', id: booking, ref: updated.contact?.name, reason: reason || undefined, after: { status: to, guests: updated.guests } });
+    await audit(payload, { user: user.id, action: 'booking.status', collection: 'eventBookings', id: booking, ref: updated.label ?? updated.contact?.name, reason: reason || undefined, after: { status: to, guests: updated.guests } });
     if (to === 'cancelled') after(() => sendBookingMail(payload, updated, false).catch(logMail));
+    return { status: updated.status };
+  },
+);
+
+/**
+ * "Payment received" on a paid booking (APPLUX audit 10 Nov, §7–§8): the payment and the confirmation are two lines
+ * of the history (amount, day, method, reference, who; then pending → confirmed), and the customer gets a separate
+ * e-mail confirming the payment and the booking.
+ */
+export const recordBookingPaymentAction = action(
+  z.object({
+    booking: z.string().min(1),
+    amount: eurosField,
+    at: bankDayField,
+    method: z.enum(['onsite', 'transfer', 'card']),
+    reference: z.string().trim().max(80, 'tooLong').optional().transform((v) => v || undefined),
+  }),
+  { roles: ['sales'] },
+  async ({ booking, amount, at, method, reference }, { payload, user }) => {
+    const updated = await recordBookingPayment(payload, booking, { amountCents: amount, at, method, reference, user: user.id });
+    const ref = updated.label ?? updated.contact?.name;
+    await audit(payload, { user: user.id, action: 'booking.payment', collection: 'eventBookings', id: booking, ref, after: { 'payment.amountCents': amount, 'payment.at': at.toISOString().slice(0, 10), 'payment.method': method, 'payment.reference': reference } });
+    await audit(payload, { user: user.id, action: 'booking.status', collection: 'eventBookings', id: booking, ref, before: { status: 'pending' }, after: { status: 'confirmed' } });
+    after(() => sendBookingMail(payload, updated, false, true).catch(logMail));
     return { status: updated.status };
   },
 );

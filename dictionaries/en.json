@@ -439,7 +439,8 @@
       "close": "Close"
     },
     "empty": "No upcoming events right now. Check back soon — or write to us to be told first.",
-    "back": "All events"
+    "back": "All events",
+    "more": "View event"
   },
   "contactPage": {
     "eyebrow": "Contact",
@@ -645,7 +646,9 @@
       "reference": "Reference",
       "amount": "Amount",
       "status": "Status",
-      "event": "Event"
+      "event": "Event",
+      "amountPaid": "Amount paid",
+      "paidOn": "Paid on"
     },
     "reset": {
       "subject": "Choose a new password",
@@ -725,7 +728,10 @@
       "pendingBody": "Your seats are held. The amount is paid on site on the day.",
       "cancelledSubject": "Your booking for {{title}} is cancelled",
       "cancelledBody": "Your booking has been cancelled.",
-      "staffSubject": "New booking: {{title}} — {{name}} ({{guests}})"
+      "staffSubject": "New booking: {{title}} — {{name}} ({{guests}})",
+      "paymentSubject": "Payment received — your booking for {{title}} is confirmed",
+      "paymentBody": "We have received your payment: your booking is confirmed. We look forward to seeing you!",
+      "statusConfirmed": "Confirmed"
     },
     "staffBanner": "Internal notification — for the Golden Grape team (do not forward to the customer)",
     "welcome": {

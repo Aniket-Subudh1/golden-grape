@@ -16,6 +16,7 @@ export const AUDIT_ACTIONS = [
   'order.return',
   'reservation.status',
   'booking.status',
+  'booking.payment',
   'stock.adjust',
   'stock.count',
   'catalogue.import',

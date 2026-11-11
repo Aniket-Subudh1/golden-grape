@@ -57,6 +57,9 @@ export type BookEventInput = { idempotencyKey: string; event: string; guests: nu
  * `booked + guests ≤ capacity`, in the transaction that inserts the booking. Free events are confirmed at once;
  * paid ones wait as `pending` (paid on site in Phase 1). A repeated key returns the first booking.
  */
+/** What staff call a booking (APPLUX audit 10 Nov, §15): "Noite de Fado · Hans Müller (2 places)", in French. */
+export const bookingLabel = (eventTitle: string, name: string, guests: number) => `${eventTitle} · ${name} (${guests} ${guests > 1 ? 'places' : 'place'})`;
+
 export async function bookEvent(payload: Payload, input: BookEventInput, { customer, now = new Date() }: { customer?: { id: string } | null; now?: Date } = {}) {
   const find = async (req?: PayloadRequest) =>
     (await payload.find({ collection: 'eventBookings', where: { idempotencyKey: { equals: input.idempotencyKey } }, limit: 1, depth: 0, overrideAccess: true, req })).docs[0];
@@ -79,6 +82,7 @@ export async function bookEvent(payload: Payload, input: BookEventInput, { custo
         overrideAccess: true,
         depth: 0,
         data: {
+          label: bookingLabel(event.title, input.name, input.guests),
           event: event.id,
           idempotencyKey: input.idempotencyKey,
           customer: customer?.id,
@@ -113,6 +117,30 @@ export async function setBookingStatus(payload: Payload, id: string, to: 'confir
       await tx.model('events').updateOne({ _id: eventId }, { $inc: { booked: -(booking.guests ?? 0) } }, { session: tx.session });
     }
     return payload.findByID({ collection: 'eventBookings', id, depth: 0, req: tx.req, overrideAccess: true });
+  });
+}
+
+export type BookingPayment = { amountCents: number; at: Date; method: 'onsite' | 'transfer' | 'card'; reference?: string; user: string };
+
+/**
+ * "Payment received" on a paid booking (§8): the money is recorded on the booking (amount, the day it came in, how,
+ * the reference and who recorded it) and the booking is confirmed, in one transaction. Only a pending booking can be
+ * paid; two staff at once record it once.
+ */
+export async function recordBookingPayment(payload: Payload, id: string, payment: BookingPayment) {
+  return withTx(payload, async (tx) => {
+    const booking = await payload.findByID({ collection: 'eventBookings', id, depth: 0, req: tx.req, overrideAccess: true, disableErrors: true });
+    if (!booking) throw new AppError('NOT_FOUND', 'booking');
+    const claim = await tx.model('eventBookings').updateOne({ _id: id, status: 'pending' }, { $set: { status: 'confirmed' } }, { session: tx.session });
+    if (claim.matchedCount === 0) throw new AppError('CONFLICT', 'transition', 'status');
+    return payload.update({
+      collection: 'eventBookings',
+      id,
+      req: tx.req,
+      overrideAccess: true,
+      depth: 0,
+      data: { payment: { amountCents: payment.amountCents, at: payment.at.toISOString(), method: payment.method, reference: payment.reference, user: payment.user } },
+    });
   });
 }
 
