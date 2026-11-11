@@ -12,7 +12,7 @@ import { Field } from '@/components/ui/field';
 import { cn } from '@/lib/cn';
 import { type Dictionary, interpolate, type Locale, localePath } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
-import { isPhone } from '@/lib/phone';
+import { isEmail, isPhone } from '@/lib/contact';
 import { slotLabel } from '@/lib/time';
 import { checkoutQuote, placeOrderAction, slotsFor } from '@/modules/sales/actions';
 import { localityAction, suggestAddressAction } from '../actions';
@@ -123,7 +123,6 @@ function LinesError() {
 }
 
 /** The same rule as the server's `z.email` for what can be typed here: something@domain.tld. */
-const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value.trim());
 const sameAddress = (a: Address, b: Address) => a.line1.trim() === b.line1.trim() && a.postalCode.trim() === b.postalCode.trim();
 
 /**

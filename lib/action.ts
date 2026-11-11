@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { hasRole, type Role } from './access';
 import { AppError, type ErrorCode } from './errors';
 import { getPayloadClient } from './payload';
-import { formatPhone, isPhone } from './phone';
+import { formatPhone, isPhone } from './contact';
 
 export type ActionResult<T> =
   | { ok: true; data: T }

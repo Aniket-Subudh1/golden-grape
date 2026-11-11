@@ -7,6 +7,7 @@ import { ActionForm, SubmitButton } from '@/components/ui/action-form';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { Sheet } from '@/components/ui/sheet';
+import { isEmail, isPhone } from '@/lib/contact';
 import { type Dictionary, interpolate, type Locale } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { bookEventAction } from '../actions';
@@ -18,6 +19,8 @@ type Props = {
   locale: Locale;
   t: Dictionary['eventsPage'];
   form: Dictionary['form'];
+  /** The checkout's "still missing" wording, so every booking form says it the same way (APPLUX audit 10 Nov, §14). */
+  check: Pick<Dictionary['checkout'], 'missing' | 'check'>;
   labels: { minus: string; plus: string };
   className?: string;
 };
@@ -26,10 +29,15 @@ type Props = {
  * "Reserve" on an event (prototype ReserveDialog): guests, contact, an indicative total, booked without overbooking
  * by bookEventAction. A new booking key per opening, so a double click books once and a second visit books again.
  */
-export function ReserveDialog({ event, left, locale, t, form, labels, className }: Props) {
+export function ReserveDialog({ event, left, locale, t, form, check, labels, className }: Props) {
   const [open, setOpen] = useState(false);
   const [key, setKey] = useState('');
   const [guests, setGuests] = useState(2);
+  const [contact, setContact] = useState({ name: '', email: '', phone: '' });
+  // The same checks as the server and the checkout: the button works only when the booking can succeed (§14).
+  const missing = [!contact.name.trim() && check.check.name, !isEmail(contact.email) && check.check.email, !isPhone(contact.phone.trim()) && check.check.phone].filter(
+    (m): m is string => Boolean(m),
+  );
   const d = t.dialog;
   const max = Math.min(20, left ?? 20);
   const soldOut = left !== null && left <= 0;
@@ -42,6 +50,7 @@ export function ReserveDialog({ event, left, locale, t, form, labels, className 
         onClick={() => {
           setKey(crypto.randomUUID());
           setGuests(Math.min(2, max));
+          setContact({ name: '', email: '', phone: '' });
           setOpen(true);
         }}
       >
@@ -83,12 +92,39 @@ export function ReserveDialog({ event, left, locale, t, form, labels, className 
                 <QtyStepper value={guests} onChange={setGuests} min={1} max={max} labels={labels} />
               </div>
               {left !== null && left <= 10 && <p className="text-xs text-gold-deep">{interpolate(left === 1 ? d.seatsLeft_one : d.seatsLeft_other, { count: left })}</p>}
-              <Field name="name" label={d.name} placeholder={d.namePh} autoComplete="name" />
+              <Field
+                name="name"
+                label={`${d.name} *`}
+                placeholder={d.namePh}
+                autoComplete="name"
+                required
+                value={contact.name}
+                onChange={(e) => setContact((c) => ({ ...c, name: e.target.value }))}
+              />
               <div className="grid gap-6 sm:grid-cols-2">
-                <Field name="email" type="email" label={d.email} placeholder={d.emailPh} autoComplete="email" />
-                <Field name="phone" type="tel" label={d.phone} placeholder={d.phonePh} autoComplete="tel" />
+                <Field
+                  name="email"
+                  type="email"
+                  label={`${d.email} *`}
+                  placeholder={d.emailPh}
+                  autoComplete="email"
+                  required
+                  value={contact.email}
+                  onChange={(e) => setContact((c) => ({ ...c, email: e.target.value }))}
+                />
+                <Field
+                  name="phone"
+                  type="tel"
+                  label={`${d.phone} *`}
+                  placeholder={d.phonePh}
+                  autoComplete="tel"
+                  required
+                  value={contact.phone}
+                  onChange={(e) => setContact((c) => ({ ...c, phone: e.target.value }))}
+                />
               </div>
               <Field as="textarea" name="notes" label={d.comment} placeholder={d.commentPh} />
+              {missing.length > 0 && <p className="text-xs text-ink/55">{interpolate(check.missing, { fields: missing.join(', ') })}</p>}
             </div>
             <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-border/60 bg-champagne/40 px-8 py-5">
               <div>
@@ -96,7 +132,7 @@ export function ReserveDialog({ event, left, locale, t, form, labels, className 
                 <p className="font-serif text-2xl tabular-nums">{event.priceCents ? formatMoney(event.priceCents * guests, locale) : d.freeEntry}</p>
                 {event.priceCents > 0 && <p className="text-[11px] text-ink/50">{d.payOnsite}</p>}
               </div>
-              <SubmitButton label={d.submit} pendingLabel={d.sending} />
+              <SubmitButton label={d.submit} pendingLabel={d.sending} disabled={missing.length > 0} />
             </footer>
           </ActionForm>
         )}

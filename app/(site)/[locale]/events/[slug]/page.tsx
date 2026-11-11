@@ -45,6 +45,7 @@ async function EventDetail({ params }: Pick<Props, 'params'>) {
             locale={locale}
             t={t}
             form={dict.form}
+            check={{ missing: dict.checkout.missing, check: dict.checkout.check }}
             labels={{ minus: dict.cart.minus, plus: dict.cart.plus }}
           />
           {left !== null && left <= 10 && (
