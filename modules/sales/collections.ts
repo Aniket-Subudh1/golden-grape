@@ -1,6 +1,6 @@
 import type { CollectionConfig, Field, PayloadRequest } from 'payload';
 import { hiddenUnless, isStaff, none, staffOrSelf } from '@/lib/access';
-import { addButton, badgeCell, emptyList, l, type Label, listOnly, say, scaledNumber, timeOfDay, WEEKDAYS } from '@/lib/admin';
+import { addButton, badgeCell, boolCell, emptyList, l, type Label, listOnly, say, scaledNumber, timeOfDay, WEEKDAYS } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { ORDER_STATUSES, RESERVATION_STATUSES } from './order-states';
 import { isLuxPostalCode, splitPostalCodes } from './zones';
@@ -478,7 +478,7 @@ export const deliveryZones: CollectionConfig = {
       type: 'row',
       fields: [
         { name: 'name', type: 'text', required: true, label: l('Nom de la zone', 'Area name', 'Name des Gebiets', 'Nome da zona'), admin: { width: '70%', placeholder: 'Bissen et environs' } },
-        { name: 'active', type: 'checkbox', defaultValue: true, label: l('Active', 'Active', 'Aktiv', 'Ativa'), admin: { width: '30%', style: { alignSelf: 'flex-end' } } },
+        { name: 'active', type: 'checkbox', defaultValue: true, label: l('Active', 'Active', 'Aktiv', 'Ativa'), admin: { width: '30%', style: { alignSelf: 'flex-end' }, components: boolCell() } },
       ],
     },
     // GG-036: paste several codes at once (the box above the field), and anything pasted into the field itself is

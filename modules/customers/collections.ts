@@ -1,6 +1,6 @@
 import type { CollectionConfig, FieldAccess } from 'payload';
 import { hiddenUnless, isStaff, staffOrSelf } from '@/lib/access';
-import { addButton, badgeCell, emptyList, l } from '@/lib/admin';
+import { addButton, badgeCell, boolCell, emptyList, l } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 
 // Shop accounts (04 §3). A separate auth collection from staff `users`; the website keeps its session in its own
@@ -117,7 +117,7 @@ export const customers: CollectionConfig = {
           type: 'checkbox',
           defaultValue: false,
           label: l('Accepte les nouvelles par e-mail', 'Accepts news by e-mail', 'Akzeptiert Neuigkeiten per E-Mail', 'Aceita novidades por e-mail'),
-          admin: { width: '50%' },
+          admin: { width: '50%', components: boolCell() },
         },
       ],
     },

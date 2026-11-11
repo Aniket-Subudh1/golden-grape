@@ -1,3 +1,4 @@
+import { BoolCell as BoolCell_e05f6ac9ede25467f55f09817b54f69f } from '@/components/admin/cells'
 import { default as default_a796cb25c6bc2ffa9d5afcf05b4d9b1b } from '@/components/admin/save-button'
 import { default as default_2d5f4fd041422560436061dbcc885ca0 } from '@/components/admin/create-button'
 import { CollectionCell as CollectionCell_e05f6ac9ede25467f55f09817b54f69f } from '@/components/admin/cells'
@@ -66,6 +67,7 @@ import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc056
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "@/components/admin/cells#BoolCell": BoolCell_e05f6ac9ede25467f55f09817b54f69f,
   "@/components/admin/save-button#default": default_a796cb25c6bc2ffa9d5afcf05b4d9b1b,
   "@/components/admin/create-button#default": default_2d5f4fd041422560436061dbcc885ca0,
   "@/components/admin/cells#CollectionCell": CollectionCell_e05f6ac9ede25467f55f09817b54f69f,

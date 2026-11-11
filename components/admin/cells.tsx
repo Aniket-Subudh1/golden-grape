@@ -18,6 +18,15 @@ export function BadgeCell({ cellData, field, tones }: DefaultCellComponentProps 
   return <span className={`gg-badge gg-badge--${tones[cellData] ?? 'neutral'}`}>{String(label)}</span>;
 }
 
+const YES_NO = { fr: ['Oui', 'Non'], en: ['Yes', 'No'], de: ['Ja', 'Nein'], pt: ['Sim', 'Não'] } as const;
+
+/** A checkbox in list columns: "Oui" / "Non" in the admin's language, never Payload's raw "vrai" (APPLUX audit 10 Nov, §11). */
+export function BoolCell({ cellData, yesTone = 'success' }: DefaultCellComponentProps & { yesTone?: Tone }) {
+  const { i18n } = useTranslation();
+  const [yes, no] = YES_NO[(i18n.language in YES_NO ? i18n.language : 'fr') as keyof typeof YES_NO];
+  return <span className={`gg-badge gg-badge--${cellData ? yesTone : 'neutral'}`}>{cellData ? yes : no}</span>;
+}
+
 /** A signed quantity: +12 in green, −3 in red. */
 export function SignedCell({ cellData }: DefaultCellComponentProps) {
   if (typeof cellData !== 'number') return null;

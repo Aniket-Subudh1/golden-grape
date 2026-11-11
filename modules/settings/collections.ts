@@ -1,7 +1,7 @@
 import { AUDIT_ACTIONS, type AuditAction } from '@/lib/audit';
 import { APIError, type CollectionConfig, type FieldAccess } from 'payload';
 import { hasRole, hiddenUnless, isStaff, none, ROLES } from '@/lib/access';
-import { addButton, l, type Label } from '@/lib/admin';
+import { addButton, boolCell, l, type Label } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 
 const adminOnly: FieldAccess = ({ req }) => hasRole(req.user, ['admin']);
@@ -84,7 +84,7 @@ const users: CollectionConfig = {
           defaultValue: true,
           label: l('Peut se connecter', 'May sign in', 'Darf sich anmelden', 'Pode entrar'),
           access: { create: adminOnly, update: adminOnly },
-          admin: { width: '50%' },
+          admin: { width: '50%', components: boolCell() },
         },
         {
           name: 'locale',

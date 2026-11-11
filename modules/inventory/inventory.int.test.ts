@@ -208,6 +208,13 @@ describe('adjustments and counts', () => {
     await expect(payload.delete({ collection: 'stockCounts', id: count.id, overrideAccess: false, user: staff })).rejects.toThrow();
   });
 
+  it('an empty count is not posted: refused, still open, nothing moved (APPLUX audit 10 Nov, §9)', async () => {
+    const count = await payload.create({ collection: 'stockCounts', data: { note: 'Vide', status: 'open', lines: [] }, overrideAccess: false, user: staff });
+    await expect(postCount(payload, count.id, staff.id)).rejects.toMatchObject({ code: 'VALIDATION', message: 'emptyCount' });
+    expect((await payload.findByID({ collection: 'stockCounts', id: count.id, depth: 0, overrideAccess: true })).status).toBe('open');
+    expect((await payload.count({ collection: 'stockMovements', where: { 'ref.value': { equals: count.id } }, overrideAccess: true })).totalDocs).toBe(0);
+  });
+
   it('AC-M2.1-03: no API role can create, edit or delete a movement or a stock level', async () => {
     const admin = await makeStaff(payload, ['admin']);
     const { variant } = await makeVariant(payload, { onHand: 1 });

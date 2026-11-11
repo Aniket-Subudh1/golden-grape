@@ -21,6 +21,7 @@ const TEXT = {
     posted: 'Inventaire validé',
     postedOn: (d: string) => `Le ${d}. Le stock a pris les quantités comptées ; l’inventaire ne peut plus être modifié.`,
     error: 'Impossible de valider. Vérifiez qu’un article n’apparaît pas deux fois.',
+    empty: 'Ajoutez au moins un article compté avant de valider l’inventaire.',
   },
   en: {
     post: 'Post this count',
@@ -31,6 +32,7 @@ const TEXT = {
     posted: 'Count posted',
     postedOn: (d: string) => `On ${d}. Stock now matches the counted quantities; the count can no longer be changed.`,
     error: 'Could not post. Check that no item appears twice.',
+    empty: 'Add at least one counted item before posting the count.',
   },
   de: {
     post: 'Inventur buchen',
@@ -41,6 +43,7 @@ const TEXT = {
     posted: 'Inventur gebucht',
     postedOn: (d: string) => `Am ${d}. Der Bestand entspricht den gezählten Mengen; die Inventur ist nicht mehr änderbar.`,
     error: 'Buchen nicht möglich. Prüfen Sie, dass kein Artikel doppelt vorkommt.',
+    empty: 'Fügen Sie mindestens einen gezählten Artikel hinzu, bevor Sie buchen.',
   },
   pt: {
     post: 'Validar inventário',
@@ -51,6 +54,7 @@ const TEXT = {
     posted: 'Inventário validado',
     postedOn: (d: string) => `Em ${d}. O stock passou a ser o contado; o inventário já não pode ser alterado.`,
     error: 'Não foi possível validar. Verifique que nenhum artigo aparece duas vezes.',
+    empty: 'Junte pelo menos um artigo contado antes de validar o inventário.',
   },
 };
 
@@ -61,6 +65,9 @@ export default function PostCountButton() {
   const status = useFormFields(([fields]) => fields.status?.value);
   const postedAt = useFormFields(([fields]) => fields.postedAt?.value) as string | undefined;
   const modified = useFormModified();
+  // Rows of the counted-items list (Payload keeps an array field's row count as its value): none → nothing to post (§9).
+  const rows = useFormFields(([fields]) => fields.lines?.value) as number | undefined;
+  const empty = !rows;
   const [busy, setBusy] = useState(false);
   const { openModal } = useModal();
   if (!id) return null;
@@ -84,7 +91,7 @@ export default function PostCountButton() {
     const res = await postStockCount(null, { count: String(id) });
     if (!res.ok) {
       setBusy(false);
-      toast.error(t.error);
+      toast.error(res.message === 'emptyCount' ? t.empty : t.error);
       return;
     }
     toast.success(t.done);
@@ -96,9 +103,9 @@ export default function PostCountButton() {
       <ClipboardCheck />
       <div>
         <b>{t.title}</b>
-        <p>{modified ? t.saveFirst : t.explain}</p>
+        <p>{modified ? t.saveFirst : empty ? t.empty : t.explain}</p>
       </div>
-      <button type="button" className="gg-btn gg-btn--primary" disabled={busy || modified} onClick={() => openModal(MODAL)}>
+      <button type="button" className="gg-btn gg-btn--primary" disabled={busy || modified || empty} onClick={() => openModal(MODAL)}>
         {t.post}
       </button>
       <ConfirmationModal modalSlug={MODAL} heading={t.title} body={t.explain} confirmLabel={t.post} onConfirm={post} />

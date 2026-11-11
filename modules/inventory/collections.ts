@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 import { hasRole, hiddenUnless, isStaff, none } from '@/lib/access';
-import { badgeCell, addButton, emptyList, l, signedCell } from '@/lib/admin';
+import { badgeCell, boolCell, addButton, emptyList, l, signedCell } from '@/lib/admin';
 import { TYPE_LABELS } from './labels';
 
 // The stock ledger (02 §5.1). Levels and movements have no write access through the API: only postMovements
@@ -59,7 +59,7 @@ export const stockLevels: CollectionConfig = {
         components: { Cell: '@/modules/inventory/admin/cells#ThresholdCell' },
       },
     },
-    { name: 'lowStock', type: 'checkbox', defaultValue: false, index: true, label: l('Stock bas', 'Low stock', 'Niedriger Bestand', 'Stock baixo') },
+    { name: 'lowStock', type: 'checkbox', defaultValue: false, index: true, label: l('Stock bas', 'Low stock', 'Niedriger Bestand', 'Stock baixo'), admin: { components: boolCell('warning') } },
   ],
 };
 

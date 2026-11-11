@@ -181,6 +181,8 @@ export async function postCount(payload: Payload, countId: string, user: string)
     }
     const count = await tx.req.payload.findByID({ collection: 'stockCounts', id: countId, depth: 0, req: tx.req, overrideAccess: true });
     const lines = (count.lines ?? []).map((line) => ({ ...line, variant: String(typeof line.variant === 'object' ? line.variant.id : line.variant) }));
+    // A count with nothing counted is not posted (APPLUX audit 10 Nov, §9): it would lock an empty count for good.
+    if (lines.length === 0) throw new AppError('VALIDATION', 'emptyCount', 'lines');
     const ids = lines.map((l) => l.variant);
     if (new Set(ids).size !== ids.length) throw new AppError('VALIDATION', 'duplicateVariant', 'lines');
 

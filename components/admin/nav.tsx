@@ -30,6 +30,8 @@ const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean;
     label: 'catalogue',
     items: [
       { label: 'products', slug: 'products', icon: 'products' },
+      // The sizes of each product (bottle, magnum…): their own pages and breadcrumb (APPLUX audit 10 Nov, §10).
+      { label: 'formats', slug: 'variants', icon: 'formats' },
       { label: 'categories', slug: 'categories', icon: 'categories' },
       { label: 'producers', slug: 'brands', icon: 'producers' },
       // Payload's own list, opened with the low-stock filter (staff can clear it to see all levels).

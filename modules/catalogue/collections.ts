@@ -1,6 +1,6 @@
 import { APIError, type CollectionConfig, type Field, type PayloadRequest, type Validate } from 'payload';
 import { hiddenUnless, isStaff } from '@/lib/access';
-import { autoSlug, badgeCell, addButton, emptyList, type Label, l, pageLinkCell, say, scaledNumber, seoSection } from '@/lib/admin';
+import { autoSlug, badgeCell, boolCell, addButton, emptyList, type Label, l, pageLinkCell, say, scaledNumber, seoSection } from '@/lib/admin';
 import { validateFactor } from './packaging';
 
 // The catalogue (04-DATA-MODEL §2). Staff-only through the API: the website reads it through service.ts.
@@ -32,6 +32,7 @@ const active: Field = {
   type: 'checkbox',
   defaultValue: true,
   label: l('En vente', 'On sale', 'Im Verkauf', 'À venda'),
+  admin: { components: boolCell() },
 };
 
 const BARCODE = /^\d{4,14}$/;
@@ -620,6 +621,7 @@ export const variants: CollectionConfig = {
               defaultValue: true,
               label: l('Suivre le stock', 'Track stock', 'Bestand führen', 'Controlar stock'),
               admin: {
+                components: boolCell(),
                 description: l(
                   'Décoché pour ce qui est préparé à la demande (comptoir) ou les bons cadeaux.',
                   'Unticked for what is made to order (counter) or gift vouchers.',

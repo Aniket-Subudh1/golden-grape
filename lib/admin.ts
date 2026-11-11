@@ -118,6 +118,9 @@ export const badgeCell = (tones: Record<string, Tone>) => ({ Cell: { path: '@/co
 /** A join-table title that opens the row's full page (Payload's join tables otherwise open a dialog). */
 export const pageLinkCell = { Cell: '@/components/admin/cells#PageLinkCell' };
 
+/** A checkbox in list columns as "Oui" / "Non" (§11); `yesTone` colours "Oui" (a warning for "Stock bas"). */
+export const boolCell = (yesTone: Tone = 'success') => ({ Cell: { path: '@/components/admin/cells#BoolCell', clientProps: { yesTone } } });
+
 /** A signed quantity in list columns: +12 green, −3 red. */
 export const signedCell = { Cell: '@/components/admin/cells#SignedCell' };
 
