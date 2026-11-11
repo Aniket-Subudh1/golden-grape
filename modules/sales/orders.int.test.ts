@@ -20,6 +20,7 @@ const DATE = '2026-11-10';
 const everyDay = Array.from({ length: 7 }, (_, day) => ({ day: String(day) as '0', open: '10:00' as const, close: '18:00' as const }));
 
 let wine: Awaited<ReturnType<typeof makeVariant>>;
+let dish: Awaited<ReturnType<typeof makeVariant>>;
 let staff: Awaited<ReturnType<typeof makeStaff>>;
 
 beforeAll(async () => {
@@ -28,6 +29,8 @@ beforeAll(async () => {
   }
   await payload.create({ collection: 'deliveryZones', data: { name: 'Bissen', postalCodes: ['7795'], feeCents: 500, minOrderCents: 3000, freeFromCents: 10000, active: true }, overrideAccess: true });
   wine = await makeVariant(payload, { onHand: 100, price: 1500, packaging: [6] });
+  // A table pre-order holds only counter items (APPLUX audit 10 Nov, §1): a tracked one, so its stock can be checked.
+  dish = await makeVariant(payload, { onHand: 100, price: 650, kind: 'snack', trackStock: true });
   staff = await makeStaff(payload, ['sales']);
 });
 
@@ -262,10 +265,20 @@ describe('payments and refunds (GG-003, GG-004)', () => {
 });
 
 describe('reservations', () => {
-  const table = (over: Partial<PlaceOrderInput> = {}) => order({ mode: 'table', time: '17:00', guests: 4, preorder: true, ...over });
+  const table = (over: Partial<PlaceOrderInput> = {}) => order({ mode: 'table', time: '17:00', guests: 4, preorder: true, lines: [{ variant: dish.variant.id, qty: 2 }], ...over });
+  const dishStock = async () => (await onHand(payload, [dish.variant.id]))[dish.variant.id];
+
+  it('a shop product is never a table pre-order: refused, and neither a reservation nor an order is created (§1)', async () => {
+    const before = await Promise.all(['reservations', 'orders'].map((c) => payload.count({ collection: c as 'orders', overrideAccess: true })));
+    await expect(placeOrder(payload, table({ time: '16:00', lines: [{ variant: dish.variant.id, qty: 1 }, { variant: wine.variant.id, qty: 1 }] }), { now: NOW })).rejects.toMatchObject({
+      message: 'notPreorderable',
+    });
+    const after = await Promise.all(['reservations', 'orders'].map((c) => payload.count({ collection: c as 'orders', overrideAccess: true })));
+    expect(after.map((c) => c.totalDocs)).toEqual(before.map((c) => c.totalDocs));
+  });
 
   it('a table with a pre-order waits as pending; the slot counts guests; no stock moves', async () => {
-    const start = await stock();
+    const start = await dishStock();
     const placed = await placeOrder(payload, table(), { now: NOW });
     expect(placed.kind).toBe('reservation');
     const res = await payload.findByID({ collection: 'reservations', id: placed.id, overrideAccess: true, depth: 0 });
@@ -273,7 +286,7 @@ describe('reservations', () => {
     expect(res.number).toMatch(/^RES-2026-\d{5}$/);
     const pre = await payload.findByID({ collection: 'orders', id: String(res.preorder), overrideAccess: true, depth: 0 });
     expect(pre).toMatchObject({ status: 'pending', mode: 'table', stockPosted: false });
-    expect(await stock()).toBe(start);
+    expect(await dishStock()).toBe(start);
     // 10 guests per slot: 4 taken, 7 more do not fit.
     await expect(placeOrder(payload, table({ guests: 7, preorder: false, lines: [] }), { now: NOW })).rejects.toMatchObject({ message: 'slotFull' });
   });
@@ -288,27 +301,27 @@ describe('reservations', () => {
   });
 
   it('accept → the pre-order is confirmed and its movements equal its lines', async () => {
-    const start = await stock();
-    const placed = await placeOrder(payload, table({ time: '11:30', lines: [{ variant: wine.variant.id, qty: 3 }] }), { now: NOW });
+    const start = await dishStock();
+    const placed = await placeOrder(payload, table({ time: '11:30', lines: [{ variant: dish.variant.id, qty: 3 }] }), { now: NOW });
     const { preorder } = await transitionReservation(payload, placed.id, 'accepted', { user: staff.id });
     expect(preorder).toMatchObject({ status: 'confirmed', stockPosted: true });
     const moves = await movementsOf(preorder!.id);
     expect(moves.map((m) => [m.type, m.qty])).toEqual([['sale', -3]]);
-    expect(await stock()).toBe(start - 3);
+    expect(await dishStock()).toBe(start - 3);
     await expect(transitionReservation(payload, placed.id, 'accepted', { user: staff.id })).rejects.toMatchObject({ code: 'CONFLICT' });
   });
 
   it('no-show (GG-019): only after accepting; the pre-order is cancelled and its stock back once; the reason is kept; nothing after it', async () => {
-    const start = await stock();
-    const placed = await placeOrder(payload, table({ time: '12:30', lines: [{ variant: wine.variant.id, qty: 2 }] }), { now: NOW });
+    const start = await dishStock();
+    const placed = await placeOrder(payload, table({ time: '12:30', lines: [{ variant: dish.variant.id, qty: 2 }] }), { now: NOW });
     await expect(transitionReservation(payload, placed.id, 'no_show', { user: staff.id })).rejects.toMatchObject({ code: 'CONFLICT' });
     await transitionReservation(payload, placed.id, 'accepted', { user: staff.id });
-    expect(await stock()).toBe(start - 2);
+    expect(await dishStock()).toBe(start - 2);
     const { reservation, preorder } = await transitionReservation(payload, placed.id, 'no_show', { user: staff.id, reason: 'Pas de réponse au téléphone' });
     expect(reservation.status).toBe('no_show');
     expect(reservation.history?.at(-1)).toMatchObject({ from: 'accepted', to: 'no_show', reason: 'Pas de réponse au téléphone' });
     expect(preorder).toMatchObject({ status: 'cancelled', stockPosted: false });
-    expect(await stock()).toBe(start);
+    expect(await dishStock()).toBe(start);
     await expect(transitionReservation(payload, placed.id, 'cancelled', { user: staff.id })).rejects.toMatchObject({ code: 'CONFLICT' });
   });
 });

@@ -37,7 +37,7 @@ async function Checkout({ locale, searchParams }: { locale: Locale; searchParams
         }
       }
       t={checkout}
-      cartT={{ modes: cart.modes, hints: cart.hints, minus: cart.minus, plus: cart.plus, toShop: cart.toShop, toCounter: cart.toCounter, vatIncluded: cart.vatIncluded }}
+      cartT={{ modes: cart.modes, hints: cart.hints, minus: cart.minus, plus: cart.plus, toShop: cart.toShop, toCounter: cart.toCounter, vatIncluded: cart.vatIncluded, tableShopNote: cart.tableShopNote }}
       formT={form}
       phone={business.phone}
       signInHref={`${localePath(locale, '/auth')}?next=${encodeURIComponent(localePath(locale, '/checkout'))}`}

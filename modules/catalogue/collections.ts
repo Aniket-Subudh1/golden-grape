@@ -313,7 +313,17 @@ export const products: CollectionConfig = {
                 { value: 'gift', label: l('Coffret cadeau', 'Gift box', 'Geschenkbox', 'Cabaz de oferta') },
                 { value: 'other', label: l('Autre', 'Other', 'Sonstiges', 'Outro') },
               ],
-              admin: { width: '25%', isClearable: false },
+              admin: {
+                width: '25%',
+                isClearable: false,
+                // APPLUX audit 10 Nov, §6: what a table pre-order depends on, said where it is set.
+                description: l(
+                  'Comptoir : sur la page Comptoir, et seuls ces plats et boissons peuvent être pré-commandés avec une table.',
+                  'Counter: on the Counter page, and only these dishes and drinks can be pre-ordered with a table.',
+                  'Theke: auf der Theken-Seite; nur diese Speisen und Getränke können mit einem Tisch vorbestellt werden.',
+                  'Balcão: na página Balcão, e só estes pratos e bebidas podem ser pré-encomendados com uma mesa.',
+                ),
+              },
             },
             {
               name: 'status',

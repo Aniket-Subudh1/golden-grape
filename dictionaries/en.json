@@ -255,7 +255,8 @@
       "removed": "An item is no longer available and was removed from your bag."
     },
     "checkout": "Checkout",
-    "bookTable": "Book a table"
+    "bookTable": "Book a table",
+    "tableShopNote": "Shop items are not pre-ordered with a table: they stay in your bag for a pickup or delivery order."
   },
   "shop": {
     "eyebrow": "Shop · Wines & Grocery",
@@ -592,7 +593,8 @@
       "emptyCart": "Your bag is empty.",
       "soldOut": "Sold out: there are not enough seats left.",
       "transition": "This change is no longer possible: the page will refresh.",
-      "event": "This event can no longer be booked."
+      "event": "This event can no longer be booked.",
+      "notPreorderable": "Only dishes and drinks from the counter can be pre-ordered with a table."
     },
     "CONFLICT": "This was just changed by someone else. Please try again.",
     "OUT_OF_STOCK": "Your bag changed (stock). Please check it and try again."
@@ -862,8 +864,8 @@
     },
     "preorder": {
       "label": "Pre-order dishes and drinks",
-      "hint": "Served when you arrive, prepared in advance.",
-      "empty": "Your bag is empty: add a few dishes from the counter to pre-order.",
+      "hint": "Dishes and drinks from the counter, prepared in advance and served when you arrive.",
+      "empty": "Pre-orders are for dishes and drinks from the counter: add some from the counter, or simply book the table.",
       "toCounter": "Browse the counter"
     },
     "payment": {

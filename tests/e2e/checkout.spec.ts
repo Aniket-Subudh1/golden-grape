@@ -97,6 +97,9 @@ test('table with a pre-order in German: request pending', async ({ page }) => {
   const email = unique('hans');
   await addBifana(page, 'de');
   await page.goto('/de/checkout?mode=table');
+  // The pre-order is the customer's explicit choice (APPLUX audit 10 Nov, §1): off until switched on.
+  await expect(page.getByRole('switch')).toHaveAttribute('aria-checked', 'false');
+  await page.getByRole('switch').click();
   await pickTime(page);
   await details(page, 'Hans Müller', email);
   await page.getByRole('button', { name: de.checkout.submitTable }).click();
@@ -104,4 +107,13 @@ test('table with a pre-order in German: request pending', async ({ page }) => {
   await expect(page.getByText(de.order.reservationStatus.pending).first()).toBeVisible();
   await expect(page.getByText('Bifana').first()).toBeVisible();
   await expectMail(email, de.mail.reservation.pendingSubject.split(' {{')[0]);
+});
+
+test('a table link is never remembered: the next shop purchase checks out as an order (APPLUX §1, §3)', async ({ page }) => {
+  await page.goto('/fr/checkout?mode=table');
+  await expect(page.getByRole('heading', { level: 1, name: fr.checkout.titleTable })).toBeVisible();
+  await addWine(page, 'fr', fr.shop.buy.add);
+  await page.goto('/fr/checkout');
+  await expect(page.getByRole('heading', { level: 1, name: fr.checkout.title })).toBeVisible();
+  await expect(page.getByRole('radio', { name: new RegExp(fr.cart.modes.pickup) })).toHaveAttribute('aria-checked', 'true');
 });

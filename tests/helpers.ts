@@ -35,7 +35,7 @@ let variantCount = 0;
  */
 export async function makeVariant(
   payload: Payload,
-  { onHand = 0, price = 1000, packaging = [], kind = 'wine' }: { onHand?: number; price?: number; packaging?: number[]; kind?: 'wine' | 'snack' } = {},
+  { onHand = 0, price = 1000, packaging = [], kind = 'wine', trackStock }: { onHand?: number; price?: number; packaging?: number[]; kind?: 'wine' | 'snack'; trackStock?: boolean } = {},
 ) {
   variantCount += 1;
   const categoryKind = kind === 'snack' ? 'snack' : 'shop';
@@ -48,7 +48,11 @@ export async function makeVariant(
     overrideAccess: true,
   });
   const { docs } = await payload.find({ collection: 'variants', where: { product: { equals: product.id } }, limit: 1, overrideAccess: true });
-  const variant = docs[0];
+  let variant = docs[0];
+  // Counter items are made to order (no stock) by default; a bottled drink at the counter can still be tracked.
+  if (trackStock !== undefined && trackStock !== variant.trackStock) {
+    variant = await payload.update({ collection: 'variants', id: variant.id, data: { trackStock }, overrideAccess: true });
+  }
   const units: Record<number, string> = {};
   for (const factor of packaging) {
     units[factor] = (await payload.create({ collection: 'packagingUnits', data: { variant: variant.id, factor, label: `Box of ${factor}` }, overrideAccess: true })).id;

@@ -255,7 +255,8 @@
       "removed": "Un article n’est plus disponible et a été retiré du panier."
     },
     "checkout": "Commander",
-    "bookTable": "Réserver une table"
+    "bookTable": "Réserver une table",
+    "tableShopNote": "Les articles de la boutique ne sont pas pré-commandés avec une table : ils restent dans votre panier pour une commande à emporter ou en livraison."
   },
   "shop": {
     "eyebrow": "Boutique · Vins & Épicerie",
@@ -592,7 +593,8 @@
       "emptyCart": "Votre panier est vide.",
       "soldOut": "Complet : il ne reste pas assez de places.",
       "transition": "Ce changement n’est plus possible : la page va se rafraîchir.",
-      "event": "Cet événement ne peut plus être réservé."
+      "event": "Cet événement ne peut plus être réservé.",
+      "notPreorderable": "Seuls les plats et boissons du Comptoir peuvent être pré-commandés avec une table."
     },
     "CONFLICT": "Quelqu’un vient de modifier cet élément. Réessayez.",
     "OUT_OF_STOCK": "Votre panier a changé (stock). Vérifiez-le et réessayez."
@@ -862,8 +864,8 @@
     },
     "preorder": {
       "label": "Pré-commander plats et boissons",
-      "hint": "Préparé à l’avance, servi à votre arrivée.",
-      "empty": "Votre panier est vide : ajoutez quelques plats du comptoir pour pré-commander.",
+      "hint": "Plats et boissons du Comptoir, préparés à l’avance et servis à votre arrivée.",
+      "empty": "La pré-commande concerne les plats et boissons du Comptoir : ajoutez-en depuis le Comptoir, ou réservez simplement la table.",
       "toCounter": "Voir le comptoir"
     },
     "payment": {

@@ -10,6 +10,8 @@ import { quoteCartAction } from './actions';
 // quote, refreshed 300 ms after each change; lines above the stock are clamped and the visitor is told.
 
 export type CartMode = 'pickup' | 'delivery' | 'table';
+/** How the basket itself is collected: the only mode the cart remembers. */
+export type BasketMode = Exclude<CartMode, 'table'>;
 export type CartItem = { variant: string; unit?: string; qty: number };
 
 const STORAGE = 'gg_cart_v2';
@@ -19,17 +21,23 @@ type CartContext = {
   /** The saved cart has been read (before that, `items` is empty because it is not known yet). */
   ready: boolean;
   items: CartItem[];
-  mode: CartMode;
+  /** Pickup or delivery for the basket, remembered between visits. A table booking is never remembered: it is
+   *  chosen each time (APPLUX audit 10 Nov, §1/§3), through `openAs('table')` or a `?mode=table` link. */
+  mode: BasketMode;
+  /** The view the drawer was opened in (`openAs`), until it closes. */
+  openMode: CartMode | null;
   open: boolean;
   count: number;
   quote: CartQuote | null;
   pending: boolean;
   setOpen: (open: boolean) => void;
   openAs: (mode: CartMode) => void;
-  setMode: (mode: CartMode) => void;
+  setMode: (mode: BasketMode) => void;
   qtyOf: (variant: string, unit?: string) => number;
   add: (item: { variant: string; unit?: string }, qty?: number) => void;
   setQty: (item: { variant: string; unit?: string }, qty: number) => void;
+  /** Takes these lines out (a table's pre-ordered dishes once booked; the shop items stay). */
+  remove: (targets: { variant: string; unit?: string }[]) => void;
   /** Empties the cart (after an order is placed). */
   clear: () => void;
   /** Asks the server again (checkout was told the stock changed). */
@@ -54,7 +62,7 @@ export function useCart(): CartContext {
 
 const same = (a: { variant: string; unit?: string }, b: { variant: string; unit?: string }) => a.variant === b.variant && (a.unit ?? '') === (b.unit ?? '');
 
-function read(): { items: CartItem[]; mode: CartMode } {
+function read(): { items: CartItem[]; mode: BasketMode } {
   try {
     for (const key of OLD_STORAGE) localStorage.removeItem(key);
     const saved = JSON.parse(localStorage.getItem(STORAGE) ?? 'null') as { items?: unknown; mode?: unknown } | null;
@@ -63,7 +71,8 @@ function read(): { items: CartItem[]; mode: CartMode } {
           (i): i is CartItem => typeof i?.variant === 'string' && Number.isInteger(i?.qty) && i.qty > 0 && (i.unit === undefined || typeof i.unit === 'string'),
         )
       : [];
-    const mode = saved?.mode === 'delivery' || saved?.mode === 'table' ? saved.mode : 'pickup';
+    // A table saved by an earlier version is not restored: the next visit starts as an ordinary basket.
+    const mode = saved?.mode === 'delivery' ? 'delivery' : 'pickup';
     return { items: items.map(({ variant, unit, qty }) => ({ variant, unit, qty })), mode };
   } catch {
     // Private mode or a corrupt value: start with an empty cart (the one allowed empty catch, 03 law 13).
@@ -73,13 +82,17 @@ function read(): { items: CartItem[]; mode: CartMode } {
 
 export function CartProvider({ locale, notices, children }: { locale: Locale; notices: { clamped: string; removed: string }; children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
-  const [mode, setMode] = useState<CartMode>('pickup');
-  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<BasketMode>('pickup');
+  const [openMode, setOpenMode] = useState<CartMode | null>(null);
+  const [open, setOpenState] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [quote, setQuote] = useState<CartQuote | null>(null);
   const [pending, setPending] = useState(false);
   const [asked, setAsked] = useState(0);
   const request = useRef(0);
+  // The first quote after loading is asked at once (the drawer has no lines to show until it arrives); later
+  // changes wait 300 ms so a stepper clicked five times asks once.
+  const quotedOnce = useRef(false);
 
   useEffect(() => {
     const saved = read();
@@ -99,7 +112,7 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
     }
   }, [items, mode, loaded]);
 
-  // Server quote, 300 ms after the last change. Only the latest answer is applied.
+  // Server quote, 300 ms after the last change (at once the first time). Only the latest answer is applied.
   useEffect(() => {
     if (!loaded) return;
     const id = ++request.current;
@@ -107,6 +120,8 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
       startTransition(() => setQuote(null));
       return;
     }
+    const delay = quotedOnce.current ? 300 : 0;
+    quotedOnce.current = true;
     const timer = window.setTimeout(async () => {
       setPending(true);
       const result = await quoteCartAction(null, { locale, lines: items });
@@ -125,7 +140,7 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
         );
         toast.warning(result.data.notices.some((n) => n.kind === 'removed') ? notices.removed : notices.clamped);
       }
-    }, 300);
+    }, delay);
     return () => window.clearTimeout(timer);
   }, [items, loaded, locale, notices, asked]);
 
@@ -137,11 +152,18 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
     });
   }, []);
 
+  // Closing the drawer forgets the view it was opened in, so a table chosen once never sticks to the basket.
+  const setOpen = useCallback((next: boolean) => {
+    setOpenState(next);
+    if (!next) setOpenMode(null);
+  }, []);
+
   const value = useMemo<CartContext>(
     () => ({
       ready: loaded,
       items,
       mode,
+      openMode,
       open,
       quote,
       pending,
@@ -149,16 +171,21 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
       setOpen,
       setMode,
       openAs: (m) => {
-        setMode(m);
-        setOpen(true);
+        if (m === 'table') setOpenMode('table');
+        else {
+          setMode(m);
+          setOpenMode(null);
+        }
+        setOpenState(true);
       },
       qtyOf: (variant, unit) => items.find((i) => same(i, { variant, unit }))?.qty ?? 0,
       add: (target, qty = 1) => setQty(target, (items.find((i) => same(i, target))?.qty ?? 0) + qty),
       setQty,
+      remove: (targets) => setItems((current) => current.filter((i) => !targets.some((t) => same(t, i)))),
       clear: () => setItems([]),
       refresh: () => setAsked((n) => n + 1),
     }),
-    [loaded, items, mode, open, quote, pending, setQty],
+    [loaded, items, mode, openMode, open, quote, pending, setQty, setOpen],
   );
 
   return <Context value={value}>{children}</Context>;

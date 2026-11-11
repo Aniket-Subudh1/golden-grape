@@ -255,7 +255,8 @@
       "removed": "Um artigo já não está disponível e foi retirado do cesto."
     },
     "checkout": "Finalizar",
-    "bookTable": "Reservar mesa"
+    "bookTable": "Reservar mesa",
+    "tableShopNote": "Os artigos da loja não são pré-encomendados com a mesa: ficam no seu saco para uma encomenda para levar ou com entrega."
   },
   "shop": {
     "eyebrow": "Loja · Vinhos & Mercearia",
@@ -592,7 +593,8 @@
       "emptyCart": "O seu saco está vazio.",
       "soldOut": "Esgotado: já não há lugares suficientes.",
       "transition": "Esta alteração já não é possível: a página vai atualizar.",
-      "event": "Este evento já não pode ser reservado."
+      "event": "Este evento já não pode ser reservado.",
+      "notPreorderable": "Só pratos e bebidas do balcão podem ser pré-encomendados com uma mesa."
     },
     "CONFLICT": "Isto acabou de ser alterado por outra pessoa. Tente de novo.",
     "OUT_OF_STOCK": "O seu saco mudou (stock). Verifique-o e tente de novo."
@@ -862,8 +864,8 @@
     },
     "preorder": {
       "label": "Pré-encomendar pratos e bebidas",
-      "hint": "Preparado com antecedência, servido à sua chegada.",
-      "empty": "O seu saco está vazio: junte alguns pratos do balcão para pré-encomendar.",
+      "hint": "Pratos e bebidas do balcão, preparados com antecedência e servidos à sua chegada.",
+      "empty": "A pré-encomenda é para pratos e bebidas do balcão: junte alguns a partir do balcão, ou reserve simplesmente a mesa.",
       "toCounter": "Ver o balcão"
     },
     "payment": {

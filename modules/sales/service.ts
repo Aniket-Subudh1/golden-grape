@@ -185,6 +185,9 @@ export async function placeOrder(payload: Payload, input: PlaceOrderInput, { cus
         : null;
       // The cart changed since it was shown (stock, availability): the visitor sees it corrected before paying.
       if (q && q.notices.length > 0) throw new AppError('OUT_OF_STOCK', 'cartChanged', 'lines');
+      // A table's pre-order holds only the counter's dishes and drinks: a shop purchase is never booked as a table
+      // (APPLUX audit 10 Nov, §1). The checkout sends only those; this is the rule, not a convenience.
+      if (q && input.mode === 'table' && q.lines.some((l) => l.kind !== 'snack')) throw new AppError('VALIDATION', 'notPreorderable', 'lines');
       if (q && zone && deliveryFee(zone, q.subtotalCents - q.discountCents).belowMinimum) throw new AppError('VALIDATION', 'belowMinimum', 'postalCode');
 
       const { numbering } = await getSettingsPrivate();

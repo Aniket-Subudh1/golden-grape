@@ -43,7 +43,7 @@ type Props = {
   initialMode: CartMode | null;
   customer: CheckoutCustomer;
   t: Dictionary['checkout'];
-  cartT: Pick<Dictionary['cart'], 'modes' | 'hints' | 'minus' | 'plus' | 'toShop' | 'toCounter' | 'vatIncluded'>;
+  cartT: Pick<Dictionary['cart'], 'modes' | 'hints' | 'minus' | 'plus' | 'toShop' | 'toCounter' | 'vatIncluded' | 'tableShopNote'>;
   formT: Dictionary['form'];
   signInHref: string;
   /** The shop's phone (Shop details), offered when nothing can be booked online. */
@@ -191,12 +191,22 @@ function StreetField({ value, onChange, onPick, label, t }: { value: string; onC
 export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, signInHref, phone }: Props) {
   const router = useRouter();
   const cart = useCart();
-  const { mode, setMode, items, ready } = cart;
+  const { items, ready } = cart;
+  // The checkout's own mode (APPLUX audit 10 Nov, §1/§3): the one the link asked for (`?mode=table`), else the
+  // basket's pickup or delivery. Choosing pickup or delivery here also becomes the basket's mode; a table never does,
+  // so a booking never turns a later shop purchase into a table.
+  const [picked, setPicked] = useState<CartMode | null>(initialMode);
+  const mode: CartMode = picked ?? cart.mode;
+  const setMode = (m: CartMode) => {
+    setPicked(m);
+    if (m !== 'table') cart.setMode(m);
+  };
   const [key, renewKey] = useIdempotencyKey();
   const [days, setDays] = useState<Partial<Record<CartMode, SlotDay[]>>>({});
   const [slot, setSlot] = useState({ date: '', time: '' });
   const [guests, setGuests] = useState(2);
-  const [preorder, setPreorder] = useState(true);
+  // Off until the customer asks for it: a table is a booking first (§1, workflow C).
+  const [preorder, setPreorder] = useState(false);
   const [contact, setContact] = useState({ name: customer?.name ?? '', email: customer?.email ?? '', phone: customer?.phone ?? '' });
   const start = customer?.address;
   // `cityFromCode`: the town was filled from the postcode (GG-007), so a new postcode may replace it; typed by hand, never.
@@ -210,11 +220,6 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
   const [pricing, setPricing] = useState(false);
   const asked = useRef(0);
   const money = (cents: number) => formatMoney(cents, locale);
-
-  // A "Book a table" link opens checkout on the table.
-  useEffect(() => {
-    if (initialMode) setMode(initialMode);
-  }, [initialMode, setMode]);
 
   const loadDays = (m: CartMode) =>
     slotsFor(null, { mode: m }).then((r) => {
@@ -261,12 +266,16 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
     };
   }, [postalCode, mode]);
 
-  // GG-039: a pre-order needs something in the basket. With an empty basket the table is booked without one: never
-  // a blocked button because the pre-order switch was on.
-  const canPreorder = items.length > 0;
+  // A table's pre-order holds only the counter's dishes and drinks (§1, §6); shop items stay in the basket for a
+  // pickup or delivery order. The server checks the same rule. With nothing from the counter, the table is booked
+  // without a pre-order (GG-039): never a blocked button because of the switch.
+  const counterKeys = new Set((cart.quote?.lines ?? []).filter((l) => l.kind === 'snack').map((l) => `${l.variant}:${l.unit ?? ''}`));
+  const preorderItems = items.filter((i) => counterKeys.has(`${i.variant}:${i.unit ?? ''}`));
+  const shopItemsAtTable = mode === 'table' && items.length > preorderItems.length;
+  const canPreorder = preorderItems.length > 0;
   const withPreorder = preorder && canPreorder;
   const withLines = mode !== 'table' || withPreorder;
-  const lines = withLines ? items : [];
+  const lines = mode === 'table' ? (withPreorder ? preorderItems : []) : items;
 
   // Server totals for what will be ordered, with the delivery fee of the postcode typed (300 ms after the last change).
   useEffect(() => {
@@ -282,7 +291,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
     return () => window.clearTimeout(timer);
     // `lines` is derived from these.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, items, mode, preorder, postalCode, locale]);
+  }, [ready, items, mode, preorder, postalCode, locale, cart.quote]);
 
   const payments = PAYMENT_CHOICES[mode];
   const payment = payments.includes(choice) ? choice : payments[0];
@@ -373,7 +382,9 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
         keepValues
         onSuccess={(data) => {
           if (!data.id) return;
-          if (withLines) cart.clear();
+          // A table takes only its pre-ordered dishes out of the basket; an order takes everything.
+          if (mode !== 'table') cart.clear();
+          else if (withPreorder) cart.remove(preorderItems);
           renewKey();
           router.push(`${localePath(locale, `/order/${data.id}`)}?t=${data.token}`);
         }}
@@ -439,6 +450,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                     </Link>
                   </Notice>
                 )}
+                {shopItemsAtTable && <Notice>{cartT.tableShopNote}</Notice>}
               </div>
             </Step>
           )}

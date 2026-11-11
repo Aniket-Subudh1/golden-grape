@@ -255,7 +255,8 @@
       "removed": "Ein Artikel ist nicht mehr verfügbar und wurde aus dem Warenkorb entfernt."
     },
     "checkout": "Zur Kasse",
-    "bookTable": "Tisch reservieren"
+    "bookTable": "Tisch reservieren",
+    "tableShopNote": "Artikel aus dem Shop werden nicht mit dem Tisch vorbestellt: Sie bleiben im Warenkorb für eine Abholung oder Lieferung."
   },
   "shop": {
     "eyebrow": "Shop · Weine & Feinkost",
@@ -592,7 +593,8 @@
       "emptyCart": "Ihr Warenkorb ist leer.",
       "soldOut": "Ausgebucht: nicht mehr genügend Plätze frei.",
       "transition": "Diese Änderung ist nicht mehr möglich: die Seite wird neu geladen.",
-      "event": "Diese Veranstaltung kann nicht mehr gebucht werden."
+      "event": "Diese Veranstaltung kann nicht mehr gebucht werden.",
+      "notPreorderable": "Nur Speisen und Getränke von der Theke können mit einem Tisch vorbestellt werden."
     },
     "CONFLICT": "Das wurde gerade von jemand anderem geändert. Bitte erneut versuchen.",
     "OUT_OF_STOCK": "Ihr Warenkorb hat sich geändert (Bestand). Bitte prüfen und erneut versuchen."
@@ -862,8 +864,8 @@
     },
     "preorder": {
       "label": "Speisen und Getränke vorbestellen",
-      "hint": "Vorbereitet und bei Ihrer Ankunft serviert.",
-      "empty": "Ihr Warenkorb ist leer: Fügen Sie einige Gerichte von der Theke hinzu.",
+      "hint": "Speisen und Getränke von der Theke, vorbereitet und bei Ihrer Ankunft serviert.",
+      "empty": "Vorbestellen können Sie Speisen und Getränke von der Theke: Fügen Sie welche hinzu oder reservieren Sie einfach den Tisch.",
       "toCounter": "Zur Theke"
     },
     "payment": {
