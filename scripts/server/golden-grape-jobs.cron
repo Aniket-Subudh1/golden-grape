@@ -1,0 +1,5 @@
+# Installed on the server as /etc/cron.d/golden-grape-jobs (mode 644): Golden Grape scheduled jobs
+# (docs/02-ARCHITECTURE.md §7). Daily: catering quotations past their validity become "Expiré".
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+30 2 * * * root /usr/local/bin/gg-job quotations-expire >> /var/log/gg-jobs.log 2>&1

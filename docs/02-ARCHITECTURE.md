@@ -187,7 +187,7 @@ Every variable lives in `.env.example` and is parsed by `lib/env.ts`. The build 
 
 ## 9. Deployment
 
-The site runs as one standalone Next process that serves the site, the admin and `/staff`. Scheduled jobs (low-stock digest, outbox, reviews refresh, backups) are HTTP routes protected by `CRON_SECRET` and called by the host's cron, so no extra worker process is needed. Production deployment, DNS and live credentials belong to APPLUX (Q§12); the `Dockerfile` stays available for such a host.
+The site runs as one standalone Next process that serves the site, the admin and `/staff`. Scheduled jobs (low-stock digest, outbox, reviews refresh, backups) are HTTP routes protected by `CRON_SECRET` and called by the host's cron, so no extra worker process is needed. On the current server: `CRON_SECRET` in `/opt/golden-grape/.env` (then `pm2 reload /opt/golden-grape/ecosystem.config.cjs --update-env`), `scripts/server/gg-job.sh` as `/usr/local/bin/gg-job`, `scripts/server/golden-grape-jobs.cron` as `/etc/cron.d/golden-grape-jobs`; `gg-job quotations-expire` runs one by hand. Production deployment, DNS and live credentials belong to APPLUX (Q§12); the `Dockerfile` stays available for such a host.
 
 **Current host: `goldengrape.devsomeware.com`.** A push to `main` deploys by itself once CI has passed.
 
