@@ -29,6 +29,14 @@ const row = (...fields: Field[]): Field => ({ type: 'row', fields });
 // everyday words (docs/03-CODING-LAWS.md: a screen shows only what a feature uses).
 const later = { hidden: true };
 
+/** The conditions a new catering quotation starts with until Golden Grape writes its own (Shop details › Devis traiteur). */
+const QUOTATION_CONDITIONS = {
+  fr: 'Prix TTC. Le nombre définitif de convives est à confirmer au plus tard 7 jours avant la prestation ; il sert de base à la facture. Toute prestation supplémentaire fait l’objet d’un nouveau devis. Ce devis est valable jusqu’à la date indiquée.',
+  en: 'Prices include VAT. The final number of guests is to be confirmed at least 7 days before the event; the invoice is based on it. Any additional service is subject to a new quotation. This quotation is valid until the date shown.',
+  de: 'Preise inkl. MwSt. Die endgültige Gästezahl ist spätestens 7 Tage vor der Veranstaltung zu bestätigen; sie ist die Grundlage der Rechnung. Zusätzliche Leistungen werden neu angeboten. Dieses Angebot gilt bis zum angegebenen Datum.',
+  pt: 'Preços com IVA incluído. O número final de convidados deve ser confirmado até 7 dias antes do evento; serve de base à fatura. Qualquer serviço adicional é objeto de um novo orçamento. Este orçamento é válido até à data indicada.',
+};
+
 export const businessSettings: GlobalConfig = {
   slug: 'BusinessSettings',
   label: l('Infos de la boutique', 'Shop details', 'Geschäftsdaten', 'Dados da loja'),
@@ -217,6 +225,36 @@ export const businessSettings: GlobalConfig = {
                   admin: { date: { pickerAppearance: 'dayOnly', displayFormat: 'dd/MM/yyyy' } },
                 },
               ],
+            },
+          ],
+        },
+        {
+          // Catering quotations (Q-12): what every new quotation starts with; staff can change them per quotation.
+          label: l('Devis traiteur', 'Catering quotations', 'Catering-Angebote', 'Orçamentos de catering'),
+          fields: [
+            {
+              name: 'quotationConditions',
+              type: 'textarea',
+              localized: true,
+              label: l('Conditions des devis', 'Quotation conditions', 'Angebotsbedingungen', 'Condições dos orçamentos'),
+              defaultValue: ({ locale }: { locale?: string }) => QUOTATION_CONDITIONS[(locale ?? 'fr') as keyof typeof QUOTATION_CONDITIONS] ?? QUOTATION_CONDITIONS.fr,
+              admin: {
+                rows: 6,
+                description: l(
+                  'Imprimées sur chaque nouveau devis, dans la langue du client. Modifiables devis par devis.',
+                  'Printed on every new quotation, in the customer’s language. Can be changed on each quotation.',
+                  'Auf jedes neue Angebot gedruckt, in der Sprache des Kunden. Pro Angebot änderbar.',
+                  'Impressas em cada novo orçamento, na língua do cliente. Podem ser alteradas em cada orçamento.',
+                ),
+              },
+            },
+            {
+              name: 'quotationValidityDays',
+              type: 'number',
+              min: 1,
+              defaultValue: 30,
+              label: l('Validité d’un devis (jours)', 'Quotation valid for (days)', 'Angebot gültig (Tage)', 'Validade do orçamento (dias)'),
+              admin: { width: '50%' },
             },
           ],
         },

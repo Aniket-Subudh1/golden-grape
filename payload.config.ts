@@ -19,6 +19,7 @@ import { cmsGlobals } from '@/modules/cms/globals';
 import { catalogueCollections } from '@/modules/catalogue/collections';
 import { customerGroups, customers } from '@/modules/customers/collections';
 import { cateringPackages, cateringRequests } from '@/modules/catering/collections';
+import { documentCollections } from '@/modules/documents/collections';
 import { eventBookings, events } from '@/modules/events/collections';
 import { payments } from '@/modules/payments/collections';
 import { salesCollections } from '@/modules/sales/collections';
@@ -36,7 +37,7 @@ const from = () => {
 
 // GG-046: every edit made by staff in the admin forms goes to the activity log (lib/audit.ts). Not the log itself, the
 // technical collections, nor what only the services write (they keep their own history and log their actions).
-const NOT_AUDITED = new Set(['auditLogs', 'rateLimits', 'counters', 'orders', 'reservations', 'eventBookings', 'payments', 'stockMovements', 'stockLevels']);
+const NOT_AUDITED = new Set(['auditLogs', 'rateLimits', 'counters', 'orders', 'reservations', 'eventBookings', 'payments', 'stockMovements', 'stockLevels', 'quotations', 'documentFiles']);
 const withAudit = (c: CollectionConfig): CollectionConfig => {
   if (NOT_AUDITED.has(c.slug)) return c;
   const hooks = auditHooks();
@@ -79,6 +80,7 @@ export default buildConfig({
     ...salesCollections,
     eventBookings,
     payments,
+    ...documentCollections,
   ].map(withAudit),
   globals: [businessSettings, ...cmsGlobals].map(withGlobalAudit),
   db: mongooseAdapter({

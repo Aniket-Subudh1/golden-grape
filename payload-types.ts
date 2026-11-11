@@ -94,6 +94,8 @@ export interface Config {
     deliveryZones: DeliveryZone;
     eventBookings: EventBooking;
     payments: Payment;
+    quotations: Quotation;
+    documentFiles: DocumentFile;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -105,6 +107,9 @@ export interface Config {
     };
     variants: {
       packaging: 'packagingUnits';
+    };
+    customers: {
+      quotations: 'quotations';
     };
   };
   collectionsSelect: {
@@ -134,6 +139,8 @@ export interface Config {
     deliveryZones: DeliveryZonesSelect<false> | DeliveryZonesSelect<true>;
     eventBookings: EventBookingsSelect<false> | EventBookingsSelect<true>;
     payments: PaymentsSelect<false> | PaymentsSelect<true>;
+    quotations: QuotationsSelect<false> | QuotationsSelect<true>;
+    documentFiles: DocumentFilesSelect<false> | DocumentFilesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -257,6 +264,12 @@ export interface AuditLog {
     | 'stock.adjust'
     | 'stock.count'
     | 'catalogue.import'
+    | 'quotation.created'
+    | 'quotation.sent'
+    | 'quotation.viewed'
+    | 'quotation.accepted'
+    | 'quotation.declined'
+    | 'quotation.expired'
     | 'doc.create'
     | 'doc.update'
     | 'doc.delete';
@@ -568,7 +581,7 @@ export interface CateringPackage {
 export interface CateringRequest {
   id: string;
   number: string;
-  status: 'new' | 'contacted' | 'accepted' | 'declined';
+  status: 'new' | 'contacted' | 'quoted' | 'accepted' | 'declined';
   package: string | CateringPackage;
   guests: number;
   date: string;
@@ -981,6 +994,11 @@ export interface Customer {
   group?: (string | null) | CustomerGroup;
   paymentTerm?: string | null;
   loyaltyBalance?: number | null;
+  quotations?: {
+    docs?: (string | Quotation)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -1010,6 +1028,102 @@ export interface Customer {
 export interface CustomerGroup {
   id: string;
   name: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Catering quotations: created from a catering request, e-mailed to the customer, signed online.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "quotations".
+ */
+export interface Quotation {
+  id: string;
+  title?: string | null;
+  number?: string | null;
+  status: 'draft' | 'sent' | 'viewed' | 'accepted' | 'declined' | 'expired';
+  cateringRequest?: (string | null) | CateringRequest;
+  customer?: (string | null) | Customer;
+  contact: {
+    name: string;
+    email: string;
+    phone?: string | null;
+    company?: string | null;
+  };
+  event?: {
+    date?: string | null;
+    time?: string | null;
+    guests?: number | null;
+    location?: string | null;
+  };
+  customerMessage?: string | null;
+  /**
+   * Menu per guest, service, equipment hire… Prices include VAT. Totals are worked out again on each save.
+   */
+  lines?:
+    | {
+        description: string;
+        qty: number;
+        unitPriceCents: number;
+        vat: 'standard' | 'intermediate' | 'reduced' | 'superReduced';
+        detail?: string | null;
+        vatBp?: number | null;
+        totalCents?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  discount?: {
+    kind?: ('none' | 'percent' | 'amount') | null;
+    percentBp?: number | null;
+    amountCents?: number | null;
+  };
+  totals?: {
+    subtotalCents?: number | null;
+    discountCents?: number | null;
+    vatCents?: number | null;
+    totalCents?: number | null;
+    vatBreakdown?:
+      | {
+          rateBp?: number | null;
+          baseCents?: number | null;
+          vatCents?: number | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  validUntil: string;
+  locale: 'fr' | 'en' | 'de' | 'pt';
+  conditions?: string | null;
+  sentAt?: string | null;
+  viewedAt?: string | null;
+  acceptedAt?: string | null;
+  declinedAt?: string | null;
+  declineReason?: string | null;
+  expiredAt?: string | null;
+  signature?: {
+    name?: string | null;
+    at?: string | null;
+    ip?: string | null;
+    userAgent?: string | null;
+  };
+  pdf?: (string | null) | DocumentFile;
+  signedPdf?: (string | null) | DocumentFile;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documentFiles".
+ */
+export interface DocumentFile {
+  id: string;
+  kind: 'quotation' | 'quotation_signed';
+  filename: string;
+  quotation?: (string | null) | Quotation;
+  customer?: (string | null) | Customer;
+  sizeBytes?: number | null;
+  sha256?: string | null;
+  data: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -1496,6 +1610,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'payments';
         value: string | Payment;
+      } | null)
+    | ({
+        relationTo: 'quotations';
+        value: string | Quotation;
+      } | null)
+    | ({
+        relationTo: 'documentFiles';
+        value: string | DocumentFile;
       } | null);
   globalSlug?: string | null;
   user:
@@ -2020,6 +2142,7 @@ export interface CustomersSelect<T extends boolean = true> {
   group?: T;
   paymentTerm?: T;
   loyaltyBalance?: T;
+  quotations?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -2271,6 +2394,105 @@ export interface PaymentsSelect<T extends boolean = true> {
   providerRef?: T;
   user?: T;
   raw?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "quotations_select".
+ */
+export interface QuotationsSelect<T extends boolean = true> {
+  title?: T;
+  number?: T;
+  status?: T;
+  cateringRequest?: T;
+  customer?: T;
+  contact?:
+    | T
+    | {
+        name?: T;
+        email?: T;
+        phone?: T;
+        company?: T;
+      };
+  event?:
+    | T
+    | {
+        date?: T;
+        time?: T;
+        guests?: T;
+        location?: T;
+      };
+  customerMessage?: T;
+  lines?:
+    | T
+    | {
+        description?: T;
+        qty?: T;
+        unitPriceCents?: T;
+        vat?: T;
+        detail?: T;
+        vatBp?: T;
+        totalCents?: T;
+        id?: T;
+      };
+  discount?:
+    | T
+    | {
+        kind?: T;
+        percentBp?: T;
+        amountCents?: T;
+      };
+  totals?:
+    | T
+    | {
+        subtotalCents?: T;
+        discountCents?: T;
+        vatCents?: T;
+        totalCents?: T;
+        vatBreakdown?:
+          | T
+          | {
+              rateBp?: T;
+              baseCents?: T;
+              vatCents?: T;
+              id?: T;
+            };
+      };
+  validUntil?: T;
+  locale?: T;
+  conditions?: T;
+  sentAt?: T;
+  viewedAt?: T;
+  acceptedAt?: T;
+  declinedAt?: T;
+  declineReason?: T;
+  expiredAt?: T;
+  signature?:
+    | T
+    | {
+        name?: T;
+        at?: T;
+        ip?: T;
+        userAgent?: T;
+      };
+  pdf?: T;
+  signedPdf?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documentFiles_select".
+ */
+export interface DocumentFilesSelect<T extends boolean = true> {
+  kind?: T;
+  filename?: T;
+  quotation?: T;
+  customer?: T;
+  sizeBytes?: T;
+  sha256?: T;
+  data?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2562,6 +2784,11 @@ export interface BusinessSetting {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Printed on every new quotation, in the customer’s language. Can be changed on each quotation.
+   */
+  quotationConditions?: string | null;
+  quotationValidityDays?: number | null;
   vat?:
     | {
         key: 'standard' | 'intermediate' | 'reduced' | 'superReduced';
@@ -2945,6 +3172,8 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
         date?: T;
         id?: T;
       };
+  quotationConditions?: T;
+  quotationValidityDays?: T;
   vat?:
     | T
     | {

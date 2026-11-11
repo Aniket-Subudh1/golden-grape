@@ -1,6 +1,5 @@
-import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { Payload } from 'payload';
-import { env } from '@/lib/env';
+import { checkLinkToken, linkToken } from '@/lib/link-token';
 import { AppError } from '@/lib/errors';
 import type { Locale } from '@/lib/i18n';
 import { formatNumber, nextNumber } from '@/lib/numbering';
@@ -112,17 +111,10 @@ export async function zoneFor(payload: Payload, postalCode: string, tx?: Tx) {
 // ---------------------------------------------------------------------------------------------------------------
 // Guest access to the confirmation page
 
-const sign = (id: string) => createHmac('sha256', env.PAYLOAD_SECRET).update(`order:${id}`).digest('base64url').slice(0, 32);
+/** The token that opens `/order/[id]` without an account (lib/link-token.ts; the same token as before). */
+export const orderToken = (id: string) => linkToken('order', id);
 
-/** The token that opens `/order/[id]` without an account (an HMAC of the id). */
-export const orderToken = (id: string) => sign(id);
-
-export function checkOrderToken(id: string, token: string | null | undefined) {
-  if (!token) return false;
-  const a = Buffer.from(sign(id));
-  const b = Buffer.from(token);
-  return a.length === b.length && timingSafeEqual(a, b);
-}
+export const checkOrderToken = (id: string, token: string | null | undefined) => checkLinkToken('order', id, token);
 
 // ---------------------------------------------------------------------------------------------------------------
 // Placing an order

@@ -175,5 +175,14 @@ export const customers: CollectionConfig = {
         },
       ],
     },
+    // The customer's file (Q-12): their catering quotations, sent and signed, each opening its page with the PDFs.
+    {
+      name: 'quotations',
+      type: 'join',
+      collection: 'quotations',
+      on: 'customer',
+      label: l('Devis', 'Quotations', 'Angebote', 'Orçamentos'),
+      admin: { defaultColumns: ['title', 'status', 'totals', 'updatedAt'], disableListColumn: true },
+    },
   ],
 };

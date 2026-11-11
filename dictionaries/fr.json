@@ -595,7 +595,9 @@
       "soldOut": "Complet : il ne reste pas assez de places.",
       "transition": "Ce changement n’est plus possible : la page va se rafraîchir.",
       "event": "Cet événement ne peut plus être réservé.",
-      "notPreorderable": "Seuls les plats et boissons du Comptoir peuvent être pré-commandés avec une table."
+      "notPreorderable": "Seuls les plats et boissons du Comptoir peuvent être pré-commandés avec une table.",
+      "consent": "Cochez la case pour accepter le devis.",
+      "notAcceptable": "Ce devis ne peut plus être accepté (expiré, déjà signé ou remplacé). La page se met à jour."
     },
     "CONFLICT": "Quelqu’un vient de modifier cet élément. Réessayez.",
     "OUT_OF_STOCK": "Votre panier a changé (stock). Vérifiez-le et réessayez."
@@ -739,6 +741,19 @@
       "title": "Votre compte est créé",
       "body": "Votre compte client a bien été créé avec l’adresse {{email}}. Vos coordonnées et vos adresses sont enregistrées pour vos prochaines commandes, et vous suivez vos commandes depuis votre compte.",
       "button": "Mon compte"
+    },
+    "quotation": {
+      "subject": "Votre devis Golden Grape {{number}}",
+      "body": "Merci pour votre demande. Notre devis est joint à cet e-mail : vous pouvez aussi le consulter et le signer en ligne.",
+      "button": "Voir et signer le devis",
+      "validUntil": "Ce devis est valable jusqu’au {{date}}.",
+      "acceptedSubject": "Devis {{number}} signé — merci !",
+      "acceptedBody": "Merci d’avoir accepté notre devis. La version signée est jointe à cet e-mail. Nous revenons vers vous pour organiser la prestation.",
+      "staffAcceptedSubject": "Devis {{number}} accepté et signé — {{name}}",
+      "staffDeclinedSubject": "Devis {{number}} refusé — {{name}}",
+      "signedBy": "Signé par",
+      "reason": "Raison donnée",
+      "open": "Ouvrir le devis dans l’espace gestion"
     }
   },
   "cookies": {
@@ -755,7 +770,8 @@
       "overview": "Aperçu",
       "profile": "Profil",
       "addresses": "Adresses",
-      "orders": "Commandes"
+      "orders": "Commandes",
+      "quotations": "Devis"
     },
     "edit": "Modifier",
     "defaultAddress": "Adresse par défaut",
@@ -827,6 +843,18 @@
       "view": "Voir",
       "guests_one": "{{count}} personne",
       "guests_other": "{{count}} personnes"
+    },
+    "quotations": {
+      "title": "Mes devis",
+      "empty": "Aucun devis pour l’instant. Les devis traiteur que nous vous envoyons apparaissent ici.",
+      "open": "Voir le devis",
+      "status": {
+        "sent": "À signer",
+        "viewed": "À signer",
+        "accepted": "Signé",
+        "declined": "Refusé",
+        "expired": "Expiré"
+      }
     }
   },
   "checkout": {
@@ -999,6 +1027,56 @@
       "done": "Compte créé : vous êtes connecté(e).",
       "exists": "Un compte existe déjà avec cet e-mail.",
       "signIn": "Se connecter"
+    }
+  },
+  "documents": {
+    "title": "Devis",
+    "number": "N°",
+    "draft": "Brouillon (non envoyé)",
+    "issuedOn": "Date :",
+    "validUntil": "Valable jusqu’au",
+    "customer": "Client",
+    "event": "Prestation",
+    "guests": "{{count}} personnes",
+    "description": "Désignation",
+    "qty": "Qté",
+    "unitPrice": "Prix unit. TTC",
+    "vat": "TVA",
+    "lineTotal": "Total TTC",
+    "subtotal": "Sous-total",
+    "discount": "Remise",
+    "total": "Total TTC",
+    "vatLine": "dont TVA {{rate}} % (base HT {{base}})",
+    "vatNumber": "TVA",
+    "conditions": "Conditions",
+    "agreement": "Bon pour accord",
+    "signedBy": "Signé électroniquement par {{name}}",
+    "signedOn": "le {{date}} à {{time}} (heure de Luxembourg)",
+    "signedIp": "Depuis l’adresse IP {{ip}}",
+    "signedHash": "Empreinte du devis envoyé (SHA-256) : {{hash}}",
+    "howToSign": "Pour accepter ce devis, ouvrez le lien reçu par e-mail : vous le lisez et le signez en ligne.",
+    "view": {
+      "metaTitle": "Votre devis — Golden Grape",
+      "intro": "Bonjour {{name}}, voici notre proposition pour votre prestation.",
+      "download": "Télécharger le PDF",
+      "downloadSigned": "Télécharger le devis signé (PDF)",
+      "acceptTitle": "Accepter et signer",
+      "acceptText": "En signant, vous acceptez ce devis et ses conditions. Votre nom, la date, l’heure et votre adresse IP sont enregistrés et imprimés sur le devis signé, que vous recevez par e-mail.",
+      "nameLabel": "Votre nom complet (signature)",
+      "consent": "J’ai lu ce devis et ses conditions, et je les accepte.",
+      "accept": "Accepter et signer le devis",
+      "signing": "Signature…",
+      "declineTitle": "Vous ne souhaitez pas donner suite ?",
+      "declineReason": "Un mot pour nous (facultatif)",
+      "decline": "Refuser le devis",
+      "declining": "Envoi…",
+      "accepted": "Devis accepté et signé",
+      "acceptedText": "Signé par {{name}} le {{date}}. Merci ! Le devis signé vous est envoyé par e-mail et nous revenons vers vous pour organiser la prestation.",
+      "declined": "Devis refusé",
+      "declinedText": "Vous avez refusé ce devis le {{date}}. Merci de nous avoir répondu ; n’hésitez pas à nous recontacter.",
+      "expired": "Ce devis a expiré",
+      "expiredText": "Il était valable jusqu’au {{date}}. Contactez-nous pour une nouvelle proposition :",
+      "replaced": "Ce devis a été remplacé par une nouvelle version, envoyée par e-mail."
     }
   }
 }

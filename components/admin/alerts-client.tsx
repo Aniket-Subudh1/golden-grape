@@ -1,7 +1,7 @@
 'use client';
 
 import { toast, useTranslation } from '@payloadcms/ui';
-import { Bell as BellIcon, CalendarCheck, ClipboardList, RotateCcw, ShoppingBag, Ticket, TriangleAlert } from 'lucide-react';
+import { Bell as BellIcon, CalendarCheck, ClipboardList, FileSignature, RotateCcw, ShoppingBag, Ticket, TriangleAlert } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { slotLabel } from '@/lib/time';
@@ -71,6 +71,7 @@ const ICONS = {
   reservation: CalendarCheck,
   booking: Ticket,
   catering: ClipboardList,
+  quotation: FileSignature,
   refund: RotateCcw,
   lowStock: TriangleAlert,
 };
@@ -156,7 +157,9 @@ export default function Bell() {
       item.state === 'done'
         ? ''
         : item.state === 'info'
-          ? t.detail.info
+          ? item.status
+            ? (item.status[lang] ?? item.status.fr)
+            : t.detail.info
           : item.awaitingTransfer
             ? t.detail.transfer
             : [t.detail[item.kind], item.preorder && t.withPreorder].filter(Boolean).join(' · ');

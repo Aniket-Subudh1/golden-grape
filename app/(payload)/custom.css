@@ -2149,6 +2149,24 @@ body:has(.gg-create) .no-results__actions {
 .gg-doc__facts a:hover {
   text-decoration: underline;
 }
+/* A catering request's quotations (modules/documents/admin/request-quotations.tsx). */
+.gg-doc__list {
+  display: grid;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+.gg-doc__list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--gg-line);
+}
+.gg-doc__list a {
+  font-weight: 600;
+}
 .gg-doc__muted {
   margin: 0;
   font-size: 13px;

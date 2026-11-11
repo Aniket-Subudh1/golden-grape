@@ -12,7 +12,7 @@ import { type Channel, quote, type QuoteCatalogue, type QuoteLineInput, type Quo
 /** Statutory Luxembourg rates, used for any class not configured in BusinessSettings (assumption A-07, DEP-07). */
 const LU_VAT: Record<VatClass, number> = { standard: 1700, intermediate: 1400, reduced: 800, superReduced: 300 };
 
-async function vatRates(): Promise<Record<VatClass, number>> {
+export async function vatRates(): Promise<Record<VatClass, number>> {
   const { vat } = await getSettingsPrivate();
   return { ...LU_VAT, ...Object.fromEntries((vat ?? []).map((v) => [v.key, v.rateBp])) };
 }

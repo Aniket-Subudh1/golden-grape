@@ -1,4 +1,4 @@
-import { add, mulQty, vatFromGross } from '@/lib/money';
+import { add, divRound, mulQty, pct, vatFromGross } from '@/lib/money';
 
 // The one pricing engine (02 §5.2, 04 §6). Pure: no Payload import. Every price shown or charged comes from `quote`.
 // Implemented: step 1 with the public price (M2.2), step 4 delivery (M2.3) and step 5 (VAT per rate). Steps 2, 3, 6
@@ -67,6 +67,16 @@ export type Quote = {
   amountDueCents: number;
 };
 
+/** VAT-inclusive amounts per rate → the breakdown printed on documents (highest rate first), VAT taken per rate. */
+function vatByRate(grossByRate: Map<number, number>) {
+  return [...grossByRate.entries()]
+    .sort(([a], [b]) => b - a)
+    .map(([rateBp, grossCents]) => {
+      const vatCents = vatFromGross(grossCents, rateBp);
+      return { rateBp, baseCents: grossCents - vatCents, vatCents };
+    });
+}
+
 /** Prices the lines. Throws when a line points at a variant or unit missing from `catalogue` (the caller filters). */
 export function quote(input: QuoteInput): Quote {
   const { catalogue, rules } = input;
@@ -106,12 +116,7 @@ export function quote(input: QuoteInput): Quote {
   const byRate = new Map<number, number>();
   for (const line of lines) byRate.set(line.vatBp, (byRate.get(line.vatBp) ?? 0) + line.totalCents - line.discountCents);
   if (deliveryCents > 0) byRate.set(rules.vatRates.standard, (byRate.get(rules.vatRates.standard) ?? 0) + deliveryCents);
-  const vatBreakdown = [...byRate.entries()]
-    .sort(([a], [b]) => b - a)
-    .map(([rateBp, grossCents]) => {
-      const vatCents = vatFromGross(grossCents, rateBp);
-      return { rateBp, baseCents: grossCents - vatCents, vatCents };
-    });
+  const vatBreakdown = vatByRate(byRate);
   const totalCents = subtotalCents - discountCents + deliveryCents;
 
   // Steps 6–7 (loyalty points, gift cards as means of payment): M3.2.
@@ -129,5 +134,64 @@ export function quote(input: QuoteInput): Quote {
     loyaltyCents: 0,
     giftCards: [],
     amountDueCents: totalCents,
+  };
+}
+
+// ---- Documents with free lines (catering quotations) -------------------------------------------------------------
+// A catering quotation is priced line by line by staff (a menu per guest, service, rentals…), not from the catalogue:
+// its prices are typed, VAT-inclusive like every B2C price (D-04). This is the one place that turns them into totals.
+
+export type DocumentLineInput = { qty: number; unitPriceCents: number; vatBp: number };
+/** `percent`: `value` in basis points (1000 = 10 %); `amount`: `value` in cents, VAT included. */
+export type DocumentDiscount = { kind: 'none' | 'percent' | 'amount'; value?: number | null };
+export type PricedDocument = {
+  /** Each line's total and its share of the discount, in the order given. */
+  lines: { totalCents: number; discountCents: number }[];
+  subtotalCents: number;
+  discountCents: number;
+  vatCents: number;
+  totalCents: number;
+  vatBreakdown: { rateBp: number; baseCents: number; vatCents: number }[];
+};
+
+/**
+ * Totals of a document with free lines. Quantities may have two decimals (2,5 hours); a line is qty × unit price,
+ * rounded half away from zero. The discount (a percentage of the subtotal, or an amount) is shared between the lines in
+ * proportion to their totals, the cents left over going to the largest remainders, so the VAT of each rate is taken on
+ * what is really charged. A discount above the subtotal is refused.
+ */
+export function priceDocument(lines: DocumentLineInput[], discount: DocumentDiscount = { kind: 'none' }): PricedDocument {
+  const totals = lines.map((line) => {
+    if (!(line.qty > 0)) throw new Error(`priceDocument: quantity ${line.qty} is not positive`);
+    if (!Number.isInteger(line.unitPriceCents) || line.unitPriceCents < 0) throw new Error(`priceDocument: price ${line.unitPriceCents} is not whole cents ≥ 0`);
+    return divRound(line.unitPriceCents * Math.round(line.qty * 100), 100);
+  });
+  const subtotalCents = add(...totals);
+  const value = discount.value ?? 0;
+  const discountCents = discount.kind === 'percent' ? pct(subtotalCents, value) : discount.kind === 'amount' ? value : 0;
+  if (!Number.isInteger(discountCents) || discountCents < 0 || discountCents > subtotalCents) throw new Error('discount');
+
+  // Largest-remainder split of the discount over the lines.
+  const shares = totals.map((t, i) => {
+    const exact = subtotalCents === 0 ? 0 : (discountCents * t) / subtotalCents;
+    return { i, cents: Math.floor(exact), rest: exact - Math.floor(exact) };
+  });
+  let left = discountCents - add(...shares.map((s) => s.cents));
+  for (const s of [...shares].sort((a, b) => b.rest - a.rest || a.i - b.i)) {
+    if (left <= 0) break;
+    s.cents += 1;
+    left -= 1;
+  }
+
+  const byRate = new Map<number, number>();
+  lines.forEach((line, i) => byRate.set(line.vatBp, (byRate.get(line.vatBp) ?? 0) + totals[i] - shares[i].cents));
+  const vatBreakdown = vatByRate(byRate);
+  return {
+    lines: totals.map((totalCents, i) => ({ totalCents, discountCents: shares[i].cents })),
+    subtotalCents,
+    discountCents,
+    vatCents: add(...vatBreakdown.map((v) => v.vatCents)),
+    totalCents: subtotalCents - discountCents,
+    vatBreakdown,
   };
 }

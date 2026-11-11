@@ -13,12 +13,14 @@ const getTransport = () =>
     auth: env.SMTP_USER ? { user: env.SMTP_USER, pass: env.SMTP_PASS } : undefined,
   }));
 
-type Mail = { to: string; subject: string; html: string; text: string; replyTo?: string };
+/** `attachments`: documents sent with the e-mail (a quotation's PDF), passed to nodemailer as they are. */
+type Mail = { to: string; subject: string; html: string; text: string; replyTo?: string; attachments?: { filename: string; content: Buffer; contentType?: string }[] };
 
 /** Sends through SMTP, or logs the mail when SMTP is not configured (local dev, tests). */
 export async function sendMail(mail: Mail) {
   if (!smtpConfigured()) {
-    console.info(`[mail] SMTP not configured, not sent: "${mail.subject}" → ${mail.to}`);
+    const files = mail.attachments?.map((a) => `${a.filename} (${Math.round(a.content.length / 1024)} KB)`).join(', ');
+    console.info(`[mail] SMTP not configured, not sent: "${mail.subject}" → ${mail.to}${files ? ` with ${files}` : ''}`);
     return;
   }
   await getTransport().sendMail({ from: env.MAIL_FROM, ...mail });

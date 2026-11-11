@@ -595,7 +595,9 @@
       "soldOut": "Esgotado: já não há lugares suficientes.",
       "transition": "Esta alteração já não é possível: a página vai atualizar.",
       "event": "Este evento já não pode ser reservado.",
-      "notPreorderable": "Só pratos e bebidas do balcão podem ser pré-encomendados com uma mesa."
+      "notPreorderable": "Só pratos e bebidas do balcão podem ser pré-encomendados com uma mesa.",
+      "consent": "Marque a caixa para aceitar o orçamento.",
+      "notAcceptable": "Este orçamento já não pode ser aceite (expirado, já assinado ou substituído). A página é atualizada."
     },
     "CONFLICT": "Isto acabou de ser alterado por outra pessoa. Tente de novo.",
     "OUT_OF_STOCK": "O seu saco mudou (stock). Verifique-o e tente de novo."
@@ -739,6 +741,19 @@
       "title": "A sua conta foi criada",
       "body": "A sua conta de cliente foi criada com o endereço {{email}}. Os seus dados e moradas ficam guardados para as próximas encomendas, e acompanha as suas encomendas na sua conta.",
       "button": "A minha conta"
+    },
+    "quotation": {
+      "subject": "O seu orçamento Golden Grape {{number}}",
+      "body": "Obrigado pelo seu pedido. O nosso orçamento segue em anexo: também o pode consultar e assinar online.",
+      "button": "Ver e assinar o orçamento",
+      "validUntil": "Este orçamento é válido até {{date}}.",
+      "acceptedSubject": "Orçamento {{number}} assinado — obrigado!",
+      "acceptedBody": "Obrigado por ter aceite o nosso orçamento. A versão assinada segue em anexo. Entraremos em contacto para organizar o evento.",
+      "staffAcceptedSubject": "Orçamento {{number}} aceite e assinado — {{name}}",
+      "staffDeclinedSubject": "Orçamento {{number}} recusado — {{name}}",
+      "signedBy": "Assinado por",
+      "reason": "Motivo indicado",
+      "open": "Abrir o orçamento na gestão"
     }
   },
   "cookies": {
@@ -755,7 +770,8 @@
       "overview": "Resumo",
       "profile": "Perfil",
       "addresses": "Moradas",
-      "orders": "Encomendas"
+      "orders": "Encomendas",
+      "quotations": "Orçamentos"
     },
     "edit": "Editar",
     "defaultAddress": "Morada predefinida",
@@ -827,6 +843,18 @@
       "view": "Ver",
       "guests_one": "{{count}} pessoa",
       "guests_other": "{{count}} pessoas"
+    },
+    "quotations": {
+      "title": "Os meus orçamentos",
+      "empty": "Ainda sem orçamentos. Os orçamentos de catering que lhe enviamos aparecem aqui.",
+      "open": "Ver orçamento",
+      "status": {
+        "sent": "Por assinar",
+        "viewed": "Por assinar",
+        "accepted": "Assinado",
+        "declined": "Recusado",
+        "expired": "Expirado"
+      }
     }
   },
   "checkout": {
@@ -999,6 +1027,56 @@
       "done": "Conta criada: tem sessão iniciada.",
       "exists": "Já existe uma conta com este e-mail.",
       "signIn": "Iniciar sessão"
+    }
+  },
+  "documents": {
+    "title": "Orçamento",
+    "number": "N.º",
+    "draft": "Rascunho (não enviado)",
+    "issuedOn": "Data:",
+    "validUntil": "Válido até",
+    "customer": "Cliente",
+    "event": "Evento",
+    "guests": "{{count}} pessoas",
+    "description": "Designação",
+    "qty": "Qtd.",
+    "unitPrice": "Preço unit.",
+    "vat": "IVA",
+    "lineTotal": "Total",
+    "subtotal": "Subtotal",
+    "discount": "Desconto",
+    "total": "Total c/ IVA",
+    "vatLine": "inclui IVA {{rate}} % (base {{base}})",
+    "vatNumber": "IVA",
+    "conditions": "Condições",
+    "agreement": "Aceite",
+    "signedBy": "Assinado eletronicamente por {{name}}",
+    "signedOn": "em {{date}} às {{time}} (hora do Luxemburgo)",
+    "signedIp": "A partir do endereço IP {{ip}}",
+    "signedHash": "Impressão digital do orçamento enviado (SHA-256): {{hash}}",
+    "howToSign": "Para aceitar este orçamento, abra a ligação recebida por e-mail: lê-o e assina-o online.",
+    "view": {
+      "metaTitle": "O seu orçamento — Golden Grape",
+      "intro": "Olá {{name}}, aqui está a nossa proposta para o seu evento.",
+      "download": "Descarregar o PDF",
+      "downloadSigned": "Descarregar o orçamento assinado (PDF)",
+      "acceptTitle": "Aceitar e assinar",
+      "acceptText": "Ao assinar, aceita este orçamento e as suas condições. O seu nome, a data, a hora e o seu endereço IP são registados e impressos no orçamento assinado, que recebe por e-mail.",
+      "nameLabel": "O seu nome completo (assinatura)",
+      "consent": "Li este orçamento e as suas condições, e aceito-os.",
+      "accept": "Aceitar e assinar o orçamento",
+      "signing": "A assinar…",
+      "declineTitle": "Não pretende avançar?",
+      "declineReason": "Uma palavra para nós (opcional)",
+      "decline": "Recusar o orçamento",
+      "declining": "A enviar…",
+      "accepted": "Orçamento aceite e assinado",
+      "acceptedText": "Assinado por {{name}} em {{date}}. Obrigado! O orçamento assinado é-lhe enviado por e-mail e entraremos em contacto para organizar o evento.",
+      "declined": "Orçamento recusado",
+      "declinedText": "Recusou este orçamento em {{date}}. Obrigado pela resposta; volte a contactar-nos quando quiser.",
+      "expired": "Este orçamento expirou",
+      "expiredText": "Era válido até {{date}}. Contacte-nos para uma nova proposta:",
+      "replaced": "Este orçamento foi substituído por uma nova versão, enviada por e-mail."
     }
   }
 }

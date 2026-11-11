@@ -4,6 +4,8 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   output: 'standalone',
   poweredByHeader: false,
+  // Quotation PDFs (modules/documents/pdf): loaded from node_modules at run time, not bundled (it reads font files).
+  serverExternalPackages: ['@react-pdf/renderer'],
   images: { minimumCacheTTL: 60 * 60 * 24 * 7 },
   cacheComponents: true,
   partialPrefetching: true,

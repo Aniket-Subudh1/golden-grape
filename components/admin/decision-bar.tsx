@@ -71,7 +71,10 @@ export default function DecisionBar({ action, target, decisions, text }: Props) 
       return;
     }
     toast.success(text.done);
-    window.location.reload();
+    // An action that made a new document (a quotation, its new version) opens it; any other reloads this page.
+    const href = (result.data as { href?: unknown } | null)?.href;
+    if (typeof href === 'string') window.location.assign(href);
+    else window.location.reload();
   }
 
   if (open) {

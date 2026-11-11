@@ -3,6 +3,7 @@ import { hasRole } from '@/lib/access';
 import type { Label } from '@/lib/admin';
 import { add } from '@/lib/money';
 import { REQUEST_STATUS } from '@/modules/catering/collections';
+import { QUOTATION_STATUS } from '@/modules/documents/collections';
 import { dueOf } from '@/modules/payments/service';
 import { BOOKING_STATUS } from '@/modules/events/collections';
 import { ORDER_TABS, orderTabWhere } from '@/modules/sales/admin/order-tabs';
@@ -18,7 +19,7 @@ import { ORDER_STATUS_LABELS, RESERVATION_STATUS_LABELS } from '@/modules/sales/
 // Callers: the sidebar (nav.tsx, first paint) and `loadAlerts` (alerts-action.ts, the bell's refresh).
 // The dashboard's tiles (`actionCounts` below) use the same conditions, so every place shows the same figure (GG-045).
 
-export type AlertKind = 'order' | 'reservation' | 'booking' | 'catering' | 'refund' | 'lowStock';
+export type AlertKind = 'order' | 'reservation' | 'booking' | 'catering' | 'quotation' | 'refund' | 'lowStock';
 export type AlertState = 'pending' | 'info' | 'done';
 export type AlertItem = {
   kind: AlertKind;
@@ -44,7 +45,7 @@ const RECENT = 6;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const TODO = ORDER_TABS[0].statuses ?? [];
 
-type Collection = 'orders' | 'reservations' | 'eventBookings' | 'cateringRequests';
+type Collection = 'orders' | 'reservations' | 'eventBookings' | 'cateringRequests' | 'quotations';
 
 /** What waits for staff, per list. Orders wait exactly when they sit in the Orders "To do" tab. */
 const WAITING = {
@@ -73,6 +74,7 @@ const LABELS: Record<Collection, Record<string, Label>> = {
   reservations: RESERVATION_STATUS_LABELS,
   eventBookings: BOOKING_STATUS,
   cateringRequests: Object.fromEntries(REQUEST_STATUS.map((s) => [s.value, s.label])),
+  quotations: QUOTATION_STATUS,
 };
 
 const toItems = (kind: AlertKind, collection: Collection, state: AlertState, docs: Doc[]): AlertItem[] =>
@@ -87,7 +89,8 @@ const toItems = (kind: AlertKind, collection: Collection, state: AlertState, doc
     slot: d.slot?.date ? { date: d.slot.date, from: d.slot.from ?? undefined } : undefined,
     awaitingTransfer: d.status === 'awaiting_payment' || undefined,
     preorder: (collection === 'reservations' && Boolean(d.preorder)) || undefined,
-    status: state === 'done' && d.status ? LABELS[collection][d.status] : undefined,
+    // Handled lines show how they ended; a quotation's line (info) says whether it was signed or declined.
+    status: (state === 'done' || collection === 'quotations') && d.status ? LABELS[collection][d.status] : undefined,
   }));
 
 export async function getAlerts(payload: Payload, user: TypedUser | null, now = new Date()): Promise<Alerts> {
@@ -99,7 +102,7 @@ export async function getAlerts(payload: Payload, user: TypedUser | null, now = 
   const recent = (collection: Collection, notIn: string[]) =>
     find(collection, { and: [{ updatedAt: { greater_than_equal: since } }, { status: { not_in: notIn } }] }, '-updatedAt', RECENT);
 
-  const [orders, reservations, bookings, catering, refunds, freeSeats, doneOrders, doneReservations, doneBookings, doneCatering, lowStock] =
+  const [orders, reservations, bookings, catering, refunds, freeSeats, doneOrders, doneReservations, doneBookings, doneCatering, lowStock, answered] =
     await Promise.all([
       find('orders', WAITING.orders),
       find('reservations', WAITING.reservations),
@@ -113,6 +116,8 @@ export async function getAlerts(payload: Payload, user: TypedUser | null, now = 
       recent('eventBookings', ['pending']),
       recent('cateringRequests', ['new']),
       stock ? payload.count({ collection: 'stockLevels', where: { lowStock: { equals: true } }, overrideAccess: true }) : null,
+      // A customer signed or declined a catering quotation in the last 24 hours (Q-12): staff are told, nothing waits.
+      find('quotations', { and: [{ status: { in: ['accepted', 'declined'] } }, { updatedAt: { greater_than_equal: since } }] }, '-updatedAt', RECENT),
     ]);
 
   const counts: Record<string, number> = {};
@@ -130,6 +135,7 @@ export async function getAlerts(payload: Payload, user: TypedUser | null, now = 
     ...toItems('catering', 'cateringRequests', 'pending', docs(catering)),
     ...toItems('refund', 'orders', 'pending', docs(refunds)).map((i) => ({ ...i, key: `refund-${i.key}` })),
     ...toItems('booking', 'eventBookings', 'info', docs(freeSeats)),
+    ...toItems('quotation', 'quotations', 'info', docs(answered)),
   ]
     .sort((a, b) => b.at.localeCompare(a.at))
     .slice(0, LIST);
@@ -173,7 +179,7 @@ type Waiting = {
 };
 type Counter = {
   key: CounterKey;
-  collection: Collection;
+  collection: Exclude<Collection, 'quotations'>;
   where: Where;
   href: string;
   unit: ActionCount['unit'];
@@ -232,7 +238,7 @@ const SELECT = {
   reservations: { guests: true, createdAt: true, updatedAt: true },
   eventBookings: { guests: true, createdAt: true, updatedAt: true },
   cateringRequests: { estimateCents: true, createdAt: true, updatedAt: true },
-} satisfies Record<Collection, object>;
+} satisfies Record<Exclude<Collection, 'quotations'>, object>;
 
 export async function actionCounts(payload: Payload, user: TypedUser | null): Promise<ActionCount[]> {
   if (!hasRole(user, ['sales'])) return [];

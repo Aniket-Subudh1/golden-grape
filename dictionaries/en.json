@@ -595,7 +595,9 @@
       "soldOut": "Sold out: there are not enough seats left.",
       "transition": "This change is no longer possible: the page will refresh.",
       "event": "This event can no longer be booked.",
-      "notPreorderable": "Only dishes and drinks from the counter can be pre-ordered with a table."
+      "notPreorderable": "Only dishes and drinks from the counter can be pre-ordered with a table.",
+      "consent": "Tick the box to accept the quotation.",
+      "notAcceptable": "This quotation can no longer be accepted (expired, already signed or replaced). The page updates."
     },
     "CONFLICT": "This was just changed by someone else. Please try again.",
     "OUT_OF_STOCK": "Your bag changed (stock). Please check it and try again."
@@ -739,6 +741,19 @@
       "title": "Your account has been created",
       "body": "Your customer account has been created with the address {{email}}. Your details and addresses are saved for your next orders, and you can follow your orders from your account.",
       "button": "My account"
+    },
+    "quotation": {
+      "subject": "Your Golden Grape quotation {{number}}",
+      "body": "Thank you for your request. Our quotation is attached to this e-mail: you can also read it and sign it online.",
+      "button": "View and sign the quotation",
+      "validUntil": "This quotation is valid until {{date}}.",
+      "acceptedSubject": "Quotation {{number}} signed — thank you!",
+      "acceptedBody": "Thank you for accepting our quotation. The signed copy is attached to this e-mail. We will be in touch to organise your event.",
+      "staffAcceptedSubject": "Quotation {{number}} accepted and signed — {{name}}",
+      "staffDeclinedSubject": "Quotation {{number}} declined — {{name}}",
+      "signedBy": "Signed by",
+      "reason": "Reason given",
+      "open": "Open the quotation in the back office"
     }
   },
   "cookies": {
@@ -755,7 +770,8 @@
       "overview": "Overview",
       "profile": "Profile",
       "addresses": "Addresses",
-      "orders": "Orders"
+      "orders": "Orders",
+      "quotations": "Quotations"
     },
     "edit": "Edit",
     "defaultAddress": "Default address",
@@ -827,6 +843,18 @@
       "view": "View",
       "guests_one": "{{count}} guest",
       "guests_other": "{{count}} guests"
+    },
+    "quotations": {
+      "title": "My quotations",
+      "empty": "No quotations yet. The catering quotations we send you appear here.",
+      "open": "View quotation",
+      "status": {
+        "sent": "To sign",
+        "viewed": "To sign",
+        "accepted": "Signed",
+        "declined": "Declined",
+        "expired": "Expired"
+      }
     }
   },
   "checkout": {
@@ -999,6 +1027,56 @@
       "done": "Account created: you are signed in.",
       "exists": "An account already exists with this e-mail.",
       "signIn": "Sign in"
+    }
+  },
+  "documents": {
+    "title": "Quotation",
+    "number": "No.",
+    "draft": "Draft (not sent)",
+    "issuedOn": "Date:",
+    "validUntil": "Valid until",
+    "customer": "Customer",
+    "event": "Event",
+    "guests": "{{count}} guests",
+    "description": "Description",
+    "qty": "Qty",
+    "unitPrice": "Unit price",
+    "vat": "VAT",
+    "lineTotal": "Total",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "total": "Total incl. VAT",
+    "vatLine": "incl. VAT {{rate}} % (net {{base}})",
+    "vatNumber": "VAT",
+    "conditions": "Conditions",
+    "agreement": "Agreed and accepted",
+    "signedBy": "Signed electronically by {{name}}",
+    "signedOn": "on {{date}} at {{time}} (Luxembourg time)",
+    "signedIp": "From IP address {{ip}}",
+    "signedHash": "Fingerprint of the quotation sent (SHA-256): {{hash}}",
+    "howToSign": "To accept this quotation, open the link in your e-mail: you read it and sign it online.",
+    "view": {
+      "metaTitle": "Your quotation — Golden Grape",
+      "intro": "Hello {{name}}, here is our proposal for your event.",
+      "download": "Download the PDF",
+      "downloadSigned": "Download the signed quotation (PDF)",
+      "acceptTitle": "Accept and sign",
+      "acceptText": "By signing, you accept this quotation and its conditions. Your name, the date, the time and your IP address are recorded and printed on the signed quotation, which you receive by e-mail.",
+      "nameLabel": "Your full name (signature)",
+      "consent": "I have read this quotation and its conditions, and I accept them.",
+      "accept": "Accept and sign the quotation",
+      "signing": "Signing…",
+      "declineTitle": "Not going ahead?",
+      "declineReason": "A word for us (optional)",
+      "decline": "Decline the quotation",
+      "declining": "Sending…",
+      "accepted": "Quotation accepted and signed",
+      "acceptedText": "Signed by {{name}} on {{date}}. Thank you! The signed quotation is sent to you by e-mail and we will be in touch to organise your event.",
+      "declined": "Quotation declined",
+      "declinedText": "You declined this quotation on {{date}}. Thank you for letting us know; do get in touch again.",
+      "expired": "This quotation has expired",
+      "expiredText": "It was valid until {{date}}. Contact us for a new proposal:",
+      "replaced": "This quotation has been replaced by a new version, sent by e-mail."
     }
   }
 }

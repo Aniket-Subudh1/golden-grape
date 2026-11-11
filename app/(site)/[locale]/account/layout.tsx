@@ -43,6 +43,7 @@ async function Shell({ locale, children }: { locale: Locale; children: React.Rea
             { href: `${base}/profile`, label: t.nav.profile },
             { href: `${base}/addresses`, label: t.nav.addresses },
             { href: `${base}/orders`, label: t.nav.orders },
+            { href: `${base}/quotations`, label: t.nav.quotations },
           ]}
         />
       </div>

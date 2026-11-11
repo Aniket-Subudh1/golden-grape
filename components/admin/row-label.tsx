@@ -11,6 +11,6 @@ const ROW = l('Ligne', 'Row', 'Zeile', 'Linha');
  */
 export default function RowLabel() {
   const { i18n } = useTranslation();
-  const { data, rowNumber = 0 } = useRowLabel<{ label?: string; title?: string; item?: string }>();
-  return <span>{data?.label || data?.title || data?.item || `${ROW[i18n.language as keyof Label] ?? ROW.fr} ${rowNumber + 1}`}</span>;
+  const { data, rowNumber = 0 } = useRowLabel<{ label?: string; title?: string; item?: string; description?: string }>();
+  return <span>{data?.label || data?.title || data?.item || data?.description || `${ROW[i18n.language as keyof Label] ?? ROW.fr} ${rowNumber + 1}`}</span>;
 }

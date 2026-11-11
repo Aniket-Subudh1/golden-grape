@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type QuoteCatalogue, quote, type QuoteRules } from './pricing';
+import { priceDocument, type QuoteCatalogue, quote, type QuoteRules } from './pricing';
 
 const rules: QuoteRules = { vatRates: { standard: 1700, intermediate: 1400, reduced: 800, superReduced: 300 } };
 const catalogue: QuoteCatalogue = {
@@ -86,5 +86,67 @@ describe('quote: delivery (step 4)', () => {
   it('no delivery rule (pickup, table) or an empty cart → no fee', () => {
     expect(deliver([{ variant: 'wine', qty: 1 }], null).deliveryCents).toBe(0);
     expect(deliver([], { feeCents: 500 }).totalCents).toBe(0);
+  });
+});
+
+describe('priceDocument (catering quotations: free lines, VAT included)', () => {
+  const menu = { qty: 20, unitPriceCents: 2800, vatBp: 300 };
+  const service = { qty: 1, unitPriceCents: 15000, vatBp: 1700 };
+
+  it('one line: 20 guests × 28,00 € at 3 %', () => {
+    expect(priceDocument([menu])).toEqual({
+      lines: [{ totalCents: 56000, discountCents: 0 }],
+      subtotalCents: 56000,
+      discountCents: 0,
+      vatCents: 1631,
+      totalCents: 56000,
+      vatBreakdown: [{ rateBp: 300, baseCents: 54369, vatCents: 1631 }],
+    });
+  });
+
+  it('two rates: the breakdown per rate, highest first', () => {
+    const doc = priceDocument([menu, service]);
+    expect(doc.vatBreakdown).toEqual([
+      { rateBp: 1700, baseCents: 12821, vatCents: 2179 },
+      { rateBp: 300, baseCents: 54369, vatCents: 1631 },
+    ]);
+    expect(doc).toMatchObject({ subtotalCents: 71000, vatCents: 3810, totalCents: 71000 });
+  });
+
+  it('10 % off: shared in proportion, VAT taken on what is charged', () => {
+    const doc = priceDocument([menu, service], { kind: 'percent', value: 1000 });
+    expect(doc.lines).toEqual([
+      { totalCents: 56000, discountCents: 5600 },
+      { totalCents: 15000, discountCents: 1500 },
+    ]);
+    expect(doc).toMatchObject({ subtotalCents: 71000, discountCents: 7100, totalCents: 63900 });
+    expect(doc.vatBreakdown).toEqual([
+      { rateBp: 1700, baseCents: 11538, vatCents: 1962 },
+      { rateBp: 300, baseCents: 48932, vatCents: 1468 },
+    ]);
+  });
+
+  it('a fixed amount: the cent left over goes to the largest remainder, the shares add up', () => {
+    const doc = priceDocument(
+      [
+        { qty: 1, unitPriceCents: 3333, vatBp: 300 },
+        { qty: 1, unitPriceCents: 6667, vatBp: 1700 },
+      ],
+      { kind: 'amount', value: 1000 },
+    );
+    expect(doc.lines.map((l) => l.discountCents)).toEqual([333, 667]);
+    expect(doc).toMatchObject({ discountCents: 1000, totalCents: 9000 });
+  });
+
+  it('quantities with decimals (2,5 hours), rounded half away from zero', () => {
+    expect(priceDocument([{ qty: 2.5, unitPriceCents: 4000, vatBp: 1700 }]).totalCents).toBe(10000);
+    expect(priceDocument([{ qty: 1.5, unitPriceCents: 333, vatBp: 1700 }]).totalCents).toBe(500);
+  });
+
+  it('refuses a discount above the subtotal, a negative price and a zero quantity; no line → zeros', () => {
+    expect(() => priceDocument([menu], { kind: 'amount', value: 56001 })).toThrow('discount');
+    expect(() => priceDocument([{ ...menu, unitPriceCents: -1 }])).toThrow();
+    expect(() => priceDocument([{ ...menu, qty: 0 }])).toThrow();
+    expect(priceDocument([])).toMatchObject({ subtotalCents: 0, totalCents: 0, vatCents: 0, vatBreakdown: [] });
   });
 });

@@ -40,7 +40,8 @@ app/
   (payload)/api/[...slug]/      Payload REST used by the admin (generated)
   api/health/route.ts           health check
   api/webhooks/[provider]/route.ts   payment / POS webhooks (M4)
-  api/cron/[job]/route.ts       scheduled jobs, protected by CRON_SECRET (M3.1+)
+  api/cron/[job]/route.ts       scheduled jobs, protected by CRON_SECRET (quotations-expire since 11 Nov 2026)
+  api/documents/[id]/route.ts   stored PDFs (quotations): staff, the owning customer, or a link token
   sitemap.ts, robots.ts
 components/
   ui/                           shadcn primitives actually used
@@ -172,7 +173,7 @@ Every variable lives in `.env.example` and is parsed by `lib/env.ts`. The build 
 | `GOOGLE_PLACES_API_KEY`, `GOOGLE_PLACE_ID`, `GBP_ACCOUNT_ID`, `GBP_LOCATION_ID`, `GBP_OAUTH_*` | M3.3 | optional; the feature degrades without them |
 | `WALLEE_SPACE_ID`, `WALLEE_USER_ID`, `WALLEE_API_SECRET`, `WALLEE_WEBHOOK_*` | M4.1 | test space |
 | `CASHMAG_*` | M4.2 | from the CashMag docs |
-| `CRON_SECRET` | M3.1 | protects scheduled-job routes |
+| `CRON_SECRET` | Q-12 (11 Nov 2026) | protects scheduled-job routes (`Authorization: Bearer …`, at least 24 characters); unset → every job call is refused. Production: daily `quotations-expire` from `/etc/cron.d/golden-grape-jobs` |
 
 ## 8. Local stack (`compose.yaml`)
 

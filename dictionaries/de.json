@@ -595,7 +595,9 @@
       "soldOut": "Ausgebucht: nicht mehr genügend Plätze frei.",
       "transition": "Diese Änderung ist nicht mehr möglich: die Seite wird neu geladen.",
       "event": "Diese Veranstaltung kann nicht mehr gebucht werden.",
-      "notPreorderable": "Nur Speisen und Getränke von der Theke können mit einem Tisch vorbestellt werden."
+      "notPreorderable": "Nur Speisen und Getränke von der Theke können mit einem Tisch vorbestellt werden.",
+      "consent": "Kreuzen Sie das Kästchen an, um das Angebot anzunehmen.",
+      "notAcceptable": "Dieses Angebot kann nicht mehr angenommen werden (abgelaufen, bereits unterschrieben oder ersetzt). Die Seite wird aktualisiert."
     },
     "CONFLICT": "Das wurde gerade von jemand anderem geändert. Bitte erneut versuchen.",
     "OUT_OF_STOCK": "Ihr Warenkorb hat sich geändert (Bestand). Bitte prüfen und erneut versuchen."
@@ -739,6 +741,19 @@
       "title": "Ihr Konto wurde erstellt",
       "body": "Ihr Kundenkonto wurde mit der Adresse {{email}} erstellt. Ihre Daten und Adressen sind für Ihre nächsten Bestellungen gespeichert, und Sie verfolgen Ihre Bestellungen in Ihrem Konto.",
       "button": "Mein Konto"
+    },
+    "quotation": {
+      "subject": "Ihr Golden-Grape-Angebot {{number}}",
+      "body": "Vielen Dank für Ihre Anfrage. Unser Angebot ist dieser E-Mail beigefügt: Sie können es auch online lesen und unterschreiben.",
+      "button": "Angebot ansehen und unterschreiben",
+      "validUntil": "Dieses Angebot ist gültig bis {{date}}.",
+      "acceptedSubject": "Angebot {{number}} unterschrieben — vielen Dank!",
+      "acceptedBody": "Vielen Dank, dass Sie unser Angebot angenommen haben. Die unterschriebene Fassung ist beigefügt. Wir melden uns zur Organisation Ihrer Veranstaltung.",
+      "staffAcceptedSubject": "Angebot {{number}} angenommen und unterschrieben — {{name}}",
+      "staffDeclinedSubject": "Angebot {{number}} abgelehnt — {{name}}",
+      "signedBy": "Unterschrieben von",
+      "reason": "Angegebener Grund",
+      "open": "Angebot im Backoffice öffnen"
     }
   },
   "cookies": {
@@ -755,7 +770,8 @@
       "overview": "Übersicht",
       "profile": "Profil",
       "addresses": "Adressen",
-      "orders": "Bestellungen"
+      "orders": "Bestellungen",
+      "quotations": "Angebote"
     },
     "edit": "Bearbeiten",
     "defaultAddress": "Standardadresse",
@@ -827,6 +843,18 @@
       "view": "Ansehen",
       "guests_one": "{{count}} Person",
       "guests_other": "{{count}} Personen"
+    },
+    "quotations": {
+      "title": "Meine Angebote",
+      "empty": "Noch keine Angebote. Die Catering-Angebote, die wir Ihnen senden, erscheinen hier.",
+      "open": "Angebot ansehen",
+      "status": {
+        "sent": "Zu unterschreiben",
+        "viewed": "Zu unterschreiben",
+        "accepted": "Unterschrieben",
+        "declined": "Abgelehnt",
+        "expired": "Abgelaufen"
+      }
     }
   },
   "checkout": {
@@ -999,6 +1027,56 @@
       "done": "Konto erstellt: Sie sind angemeldet.",
       "exists": "Mit dieser E-Mail gibt es bereits ein Konto.",
       "signIn": "Anmelden"
+    }
+  },
+  "documents": {
+    "title": "Angebot",
+    "number": "Nr.",
+    "draft": "Entwurf (nicht gesendet)",
+    "issuedOn": "Datum:",
+    "validUntil": "Gültig bis",
+    "customer": "Kunde",
+    "event": "Veranstaltung",
+    "guests": "{{count}} Personen",
+    "description": "Bezeichnung",
+    "qty": "Menge",
+    "unitPrice": "Einzelpreis",
+    "vat": "MwSt.",
+    "lineTotal": "Summe",
+    "subtotal": "Zwischensumme",
+    "discount": "Rabatt",
+    "total": "Summe inkl. MwSt.",
+    "vatLine": "inkl. MwSt. {{rate}} % (netto {{base}})",
+    "vatNumber": "USt-IdNr.",
+    "conditions": "Bedingungen",
+    "agreement": "Einverstanden",
+    "signedBy": "Elektronisch unterschrieben von {{name}}",
+    "signedOn": "am {{date}} um {{time}} (Luxemburger Zeit)",
+    "signedIp": "Von der IP-Adresse {{ip}}",
+    "signedHash": "Fingerabdruck des gesendeten Angebots (SHA-256): {{hash}}",
+    "howToSign": "Um dieses Angebot anzunehmen, öffnen Sie den Link in Ihrer E-Mail: Sie lesen und unterschreiben es online.",
+    "view": {
+      "metaTitle": "Ihr Angebot — Golden Grape",
+      "intro": "Guten Tag {{name}}, hier ist unser Angebot für Ihre Veranstaltung.",
+      "download": "PDF herunterladen",
+      "downloadSigned": "Unterschriebenes Angebot herunterladen (PDF)",
+      "acceptTitle": "Annehmen und unterschreiben",
+      "acceptText": "Mit Ihrer Unterschrift nehmen Sie dieses Angebot und seine Bedingungen an. Ihr Name, Datum, Uhrzeit und Ihre IP-Adresse werden gespeichert und auf das unterschriebene Angebot gedruckt, das Sie per E-Mail erhalten.",
+      "nameLabel": "Ihr vollständiger Name (Unterschrift)",
+      "consent": "Ich habe dieses Angebot und seine Bedingungen gelesen und nehme sie an.",
+      "accept": "Angebot annehmen und unterschreiben",
+      "signing": "Unterschrift…",
+      "declineTitle": "Möchten Sie nicht annehmen?",
+      "declineReason": "Ein Wort an uns (optional)",
+      "decline": "Angebot ablehnen",
+      "declining": "Wird gesendet…",
+      "accepted": "Angebot angenommen und unterschrieben",
+      "acceptedText": "Unterschrieben von {{name}} am {{date}}. Vielen Dank! Das unterschriebene Angebot erhalten Sie per E-Mail; wir melden uns zur Organisation.",
+      "declined": "Angebot abgelehnt",
+      "declinedText": "Sie haben dieses Angebot am {{date}} abgelehnt. Danke für Ihre Antwort; melden Sie sich gerne wieder.",
+      "expired": "Dieses Angebot ist abgelaufen",
+      "expiredText": "Es war gültig bis {{date}}. Kontaktieren Sie uns für ein neues Angebot:",
+      "replaced": "Dieses Angebot wurde durch eine neue Version ersetzt, die per E-Mail gesendet wurde."
     }
   }
 }

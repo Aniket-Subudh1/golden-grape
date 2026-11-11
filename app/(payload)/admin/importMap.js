@@ -28,6 +28,7 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { default as default_fe401d340ce00cc899cf727d6137f487 } from '@/components/admin/row-label'
 import { NumberCell as NumberCell_f2a5de4e6cd5b225ec768dfc00185072 } from '@/components/admin/number-field'
 import { default as default_f2a5de4e6cd5b225ec768dfc00185072 } from '@/components/admin/number-field'
+import { default as default_fd74764ae39eafa331c7675092856f1d } from '@/modules/documents/admin/request-quotations'
 import { default as default_a5d8806efdc56df6c24d184bfb005004 } from '@/components/admin/audit-trail'
 import { BadgeCell as BadgeCell_e05f6ac9ede25467f55f09817b54f69f } from '@/components/admin/cells'
 import { default as default_ea5aef8a9a35ef0cb8d9e90a51957cfa } from '@/components/admin/empty-list'
@@ -52,6 +53,8 @@ import { PreorderCell as PreorderCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@
 import { default as default_e878a1c008f508aed324fd57a4961771 } from '@/components/admin/weekday-bulk'
 import { default as default_e56de72a9d317b87d590db40d7733bc6 } from '@/modules/sales/admin/postcode-paste'
 import { default as default_5ae1914325a0ee108216435b317303b1 } from '@/modules/events/admin/booking-panel'
+import { default as default_e7547a6d616d19573a629279234f5127 } from '@/modules/documents/admin/quotation-panel'
+import { TotalCell as TotalCell_d6358e374739dc2aac8672e72d6cc454 } from '@/modules/documents/admin/cells'
 import { default as default_a2f0eccb7507197ce791108816851322 } from '@/components/admin/nav'
 import { default as default_0430f5fb3b8132a602107d7535a2a344 } from '@/components/admin/icon'
 import { default as default_334250e18ce0b45af3e0c04bb6fe8307 } from '@/components/admin/logo'
@@ -97,6 +100,7 @@ export const importMap = {
   "@/components/admin/row-label#default": default_fe401d340ce00cc899cf727d6137f487,
   "@/components/admin/number-field#NumberCell": NumberCell_f2a5de4e6cd5b225ec768dfc00185072,
   "@/components/admin/number-field#default": default_f2a5de4e6cd5b225ec768dfc00185072,
+  "@/modules/documents/admin/request-quotations#default": default_fd74764ae39eafa331c7675092856f1d,
   "@/components/admin/audit-trail#default": default_a5d8806efdc56df6c24d184bfb005004,
   "@/components/admin/cells#BadgeCell": BadgeCell_e05f6ac9ede25467f55f09817b54f69f,
   "@/components/admin/empty-list#default": default_ea5aef8a9a35ef0cb8d9e90a51957cfa,
@@ -121,6 +125,8 @@ export const importMap = {
   "@/components/admin/weekday-bulk#default": default_e878a1c008f508aed324fd57a4961771,
   "@/modules/sales/admin/postcode-paste#default": default_e56de72a9d317b87d590db40d7733bc6,
   "@/modules/events/admin/booking-panel#default": default_5ae1914325a0ee108216435b317303b1,
+  "@/modules/documents/admin/quotation-panel#default": default_e7547a6d616d19573a629279234f5127,
+  "@/modules/documents/admin/cells#TotalCell": TotalCell_d6358e374739dc2aac8672e72d6cc454,
   "@/components/admin/nav#default": default_a2f0eccb7507197ce791108816851322,
   "@/components/admin/icon#default": default_0430f5fb3b8132a602107d7535a2a344,
   "@/components/admin/logo#default": default_334250e18ce0b45af3e0c04bb6fe8307,

@@ -21,6 +21,8 @@ const schema = z.object({
   SMTP_SECURE: z.stringbool().default(false),
   MAIL_FROM: z.string().default('Golden Grape <hello@goldengrape.lu>'),
   MAIL_STAFF_TO: z.email().optional(),
+  // Scheduled jobs (app/api/cron/[job]): the host's cron sends it as a Bearer token. Unset → the jobs refuse every call.
+  CRON_SECRET: z.string().min(24).optional(),
 });
 
 type Env = z.infer<typeof schema>;

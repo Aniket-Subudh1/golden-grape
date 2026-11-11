@@ -1,14 +1,15 @@
-import type { CollectionConfig } from 'payload';
+import { type CollectionBeforeChangeHook, type CollectionConfig, ValidationError } from 'payload';
 import { hiddenUnless, isStaff, none, publicRead } from '@/lib/access';
-import { addButton, l, scaledNumber } from '@/lib/admin';
+import { addButton, l, say, scaledNumber } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { revalidateTagHook } from '@/lib/revalidate';
 
 /** Request statuses with their everyday names (also shown on the dashboard). */
 export const REQUEST_STATUS = [
   { value: 'new', label: l('Nouvelle', 'New', 'Neu', 'Novo') },
-  // "Devis envoyé" (`quoted`) returns with catering quotations, set only when a quotation is really sent (APPLUX, §1).
   { value: 'contacted', label: l('Client contacté', 'Customer contacted', 'Kunde kontaktiert', 'Cliente contactado') },
+  // Set only by sending a quotation (Q-12): a request never reads "quoted" unless one was really sent (APPLUX, §1).
+  { value: 'quoted', label: l('Devis envoyé', 'Quotation sent', 'Angebot gesendet', 'Orçamento enviado') },
   { value: 'accepted', label: l('Acceptée', 'Accepted', 'Angenommen', 'Aceite') },
   { value: 'declined', label: l('Refusée', 'Declined', 'Abgelehnt', 'Recusado') },
 ];
@@ -91,6 +92,30 @@ export const cateringPackages: CollectionConfig = {
   ],
 };
 
+/** "Devis envoyé" is set by sending a quotation (documents/service.ts, `context.byQuotation`), never by hand. */
+const quotedOnlyBySending: CollectionBeforeChangeHook = ({ data, originalDoc, req }) => {
+  if (data.status === 'quoted' && originalDoc?.status !== 'quoted' && !req.context?.byQuotation) {
+    throw new ValidationError({
+      collection: 'cateringRequests',
+      errors: [
+        {
+          path: 'status',
+          message: say(
+            req,
+            l(
+              '« Devis envoyé » se pose tout seul quand un devis est envoyé : utilisez « Créer un devis » ci-dessous.',
+              '“Quotation sent” is set when a quotation is sent: use “Create a quotation” below.',
+              '„Angebot gesendet“ wird beim Senden eines Angebots gesetzt: nutzen Sie „Angebot erstellen“ unten.',
+              '«Orçamento enviado» é definido ao enviar um orçamento: use «Criar um orçamento» abaixo.',
+            ),
+          ),
+        },
+      ],
+    });
+  }
+  return data;
+};
+
 // Created only by the requestCatering service (server-computed estimate, gapless DEM number).
 export const cateringRequests: CollectionConfig = {
   slug: 'cateringRequests',
@@ -110,6 +135,7 @@ export const cateringRequests: CollectionConfig = {
     ),
   },
   access: { read: isStaff('sales'), create: none, update: isStaff('sales'), delete: isStaff('admin') },
+  hooks: { beforeChange: [quotedOnlyBySending] },
   defaultSort: '-createdAt',
   fields: [
     {
@@ -185,6 +211,8 @@ export const cateringRequests: CollectionConfig = {
         },
       ],
     },
+    // Q-12: the request's quotations, and "Créer un devis".
+    { name: 'quotations', type: 'ui', admin: { disableListColumn: true, components: { Field: '@/modules/documents/admin/request-quotations' } } },
     // GG-046: who changed the status, the estimate or the details, and when.
     { name: 'trail', type: 'ui', admin: { disableListColumn: true, components: { Field: '@/components/admin/audit-trail' } } },
   ],
