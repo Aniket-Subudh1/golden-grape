@@ -10,7 +10,7 @@ import { rateLimit } from '@/lib/rate-limit';
 import { currentCustomer } from '@/modules/customers/service';
 import type { EventBooking } from '@/payload-types';
 import { mailEventBooking } from './mail';
-import { bookEvent as book, recordBookingPayment, setBookingStatus } from './service';
+import { bookEvent as book, recordBookingPayment, recordBookingRefund, setBookingStatus } from './service';
 
 const logMail = (error: unknown) => console.error('[mail] event booking', error);
 
@@ -56,26 +56,35 @@ export const setBookingStatusAction = action(
   },
 );
 
+const money = {
+  booking: z.string().min(1),
+  amount: eurosField,
+  at: bankDayField,
+  method: z.enum(['onsite', 'transfer', 'card']),
+  reference: z.string().trim().max(80, 'tooLong').optional().transform((v) => v || undefined),
+};
+
 /**
- * "Payment received" on a paid booking (APPLUX audit 10 Nov, §7–§8): the payment and the confirmation are two lines
- * of the history (amount, day, method, reference, who; then pending → confirmed), and the customer gets a separate
- * e-mail confirming the payment and the booking.
+ * "Payment received" on a paid booking (APPLUX audit 10 Nov, §7–§8; report 4, §4): each payment is a line of the
+ * history (amount, day, method, reference, who). The one that completes the total confirms a booking still waiting
+ * (a second line: pending → confirmed). The customer gets the payment e-mail each time, with the balance if any.
  */
-export const recordBookingPaymentAction = action(
-  z.object({
-    booking: z.string().min(1),
-    amount: eurosField,
-    at: bankDayField,
-    method: z.enum(['onsite', 'transfer', 'card']),
-    reference: z.string().trim().max(80, 'tooLong').optional().transform((v) => v || undefined),
-  }),
+export const recordBookingPaymentAction = action(z.object(money), { roles: ['sales'] }, async ({ booking, amount, at, method, reference }, { payload, user }) => {
+  const { booking: updated, confirmed } = await recordBookingPayment(payload, booking, { amountCents: amount, at, method, reference, user: user.id });
+  const ref = updated.label ?? updated.contact?.name;
+  await audit(payload, { user: user.id, action: 'booking.payment', collection: 'eventBookings', id: booking, ref, after: { 'payments.amountCents': amount, 'payments.at': at.toISOString().slice(0, 10), 'payments.method': method, 'payments.reference': reference } });
+  if (confirmed) await audit(payload, { user: user.id, action: 'booking.status', collection: 'eventBookings', id: booking, ref, before: { status: 'pending' }, after: { status: 'confirmed' } });
+  after(() => sendBookingMail(payload, updated, false, true).catch(logMail));
+  return { status: updated.status };
+});
+
+/** Money given back on a booking, with the reason; the booking's status does not change (cancel it separately). */
+export const recordBookingRefundAction = action(
+  z.object({ ...money, reason: z.string().trim().min(1, 'reasonRequired').max(300) }),
   { roles: ['sales'] },
-  async ({ booking, amount, at, method, reference }, { payload, user }) => {
-    const updated = await recordBookingPayment(payload, booking, { amountCents: amount, at, method, reference, user: user.id });
-    const ref = updated.label ?? updated.contact?.name;
-    await audit(payload, { user: user.id, action: 'booking.payment', collection: 'eventBookings', id: booking, ref, after: { 'payment.amountCents': amount, 'payment.at': at.toISOString().slice(0, 10), 'payment.method': method, 'payment.reference': reference } });
-    await audit(payload, { user: user.id, action: 'booking.status', collection: 'eventBookings', id: booking, ref, before: { status: 'pending' }, after: { status: 'confirmed' } });
-    after(() => sendBookingMail(payload, updated, false, true).catch(logMail));
+  async ({ booking, amount, at, method, reference, reason }, { payload, user }) => {
+    const { booking: updated } = await recordBookingRefund(payload, booking, { amountCents: amount, at, method, reference, reason, user: user.id });
+    await audit(payload, { user: user.id, action: 'booking.refund', collection: 'eventBookings', id: booking, ref: updated.label ?? updated.contact?.name, reason, after: { 'payments.amountCents': -amount, 'payments.at': at.toISOString().slice(0, 10), 'payments.method': method, 'payments.reference': reference } });
     return { status: updated.status };
   },
 );

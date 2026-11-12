@@ -1,6 +1,6 @@
 import type { CollectionConfig, Field, PayloadRequest } from 'payload';
 import { hiddenUnless, isStaff, none, staffOrSelf } from '@/lib/access';
-import { addButton, badgeCell, boolCell, emptyList, l, type Label, listOnly, say, scaledNumber, timeOfDay, WEEKDAYS } from '@/lib/admin';
+import { addButton, badgeCell, boolCell, emptyList, l, type Label, listOnly, say, scaledNumber, statusTabs, timeOfDay, WEEKDAYS } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { ORDER_STATUSES, RESERVATION_STATUSES } from './order-states';
 import { isLuxPostalCode, splitPostalCodes } from './zones';
@@ -70,6 +70,18 @@ export const PAYMENT_STATUS_LABELS = {
   voided: l('Annulé', 'Voided', 'Storniert', 'Anulado'),
 };
 export type PaymentStatus = keyof typeof PAYMENT_STATUS_LABELS;
+/** One colour code for every status pill (APPLUX report 4, §7): amber waits, blue is in progress, green is done, red is undone. */
+export const PAYMENT_STATUS_TONES = {
+  none: 'neutral',
+  pending: 'warning',
+  partial: 'warning',
+  authorized: 'info',
+  paid: 'success',
+  refund_pending: 'danger',
+  partially_refunded: 'neutral',
+  refunded: 'neutral',
+  voided: 'neutral',
+} as const;
 
 const options = <K extends string>(labels: Record<K, Label>) => (Object.keys(labels) as K[]).map((value) => ({ value, label: labels[value] }));
 
@@ -214,6 +226,18 @@ export const orders: CollectionConfig = {
           { name: 'refundedCents', type: 'number', defaultValue: 0 },
           { name: 'refundDueCents', type: 'number', defaultValue: 0 },
           { name: 'refundReason', type: 'text' },
+          // The bank account this order's customer was told to pay into (transfer orders): a copy taken when the
+          // order is placed or when staff choose another one, so a later change of the settings never alters it.
+          {
+            name: 'bankAccount',
+            type: 'group',
+            fields: [
+              { name: 'holder', type: 'text' },
+              { name: 'bankName', type: 'text' },
+              { name: 'iban', type: 'text' },
+              { name: 'bic', type: 'text' },
+            ],
+          },
         ],
       },
       localeField,
@@ -249,7 +273,17 @@ export const reservations: CollectionConfig = {
       'Tischanfragen von der Website. Annehmen oder ablehnen: der Kunde erhält eine E-Mail in seiner Sprache.',
       'Pedidos de mesa do site. Aceite ou recuse: o cliente recebe um e-mail na sua língua.',
     ),
-    components: emptyList({
+    // Stage tabs instead of the filter builder (APPLUX report 4, §7), then the first-use state.
+    components: {
+      beforeListTable: [
+        statusTabs('reservations', [
+          { label: l('À confirmer', 'To confirm', 'Zu bestätigen', 'Por confirmar'), statuses: ['pending'], sort: 'slotAt', urgent: true },
+          { label: l('Acceptées', 'Accepted', 'Angenommen', 'Aceites'), statuses: ['accepted'], sort: 'slotAt' },
+          { label: l('Terminées', 'Completed', 'Abgeschlossen', 'Concluídas'), statuses: ['completed', 'no_show'], sort: '-slotAt' },
+          { label: l('Refusées / annulées', 'Declined / cancelled', 'Abgelehnt / storniert', 'Recusadas / canceladas'), statuses: ['rejected', 'cancelled'], sort: '-slotAt' },
+          { label: l('Toutes', 'All', 'Alle', 'Todas'), sort: '-slotAt' },
+        ]),
+        ...emptyList({
       icon: 'reservations',
       title: l('Aucune réservation à venir', 'No upcoming reservations', 'Keine anstehenden Reservierungen', 'Sem reservas futuras'),
       text: l(
@@ -259,7 +293,9 @@ export const reservations: CollectionConfig = {
         'Os pedidos de mesa enviados pelo site aparecem aqui. Retire o filtro para ver os antigos.',
       ),
       evenFiltered: true,
-    }),
+    }).beforeListTable,
+      ],
+    },
   },
   access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
   defaultSort: '-createdAt',

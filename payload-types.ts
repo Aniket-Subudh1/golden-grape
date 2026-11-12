@@ -255,12 +255,14 @@ export interface AuditLog {
   action:
     | 'order.status'
     | 'order.payment'
+    | 'order.bankAccount'
     | 'order.refundRequest'
     | 'order.refund'
     | 'order.return'
     | 'reservation.status'
     | 'booking.status'
     | 'booking.payment'
+    | 'booking.refund'
     | 'stock.adjust'
     | 'stock.count'
     | 'catalogue.import'
@@ -946,6 +948,12 @@ export interface Order {
     refundedCents?: number | null;
     refundDueCents?: number | null;
     refundReason?: string | null;
+    bankAccount?: {
+      holder?: string | null;
+      bankName?: string | null;
+      iban?: string | null;
+      bic?: string | null;
+    };
   };
   locale?: ('fr' | 'en' | 'de' | 'pt') | null;
   staff?: (string | null) | User;
@@ -1421,7 +1429,7 @@ export interface DeliveryZone {
   createdAt: string;
 }
 /**
- * Seats booked from the Events page. Paid events are paid on site.
+ * Seats booked from the Events page. A booking’s status and its payment are followed separately.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "eventBookings".
@@ -1439,13 +1447,22 @@ export interface EventBooking {
   };
   guests?: number | null;
   amountCents?: number | null;
-  payment?: {
-    amountCents?: number | null;
-    at?: string | null;
-    method?: ('onsite' | 'transfer' | 'invoice' | 'card') | null;
-    reference?: string | null;
-    user?: (string | null) | User;
-  };
+  payments?:
+    | {
+        kind: 'charge' | 'refund';
+        amountCents: number;
+        at?: string | null;
+        method?: ('onsite' | 'transfer' | 'invoice' | 'card') | null;
+        reference?: string | null;
+        reason?: string | null;
+        user?: (string | null) | User;
+        notedAt?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  paidCents?: number | null;
+  refundedCents?: number | null;
+  paymentStatus?: ('free' | 'pending' | 'partial' | 'paid' | 'partially_refunded' | 'refunded') | null;
   status?: ('pending' | 'confirmed' | 'cancelled') | null;
   notes?: string | null;
   locale?: ('fr' | 'en' | 'de' | 'pt') | null;
@@ -2248,6 +2265,14 @@ export interface OrdersSelect<T extends boolean = true> {
         refundedCents?: T;
         refundDueCents?: T;
         refundReason?: T;
+        bankAccount?:
+          | T
+          | {
+              holder?: T;
+              bankName?: T;
+              iban?: T;
+              bic?: T;
+            };
       };
   locale?: T;
   staff?: T;
@@ -2362,15 +2387,22 @@ export interface EventBookingsSelect<T extends boolean = true> {
       };
   guests?: T;
   amountCents?: T;
-  payment?:
+  payments?:
     | T
     | {
+        kind?: T;
         amountCents?: T;
         at?: T;
         method?: T;
         reference?: T;
+        reason?: T;
         user?: T;
+        notedAt?: T;
+        id?: T;
       };
+  paidCents?: T;
+  refundedCents?: T;
+  paymentStatus?: T;
   status?: T;
   notes?: T;
   locale?: T;
@@ -2567,10 +2599,19 @@ export interface BusinessSetting {
      */
     longitude?: number | null;
     /**
-     * Shown to customers who pay by transfer, with the order number as the reference.
+     * The “default” account is given to customers who pay by transfer. A deactivated account is no longer offered; orders already placed keep theirs.
      */
-    iban?: string | null;
-    bic?: string | null;
+    bankAccounts?:
+      | {
+          holder: string;
+          bankName?: string | null;
+          iban: string;
+          bic?: string | null;
+          active?: boolean | null;
+          isDefault?: boolean | null;
+          id?: string | null;
+        }[]
+      | null;
   };
   /**
    * One line per open day (two lines if you close at lunchtime). A day without a line is closed.
@@ -3155,8 +3196,17 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
         rcs?: T;
         latitude?: T;
         longitude?: T;
-        iban?: T;
-        bic?: T;
+        bankAccounts?:
+          | T
+          | {
+              holder?: T;
+              bankName?: T;
+              iban?: T;
+              bic?: T;
+              active?: T;
+              isDefault?: T;
+              id?: T;
+            };
       };
   hours?:
     | T

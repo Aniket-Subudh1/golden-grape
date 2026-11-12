@@ -1,161 +1,202 @@
 import type { UIFieldServerProps } from 'payload';
+import type { ReactNode } from 'react';
 import DecisionBar, { type Decision } from '@/components/admin/decision-bar';
-import { DocCard, DocFacts, DocGrid, DocHead, DocPanel } from '@/components/admin/doc-panel';
+import { DocBadge, DocCard, DocFacts, DocFigures, DocGrid, DocHead, DocPanel } from '@/components/admin/doc-panel';
 import { hasRole } from '@/lib/access';
 import { LOCALE_NAMES, type Locale } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
-import { eventDate } from '@/lib/time';
-import { recordBookingPaymentAction, setBookingStatusAction } from '../actions';
-import { BOOKING_STATUS } from '../collections';
+import { eventDate, today } from '@/lib/time';
+import { dueOf, refundableOf } from '@/modules/payments/balance';
+import { langOf, salesText } from '@/modules/sales/admin/text';
+import { recordBookingPaymentAction, recordBookingRefundAction, setBookingStatusAction } from '../actions';
+import { BOOKING_PAYMENT_STATUS, BOOKING_PAYMENT_TONES, BOOKING_STATUS, BOOKING_STATUS_TONES } from '../collections';
+import { bookingPaymentStatus } from '../service';
+import { bookingsHref } from './events-board';
 
-// An event booking's edit view (ui field `panel`): the seats, the guest, and confirm (paid on site) or cancel.
+// An event booking's edit view (ui field `panel`). Its status (to confirm, confirmed, cancelled) and its payment
+// (free, unpaid, partly paid, paid, refunded) are two separate things (APPLUX report 4, §4): the header shows both,
+// with the total, what was received and what is still due, then the payments one by one.
 
 const TEXT = {
   fr: {
     event: 'Événement',
+    booking: 'Réservation',
     guests: 'Personnes',
-    amount: 'À régler sur place',
     free: 'Gratuit',
     customer: 'Client',
     language: 'Langue du client',
     message: 'Message du client',
     seats: (left: number | null) => (left === null ? 'Places illimitées' : `${left} place(s) encore libre(s)`),
     nothing: 'Plus rien à faire pour cette réservation.',
-    confirmed: { label: 'Paiement reçu', hint: 'la réservation est confirmée.' },
-    cancelled: { label: 'Annuler', hint: 'les places sont libérées et le client reçoit un e-mail.' },
-    paid: 'Payé',
-    payment: 'Paiement',
-    received: 'Montant reçu (€)',
-    paidOn: 'Reçu le',
-    method: 'Moyen',
-    reference: 'Référence (facultatif)',
-    recordedBy: 'Enregistré par',
-    methods: { onsite: 'Sur place', transfer: 'Virement', card: 'Carte' },
-    paymentHint: 'la réservation est confirmée et le client reçoit un e-mail de confirmation du paiement.',
+    all: 'Toutes les réservations de cet événement',
+    pay: { label: 'Paiement reçu', hint: 'notez l’argent réellement reçu (acompte ou solde). Le client reçoit un e-mail ; une fois le total reçu, une réservation à confirmer est confirmée.' },
+    confirm: { label: 'Confirmer la réservation', hint: 'les places sont confirmées. Le paiement reste à part : il peut être enregistré avant ou après.' },
+    confirmFree: { label: 'Confirmer la réservation', hint: 'la réservation est confirmée.' },
+    refund: { label: 'Rembourser', hint: 'notez le remboursement réellement envoyé au client. Le statut de la réservation ne change pas : annulez-la à part si besoin.' },
+    cancel: { label: 'Annuler la réservation', hint: 'les places sont libérées et le client reçoit un e-mail. Ce qu’il a payé reste à rembourser à part.' },
+    next: {
+      confirm: 'À confirmer : vérifiez la demande, puis confirmez la réservation ou enregistrez le paiement reçu.',
+      due: (amount: string) => `Réservation confirmée, reste à encaisser : ${amount}.`,
+      refund: (amount: string) => `Réservation annulée avec ${amount} encaissés : pensez à rembourser le client.`,
+    },
+    recordedOn: 'noté le',
   },
   en: {
     event: 'Event',
+    booking: 'Booking',
     guests: 'Guests',
-    amount: 'To pay on site',
     free: 'Free',
     customer: 'Customer',
     language: 'Customer’s language',
     message: 'Customer’s message',
     seats: (left: number | null) => (left === null ? 'Unlimited seats' : `${left} seat(s) still free`),
     nothing: 'Nothing left to do for this booking.',
-    confirmed: { label: 'Payment received', hint: 'the booking is confirmed.' },
-    cancelled: { label: 'Cancel', hint: 'the seats are freed and the customer gets an e-mail.' },
-    paid: 'Paid',
-    payment: 'Payment',
-    received: 'Amount received (€)',
-    paidOn: 'Received on',
-    method: 'Method',
-    reference: 'Reference (optional)',
-    recordedBy: 'Recorded by',
-    methods: { onsite: 'On site', transfer: 'Bank transfer', card: 'Card' },
-    paymentHint: 'the booking is confirmed and the customer gets an e-mail confirming the payment.',
+    all: 'All bookings for this event',
+    pay: { label: 'Payment received', hint: 'record the money actually received (deposit or balance). The customer gets an e-mail; once the total is in, a booking still to confirm is confirmed.' },
+    confirm: { label: 'Confirm the booking', hint: 'the seats are confirmed. The payment is separate: it can be recorded before or after.' },
+    confirmFree: { label: 'Confirm the booking', hint: 'the booking is confirmed.' },
+    refund: { label: 'Refund', hint: 'record the refund actually sent to the customer. The booking’s status does not change: cancel it separately if needed.' },
+    cancel: { label: 'Cancel the booking', hint: 'the seats are freed and the customer gets an e-mail. What they paid is refunded separately.' },
+    next: {
+      confirm: 'To confirm: check the request, then confirm the booking or record the payment received.',
+      due: (amount: string) => `Booking confirmed, still to collect: ${amount}.`,
+      refund: (amount: string) => `Booking cancelled with ${amount} received: remember to refund the customer.`,
+    },
+    recordedOn: 'recorded on',
   },
   de: {
     event: 'Veranstaltung',
+    booking: 'Buchung',
     guests: 'Personen',
-    amount: 'Vor Ort zu bezahlen',
     free: 'Kostenlos',
     customer: 'Kunde',
     language: 'Sprache des Kunden',
     message: 'Nachricht des Kunden',
     seats: (left: number | null) => (left === null ? 'Unbegrenzte Plätze' : `${left} Platz/Plätze noch frei`),
     nothing: 'Für diese Buchung ist nichts mehr zu tun.',
-    confirmed: { label: 'Zahlung erhalten', hint: 'die Buchung ist bestätigt.' },
-    cancelled: { label: 'Stornieren', hint: 'die Plätze werden frei und der Kunde erhält eine E-Mail.' },
-    paid: 'Bezahlt',
-    payment: 'Zahlung',
-    received: 'Erhaltener Betrag (€)',
-    paidOn: 'Erhalten am',
-    method: 'Art',
-    reference: 'Referenz (optional)',
-    recordedBy: 'Erfasst von',
-    methods: { onsite: 'Vor Ort', transfer: 'Überweisung', card: 'Karte' },
-    paymentHint: 'die Buchung ist bestätigt und der Kunde erhält eine E-Mail mit der Zahlungsbestätigung.',
+    all: 'Alle Buchungen dieser Veranstaltung',
+    pay: { label: 'Zahlung erhalten', hint: 'erfassen Sie das tatsächlich erhaltene Geld (Anzahlung oder Rest). Der Kunde erhält eine E-Mail; ist alles bezahlt, wird eine offene Buchung bestätigt.' },
+    confirm: { label: 'Buchung bestätigen', hint: 'die Plätze sind bestätigt. Die Zahlung ist getrennt: sie kann vorher oder nachher erfasst werden.' },
+    confirmFree: { label: 'Buchung bestätigen', hint: 'die Buchung ist bestätigt.' },
+    refund: { label: 'Erstatten', hint: 'erfassen Sie die tatsächlich gesendete Erstattung. Der Status der Buchung ändert sich nicht: bei Bedarf separat stornieren.' },
+    cancel: { label: 'Buchung stornieren', hint: 'die Plätze werden frei und der Kunde erhält eine E-Mail. Bereits Bezahltes wird separat erstattet.' },
+    next: {
+      confirm: 'Zu bestätigen: Anfrage prüfen, dann die Buchung bestätigen oder die erhaltene Zahlung erfassen.',
+      due: (amount: string) => `Buchung bestätigt, noch zu kassieren: ${amount}.`,
+      refund: (amount: string) => `Buchung storniert, ${amount} erhalten: bitte dem Kunden erstatten.`,
+    },
+    recordedOn: 'erfasst am',
   },
   pt: {
     event: 'Evento',
+    booking: 'Reserva',
     guests: 'Pessoas',
-    amount: 'A pagar no local',
     free: 'Grátis',
     customer: 'Cliente',
     language: 'Língua do cliente',
     message: 'Mensagem do cliente',
     seats: (left: number | null) => (left === null ? 'Lugares ilimitados' : `${left} lugar(es) ainda livre(s)`),
     nothing: 'Nada mais a fazer nesta reserva.',
-    confirmed: { label: 'Pagamento recebido', hint: 'a reserva fica confirmada.' },
-    cancelled: { label: 'Cancelar', hint: 'os lugares ficam livres e o cliente recebe um e-mail.' },
-    paid: 'Pago',
-    payment: 'Pagamento',
-    received: 'Montante recebido (€)',
-    paidOn: 'Recebido em',
-    method: 'Meio',
-    reference: 'Referência (opcional)',
-    recordedBy: 'Registado por',
-    methods: { onsite: 'No local', transfer: 'Transferência', card: 'Cartão' },
-    paymentHint: 'a reserva fica confirmada e o cliente recebe um e-mail a confirmar o pagamento.',
+    all: 'Todas as reservas deste evento',
+    pay: { label: 'Pagamento recebido', hint: 'registe o dinheiro realmente recebido (sinal ou saldo). O cliente recebe um e-mail; com o total recebido, uma reserva por confirmar fica confirmada.' },
+    confirm: { label: 'Confirmar a reserva', hint: 'os lugares ficam confirmados. O pagamento é à parte: pode ser registado antes ou depois.' },
+    confirmFree: { label: 'Confirmar a reserva', hint: 'a reserva fica confirmada.' },
+    refund: { label: 'Reembolsar', hint: 'registe o reembolso realmente enviado ao cliente. O estado da reserva não muda: cancele-a à parte se for preciso.' },
+    cancel: { label: 'Cancelar a reserva', hint: 'os lugares ficam livres e o cliente recebe um e-mail. O que pagou é reembolsado à parte.' },
+    next: {
+      confirm: 'Por confirmar: verifique o pedido e confirme a reserva ou registe o pagamento recebido.',
+      due: (amount: string) => `Reserva confirmada, ainda por cobrar: ${amount}.`,
+      refund: (amount: string) => `Reserva cancelada com ${amount} recebidos: não se esqueça de reembolsar o cliente.`,
+    },
+    recordedOn: 'registado em',
   },
 };
 
-const TONES = { pending: 'warning', confirmed: 'success', cancelled: 'danger' } as const;
-const DECIDE = {
-  fr: { confirm: 'Confirmer', back: 'Retour', reason: 'Raison (facultatif, gardée dans l’historique)', reasonPh: 'Client malade, erreur de date…', done: 'Enregistré.', error: 'Impossible d’enregistrer. Réessayez.', errors: { transition: 'Quelqu’un vient de la modifier : la page se rafraîchit.' } },
-  en: { confirm: 'Confirm', back: 'Back', reason: 'Reason (optional, kept in the history)', reasonPh: 'Customer ill, wrong date…', done: 'Saved.', error: 'Could not save. Please try again.', errors: { transition: 'Someone just changed it: the page refreshes.' } },
-  de: { confirm: 'Bestätigen', back: 'Zurück', reason: 'Grund (optional, im Verlauf gespeichert)', reasonPh: 'Kunde krank, falsches Datum…', done: 'Gespeichert.', error: 'Speichern nicht möglich.', errors: { transition: 'Jemand hat sie gerade geändert: die Seite wird neu geladen.' } },
-  pt: { confirm: 'Confirmar', back: 'Voltar', reason: 'Motivo (opcional, guardado no histórico)', reasonPh: 'Cliente doente, data errada…', done: 'Guardado.', error: 'Não foi possível guardar.', errors: { transition: 'Alguém acabou de a alterar: a página vai atualizar.' } },
-};
+const euros = (cents: number) => (cents / 100).toFixed(2).replace('.', ',');
 
 export default async function BookingPanel({ id, payload, i18n, user }: UIFieldServerProps) {
   if (!id) return null;
-  const lang = (i18n.language in TEXT ? i18n.language : 'fr') as keyof typeof TEXT;
+  const lang = langOf(i18n.language);
   const t = TEXT[lang];
+  // The money words and the decision bar's texts are the orders' (one wording for payments everywhere).
+  const s = salesText(lang);
+  const m = s.money;
   const booking = await payload.findByID({ collection: 'eventBookings', id, depth: 0, overrideAccess: true, disableErrors: true });
   if (!booking) return null;
-  const event = await payload.findByID({ collection: 'events', id: String(booking.event), depth: 0, locale: lang, overrideAccess: true, disableErrors: true });
+  const [event, staff] = await Promise.all([
+    payload.findByID({ collection: 'events', id: String(booking.event), depth: 0, locale: lang, overrideAccess: true, disableErrors: true }),
+    payload.find({ collection: 'users', limit: 0, depth: 0, overrideAccess: true, select: { name: true } }),
+  ]);
+  const staffName = new Map(staff.docs.map((u) => [u.id, u.name]));
   const status = booking.status ?? 'pending';
-  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Luxembourg' }).format(new Date());
-  const euros = (cents: number) => (cents / 100).toFixed(2).replace('.', ',');
-  // A paid booking is confirmed by recording its payment (§8): amount, day, method, reference; a free one never waits.
-  const payDecision: Decision = {
-    to: 'payment',
-    label: t.confirmed.label,
-    hint: t.paymentHint,
-    tone: 'primary',
-    action: recordBookingPaymentAction,
-    fields: [
-      { name: 'amount', label: t.received, kind: 'money', value: euros(booking.amountCents ?? 0), required: true },
-      { name: 'at', label: t.paidOn, kind: 'date', value: today, max: today, required: true },
-      { name: 'method', label: t.method, kind: 'select', value: 'onsite', options: (['onsite', 'transfer', 'card'] as const).map((v) => ({ value: v, label: t.methods[v] })) },
-      { name: 'reference', label: t.reference, kind: 'text' },
-    ],
-  };
+  const money = (cents: number) => formatMoney(cents, lang);
+  const f = { totalCents: booking.amountCents ?? 0, paidCents: booking.paidCents ?? 0, refundedCents: booking.refundedCents ?? 0, refundDueCents: 0 };
+  const due = status === 'cancelled' ? 0 : dueOf(f);
+  const refundable = refundableOf(f);
+  const payStatus = bookingPaymentStatus(booking);
+  const day = today();
+  const paid = f.totalCents > 0;
+  const methods = (['onsite', 'transfer', 'card'] as const).map((v) => ({ value: v, label: m.methods[v] }));
+  const moneyFields = (amount: number, method: string) => [
+    { name: 'amount', label: m.amount, kind: 'money' as const, value: euros(amount), required: true },
+    { name: 'at', label: m.date, kind: 'date' as const, value: day, max: day, required: true },
+    { name: 'method', label: m.method, kind: 'select' as const, value: method, options: methods },
+    { name: 'reference', label: m.bankRef, kind: 'text' as const },
+  ];
+  // The main next step first, the ways back last.
   const decisions: Decision[] = hasRole(user, ['sales'])
     ? [
-        ...(status === 'pending' ? [(booking.amountCents ?? 0) > 0 ? payDecision : { to: 'confirmed', ...t.confirmed, tone: 'primary' as const }] : []),
+        ...(due > 0 ? [{ to: 'payment', ...t.pay, tone: 'primary' as const, action: recordBookingPaymentAction, fields: moneyFields(due, 'onsite') }] : []),
+        ...(status === 'pending' ? [{ to: 'confirmed', ...(paid ? t.confirm : t.confirmFree), tone: due > 0 ? undefined : ('primary' as const) }] : []),
+        ...(refundable > 0 ? [{ to: 'refund', ...t.refund, tone: 'danger' as const, action: recordBookingRefundAction, reason: 'required' as const, fields: moneyFields(refundable, 'transfer') }] : []),
         // GG-046: an optional reason, kept in the activity log.
-        ...(status !== 'cancelled' ? [{ to: 'cancelled', ...t.cancelled, tone: 'danger' as const, reason: true }] : []),
+        ...(status !== 'cancelled' ? [{ to: 'cancelled', ...t.cancel, tone: 'danger' as const, reason: true }] : []),
       ]
     : [];
   const when = event ? eventDate(event.startsAt, event.endsAt, lang) : null;
-  const payer = booking.payment?.user;
-  const recordedBy = payer
-    ? ((await payload.findByID({ collection: 'users', id: String(typeof payer === 'object' ? payer.id : payer), depth: 0, overrideAccess: true, disableErrors: true, select: { name: true } }))?.name ?? null)
-    : null;
   const left = event?.capacity ? Math.max(0, event.capacity - (event.booked ?? 0)) : null;
+  const next = status === 'pending' ? t.next.confirm : status === 'confirmed' && due > 0 ? t.next.due(money(due)) : status === 'cancelled' && refundable > 0 ? t.next.refund(money(refundable)) : null;
+  const dayOf = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeZone: 'Europe/Luxembourg' });
+  const noted = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Luxembourg' });
 
   return (
     <DocPanel>
       <DocHead
-        badge={<span className={`gg-badge gg-badge--${TONES[status]}`}>{BOOKING_STATUS[status][lang]}</span>}
+        badge={
+          <>
+            <DocBadge label={t.booking} tone={BOOKING_STATUS_TONES[status]}>
+              {BOOKING_STATUS[status][lang]}
+            </DocBadge>
+            <DocBadge label={s.payment} tone={BOOKING_PAYMENT_TONES[payStatus]}>
+              {BOOKING_PAYMENT_STATUS[payStatus][lang]}
+            </DocBadge>
+          </>
+        }
         title={`${event?.title ?? '—'} · ${booking.guests} ${t.guests.toLowerCase()}`}
-        sub={when ? `${when.date} · ${when.time}` : undefined}
+        sub={[booking.contact?.name, when ? `${when.date} · ${when.time}` : null].filter(Boolean).join(' · ')}
+        figures={
+          paid && (
+            <DocFigures
+              items={[
+                { label: s.toPay, value: money(f.totalCents) },
+                { label: m.paid, value: money(f.paidCents), tone: f.paidCents > 0 ? 'ok' : undefined },
+                { label: m.due, value: money(due), tone: due > 0 ? 'due' : undefined },
+                ...(f.refundedCents ? [{ label: m.refunded, value: money(f.refundedCents) }] : []),
+              ]}
+            />
+          )
+        }
+        next={
+          next && (
+            <>
+              <strong>{s.nextStep}</strong>
+              <span>{next}</span>
+            </>
+          )
+        }
       >
         {decisions.length > 0 ? (
-          <DecisionBar action={setBookingStatusAction} target={{ booking: booking.id }} decisions={decisions} text={DECIDE[lang]} />
+          <DecisionBar action={setBookingStatusAction} target={{ booking: booking.id }} decisions={decisions} text={s.decide} />
         ) : (
           <p className="gg-doc__muted">{t.nothing}</p>
         )}
@@ -176,24 +217,43 @@ export default async function BookingPanel({ id, payload, i18n, user }: UIFieldS
             rows={[
               [t.event, event ? <a href={`/admin/collections/events/${event.id}`}>{event.title}</a> : '—'],
               [t.guests, booking.guests],
-              [booking.payment?.amountCents ? t.paid : t.amount, booking.amountCents ? <b key="amount">{formatMoney(booking.amountCents, lang)}</b> : t.free],
+              [s.toPay, paid ? <b key="amount">{money(f.totalCents)}</b> : t.free],
               ['', t.seats(left)],
+              ...(event ? [[' ', <a key="all" href={bookingsHref(event.id)}>{t.all}</a>] as [string, ReactNode]] : []),
             ]}
           />
         </DocCard>
-        {booking.payment?.amountCents ? (
-          <DocCard title={t.payment}>
-            <DocFacts
-              rows={[
-                [t.received.replace(' (€)', ''), <b key="paid">{formatMoney(booking.payment.amountCents, lang)}</b>],
-                [t.paidOn, booking.payment.at ? new Intl.DateTimeFormat(lang, { dateStyle: 'long', timeZone: 'Europe/Luxembourg' }).format(new Date(booking.payment.at)) : '—'],
-                [t.method, booking.payment.method ? t.methods[booking.payment.method as keyof typeof t.methods] ?? booking.payment.method : '—'],
-                [t.reference.replace(/ \(.*\)$/, ''), booking.payment.reference || '—'],
-                [t.recordedBy, recordedBy ?? '—'],
-              ]}
-            />
+        {paid && (
+          <DocCard title={m.payments} wide>
+            {(booking.payments ?? []).length === 0 ? (
+              <p className="gg-doc__muted">{m.noPayments}</p>
+            ) : (
+              <table className="gg-doc__lines">
+                <tbody>
+                  {(booking.payments ?? []).map((p) => (
+                    <tr key={p.id}>
+                      <td>
+                        {m.kinds[p.kind] ?? p.kind}
+                        <small>
+                          {[
+                            p.method ? (m.methods[p.method as keyof typeof m.methods] ?? p.method) : null,
+                            p.reference,
+                            p.reason ? `« ${p.reason} »` : null,
+                            [p.user ? staffName.get(String(typeof p.user === 'object' ? p.user.id : p.user)) : null, p.notedAt ? `${t.recordedOn} ${noted.format(new Date(p.notedAt))}` : null].filter(Boolean).join(', '),
+                          ]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </small>
+                      </td>
+                      <td>{p.at ? dayOf.format(new Date(p.at)) : '—'}</td>
+                      <td>{money(p.amountCents)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </DocCard>
-        ) : null}
+        )}
         {booking.notes && (
           <DocCard title={t.message} wide>
             <p className="gg-doc__note">{booking.notes}</p>

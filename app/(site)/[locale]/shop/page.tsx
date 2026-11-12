@@ -55,13 +55,13 @@ async function Results({ locale, t, searchParams }: { locale: Locale; t: Diction
         colours={data.facets.colours}
         t={{ ...s.filters, all: s.categories.all, searchPh: s.searchPh, close: t.cart.close, colours: s.colours }}
       />
-      <section className="py-12 md:py-16">
+      <section className="pt-6 pb-16 md:pt-8">
         <Container>
           {data.products.length === 0 ? (
             <p className="py-24 text-center text-ink/50 italic">{s.empty}</p>
           ) : (
             <>
-              <p className="eyebrow mb-8 text-ink/40">{s.count.replace('{{count}}', String(data.total))}</p>
+              <p className="eyebrow mb-4 text-ink/40">{s.count.replace('{{count}}', String(data.total))}</p>
               <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:gap-8 lg:grid-cols-4">
                 {data.products.map((p, i) => (
                   <ProductCard key={p.id} product={p} locale={locale} t={s} priority={i < 4} />
@@ -95,7 +95,7 @@ export default async function ShopPage({ params, searchParams }: Props) {
   const t = await getDictionary(locale);
   return (
     <>
-      <PageHero eyebrow={t.shop.eyebrow} title={[t.shop.titleA, t.shop.titleB]} subtitle={t.shop.subtitle} className="pb-10 md:pb-14" />
+      <PageHero eyebrow={t.shop.eyebrow} title={[t.shop.titleA, t.shop.titleB]} subtitle={t.shop.subtitle} compact />
       <Suspense fallback={<div className="min-h-[60vh] border-y border-border/60" />}>
         <Results locale={locale} t={t} searchParams={searchParams} />
       </Suspense>

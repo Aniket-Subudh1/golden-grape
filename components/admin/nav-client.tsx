@@ -14,6 +14,7 @@ import {
   CalendarDays,
   ChevronDown,
   ClipboardList,
+  FileSignature,
   ExternalLink,
   FileSpreadsheet,
   FileText,
@@ -59,6 +60,7 @@ const ICONS = {
   media: Images,
   legal: Scale,
   requests: ClipboardList,
+  quotations: FileSignature,
   orders: ShoppingBag,
   reservations: CalendarCheck,
   bookings: Ticket,
@@ -158,12 +160,13 @@ export function NavClient({ groups, alerts: fresh, text }: { groups: NavGroup[];
     if (!hydrated || !window.matchMedia('(min-width: 1025px)').matches) return;
     void getPreference<{ open?: boolean }>('nav').then((pref) => setNavOpen(pref?.open !== false));
   }, [hydrated, getPreference, setNavOpen]);
-  const isActive = (link: string) => {
+  // An item is active on its own page and, when it opens a board (event bookings), on its collection's pages too.
+  const isActive = (link: string, slug?: string) => {
     const href = link.split('?')[0];
-    return pathname === href || pathname.startsWith(`${href}/`);
+    return pathname === href || pathname.startsWith(`${href}/`) || Boolean(slug && pathname.startsWith(`/admin/collections/${slug}`));
   };
   const choices = parseChoices(useSyncExternalStore(subscribeGroups, readGroups, () => '{}'));
-  const activeGroup = groups.find((g) => g.items.some((i) => isActive(i.href)))?.id;
+  const activeGroup = groups.find((g) => g.items.some((i) => isActive(i.href, i.slug)))?.id;
   const isOpen = (id: string) => choices[id] ?? id === activeGroup;
   // Arriving on a page inside a closed section opens it once, so the page just opened is visible. Only on arrival:
   // the user can still close that section afterwards (its total then shows on the header).
@@ -213,7 +216,7 @@ export function NavClient({ groups, alerts: fresh, text }: { groups: NavGroup[];
                 <div id={`gg-nav-${group.id}`} className="gg-nav__group-items" inert={!open || undefined}>
                   <div>
                     {group.items.map((item) => (
-                      <Item key={item.href} item={item} active={isActive(item.href)} count={count(item)} />
+                      <Item key={item.href} item={item} active={isActive(item.href, item.slug)} count={count(item)} />
                     ))}
                   </div>
                 </div>

@@ -3,10 +3,11 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { cn } from '@/lib/cn';
+import { Ribbon } from '@/components/site/media-card';
 import type { Photo } from '@/modules/webshop/service';
 
 /** Product photos: the chosen one large, the others as thumbnails beneath. */
-export function Gallery({ photos, name }: { photos: Photo[]; name: string }) {
+export function Gallery({ photos, name, ribbon }: { photos: Photo[]; name: string; ribbon?: string }) {
   const [index, setIndex] = useState(0);
   const photo = photos[index];
   return (
@@ -17,6 +18,7 @@ export function Gallery({ photos, name }: { photos: Photo[]; name: string }) {
         ) : (
           <div className="bg-azulejo absolute inset-0 opacity-20" aria-hidden="true" />
         )}
+        {ribbon && <Ribbon>{ribbon}</Ribbon>}
       </div>
       {photos.length > 1 && (
         <div className="mt-3 grid grid-cols-5 gap-3">

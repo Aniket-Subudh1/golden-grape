@@ -322,7 +322,8 @@
       "perUnit": "ou seja {{price}} por unidade",
       "add": "Adicionar ao cesto",
       "added": "Adicionado ao cesto",
-      "left": "Só restam {{count}}"
+      "left": "Só restam {{count}}",
+      "inStock": "Em stock"
     },
     "related": {
       "eyebrow": "Da mesma garrafeira",
@@ -346,7 +347,7 @@
     },
     "add": "Adicionar",
     "allergensLabel": "Alergénios",
-    "soldOut": "Indisponível",
+    "soldOut": "Esgotado",
     "empty": "O menu do balcão chega muito em breve.",
     "allergens": {
       "gluten": "Glúten",
@@ -643,6 +644,7 @@
       "vat": "IVA incluído {{rate}} %",
       "payment": "Pagamento",
       "beneficiary": "Beneficiário",
+      "bank": "Banco",
       "iban": "IBAN",
       "bic": "BIC",
       "reference": "Referência",
@@ -650,7 +652,8 @@
       "status": "Estado",
       "event": "Evento",
       "amountPaid": "Montante pago",
-      "paidOn": "Pago em"
+      "paidOn": "Pago em",
+      "balance": "Saldo a pagar"
     },
     "reset": {
       "subject": "Escolha uma nova palavra-passe",
@@ -733,7 +736,10 @@
       "staffSubject": "Nova reserva: {{title}} — {{name}} ({{guests}})",
       "paymentSubject": "Pagamento recebido — a sua reserva para {{title}} está confirmada",
       "paymentBody": "Recebemos o seu pagamento: a sua reserva está confirmada. Esperamos por si com todo o gosto!",
-      "statusConfirmed": "Confirmada"
+      "statusConfirmed": "Confirmada",
+      "statusPending": "A aguardar confirmação",
+      "paymentPartialSubject": "Pagamento recebido — a sua reserva para {{title}}",
+      "paymentPartialBody": "Recebemos o seu pagamento, obrigado. O saldo indicado abaixo fica por pagar."
     },
     "staffBanner": "Notificação interna — para a equipa Golden Grape (não reencaminhar ao cliente)",
     "welcome": {
@@ -863,7 +869,7 @@
     "titleTable": "A sua mesa",
     "eyebrowTable": "Reserva",
     "steps": {
-      "mode": "Como a prefere?",
+      "mode": "Como deseja receber a sua encomenda?",
       "when": "Quando?",
       "guests": "Quantas pessoas?",
       "address": "Onde entregamos?",
@@ -943,6 +949,8 @@
     },
     "moreDates": "Ver mais datas",
     "fewerDates": "Menos datas",
+    "moreTimes": "Ver mais horários",
+    "fewerTimes": "Menos horários",
     "address": {
       "hint": "Escreva a sua rua: sugerimos moradas oficiais do Luxemburgo. Pode corrigir tudo.",
       "searching": "A procurar…",
@@ -955,6 +963,32 @@
     "noSlots": "A reserva online não é possível: não há horários disponíveis. Ligue-nos para reservar."
   },
   "order": {
+    "next": {
+      "title": "E agora?",
+      "payDue": "Transferência a efetuar: {{amount}}",
+      "transfer": [
+        "Faça uma transferência de {{amount}} com a referência {{number}}.",
+        "Assim que a recebermos, confirmamos a sua encomenda e avisamos por e-mail.",
+        "Preparamo-la depois para o horário escolhido."
+      ],
+      "pickup": [
+        "Preparamos a sua encomenda para o horário escolhido.",
+        "Recebe um e-mail assim que estiver pronta.",
+        "Paga na loja no momento do levantamento."
+      ],
+      "delivery": [
+        "Preparamos a sua encomenda para o horário escolhido.",
+        "Recebe um e-mail quando a entrega sair."
+      ],
+      "table": [
+        "A Casa confirma a sua mesa por e-mail, em geral no próprio dia.",
+        "Paga à mesa, no fim da sua visita."
+      ],
+      "accepted": [
+        "Apresente-se à hora reservada: a sua mesa espera por si.",
+        "Um imprevisto? Avise-nos por telefone ou e-mail."
+      ]
+    },
     "eyebrow": "Encomenda {{number}}",
     "reservationEyebrow": "Reserva {{number}}",
     "thanks": "Obrigado, {{name}}",
@@ -1005,6 +1039,7 @@
     "transfer": {
       "title": "Dados para a transferência",
       "beneficiary": "Beneficiário",
+      "bank": "Banco",
       "iban": "IBAN",
       "bic": "BIC",
       "reference": "Referência",

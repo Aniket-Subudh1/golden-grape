@@ -50,7 +50,7 @@ export default async function CheckoutPage({ params, searchParams }: Props) {
   if (!isLocale(locale)) notFound();
   // The heading is drawn by the form: it follows the chosen mode (order or table).
   return (
-    <section className="pt-36 pb-32 md:pt-44">
+    <section className="pt-28 pb-24 md:pt-32">
       <Container>
         <Suspense fallback={<div className="min-h-[60vh]" />}>
           <Checkout locale={locale} searchParams={searchParams} />

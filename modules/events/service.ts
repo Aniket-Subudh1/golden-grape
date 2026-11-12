@@ -5,6 +5,8 @@ import { AppError } from '@/lib/errors';
 import type { Locale } from '@/lib/i18n';
 import { atRequest, getPayloadClient } from '@/lib/payload';
 import { withTx } from '@/lib/tx';
+import { dueOf, paymentState, refundableOf } from '@/modules/payments/balance';
+import type { BookingPaymentStatus } from './collections';
 
 /** Published events that have not started yet, soonest first. Refreshed hourly and on every edit. */
 async function upcomingCached(locale: Locale, limit = 24) {
@@ -90,6 +92,9 @@ export async function bookEvent(payload: Payload, input: BookEventInput, { custo
           guests: input.guests,
           amountCents: event.priceCents * input.guests,
           status: event.priceCents > 0 ? 'pending' : 'confirmed',
+          paidCents: 0,
+          refundedCents: 0,
+          paymentStatus: event.priceCents > 0 ? 'pending' : 'free',
           notes: input.notes,
           locale: input.locale,
         },
@@ -103,7 +108,7 @@ export async function bookEvent(payload: Payload, input: BookEventInput, { custo
   }
 }
 
-/** Staff confirm (paid on site) or cancel a booking; cancelling gives the seats back. */
+/** Staff confirm a booking (whatever its payment: the two are separate) or cancel it; cancelling gives the seats back. */
 export async function setBookingStatus(payload: Payload, id: string, to: 'confirmed' | 'cancelled') {
   return withTx(payload, async (tx) => {
     const booking = await payload.findByID({ collection: 'eventBookings', id, depth: 0, req: tx.req, overrideAccess: true, disableErrors: true });
@@ -120,29 +125,58 @@ export async function setBookingStatus(payload: Payload, id: string, to: 'confir
   });
 }
 
-export type BookingPayment = { amountCents: number; at: Date; method: 'onsite' | 'transfer' | 'card'; reference?: string; user: string };
+export type BookingPayment = { amountCents: number; at: Date; method: 'onsite' | 'transfer' | 'card'; reference?: string; reason?: string; user: string };
+
+/** A booking's payment status from its figures: free events never owe anything (APPLUX report 4, §4). */
+export const bookingPaymentStatus = (b: { amountCents?: number | null; paidCents?: number | null; refundedCents?: number | null }): BookingPaymentStatus =>
+  (b.amountCents ?? 0) === 0 ? 'free' : (paymentState({ totalCents: b.amountCents ?? 0, paidCents: b.paidCents ?? 0, refundedCents: b.refundedCents ?? 0, refundDueCents: 0 }) as BookingPaymentStatus);
 
 /**
- * "Payment received" on a paid booking (§8): the money is recorded on the booking (amount, the day it came in, how,
- * the reference and who recorded it) and the booking is confirmed, in one transaction. Only a pending booking can be
- * paid; two staff at once record it once.
+ * One more payment row on a booking, in one transaction. The claim on the figure it changes (`paidCents` or
+ * `refundedCents`, still at the value just read) makes two staff recording the same money at once count it once.
  */
-export async function recordBookingPayment(payload: Payload, id: string, payment: BookingPayment) {
+async function addBookingPayment(payload: Payload, id: string, kind: 'charge' | 'refund', payment: BookingPayment) {
   return withTx(payload, async (tx) => {
     const booking = await payload.findByID({ collection: 'eventBookings', id, depth: 0, req: tx.req, overrideAccess: true, disableErrors: true });
     if (!booking) throw new AppError('NOT_FOUND', 'booking');
-    const claim = await tx.model('eventBookings').updateOne({ _id: id, status: 'pending' }, { $set: { status: 'confirmed' } }, { session: tx.session });
+    const money = { totalCents: booking.amountCents ?? 0, paidCents: booking.paidCents ?? 0, refundedCents: booking.refundedCents ?? 0, refundDueCents: 0 };
+    if (kind === 'charge' && booking.status === 'cancelled') throw new AppError('CONFLICT', 'transition', 'status');
+    const limit = kind === 'charge' ? dueOf(money) : refundableOf(money);
+    if (payment.amountCents <= 0 || payment.amountCents > limit) throw new AppError('VALIDATION', 'amountTooHigh', 'amount');
+    const field = kind === 'charge' ? 'paidCents' : 'refundedCents';
+    const before = money[field];
+    money[field] += payment.amountCents;
+    const claim = await tx.model('eventBookings').updateOne({ _id: id, [field]: before === 0 ? { $in: [0, null] } : before }, { $set: { [field]: money[field] } }, { session: tx.session });
     if (claim.matchedCount === 0) throw new AppError('CONFLICT', 'transition', 'status');
-    return payload.update({
+    // Fully paid: a booking still waiting is confirmed. A part payment leaves its status to staff.
+    const confirmed = kind === 'charge' && booking.status === 'pending' && dueOf(money) === 0;
+    const updated = await payload.update({
       collection: 'eventBookings',
       id,
       req: tx.req,
       overrideAccess: true,
       depth: 0,
-      data: { payment: { amountCents: payment.amountCents, at: payment.at.toISOString(), method: payment.method, reference: payment.reference, user: payment.user } },
+      data: {
+        payments: [
+          ...(booking.payments ?? []),
+          { kind, amountCents: kind === 'charge' ? payment.amountCents : -payment.amountCents, at: payment.at.toISOString(), method: payment.method, reference: payment.reference, reason: payment.reason, user: payment.user, notedAt: new Date().toISOString() },
+        ],
+        paymentStatus: bookingPaymentStatus({ amountCents: money.totalCents, ...money }),
+        ...(confirmed ? { status: 'confirmed' as const } : {}),
+      },
     });
+    return { booking: updated, confirmed, dueCents: dueOf(money) };
   });
 }
+
+/**
+ * "Payment received" on a paid booking: the money as staff recorded it (amount, the day it came in, how, the
+ * reference, who). Several payments add up; never more than what is still due, never on a cancelled booking.
+ */
+export const recordBookingPayment = (payload: Payload, id: string, payment: BookingPayment) => addBookingPayment(payload, id, 'charge', payment);
+
+/** Money given back on a booking: at most what was received and not yet refunded. The seats follow the status, not this. */
+export const recordBookingRefund = (payload: Payload, id: string, payment: BookingPayment) => addBookingPayment(payload, id, 'refund', payment);
 
 /** Seats left for each event (null = unlimited), read live: the event pages are cached, the counter is not. */
 export async function seatsLeft(eventIds: string[]): Promise<Record<string, number | null>> {

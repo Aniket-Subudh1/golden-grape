@@ -64,6 +64,8 @@ export default buildConfig({
         dashboard: { Component: '@/components/admin/dashboard' },
         // Products, stock counts and movements as spreadsheets (client request, 7 Nov).
         importExport: { Component: '@/components/admin/import-export', path: '/import-export' },
+        // Event reservations by event: upcoming and archives (APPLUX report 4, §4).
+        eventBookings: { Component: '@/modules/events/admin/events-board', path: '/event-bookings' },
       },
     },
   },

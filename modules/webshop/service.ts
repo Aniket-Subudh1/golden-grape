@@ -70,9 +70,9 @@ async function cards(payload: Payload, products: Product[], locale: Locale): Pro
 
 /** The shop: categories, filter values, one page of cards and the paging. */
 export async function shopPage(payload: Payload, filters: Omit<ProductFilters, 'kind'>) {
-  const [categories, facets, result] = await Promise.all([
-    listCategories(payload, 'shop', filters.locale),
-    shopFacets(payload, filters.locale),
+  const categories = await listCategories(payload, 'shop', filters.locale);
+  const [facets, result] = await Promise.all([
+    shopFacets(payload, filters.locale, categories.find((c) => c.slug === filters.category)?.id),
     listProducts(payload, { ...filters, kind: 'shop' }),
   ]);
   return { categories, facets, products: await cards(payload, result.docs, filters.locale), page: result.page ?? 1, totalPages: result.totalPages, total: result.totalDocs };

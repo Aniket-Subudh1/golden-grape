@@ -108,7 +108,7 @@ export function orderTabQuery(tab: Tab, keep: { search?: string; day?: string } 
 // An already-parsed `where` object is flattened to the same bracket keys first.
 const flat = (value: unknown, key: string): [string, unknown][] =>
   value && typeof value === 'object' && !Array.isArray(value) ? Object.entries(value).flatMap(([k, v]) => flat(v, `${key}[${k}]`)) : [[key, value]];
-const valuesOf = (searchParams: Record<string, unknown>, test: RegExp) =>
+export const valuesOf = (searchParams: Record<string, unknown>, test: RegExp) =>
   Object.entries(searchParams)
     .flatMap(([key, value]) => flat(value, key))
     .filter(([key]) => test.test(key))

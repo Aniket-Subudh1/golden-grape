@@ -28,9 +28,10 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { default as default_fe401d340ce00cc899cf727d6137f487 } from '@/components/admin/row-label'
 import { NumberCell as NumberCell_f2a5de4e6cd5b225ec768dfc00185072 } from '@/components/admin/number-field'
 import { default as default_f2a5de4e6cd5b225ec768dfc00185072 } from '@/components/admin/number-field'
+import { BadgeCell as BadgeCell_e05f6ac9ede25467f55f09817b54f69f } from '@/components/admin/cells'
 import { default as default_fd74764ae39eafa331c7675092856f1d } from '@/modules/documents/admin/request-quotations'
 import { default as default_a5d8806efdc56df6c24d184bfb005004 } from '@/components/admin/audit-trail'
-import { BadgeCell as BadgeCell_e05f6ac9ede25467f55f09817b54f69f } from '@/components/admin/cells'
+import { default as default_6b35a335f48a8e2e1b7f149b4549329e } from '@/components/admin/status-tabs'
 import { default as default_ea5aef8a9a35ef0cb8d9e90a51957cfa } from '@/components/admin/empty-list'
 import { CategoryCell as CategoryCell_e9bb4d3db189c5a7e4368b00cc26eb11 } from '@/modules/catalogue/admin/product-cells'
 import { PhotoCell as PhotoCell_e9bb4d3db189c5a7e4368b00cc26eb11 } from '@/modules/catalogue/admin/product-cells'
@@ -53,6 +54,7 @@ import { PreorderCell as PreorderCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@
 import { default as default_e878a1c008f508aed324fd57a4961771 } from '@/components/admin/weekday-bulk'
 import { default as default_e56de72a9d317b87d590db40d7733bc6 } from '@/modules/sales/admin/postcode-paste'
 import { default as default_5ae1914325a0ee108216435b317303b1 } from '@/modules/events/admin/booking-panel'
+import { default as default_d7d5ef2f5280292ebc8cb7d4f5d043cc } from '@/modules/events/admin/booking-tabs'
 import { default as default_e7547a6d616d19573a629279234f5127 } from '@/modules/documents/admin/quotation-panel'
 import { TotalCell as TotalCell_d6358e374739dc2aac8672e72d6cc454 } from '@/modules/documents/admin/cells'
 import { default as default_a2f0eccb7507197ce791108816851322 } from '@/components/admin/nav'
@@ -65,6 +67,7 @@ import { default as default_53edbba2deecf14dde23d037e9db9140 } from '@/component
 import { default as default_6bcd1c2d18bda2e25f236d9cca5fccfd } from '@/components/admin/password-toggle'
 import { default as default_7215358aebef2f123662c81dc8a03dd2 } from '@/components/admin/dashboard'
 import { default as default_47394fc398fbb6257bef21c65839433a } from '@/components/admin/import-export'
+import { default as default_3ee16c206b08a67611daf03ad27771c6 } from '@/modules/events/admin/events-board'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 
@@ -100,9 +103,10 @@ export const importMap = {
   "@/components/admin/row-label#default": default_fe401d340ce00cc899cf727d6137f487,
   "@/components/admin/number-field#NumberCell": NumberCell_f2a5de4e6cd5b225ec768dfc00185072,
   "@/components/admin/number-field#default": default_f2a5de4e6cd5b225ec768dfc00185072,
+  "@/components/admin/cells#BadgeCell": BadgeCell_e05f6ac9ede25467f55f09817b54f69f,
   "@/modules/documents/admin/request-quotations#default": default_fd74764ae39eafa331c7675092856f1d,
   "@/components/admin/audit-trail#default": default_a5d8806efdc56df6c24d184bfb005004,
-  "@/components/admin/cells#BadgeCell": BadgeCell_e05f6ac9ede25467f55f09817b54f69f,
+  "@/components/admin/status-tabs#default": default_6b35a335f48a8e2e1b7f149b4549329e,
   "@/components/admin/empty-list#default": default_ea5aef8a9a35ef0cb8d9e90a51957cfa,
   "@/modules/catalogue/admin/product-cells#CategoryCell": CategoryCell_e9bb4d3db189c5a7e4368b00cc26eb11,
   "@/modules/catalogue/admin/product-cells#PhotoCell": PhotoCell_e9bb4d3db189c5a7e4368b00cc26eb11,
@@ -125,6 +129,7 @@ export const importMap = {
   "@/components/admin/weekday-bulk#default": default_e878a1c008f508aed324fd57a4961771,
   "@/modules/sales/admin/postcode-paste#default": default_e56de72a9d317b87d590db40d7733bc6,
   "@/modules/events/admin/booking-panel#default": default_5ae1914325a0ee108216435b317303b1,
+  "@/modules/events/admin/booking-tabs#default": default_d7d5ef2f5280292ebc8cb7d4f5d043cc,
   "@/modules/documents/admin/quotation-panel#default": default_e7547a6d616d19573a629279234f5127,
   "@/modules/documents/admin/cells#TotalCell": TotalCell_d6358e374739dc2aac8672e72d6cc454,
   "@/components/admin/nav#default": default_a2f0eccb7507197ce791108816851322,
@@ -137,6 +142,7 @@ export const importMap = {
   "@/components/admin/password-toggle#default": default_6bcd1c2d18bda2e25f236d9cca5fccfd,
   "@/components/admin/dashboard#default": default_7215358aebef2f123662c81dc8a03dd2,
   "@/components/admin/import-export#default": default_47394fc398fbb6257bef21c65839433a,
+  "@/modules/events/admin/events-board#default": default_3ee16c206b08a67611daf03ad27771c6,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24
 }

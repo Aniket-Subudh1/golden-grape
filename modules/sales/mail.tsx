@@ -11,7 +11,7 @@ import { type ReservationMail, type ReservationMailKind, ReservationCustomer, Re
 import { dueOf } from '@/modules/payments/service';
 import { formatIban, getSettingsPrivate } from '@/modules/settings/service';
 import type { Order, Reservation } from '@/payload-types';
-import { orderToken } from './service';
+import { orderBankAccount, orderToken } from './service';
 
 // Order and reservation e-mails (M2.3 T7). The customer's copy is in the order's language; the staff copy in French,
 // to MAIL_STAFF_TO. Callers send them in after(), only when the transaction actually changed something.
@@ -27,6 +27,7 @@ async function orderMail(order: Order, locale: Locale, url: string): Promise<Ord
   const totals = order.totals ?? { subtotalCents: 0, vatCents: 0, totalCents: 0 };
   const mode = (order.mode ?? 'pickup') as keyof typeof t.modes;
   const awaiting = order.status === 'awaiting_payment';
+  const account = orderBankAccount(order, business.bankAccounts);
   const a = order.address;
   return {
     number: order.number ?? '',
@@ -44,12 +45,14 @@ async function orderMail(order: Order, locale: Locale, url: string): Promise<Ord
     vat: (totals.vatBreakdown ?? []).map((v) => ({ label: interpolate(t.labels.vat, { rate: percent(v.rateBp ?? 0, locale) }), amount: money(v.vatCents ?? 0) })),
     payment: t.payments[order.payment?.method ?? 'onsite'],
     awaiting,
-    // GG-014: the reference and what is still due always; the bank details only when a real IBAN is saved.
+    // GG-014: the reference and what is still due always; the bank details only when an account is configured.
+    // Only this order's account (APPLUX, 12 Nov), never the list.
     transfer: awaiting
       ? {
-          beneficiary: business.legalName || business.name,
-          iban: business.iban ? formatIban(business.iban) : null,
-          bic: business.bic,
+          beneficiary: account?.holder || business.legalName || business.name,
+          bank: account?.bankName,
+          iban: account?.iban ? formatIban(account.iban) : null,
+          bic: account?.bic,
           reference: order.number ?? '',
           amount: money(dueOf({ totalCents: totals.totalCents, paidCents: order.payment?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 })),
         }
@@ -67,8 +70,11 @@ async function send(to: string | undefined, subject: string, html: Promise<{ htm
   await sendMail({ to, subject, replyTo, ...(await html) });
 }
 
-/** A new order: confirmation to the customer (with transfer details when relevant) and a copy to staff. */
-export async function mailOrderPlaced(order: Order) {
+/**
+ * A new order: confirmation to the customer (with transfer details when relevant) and a copy to staff. `staff: false`:
+ * the customer's copy again, after staff chose another bank account for the transfer.
+ */
+export async function mailOrderPlaced(order: Order, { staff: toStaff = true }: { staff?: boolean } = {}) {
   const locale = localeOf(order);
   const ctx = await mailContext(locale);
   const shared = { business: ctx.business, logoUrl: ctx.logoUrl };
@@ -76,7 +82,7 @@ export async function mailOrderPlaced(order: Order) {
   const vars = { number: customer.number, name: customer.name };
   await Promise.all([
     send(customer.email, interpolate(ctx.customerT.order.subject, vars), render(<OrderReceived t={ctx.customerT} data={customer} {...shared} />)),
-    send(ctx.staffTo, interpolate(ctx.staffT.order.staffSubject, vars), render(<OrderStaff t={ctx.staffT} data={staff} {...shared} />), customer.email),
+    ...(toStaff ? [send(ctx.staffTo, interpolate(ctx.staffT.order.staffSubject, vars), render(<OrderStaff t={ctx.staffT} data={staff} {...shared} />), customer.email)] : []),
   ]);
 }
 

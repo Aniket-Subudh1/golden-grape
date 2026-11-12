@@ -28,6 +28,7 @@ import CreateButton from './create-button';
 import { actionCounts, type CounterKey, listUrl } from './alerts';
 import { adminText, type AdminLanguage } from './text';
 import { eventDate, toLocal, today, TZ } from '@/lib/time';
+import { transferAccount } from '@/modules/settings/service';
 
 // The admin home (Payload `admin.components.views.dashboard`), laid out like the Ancora dashboard: title row, quick
 // actions, the tiles of what waits (sales staff), the key figures (managers), then what needs attention and the
@@ -170,7 +171,7 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
     ...(legalDrafts?.totalDocs
       ? [{ key: 'legal', href: '/admin/collections/legal', title: t.home.legalTitle(legalDrafts.totalDocs), detail: t.home.legalText, badge: t.home.draftBadge, tone: 'warning' as const }]
       : []),
-    ...(settings && !settings.business.iban
+    ...(settings && !transferAccount(settings.business.bankAccounts)
       ? [{ key: 'iban', href: '/admin/globals/BusinessSettings', title: t.home.ibanTitle, detail: t.home.ibanText, badge: t.home.settingsBadge, tone: 'danger' as const }]
       : []),
     ...(settings && !settings.business.facebook

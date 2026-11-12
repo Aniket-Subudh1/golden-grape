@@ -322,7 +322,8 @@
       "perUnit": "{{price}} per unit",
       "add": "Add to bag",
       "added": "Added to bag",
-      "left": "Only {{count}} left"
+      "left": "Only {{count}} left",
+      "inStock": "In stock"
     },
     "related": {
       "eyebrow": "From the same cellar",
@@ -346,7 +347,7 @@
     },
     "add": "Add",
     "allergensLabel": "Allergens",
-    "soldOut": "Unavailable",
+    "soldOut": "Sold out",
     "empty": "The counter menu is coming very soon.",
     "allergens": {
       "gluten": "Gluten",
@@ -643,6 +644,7 @@
       "vat": "incl. VAT {{rate}} %",
       "payment": "Payment",
       "beneficiary": "Beneficiary",
+      "bank": "Bank",
       "iban": "IBAN",
       "bic": "BIC",
       "reference": "Reference",
@@ -650,7 +652,8 @@
       "status": "Status",
       "event": "Event",
       "amountPaid": "Amount paid",
-      "paidOn": "Paid on"
+      "paidOn": "Paid on",
+      "balance": "Balance due"
     },
     "reset": {
       "subject": "Choose a new password",
@@ -733,7 +736,10 @@
       "staffSubject": "New booking: {{title}} — {{name}} ({{guests}})",
       "paymentSubject": "Payment received — your booking for {{title}} is confirmed",
       "paymentBody": "We have received your payment: your booking is confirmed. We look forward to seeing you!",
-      "statusConfirmed": "Confirmed"
+      "statusConfirmed": "Confirmed",
+      "statusPending": "Awaiting confirmation",
+      "paymentPartialSubject": "Payment received — your booking for {{title}}",
+      "paymentPartialBody": "We have received your payment, thank you. The balance below is still to be paid."
     },
     "staffBanner": "Internal notification — for the Golden Grape team (do not forward to the customer)",
     "welcome": {
@@ -863,7 +869,7 @@
     "titleTable": "Your table",
     "eyebrowTable": "Reservation",
     "steps": {
-      "mode": "How would you like it?",
+      "mode": "How would you like to receive your order?",
       "when": "When?",
       "guests": "How many guests?",
       "address": "Where should we deliver?",
@@ -943,6 +949,8 @@
     },
     "moreDates": "See more dates",
     "fewerDates": "Fewer dates",
+    "moreTimes": "See more times",
+    "fewerTimes": "Fewer times",
     "address": {
       "hint": "Type your street: we suggest official Luxembourg addresses. You can correct anything.",
       "searching": "Searching…",
@@ -955,6 +963,32 @@
     "noSlots": "Booking online is not possible: no time is available. Call us to book."
   },
   "order": {
+    "next": {
+      "title": "What happens next?",
+      "payDue": "Transfer to make: {{amount}}",
+      "transfer": [
+        "Make a bank transfer of {{amount}} with the reference {{number}}.",
+        "As soon as we receive it, we confirm your order and e-mail you.",
+        "We then prepare it for the time you chose."
+      ],
+      "pickup": [
+        "We prepare your order for the time you chose.",
+        "You get an e-mail as soon as it is ready.",
+        "You pay in the shop when you collect it."
+      ],
+      "delivery": [
+        "We prepare your order for the time you chose.",
+        "You get an e-mail when the delivery leaves."
+      ],
+      "table": [
+        "The House confirms your table by e-mail, usually the same day.",
+        "You pay at the table at the end of your visit."
+      ],
+      "accepted": [
+        "Come at the time you booked: your table is waiting.",
+        "Something came up? Let us know by phone or e-mail."
+      ]
+    },
     "eyebrow": "Order {{number}}",
     "reservationEyebrow": "Reservation {{number}}",
     "thanks": "Thank you, {{name}}",
@@ -1005,6 +1039,7 @@
     "transfer": {
       "title": "Bank transfer details",
       "beneficiary": "Beneficiary",
+      "bank": "Bank",
       "iban": "IBAN",
       "bic": "BIC",
       "reference": "Reference",

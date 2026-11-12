@@ -16,6 +16,7 @@ import { getPayloadClient } from '@/lib/payload';
 import { checkOrderToken, getOrder, getReservation } from '@/modules/sales/service';
 import { dueOf } from '@/modules/payments/service';
 import { formatIban, getSettingsPrivate } from '@/modules/settings/service';
+import { orderBankAccount } from '@/modules/sales/service';
 import type { Order } from '@/payload-types';
 
 type Props = PageProps<'/[locale]/order/[id]'>;
@@ -137,6 +138,8 @@ async function Confirmation({ params, searchParams }: Pick<Props, 'params' | 'se
   const statusName = reservation ? t.reservationStatus[status as keyof typeof t.reservationStatus] : t.status[status as keyof typeof t.status];
   const awaiting = order?.status === 'awaiting_payment';
   const { business } = awaiting ? await getSettingsPrivate() : { business: null };
+  // Only the account chosen for this order (APPLUX, 12 Nov), never the shop's list.
+  const account = order && business ? orderBankAccount(order, business.bankAccounts) : null;
   const name = doc.contact?.name?.split(' ')[0] ?? '';
   const intro = reservation
     ? status === 'accepted'
@@ -157,39 +160,79 @@ async function Confirmation({ params, searchParams }: Pick<Props, 'params' | 'se
           : t.intro.pickup;
   const address = order?.mode === 'delivery' ? order.address : null;
   const money = (c: number | null | undefined) => formatMoney(c ?? 0, locale);
+  const due = order ? dueOf({ totalCents: order.totals?.totalCents ?? 0, paidCents: order.payment?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 }) : 0;
+  // The payment, said beside the status (APPLUX report 4, §6): paid, a transfer to make, or to pay on site.
+  const paymentName =
+    shown?.payment?.status === 'paid' ? t.paid : awaiting ? interpolate(t.next.payDue, { amount: money(due) }) : shown?.payment?.method === 'transfer' ? t.payTransfer : reservation ? t.payTable : t.payOnsite;
+  // What happens next, while something still does.
+  const steps = reservation
+    ? status === 'pending'
+      ? t.next.table
+      : status === 'accepted'
+        ? t.next.accepted
+        : []
+    : awaiting
+      ? t.next.transfer
+      : status === 'pending' || status === 'confirmed'
+        ? order?.mode === 'delivery'
+          ? t.next.delivery
+          : t.next.pickup
+        : [];
 
   return (
     <div className="mx-auto max-w-4xl">
       <header className="text-center">
-        <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-gold/20">
-          <Check className="h-8 w-8 text-gold-deep" />
+        <span className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-gold/20">
+          <Check className="h-5 w-5 text-gold-deep" />
         </span>
-        <p className="eyebrow mt-8 text-gold-deep">{interpolate(reservation ? t.reservationEyebrow : t.eyebrow, { number: doc.number ?? '' })}</p>
-        <h1 className="mt-4 font-serif text-5xl leading-[0.95] tracking-tight md:text-6xl">{interpolate(t.thanks, { name })}</h1>
-        <p className="mx-auto mt-5 max-w-lg text-ink/65">{intro}</p>
-        <span className={cn('mt-6 inline-flex rounded-full px-4 py-1.5 text-[11px] tracking-[0.18em] uppercase', TONE[status] ?? 'bg-champagne')}>{statusName}</span>
-        {doc.contact?.email && <p className="mt-4 text-xs text-ink/50">{interpolate(t.emailSent, { email: doc.contact.email })}</p>}
+        <p className="eyebrow mt-4 text-gold-deep">{interpolate(reservation ? t.reservationEyebrow : t.eyebrow, { number: doc.number ?? '' })}</p>
+        <h1 className="mt-2 font-serif text-3xl leading-tight tracking-tight md:text-4xl">{interpolate(t.thanks, { name })}</h1>
+        <p className="mt-4 flex flex-wrap items-center justify-center gap-2">
+          <span className={cn('inline-flex rounded-full px-4 py-1.5 text-[11px] tracking-[0.18em] uppercase', TONE[status] ?? 'bg-champagne')}>{statusName}</span>
+          {(shown || reservation) && status !== 'cancelled' && status !== 'rejected' && status !== 'refunded' && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-ink/20 px-4 py-1.5 text-[11px] tracking-[0.18em] uppercase">
+              <Landmark className="h-3 w-3 text-gold-deep" /> {paymentName}
+            </span>
+          )}
+        </p>
+        <p className="mx-auto mt-4 max-w-lg text-sm text-ink/65">{intro}</p>
+        {doc.contact?.email && <p className="mt-2 text-xs text-ink/50">{interpolate(t.emailSent, { email: doc.contact.email })}</p>}
       </header>
 
+      {steps.length > 0 && (
+        <section className="mx-auto mt-6 max-w-2xl border border-border/70 bg-champagne/30 p-5">
+          <h2 className="eyebrow mb-3 text-gold-deep">{t.next.title}</h2>
+          <ol className="space-y-2 text-sm">
+            {steps.map((step, i) => (
+              <li key={step} className="flex gap-3">
+                <span className="font-serif text-gold-deep tabular-nums">{i + 1}.</span>
+                <span>{interpolate(step, { amount: money(due), number: doc.number ?? '' })}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
       {awaiting && order && (
-        <section className="mt-12 border border-gold-deep/40 bg-gold/10 p-6 md:p-8">
+        <section className="mt-6 border border-gold-deep/40 bg-gold/10 p-5 md:p-6">
           <p className="eyebrow mb-4 flex items-center gap-2 text-gold-deep">
             <Landmark className="h-3.5 w-3.5" /> {t.transfer.title}
           </p>
-          {/* GG-014: the reference and what is still due always; the bank details only once a real IBAN is saved. */}
-          {!business?.iban && <p className="mb-5 text-sm">{t.transfer.missing}</p>}
+          {/* GG-014: the reference and what is still due always; the bank details only once an account is configured. */}
+          {!account && <p className="mb-5 text-sm">{t.transfer.missing}</p>}
           <dl className="grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
             {(
               [
-                ...(business?.iban
+                ...(account?.iban
                   ? [
-                      [t.transfer.beneficiary, business.legalName || business.name],
-                      [t.transfer.iban, formatIban(business.iban)],
-                      ...(business.bic ? [[t.transfer.bic, business.bic]] : []),
+                      [t.transfer.beneficiary, account.holder || business?.legalName || business?.name],
+                      ...(account.bankName ? [[t.transfer.bank, account.bankName]] : []),
+                      [t.transfer.iban, formatIban(account.iban)],
+                      ...(account.bic ? [[t.transfer.bic, account.bic]] : []),
                     ]
                   : []),
                 [t.transfer.reference, order.number],
-                [t.transfer.amount, money(dueOf({ totalCents: order.totals?.totalCents ?? 0, paidCents: order.payment?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 }))],
+                [t.transfer.amount, money(due)],
               ] as [string, string][]
             ).map(([label, value]) => (
               <div key={label}>
@@ -198,11 +241,11 @@ async function Confirmation({ params, searchParams }: Pick<Props, 'params' | 'se
               </div>
             ))}
           </dl>
-          {business?.iban && <p className="mt-5 text-xs text-ink/60">{t.transfer.note}</p>}
+          {account && <p className="mt-5 text-xs text-ink/60">{t.transfer.note}</p>}
         </section>
       )}
 
-      <div className="mt-12 grid gap-4 md:grid-cols-3">
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
         <Card icon={<Clock className="h-3.5 w-3.5" />} title={t.when}>
           {slotLabel(doc.slot ?? {}, locale)}
         </Card>
@@ -225,18 +268,12 @@ async function Confirmation({ params, searchParams }: Pick<Props, 'params' | 'se
           )}
         </Card>
         <Card icon={<Landmark className="h-3.5 w-3.5" />} title={t.payment}>
-          {shown?.payment?.status === 'paid'
-            ? t.paid
-            : shown?.payment?.method === 'transfer'
-              ? t.payTransfer
-              : reservation
-                ? t.payTable
-                : t.payOnsite}
+          {paymentName}
         </Card>
       </div>
 
       {shown && (shown.lines ?? []).length > 0 && (
-        <section className="mt-12">
+        <section className="mt-8">
           <h2 className="eyebrow mb-4 text-ink/60">{reservation ? t.preorder : t.items}</h2>
           <Lines order={shown} locale={locale} t={dict.checkout} vatIncluded={dict.cart.vatIncluded} />
         </section>
@@ -254,7 +291,7 @@ async function Confirmation({ params, searchParams }: Pick<Props, 'params' | 'se
         />
       )}
 
-      <div className="mt-16 flex flex-wrap justify-center gap-3">
+      <div className="mt-10 flex flex-wrap justify-center gap-3">
         <Button asChild>
           <Link href={localePath(locale, '/shop')}>{t.continue}</Link>
         </Button>
@@ -270,7 +307,7 @@ async function Confirmation({ params, searchParams }: Pick<Props, 'params' | 'se
 
 export default function OrderPage({ params, searchParams }: Props) {
   return (
-    <section className="pt-36 pb-32 md:pt-44">
+    <section className="pt-28 pb-24 md:pt-32">
       <Container>
         <Suspense fallback={<div className="min-h-[60vh]" />}>
           <Confirmation params={params} searchParams={searchParams} />

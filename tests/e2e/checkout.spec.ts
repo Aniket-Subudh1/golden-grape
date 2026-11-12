@@ -63,6 +63,10 @@ test('pickup in French: confirmation page and one e-mail in French', async ({ pa
   await addWine(page, 'fr', fr.shop.buy.add);
   await page.goto('/fr/checkout');
   await pickTime(page);
+  // Confirming too early places nothing: the customer is taken to the first missing field (APPLUX report 4, §2).
+  await page.getByRole('button', { name: fr.checkout.submit }).click();
+  await expect(page.locator('#name')).toBeFocused();
+  await expect(page).toHaveURL(/\/fr\/checkout/);
   await details(page, 'Ana Silva', email);
   await page.getByRole('button', { name: fr.checkout.submit }).click();
   await expect(page).toHaveURL(/\/fr\/order\/[a-f0-9]{24}\?t=/);

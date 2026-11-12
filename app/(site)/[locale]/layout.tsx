@@ -96,7 +96,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
             <SiteFooter locale={locale} t={t} />
           </Suspense>
           <CartSheet locale={locale} t={t.cart} />
-          <FloatingCart locale={locale} t={t.floatingCart} />
+          {/* Reads the path (hidden on the checkout), which is only known at request time. */}
+          <Suspense fallback={null}>
+            <FloatingCart locale={locale} t={t.floatingCart} />
+          </Suspense>
         </CartProvider>
         <CookieConsent t={t.cookies} />
         <Toaster position="top-center" />

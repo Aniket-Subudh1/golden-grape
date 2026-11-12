@@ -7,7 +7,7 @@ import { AddButton } from './add-button';
 
 type Props = { product: ProductCardData; locale: Locale; t: Dictionary['shop']; sizes?: string; priority?: boolean };
 
-/** A shop product (prototype ProductCard): photo 4/5, label, "+" to add one bottle, region, name, price. */
+/** A shop product (prototype ProductCard): photo 4/5, label, "+" to add one bottle (or the sold-out ribbon), region, name, price. */
 export function ProductCard({ product: p, locale, t, sizes, priority }: Props) {
   const tag = p.badge ? (t.tags as Record<string, string>)[p.badge] : undefined;
   return (
@@ -18,7 +18,9 @@ export function ProductCard({ product: p, locale, t, sizes, priority }: Props) {
       tag={tag}
       sizes={sizes ?? '(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw'}
       priority={priority}
-      action={p.variant && <AddButton variant={p.variant} label={interpolate(t.addAria, { name: p.name })} disabled={!p.inStock} />}
+      // Sold out: the ribbon, and no "+" at all (APPLUX report 4, §1).
+      ribbon={p.inStock ? undefined : t.outOfStock}
+      action={p.variant && p.inStock && <AddButton variant={p.variant} label={interpolate(t.addAria, { name: p.name })} />}
     >
       <div className="p-4 md:p-5">
         {p.region && <p className="text-[10px] tracking-[0.22em] text-ink/40 uppercase">{p.region}</p>}
@@ -28,14 +30,13 @@ export function ProductCard({ product: p, locale, t, sizes, priority }: Props) {
             {p.name}
           </Link>
         </h3>
-        <p className="mt-2 flex items-baseline gap-2 text-sm tabular-nums">
+        <p className="mt-2 text-sm tabular-nums">
           {p.priceCents !== null && (
             <span>
               {p.from && <span className="text-ink/50">{t.from} </span>}
               {formatMoney(p.priceCents, locale)}
             </span>
           )}
-          {!p.inStock && <span className="eyebrow text-[9px] text-ink/40">{t.outOfStock}</span>}
         </p>
       </div>
     </MediaCard>

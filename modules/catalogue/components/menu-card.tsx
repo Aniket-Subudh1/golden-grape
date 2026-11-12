@@ -12,7 +12,7 @@ export function MenuCard({ item, locale, t, steps }: Props) {
   const tag = item.badge ? (t.tags as Record<string, string>)[item.badge] : undefined;
   const allergens = (item.allergens ?? []).map((a) => (t.allergens as Record<string, string>)[a] ?? a);
   return (
-    <MediaCard image={item.photo?.src} alt={item.photo?.alt ?? item.name} ratio="4/3" tag={tag} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw">
+    <MediaCard image={item.photo?.src} alt={item.photo?.alt ?? item.name} ratio="4/3" tag={tag} ribbon={item.inStock ? undefined : t.soldOut} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw">
       <div className="flex flex-1 flex-col p-6 md:p-8">
         <div className="flex items-baseline justify-between gap-4">
           <h3 className="font-serif text-2xl font-light md:text-3xl">{item.name}</h3>
@@ -29,7 +29,11 @@ export function MenuCard({ item, locale, t, steps }: Props) {
             {allergens.join(' · ')}
           </p>
         )}
-        <div className="mt-6">{item.variant && <MenuAction variant={item.variant} label={t.add} steps={steps} disabled={!item.inStock} soldOut={t.soldOut} />}</div>
+        {item.variant && item.inStock && (
+          <div className="mt-6">
+            <MenuAction variant={item.variant} label={t.add} steps={steps} />
+          </div>
+        )}
       </div>
     </MediaCard>
   );

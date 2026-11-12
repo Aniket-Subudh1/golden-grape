@@ -10,7 +10,7 @@ import { provider } from '@/modules/payments/provider';
 import { dueOf, type Figures, paymentState, refundableOf } from '@/modules/payments/service';
 import { quoteCart } from '@/modules/promotions/service';
 import { NUMBERING } from '@/modules/settings/globals';
-import { getSettingsPrivate } from '@/modules/settings/service';
+import { activeAccounts, type BankAccount, getSettingsPrivate, transferAccount } from '@/modules/settings/service';
 import type { Customer, Order, Reservation, SlotRule as SlotRuleDoc } from '@/payload-types';
 import type { SlotMode } from './collections';
 import { canTransition, effects as effectsOf, type Effect, type OrderStatus, PAYMENT_CHOICES, type PaymentChoice } from './order-states';
@@ -182,7 +182,7 @@ export async function placeOrder(payload: Payload, input: PlaceOrderInput, { cus
       if (q && input.mode === 'table' && q.lines.some((l) => l.kind !== 'snack')) throw new AppError('VALIDATION', 'notPreorderable', 'lines');
       if (q && zone && deliveryFee(zone, q.subtotalCents - q.discountCents).belowMinimum) throw new AppError('VALIDATION', 'belowMinimum', 'postalCode');
 
-      const { numbering } = await getSettingsPrivate();
+      const { numbering, business } = await getSettingsPrivate();
       const year = Number(today(now).slice(0, 4));
       const slotData = { date: input.date, from: slot.from, to: slot.to };
       const contact = { name: input.name, email: input.email.toLowerCase(), phone: input.phone };
@@ -219,7 +219,8 @@ export async function placeOrder(payload: Payload, input: PlaceOrderInput, { cus
               totalCents: l.totalCents,
             })),
             totals: { subtotalCents: q.subtotalCents, discountCents: q.discountCents, deliveryCents: q.deliveryCents, vatCents: q.vatCents, totalCents: q.totalCents, vatBreakdown: q.vatBreakdown },
-            payment: { provider: 'manual', method: input.payment, status: 'none' },
+            // A transfer order keeps the account its customer is told to pay into: the default one today.
+            payment: { provider: 'manual', method: input.payment, status: 'none', ...(input.payment === 'transfer' ? { bankAccount: accountCopy(transferAccount(business.bankAccounts)) } : {}) },
             locale: input.locale,
             notes: input.notes,
             stockPosted: false,
@@ -399,6 +400,34 @@ async function loadOrder(tx: Tx, id: string) {
 }
 
 const historyRow = (to: string, user?: string, reason?: string) => ({ at: new Date().toISOString(), from: null, to, user, reason });
+
+/** The fields of a bank account an order keeps. */
+const accountCopy = (a: BankAccount | null) => (a ? { holder: a.holder, bankName: a.bankName, iban: a.iban, bic: a.bic } : undefined);
+
+/**
+ * The account an order's customer pays into: the order's own copy, else (orders placed before accounts were kept on
+ * the order, or while none was configured) today's default account. Null when nothing is configured.
+ */
+export const orderBankAccount = (order: Pick<Order, 'payment'>, accounts: BankAccount[] | null | undefined): BankAccount | null =>
+  order.payment?.bankAccount?.iban ? order.payment.bankAccount : transferAccount(accounts);
+
+/**
+ * Staff choose which of the shop's active accounts a transfer order is paid into (APPLUX, 12 Nov). Only while money
+ * is still expected by transfer; the customer's page shows it at once and the caller e-mails the new details.
+ */
+export function setOrderBankAccount(payload: Payload, orderId: string, accountId: string, user: string): Promise<Order> {
+  return withTx(payload, async (tx) => {
+    const order = await loadOrder(tx, orderId);
+    if (order.payment?.method !== 'transfer' || order.status === 'cancelled' || order.status === 'refunded' || dueOf(figuresOf(order)) === 0) throw new AppError('CONFLICT', 'transition', 'status');
+    const { business } = await getSettingsPrivate();
+    const account = activeAccounts(business.bankAccounts).find((a) => a.id === accountId);
+    if (!account) throw new AppError('VALIDATION', 'invalid', 'account');
+    return setOrder(tx, order.id, {
+      payment: { ...order.payment, bankAccount: accountCopy(account) },
+      history: [...(order.history ?? []), historyRow('bank_account', user, [account.holder, account.bankName].filter(Boolean).join(' · '))],
+    });
+  });
+}
 
 export type MoneyInput = { amountCents: number; at: Date; reference?: string; user?: string };
 export type MoneyResult = { order: Order; effects: Effect[] };

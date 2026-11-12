@@ -1,16 +1,17 @@
 import type { UIFieldServerProps } from 'payload';
 import type { ReactNode } from 'react';
 import DecisionBar, { type Decision } from '@/components/admin/decision-bar';
-import { DocCard, DocFacts, DocGrid, DocHead, DocHistory, DocPanel } from '@/components/admin/doc-panel';
+import { DocBadge, DocCard, DocFacts, DocFigures, DocGrid, DocHead, DocHistory, DocPanel } from '@/components/admin/doc-panel';
 import { hasRole } from '@/lib/access';
 import { LOCALE_NAMES, type Locale } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { isBeforeSlot, slotLabel, today } from '@/lib/time';
 import type { Order } from '@/payload-types';
 import { dueOf, paymentsOf, refundableOf } from '@/modules/payments/service';
-import { recordOrderPayment, recordOrderRefund, requestOrderRefund, returnOrderItems, transitionOrder } from '../actions';
-import { returnableLines } from '../service';
-import { MODE_LABELS, ORDER_STATUS_LABELS, ORDER_STATUS_TONES, PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS } from '../collections';
+import { activeAccounts, type BankAccount, formatIban } from '@/modules/settings/service';
+import { changeOrderBankAccount, recordOrderPayment, recordOrderRefund, requestOrderRefund, returnOrderItems, transitionOrder } from '../actions';
+import { orderBankAccount, returnableLines } from '../service';
+import { MODE_LABELS, ORDER_STATUS_LABELS, ORDER_STATUS_TONES, PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS, PAYMENT_STATUS_TONES, type PaymentStatus, RESERVATION_STATUS_LABELS, RESERVATION_STATUS_TONES } from '../collections';
 import { ORDER_FLOW, type OrderStatus } from '../order-states';
 import { langOf, salesText } from './text';
 
@@ -28,7 +29,7 @@ const euros = (cents: number) => (cents / 100).toFixed(2).replace('.', ',');
  */
 type Returnable = Awaited<ReturnType<typeof returnableLines>>;
 
-function decisionsFor(order: Order, t: ReturnType<typeof salesText>, returnable: Returnable): Decision[] {
+function decisionsFor(order: Order, t: ReturnType<typeof salesText>, returnable: Returnable, accounts: BankAccount[]): Decision[] {
   const from = (order.status ?? 'pending') as OrderStatus;
   const moves: Decision[] = (ORDER_FLOW[from] as readonly OrderStatus[])
     .filter((to) => to !== 'refunded')
@@ -57,6 +58,17 @@ function decisionsFor(order: Order, t: ReturnType<typeof salesText>, returnable:
         { name: 'at', label: m.date, kind: 'date', value: day, max: day, required: true },
         { name: 'reference', label: m.bankRef, kind: 'text' },
       ],
+    });
+  }
+  // Another of the shop's accounts for this transfer (APPLUX, 12 Nov): offered while money is expected and there is a choice.
+  const current = order.payment?.bankAccount?.iban;
+  const others = accounts.filter((a) => a.iban !== current);
+  if (open && dueOf(f) > 0 && order.payment?.method === 'transfer' && others.length > 0) {
+    money.push({
+      to: 'bank_account',
+      ...t.bank,
+      action: changeOrderBankAccount,
+      fields: [{ name: 'account', label: t.bank.account, kind: 'select', value: others[0].id ?? '', options: others.map((a) => ({ value: a.id ?? '', label: [a.holder, a.bankName, formatIban(a.iban ?? '')].filter(Boolean).join(' · ') })) }],
     });
   }
   if (f.refundDueCents > 0) {
@@ -112,7 +124,8 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
   const money = (cents: number | null | undefined) => formatMoney(cents ?? 0, lang);
   const status = (order.status ?? 'pending') as OrderStatus;
 
-  const [reservation, staff, customer, payments] = await Promise.all([
+  const [settings, reservation, staff, customer, payments] = await Promise.all([
+    payload.findGlobal({ slug: 'BusinessSettings', depth: 0, overrideAccess: true }),
     order.mode === 'table'
       ? payload.find({ collection: 'reservations', where: { preorder: { equals: order.id } }, limit: 1, depth: 0, overrideAccess: true }).then((r) => r.docs[0] ?? null)
       : null,
@@ -126,18 +139,78 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
   const staffName = new Map(staff.docs.map((u) => [u.id, u.name]));
   const when = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Luxembourg' });
   const returnable = order.status === 'completed' || order.status === 'refunded' ? await returnableLines(payload, order) : [];
-  const decisions = reservation || !hasRole(user, ['sales']) ? [] : decisionsFor(order, t, returnable);
+  const account = order.payment?.method === 'transfer' ? orderBankAccount(order, settings.business?.bankAccounts) : null;
+  const decisions = reservation || !hasRole(user, ['sales']) ? [] : decisionsFor(order, t, returnable, activeAccounts(settings.business?.bankAccounts));
   // When the order was made ready, if it was (kept after handover too: the history shows the whole story).
   const readyAt = [...(order.history ?? [])].reverse().find((h) => h.to === 'ready')?.at ?? null;
   const totals = order.totals;
   const address = order.address;
+  const payStatus = (pay?.status ?? 'none') as PaymentStatus;
+  const closed = status === 'cancelled' || status === 'refunded';
+  // What staff should do now, in one sentence (APPLUX report 4, §3): a transfer to wait for, an order to prepare,
+  // an order waiting for its customer are three different situations.
+  const next = reservation
+    ? null
+    : pay?.refundDueCents
+      ? t.next.refund(money(pay.refundDueCents))
+      : status === 'pending'
+        ? t.next.pending
+        : status === 'awaiting_payment'
+          ? t.next.awaiting(money(due), order.number ?? '')
+          : status === 'confirmed'
+            ? order.mode === 'delivery'
+              ? t.next.prepareDelivery
+              : t.next.prepare
+            : status === 'ready'
+              ? t.next.ready
+              : status === 'out_for_delivery'
+                ? t.next.delivering
+                : null;
 
   return (
     <DocPanel>
       <DocHead
-        badge={<span className={`gg-badge gg-badge--${ORDER_STATUS_TONES[status]}`}>{ORDER_STATUS_LABELS[status][lang]}</span>}
-        title={`${MODE_LABELS[order.mode ?? 'pickup'][lang]} · ${slotLabel(order.slot ?? {}, lang)}`}
-        sub={`${order.contact?.name ?? ''} · ${money(totals?.totalCents)}`}
+        badge={
+          <>
+            <DocBadge label={t.orderState} tone={ORDER_STATUS_TONES[status]}>
+              {ORDER_STATUS_LABELS[status][lang]}
+            </DocBadge>
+            {payStatus !== 'none' && (
+              <DocBadge label={t.payment} tone={PAYMENT_STATUS_TONES[payStatus]}>
+                {PAYMENT_STATUS_LABELS[payStatus][lang]}
+              </DocBadge>
+            )}
+            {reservation && (
+              <DocBadge label={t.reservationState} tone={RESERVATION_STATUS_TONES[reservation.status ?? 'pending']}>
+                {RESERVATION_STATUS_LABELS[reservation.status ?? 'pending'][lang]}
+              </DocBadge>
+            )}
+          </>
+        }
+        title={`${order.number ?? ''} · ${MODE_LABELS[order.mode ?? 'pickup'][lang]} · ${slotLabel(order.slot ?? {}, lang)}`}
+        sub={order.contact?.name ?? ''}
+        figures={
+          <DocFigures
+            items={[
+              { label: t.toPay, value: money(totals?.totalCents) },
+              { label: t.money.paid, value: money(pay?.paidCents), tone: (pay?.paidCents ?? 0) > 0 ? 'ok' : undefined },
+              { label: t.money.due, value: money(closed ? 0 : due), tone: due > 0 && !closed ? 'due' : undefined },
+              ...(pay?.refundedCents ? [{ label: t.money.refunded, value: money(pay.refundedCents) }] : []),
+              ...(pay?.refundDueCents ? [{ label: t.money.refundDue, value: money(pay.refundDueCents), tone: 'alert' as const }] : []),
+            ]}
+          />
+        }
+        next={
+          next && (
+            <>
+              <strong>{t.nextStep}</strong>
+              <span>
+                {next}
+                {(status === 'ready' || status === 'out_for_delivery') && due > 0 ? ` ${t.next.collect(money(due))}` : ''}
+              </span>
+            </>
+          )
+        }
       >
         {reservation ? (
           <div className="gg-decide gg-decide--note">
@@ -190,7 +263,12 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
               ...(pay?.refundDueCents
                 ? [[t.money.refundDue, <b key="refund" className="gg-doc__alert">{`${money(pay.refundDueCents)}${pay.refundReason ? ` — ${pay.refundReason}` : ''}`}</b>] as [string, ReactNode]]
                 : []),
-              ...(order.payment?.method === 'transfer' ? [[t.reference, order.number] as [string, ReactNode]] : []),
+              ...(order.payment?.method === 'transfer'
+                ? ([
+                    [t.reference, order.number],
+                    [t.bank.title, account?.iban ? `${[account.holder, account.bankName].filter(Boolean).join(' · ')} — ${formatIban(account.iban)}` : <span key="none" className="gg-doc__alert">{t.bank.none}</span>],
+                  ] as [string, ReactNode][])
+                : []),
             ]}
           />
         </DocCard>
@@ -279,7 +357,7 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
           </DocCard>
         )}
 
-        <DocCard title={t.history} wide>
+        <DocCard title={t.activity} wide>
           <DocHistory
             empty={t.noHistory}
             rows={[

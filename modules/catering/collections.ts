@@ -1,8 +1,10 @@
 import { type CollectionBeforeChangeHook, type CollectionConfig, ValidationError } from 'payload';
 import { hiddenUnless, isStaff, none, publicRead } from '@/lib/access';
-import { addButton, l, say, scaledNumber } from '@/lib/admin';
+import { addButton, badgeCell, l, say, scaledNumber, statusTabs } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { revalidateTagHook } from '@/lib/revalidate';
+
+export const REQUEST_TONES = { new: 'warning', contacted: 'info', quoted: 'info', accepted: 'success', declined: 'danger' } as const;
 
 /** Request statuses with their everyday names (also shown on the dashboard). */
 export const REQUEST_STATUS = [
@@ -133,6 +135,18 @@ export const cateringRequests: CollectionConfig = {
       'Anfragen von der Catering-Seite. Ändern Sie den Status, wenn Sie antworten.',
       'Pedidos enviados a partir da página Catering. Mude o estado quando responder.',
     ),
+    // Stage tabs instead of the filter builder (APPLUX report 4, §7).
+    components: {
+      beforeListTable: [
+        statusTabs('cateringRequests', [
+          { label: l('Nouvelles', 'New', 'Neu', 'Novos'), statuses: ['new'], urgent: true },
+          { label: l('En cours', 'In progress', 'In Bearbeitung', 'Em curso'), statuses: ['contacted', 'quoted'] },
+          { label: l('Acceptées', 'Accepted', 'Angenommen', 'Aceites'), statuses: ['accepted'] },
+          { label: l('Refusées', 'Declined', 'Abgelehnt', 'Recusados'), statuses: ['declined'] },
+          { label: l('Toutes', 'All', 'Alle', 'Todos') },
+        ]),
+      ],
+    },
   },
   access: { read: isStaff('sales'), create: none, update: isStaff('sales'), delete: isStaff('admin') },
   hooks: { beforeChange: [quotedOnlyBySending] },
@@ -150,7 +164,8 @@ export const cateringRequests: CollectionConfig = {
           index: true,
           label: l('Statut', 'Status', 'Status', 'Estado'),
           options: REQUEST_STATUS,
-          admin: { width: '50%', isClearable: false },
+          // One colour code everywhere (APPLUX report 4, §7): amber waits, blue in progress, green done, red refused.
+          admin: { width: '50%', isClearable: false, components: badgeCell(REQUEST_TONES) },
         },
       ],
     },

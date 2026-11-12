@@ -22,7 +22,8 @@ function namesOf(fields: Field[], lang: string, prefix = '', out = new Map<strin
   for (const f of fields) {
     if ('fields' in f && (f.type === 'row' || f.type === 'collapsible')) namesOf(f.fields, lang, prefix, out);
     else if (f.type === 'tabs') for (const tab of f.tabs) namesOf(tab.fields, lang, 'name' in tab && tab.name ? `${prefix}${tab.name}.` : prefix, out);
-    else if (f.type === 'group' && 'name' in f) namesOf(f.fields, lang, `${prefix}${f.name}.`, out);
+    // Rows of a list are named like a group's fields ("payments.amountCents": a booking's payment lines).
+    else if ((f.type === 'group' || f.type === 'array') && 'name' in f) namesOf(f.fields, lang, `${prefix}${f.name}.`, out);
     else if ('name' in f) {
       const options = new Map<string, string>();
       if ('options' in f && Array.isArray(f.options)) for (const o of f.options) if (typeof o === 'object') options.set(String(o.value), say(o.label, lang));

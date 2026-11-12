@@ -13,7 +13,7 @@ import { SLOT_MODES } from './collections';
 import { mailOrderPlaced, mailOrderStatus, mailReservation } from './mail';
 import { ORDER_STATUSES } from './order-states';
 import { transitionReservation } from './reservations';
-import { getOrder, getReservation, type MoneyResult, returnItems, orderToken, placeOrder, recordPayment, recordRefund, requestRefund, slotCalendar, transition, zoneFor } from './service';
+import { getOrder, getReservation, type MoneyResult, returnItems, orderToken, placeOrder, recordPayment, recordRefund, requestRefund, setOrderBankAccount, slotCalendar, transition, zoneFor } from './service';
 import { deliveryFee } from './zones';
 
 // Checkout (public) and order / reservation decisions (staff). Error messages are dictionary keys (`form.fields.*`).
@@ -145,6 +145,15 @@ export const recordOrderPayment = action(
     return { status: result.order.status };
   },
 );
+
+/** Another of the shop's bank accounts for a transfer order: the customer gets the order e-mail again with its details. */
+export const changeOrderBankAccount = action(z.object({ order: z.string().min(1), account: z.string().min(1) }), { roles: ['sales'] }, async ({ order, account }, { payload, user }) => {
+  const updated = await setOrderBankAccount(payload, order, account, user.id);
+  const chosen = updated.payment?.bankAccount;
+  await audit(payload, { user: user.id, action: 'order.bankAccount', collection: 'orders', id: order, ref: updated.number, reason: [chosen?.holder, chosen?.bankName].filter(Boolean).join(' · ') });
+  after(() => mailOrderPlaced(updated, { staff: false }).catch(logMail('order bank account')));
+  return { status: updated.status };
+});
 
 /** A refund decided (amount and reason); nothing is sent yet. */
 export const requestOrderRefund = action(

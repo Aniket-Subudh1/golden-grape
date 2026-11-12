@@ -103,11 +103,38 @@ export const events: CollectionConfig = {
   ],
 };
 
+/**
+ * A booking's payment, apart from its status (APPLUX report 4, §4): a booking can be confirmed while only part of
+ * it is paid. Computed from its payment rows by `bookingPaymentStatus` (service.ts).
+ */
+export const BOOKING_PAYMENT_STATUS = {
+  free: l('Gratuit', 'Free', 'Kostenlos', 'Grátis'),
+  pending: l('Non payé', 'Unpaid', 'Unbezahlt', 'Não pago'),
+  partial: l('Partiellement payé', 'Partially paid', 'Teilweise bezahlt', 'Parcialmente pago'),
+  paid: l('Payé', 'Paid', 'Bezahlt', 'Pago'),
+  partially_refunded: l('Partiellement remboursé', 'Partially refunded', 'Teilweise erstattet', 'Parcialmente reembolsado'),
+  refunded: l('Remboursé', 'Refunded', 'Erstattet', 'Reembolsado'),
+};
+export type BookingPaymentStatus = keyof typeof BOOKING_PAYMENT_STATUS;
+export const BOOKING_PAYMENT_TONES = { free: 'neutral', pending: 'warning', partial: 'warning', paid: 'success', partially_refunded: 'neutral', refunded: 'neutral' } as const;
+export const BOOKING_STATUS_TONES = { pending: 'warning', confirmed: 'success', cancelled: 'danger' } as const;
+
 export const BOOKING_STATUS = {
   pending: l('À confirmer', 'To confirm', 'Zu bestätigen', 'Por confirmar'),
   confirmed: l('Confirmée', 'Confirmed', 'Bestätigt', 'Confirmada'),
   cancelled: l('Annulée', 'Cancelled', 'Storniert', 'Cancelada'),
 };
+
+const BOOKINGS_EMPTY = emptyList({
+      icon: 'bookings',
+      title: l('Aucune réservation d’événement', 'No event bookings yet', 'Noch keine Buchungen', 'Ainda sem reservas de eventos'),
+      text: l(
+        'Quand un client réserve des places pour un événement, la réservation apparaît ici.',
+        'When a customer books seats for an event, the booking appears here.',
+        'Wenn ein Kunde Plätze für eine Veranstaltung bucht, erscheint die Buchung hier.',
+        'Quando um cliente reserva lugares para um evento, a reserva aparece aqui.',
+      ),
+    });
 
 // Written only by bookEvent and the staff booking actions (service.ts), so `events.booked` always matches.
 export const eventBookings: CollectionConfig = {
@@ -119,25 +146,17 @@ export const eventBookings: CollectionConfig = {
   admin: {
     // APPLUX audit 10 Nov, §15: a readable title ("Noite de Fado · Hans Müller (2 places)") instead of the record id.
     useAsTitle: 'label',
-    defaultColumns: ['label', 'guests', 'status', 'createdAt'],
+    defaultColumns: ['label', 'guests', 'status', 'paymentStatus', 'paidCents', 'amountCents', 'createdAt'],
     hidden: hiddenUnless('sales'),
     listSearchableFields: ['label', 'contact.name', 'contact.email', 'contact.phone'],
     description: l(
-      'Les places réservées depuis la page Événements. Les événements payants se règlent sur place.',
-      'Seats booked from the Events page. Paid events are paid on site.',
-      'Auf der Veranstaltungsseite gebuchte Plätze. Kostenpflichtige Veranstaltungen werden vor Ort bezahlt.',
-      'Lugares reservados na página Eventos. Os eventos pagos são pagos no local.',
+      'Les places réservées depuis la page Événements. Le statut de la réservation et son paiement se suivent séparément.',
+      'Seats booked from the Events page. A booking’s status and its payment are followed separately.',
+      'Auf der Veranstaltungsseite gebuchte Plätze. Status und Zahlung einer Buchung werden getrennt verfolgt.',
+      'Lugares reservados na página Eventos. O estado da reserva e o seu pagamento são seguidos em separado.',
     ),
-    components: emptyList({
-      icon: 'bookings',
-      title: l('Aucune réservation d’événement', 'No event bookings yet', 'Noch keine Buchungen', 'Ainda sem reservas de eventos'),
-      text: l(
-        'Quand un client réserve des places pour un événement, la réservation apparaît ici.',
-        'When a customer books seats for an event, the booking appears here.',
-        'Wenn ein Kunde Plätze für eine Veranstaltung bucht, erscheint die Buchung hier.',
-        'Quando um cliente reserva lugares para um evento, a reserva aparece aqui.',
-      ),
-    }),
+    // The event's name and tabs first (booking-tabs.tsx), then the first-use state.
+    components: { beforeListTable: ['@/modules/events/admin/booking-tabs', ...BOOKINGS_EMPTY.beforeListTable] },
   },
   access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
   defaultSort: '-createdAt',
@@ -163,19 +182,35 @@ export const eventBookings: CollectionConfig = {
         },
         { name: 'guests', type: 'number', required: true, min: 1, label: l('Personnes', 'Guests', 'Personen', 'Pessoas') },
         { name: 'amountCents', type: 'number', defaultValue: 0, label: l('Total', 'Total', 'Summe', 'Total'), admin: { components: scaledNumber('€') } },
-        // §8: the money received for a paid event, as staff recorded it with "Paiement reçu" (recordBookingPayment).
+        // The money received and paid back, one row each time, as staff recorded it ("Paiement reçu", "Rembourser").
+        // Refund rows are negative, as on orders (payments/balance.ts). Written only by the booking service.
         {
-          name: 'payment',
-          type: 'group',
-          label: l('Paiement', 'Payment', 'Zahlung', 'Pagamento'),
+          name: 'payments',
+          type: 'array',
+          label: l('Paiements', 'Payments', 'Zahlungen', 'Pagamentos'),
           admin: { disableListColumn: true },
           fields: [
-            { name: 'amountCents', type: 'number', label: l('Montant reçu', 'Amount received', 'Erhaltener Betrag', 'Montante recebido'), admin: { components: scaledNumber('€') } },
-            { name: 'at', type: 'date', label: l('Reçu le', 'Received on', 'Erhalten am', 'Recebido em') },
-            { name: 'method', type: 'select', options: (Object.keys(PAYMENT_METHOD_LABELS) as (keyof typeof PAYMENT_METHOD_LABELS)[]).map((value) => ({ value, label: PAYMENT_METHOD_LABELS[value] })), label: l('Moyen', 'Method', 'Art', 'Meio') },
+            { name: 'kind', type: 'select', required: true, options: ['charge', 'refund'] },
+            // The labels are what the booking's history prints for each payment line (audit-trail.tsx).
+            { name: 'amountCents', type: 'number', required: true, label: l('Montant', 'Amount', 'Betrag', 'Montante') },
+            { name: 'at', type: 'date', label: l('Date', 'Date', 'Datum', 'Data') },
+            { name: 'method', type: 'select', label: l('Moyen', 'Method', 'Art', 'Meio'), options: (Object.keys(PAYMENT_METHOD_LABELS) as (keyof typeof PAYMENT_METHOD_LABELS)[]).map((value) => ({ value, label: PAYMENT_METHOD_LABELS[value] })) },
             { name: 'reference', type: 'text', label: l('Référence', 'Reference', 'Referenz', 'Referência') },
-            { name: 'user', type: 'relationship', relationTo: 'users', label: l('Enregistré par', 'Recorded by', 'Erfasst von', 'Registado por') },
+            { name: 'reason', type: 'text' },
+            { name: 'user', type: 'relationship', relationTo: 'users' },
+            { name: 'notedAt', type: 'date' },
           ],
+        },
+        // Kept equal to the sums of the rows above, so lists and the events board read them without loading the rows.
+        { name: 'paidCents', type: 'number', defaultValue: 0, label: l('Reçu', 'Received', 'Erhalten', 'Recebido'), admin: { components: scaledNumber('€') } },
+        { name: 'refundedCents', type: 'number', defaultValue: 0, label: l('Remboursé', 'Refunded', 'Erstattet', 'Reembolsado'), admin: { components: scaledNumber('€') } },
+        {
+          name: 'paymentStatus',
+          type: 'select',
+          index: true,
+          label: l('Paiement', 'Payment', 'Zahlung', 'Pagamento'),
+          options: (Object.keys(BOOKING_PAYMENT_STATUS) as BookingPaymentStatus[]).map((value) => ({ value, label: BOOKING_PAYMENT_STATUS[value] })),
+          admin: { components: badgeCell(BOOKING_PAYMENT_TONES) },
         },
         {
           name: 'status',
@@ -185,7 +220,7 @@ export const eventBookings: CollectionConfig = {
           index: true,
           label: l('Statut', 'Status', 'Status', 'Estado'),
           options: (Object.keys(BOOKING_STATUS) as (keyof typeof BOOKING_STATUS)[]).map((value) => ({ value, label: BOOKING_STATUS[value] })),
-          admin: { components: badgeCell({ pending: 'warning', confirmed: 'success', cancelled: 'danger' }) },
+          admin: { components: badgeCell(BOOKING_STATUS_TONES) },
         },
         { name: 'notes', type: 'textarea', label: l('Message du client', 'Customer’s message', 'Nachricht des Kunden', 'Mensagem do cliente') },
         {

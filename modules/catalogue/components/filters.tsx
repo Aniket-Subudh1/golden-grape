@@ -31,7 +31,7 @@ type Props = {
   t: FilterText;
 };
 
-const select = 'h-9 w-full border-b border-border bg-transparent text-sm outline-none focus:border-gold-deep';
+const select = 'border-b border-border bg-transparent text-sm outline-none focus:border-gold-deep';
 
 /**
  * The shop's sticky filter bar (prototype shop.tsx): category chips, search, and region / colour / price. The URL is
@@ -70,60 +70,66 @@ export function Filters({ categories, regions, colours, t }: Props) {
   const category = params.get('category');
   const active = ['region', 'colour', 'min', 'max'].filter((k) => params.get(k)).length;
 
-  const fields: ReactNode = (
-    <>
-      <label className="block">
-        <span className="eyebrow text-ink/50 mb-1 block">{t.region}</span>
-        <select
-          className={select}
-          value={params.get('region') ?? ''}
-          onChange={(e) => replace({ region: e.target.value || null })}
-        >
-          <option value="">{t.any}</option>
-          {regions.map((r) => (
-            <option key={r} value={r}>
-              {r}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="block">
-        <span className="eyebrow text-ink/50 mb-1 block">{t.colour}</span>
-        <select
-          className={select}
-          value={params.get('colour') ?? ''}
-          onChange={(e) => replace({ colour: e.target.value || null })}
-        >
-          <option value="">{t.any}</option>
-          {colours.map((c) => (
-            <option key={c} value={c}>
-              {t.colours[c] ?? c}
-            </option>
-          ))}
-        </select>
-      </label>
-      <fieldset className="block">
-        <legend className="eyebrow text-ink/50 mb-1 block">{t.price}</legend>
-        <div className="flex items-center gap-2">
-          {(['min', 'max'] as const).map((key) => (
-            <input
-              key={key}
-              type="number"
-              min={0}
-              inputMode="numeric"
-              placeholder={t[key]}
-              aria-label={`${t.price} ${t[key]}`}
-              defaultValue={params.get(key) ?? ''}
-              onBlur={(e) => e.target.value !== (params.get(key) ?? '') && replace({ [key]: e.target.value || null })}
-              onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-              className="border-border placeholder:text-ink/30 focus:border-gold-deep h-9 w-full border-b bg-transparent text-sm tabular-nums outline-none"
-            />
-          ))}
-          <span className="text-ink/40 text-sm">€</span>
-        </div>
-      </fieldset>
-    </>
-  );
+  // Region and colour are offered only when the current category has such values (APPLUX report 4, §1).
+  // `inline`: the desktop bar, one slim row with the label beside each control; stacked in the phone sheet.
+  const fields = (inline: boolean): ReactNode => {
+    const wrap = inline ? 'flex items-center gap-2' : 'block';
+    const caption = cn('eyebrow text-ink/50', inline ? 'shrink-0' : 'mb-1 block');
+    const control = inline ? 'h-8 w-36' : 'h-9 w-full';
+    return (
+      <>
+        {regions.length > 0 && (
+          <label className={wrap}>
+            <span className={caption}>{t.region}</span>
+            <select className={cn(select, control)} value={params.get('region') ?? ''} onChange={(e) => replace({ region: e.target.value || null })}>
+              <option value="">{t.any}</option>
+              {regions.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        {colours.length > 0 && (
+          <label className={wrap}>
+            <span className={caption}>{t.colour}</span>
+            <select className={cn(select, control)} value={params.get('colour') ?? ''} onChange={(e) => replace({ colour: e.target.value || null })}>
+              <option value="">{t.any}</option>
+              {colours.map((c) => (
+                <option key={c} value={c}>
+                  {t.colours[c] ?? c}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        <fieldset className={wrap}>
+          <legend className={cn(caption, inline && 'float-left mr-2 leading-8')}>{t.price}</legend>
+          <div className="flex items-center gap-2">
+            {(['min', 'max'] as const).map((key) => (
+              <input
+                key={key}
+                // Text, not number: digits only, without the browser's up/down arrows.
+                type="text"
+                inputMode="numeric"
+                pattern="\d*"
+                maxLength={5}
+                placeholder={t[key]}
+                aria-label={`${t.price} ${t[key]}`}
+                defaultValue={params.get(key) ?? ''}
+                onInput={(e) => (e.currentTarget.value = e.currentTarget.value.replace(/\D/g, ''))}
+                onBlur={(e) => e.target.value !== (params.get(key) ?? '') && replace({ [key]: e.target.value || null })}
+                onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+                className={cn('border-border placeholder:text-ink/30 focus:border-gold-deep border-b bg-transparent text-sm tabular-nums outline-none', inline ? 'h-8 w-16' : 'h-9 w-full')}
+              />
+            ))}
+            <span className="text-ink/40 text-sm">€</span>
+          </div>
+        </fieldset>
+      </>
+    );
+  };
 
   return (
     <>
@@ -133,7 +139,7 @@ export function Filters({ categories, regions, colours, t }: Props) {
           pending && 'opacity-90',
         )}
       >
-        <div className="mx-auto flex max-w-[1400px] flex-col gap-4 px-5 py-4 md:px-10 lg:flex-row lg:items-center">
+        <div className="mx-auto flex max-w-[1400px] flex-col gap-3 px-5 py-3 md:px-10 lg:flex-row lg:items-center">
           <div className="no-scrollbar -mx-2 flex-1 overflow-x-auto px-2">
             <div className="inline-flex items-center gap-2 md:gap-3">
               {[{ slug: '', name: t.all }, ...categories].map((c) => (
@@ -146,7 +152,7 @@ export function Filters({ categories, regions, colours, t }: Props) {
                   className="text-[11px]"
                 >
                   <Link
-                    href={hrefWith({ category: c.slug || null })}
+                    href={hrefWith({ category: c.slug || null, region: null, colour: null })}
                     scroll={false}
                     aria-current={(category ?? '') === c.slug ? 'page' : undefined}
                   >
@@ -194,13 +200,9 @@ export function Filters({ categories, regions, colours, t }: Props) {
             </Button>
           </div>
         </div>
-        <div className="mx-auto hidden max-w-[1400px] grid-cols-[1fr_1fr_1.2fr_auto] items-end gap-6 px-10 pb-4 lg:grid">
-          {fields}
-          <Link
-            href={pathname + (category ? `?category=${category}` : '')}
-            scroll={false}
-            className={cn('eyebrow text-ink/50 hover:text-gold-deep pb-2', active === 0 && 'invisible')}
-          >
+        <div className="mx-auto hidden max-w-[1400px] flex-wrap items-center gap-x-8 gap-y-2 px-10 pb-3 lg:flex">
+          {fields(true)}
+          <Link href={pathname + (category ? `?category=${category}` : '')} scroll={false} className={cn('eyebrow text-ink/50 hover:text-gold-deep ml-auto', active === 0 && 'invisible')}>
             {t.clear}
           </Link>
         </div>
@@ -210,7 +212,7 @@ export function Filters({ categories, regions, colours, t }: Props) {
         <div className="border-border/60 border-b px-6 pt-6 pb-4">
           <h2 className="font-serif text-3xl font-light">{t.filters}</h2>
         </div>
-        <div className="flex-1 space-y-6 overflow-y-auto px-6 py-6">{fields}</div>
+        <div className="flex-1 space-y-6 overflow-y-auto px-6 py-6">{fields(false)}</div>
         <div className="border-border/60 flex gap-3 border-t px-6 py-5">
           <Button asChild variant="outline" className="min-w-0 flex-1 px-3 tracking-[0.18em]">
             <Link

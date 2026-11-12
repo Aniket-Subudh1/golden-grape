@@ -93,6 +93,7 @@ If a dependency arrives late, the dependent date moves by the same number of day
 | DEP-08 | B2B customer list and price lists (≤30 customers) | Golden Grape | 12 Nov | M3.2 import |
 | DEP-09 | Google Business Profile manager access, Google Cloud billing account and Places API key | Golden Grape | 12 Nov | M3.3 T1–T2 |
 | DEP-10 | wallee test-space credentials **and written authorisation** to start Phase 2 | APPLUX | Phase 2 | M4.1 |
+| DEP-12 | Bank details for transfers: the official account(s) (holder, IBAN, BIC, bank) entered in Réglages › Boutique › Comptes bancaires (production has none, so the confirmation page and e-mail cannot show them), and confirmation that showing them at once is the wanted process | Golden Grape | now | bank-transfer orders (AC-M2.3-08 in production) |
 | DEP-11 | CashMag documentation and test credentials (or middleware decision) | APPLUX | Phase 2 | M4.2 |
 
 ## 7. Decisions

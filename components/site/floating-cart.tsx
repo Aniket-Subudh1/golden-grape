@@ -1,6 +1,7 @@
 'use client';
 
 import { ShoppingBag } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import type { Dictionary, Locale } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { useCart } from '@/modules/webshop/cart';
@@ -8,7 +9,9 @@ import { useCart } from '@/modules/webshop/cart';
 /** The round cart button bottom-right (prototype FloatingCart), shown once something is in the cart. */
 export function FloatingCart({ locale, t }: { locale: Locale; t: Dictionary['floatingCart'] }) {
   const { count, quote, setOpen, open } = useCart();
-  if (count === 0 || open) return null;
+  // Not on the checkout: its summary already shows the basket, and the button would cover "Confirm".
+  const onCheckout = usePathname().endsWith('/checkout');
+  if (count === 0 || open || onCheckout) return null;
   return (
     <button
       type="button"

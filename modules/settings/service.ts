@@ -2,7 +2,7 @@ import { cacheTag } from 'next/cache';
 import { atRequest, getPayloadClient } from '@/lib/payload';
 import type { ModuleName } from './globals';
 
-export { formatIban } from './iban';
+export { activeAccounts, type BankAccount, formatIban, transferAccount } from './iban';
 
 /** Full settings, bank details included: for documents and e-mails only, never sent to a page. */
 export async function getSettingsPrivate() {

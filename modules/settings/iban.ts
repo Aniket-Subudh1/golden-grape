@@ -21,3 +21,20 @@ export const isBic = (value: string) => /^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3
 
 /** "lu280019400644750000" → "LU28 0019 4006 4475 0000", the way customers type it into their bank. */
 export const formatIban = (value: string) => compact(value).replace(/(.{4})(?=.)/g, '$1 ');
+
+export type BankAccount = { id?: string | null; holder?: string | null; bankName?: string | null; iban?: string | null; bic?: string | null; active?: boolean | null; isDefault?: boolean | null };
+
+/** The accounts customers may be asked to pay into: active, with an IBAN. */
+export const activeAccounts = (accounts: BankAccount[] | null | undefined) => (accounts ?? []).filter((a) => a.active !== false && a.iban);
+
+/** The account a new transfer order gets: the default one if it is active, else the first active one, else none. */
+export const transferAccount = (accounts: BankAccount[] | null | undefined) => {
+  const usable = activeAccounts(accounts);
+  return usable.find((a) => a.isDefault) ?? usable[0] ?? null;
+};
+
+/** Exactly one default among the active accounts: the first one ticked, else the first active one. */
+export function withOneDefault<T extends BankAccount>(accounts: T[]): T[] {
+  const chosen = accounts.find((a) => a.isDefault && a.active !== false) ?? accounts.find((a) => a.active !== false);
+  return accounts.map((a) => ({ ...a, isDefault: a === chosen }));
+}

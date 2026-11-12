@@ -129,6 +129,12 @@ export const emptyList = (empty: { icon: string; title: Label; text: Label; acti
   beforeListTable: [{ path: '@/components/admin/empty-list', clientProps: empty }],
 });
 
+/** Stage tabs above a list, each a plain `status` query (components/admin/status-tabs.tsx). */
+export const statusTabs = (collection: string, tabs: { label: Label; statuses?: string[]; sort?: string; urgent?: boolean }[]) => ({
+  path: '@/components/admin/status-tabs',
+  serverProps: { collection, tabs },
+});
+
 /**
  * A field kept for list columns and filters but not drawn in the edit view, where a summary panel (a `ui` field)
  * shows the document instead: orders, reservations and bookings, which only their services write.

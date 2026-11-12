@@ -322,7 +322,8 @@
       "perUnit": "soit {{price}} l’unité",
       "add": "Ajouter au panier",
       "added": "Ajouté au panier",
-      "left": "Plus que {{count}} disponibles"
+      "left": "Plus que {{count}} disponibles",
+      "inStock": "En stock"
     },
     "related": {
       "eyebrow": "Dans la même cave",
@@ -346,7 +347,7 @@
     },
     "add": "Ajouter",
     "allergensLabel": "Allergènes",
-    "soldOut": "Indisponible",
+    "soldOut": "Épuisé",
     "empty": "Le menu du comptoir arrive très bientôt.",
     "allergens": {
       "gluten": "Gluten",
@@ -643,6 +644,7 @@
       "vat": "dont TVA {{rate}} %",
       "payment": "Paiement",
       "beneficiary": "Bénéficiaire",
+      "bank": "Banque",
       "iban": "IBAN",
       "bic": "BIC",
       "reference": "Communication",
@@ -650,7 +652,8 @@
       "status": "Statut",
       "event": "Événement",
       "amountPaid": "Montant payé",
-      "paidOn": "Payé le"
+      "paidOn": "Payé le",
+      "balance": "Reste à payer"
     },
     "reset": {
       "subject": "Choisissez un nouveau mot de passe",
@@ -733,7 +736,10 @@
       "staffSubject": "Nouvelle réservation : {{title}} — {{name}} ({{guests}})",
       "paymentSubject": "Paiement reçu — votre réservation pour {{title}} est confirmée",
       "paymentBody": "Nous avons bien reçu votre paiement : votre réservation est confirmée. Nous vous attendons avec plaisir !",
-      "statusConfirmed": "Confirmée"
+      "statusConfirmed": "Confirmée",
+      "statusPending": "En attente de confirmation",
+      "paymentPartialSubject": "Paiement reçu — votre réservation pour {{title}}",
+      "paymentPartialBody": "Nous avons bien reçu votre paiement, merci. Le solde indiqué ci-dessous reste à régler."
     },
     "staffBanner": "Notification interne — pour l’équipe Golden Grape (ne pas transférer au client)",
     "welcome": {
@@ -863,7 +869,7 @@
     "titleTable": "Votre table",
     "eyebrowTable": "Réservation",
     "steps": {
-      "mode": "Comment la souhaitez-vous ?",
+      "mode": "Comment souhaitez-vous recevoir votre commande ?",
       "when": "Quand ?",
       "guests": "Combien de personnes ?",
       "address": "Où livrer ?",
@@ -943,6 +949,8 @@
     },
     "moreDates": "Voir plus de dates",
     "fewerDates": "Moins de dates",
+    "moreTimes": "Voir plus d’horaires",
+    "fewerTimes": "Moins d’horaires",
     "address": {
       "hint": "Tapez votre rue : nous proposons les adresses officielles du Luxembourg. Vous pouvez tout corriger.",
       "searching": "Recherche…",
@@ -955,6 +963,32 @@
     "noSlots": "La réservation en ligne n’est pas possible : aucun créneau n’est disponible. Appelez-nous pour réserver."
   },
   "order": {
+    "next": {
+      "title": "Et maintenant ?",
+      "payDue": "Virement à effectuer : {{amount}}",
+      "transfer": [
+        "Effectuez un virement de {{amount}} avec la communication {{number}}.",
+        "Dès réception, nous confirmons votre commande et vous prévenons par e-mail.",
+        "Nous la préparons ensuite pour le créneau choisi."
+      ],
+      "pickup": [
+        "Nous préparons votre commande pour le créneau choisi.",
+        "Vous recevez un e-mail dès qu’elle est prête.",
+        "Vous réglez en boutique au retrait."
+      ],
+      "delivery": [
+        "Nous préparons votre commande pour le créneau choisi.",
+        "Vous recevez un e-mail au départ de la livraison."
+      ],
+      "table": [
+        "La Maison confirme votre table par e-mail, en général dans la journée.",
+        "Vous réglez à table, à la fin de votre visite."
+      ],
+      "accepted": [
+        "Présentez-vous à l’heure réservée : votre table vous attend.",
+        "Un empêchement ? Prévenez-nous par téléphone ou par e-mail."
+      ]
+    },
     "eyebrow": "Commande {{number}}",
     "reservationEyebrow": "Réservation {{number}}",
     "thanks": "Merci, {{name}}",
@@ -1005,6 +1039,7 @@
     "transfer": {
       "title": "Coordonnées pour le virement",
       "beneficiary": "Bénéficiaire",
+      "bank": "Banque",
       "iban": "IBAN",
       "bic": "BIC",
       "reference": "Communication",

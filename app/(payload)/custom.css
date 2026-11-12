@@ -2081,12 +2081,84 @@ body:has(.gg-create) .no-results__actions {
 }
 .gg-doc__title {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
-  gap: 14px;
+  justify-content: space-between;
+  gap: 12px 24px;
 }
 .gg-doc__title .gg-badge {
-  margin-top: 3px;
   text-transform: none;
+}
+/* The document's status and its payment's, side by side, each with its name (APPLUX report 4, §3–§4). */
+.gg-doc__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.gg-doc__badge {
+  display: grid;
+  gap: 4px;
+}
+.gg-doc__badge small {
+  font: 600 10px/1 var(--font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gg-text-2);
+}
+.gg-doc__figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+.gg-doc__figures > div {
+  padding: 12px 14px;
+  border: 1px solid var(--gg-line);
+  border-left: 3px solid var(--gg-line-2);
+  border-radius: 8px;
+  background: #ffffff;
+}
+.gg-doc__figures dt {
+  font: 600 10px/1 var(--font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gg-text-2);
+}
+.gg-doc__figures dd {
+  margin: 6px 0 0;
+  font: 600 20px/1.2 var(--font-body);
+  font-variant-numeric: tabular-nums;
+  color: var(--gg-ink);
+}
+.gg-doc__figures [data-tone='due'] {
+  border-left-color: #d98a00;
+  background: #fff8ea;
+}
+.gg-doc__figures [data-tone='ok'] {
+  border-left-color: #1f8a4c;
+}
+.gg-doc__figures [data-tone='ok'] dd {
+  color: #17693a;
+}
+.gg-doc__figures [data-tone='alert'] {
+  border-left-color: var(--gg-danger);
+  background: var(--gg-danger-tint);
+}
+.gg-doc__next {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--gg-primary-tint);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--gg-ink);
+}
+.gg-doc__next strong {
+  font: 600 10px/1.6 var(--font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gg-text-2);
 }
 .gg-doc__title h2 {
   margin: 0;
@@ -2358,6 +2430,13 @@ body:has(.gg-create) .no-results__actions {
 }
 .gg-btn--quiet-danger {
   color: var(--gg-danger);
+}
+/* The way back sits apart, on the right: the next step is what the eye meets first. */
+.gg-decide > .gg-btn--quiet-danger {
+  margin-left: auto;
+}
+.gg-decide > .gg-btn--quiet-danger ~ .gg-btn--quiet-danger {
+  margin-left: 0;
 }
 .gg-btn--quiet-danger:hover {
   border-color: var(--gg-danger);
@@ -3006,4 +3085,121 @@ body:has(.gg-create) .no-results__actions {
 }
 .gg-io__date input {
   min-width: 160px;
+}
+
+/* ---- Event reservations by event (modules/events/admin/events-board.tsx, booking-tabs.tsx) ---------------- */
+.gg-events {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+.gg-event {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  padding: 18px;
+  border: 1px solid var(--gg-line);
+  border-left: 3px solid var(--gg-line-2);
+  border-radius: 12px;
+  background: #ffffff;
+}
+.gg-event[data-waiting] {
+  border-left-color: #d98a00;
+}
+.gg-event header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.gg-event h2 {
+  margin: 0;
+  font: 600 16px/1.3 var(--font-body);
+  color: var(--gg-ink);
+}
+.gg-event header p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--gg-text-2);
+}
+.gg-event__count {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--gg-text-2);
+}
+.gg-event__bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--gg-accent);
+  overflow: hidden;
+}
+.gg-event__bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--gg-primary);
+}
+.gg-event dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+.gg-event dl > div {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--gg-frame);
+}
+.gg-event dl > div[data-tone='due'] {
+  background: #fff8ea;
+}
+.gg-event dt {
+  font: 600 10px/1 var(--font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gg-text-2);
+}
+.gg-event dd {
+  margin: 6px 0 0;
+  font: 600 18px/1.2 var(--font-body);
+  font-variant-numeric: tabular-nums;
+  color: var(--gg-ink);
+}
+.gg-event dd small {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--gg-text-2);
+}
+.gg-event footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.gg-event__pending {
+  border-color: #d98a00;
+  color: #8a5800;
+  background: #fff8ea;
+}
+.gg-crumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 12px;
+  font-size: 13px;
+}
+.gg-crumb a {
+  color: var(--gg-text-2);
+  text-decoration: none;
+}
+.gg-crumb a:hover {
+  color: var(--gg-ink);
+}
+.gg-crumb b {
+  font-size: 15px;
+  color: var(--gg-ink);
 }

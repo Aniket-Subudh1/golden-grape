@@ -5,7 +5,7 @@ import { cn } from '@/lib/cn';
 import { useFieldError } from './action-form';
 
 const control =
-  'w-full border-b border-border bg-transparent outline-none transition placeholder:text-ink/30 focus:border-gold-deep';
+  'w-full border-b border-border bg-transparent outline-none transition placeholder:text-ink/30 focus:border-gold-deep aria-invalid:border-red-700';
 
 // `md`: compact forms (events dialog, cart). `lg`: page forms (contact, catering).
 const SIZES = {
@@ -13,16 +13,18 @@ const SIZES = {
   lg: { label: 'mb-2', control: 'text-base', height: 'h-11' },
 };
 
-type Common = { label: string; name: string; size?: 'md' | 'lg' };
+/** `error`: a message decided in the browser (the checkout's missing fields); otherwise the ActionForm error for `name`. */
+type Common = { label: string; name: string; size?: 'md' | 'lg'; error?: string | false | null };
 type Props =
   | (Common & { as?: 'input' } & Omit<ComponentProps<'input'>, 'size'>)
   | (Common & { as: 'textarea' } & ComponentProps<'textarea'>)
   | (Common & { as: 'select' } & Omit<ComponentProps<'select'>, 'size'>);
 
 /** Underline field with its label and the ActionForm error for `name`. */
-export function Field({ label, name, className, as = 'input', size = 'md', ...props }: Props) {
+export function Field({ label, name, className, as = 'input', size = 'md', error: own, ...props }: Props) {
   const sz = SIZES[size];
-  const error = useFieldError(name);
+  const fromAction = useFieldError(name);
+  const error = own || fromAction;
   const describedBy = error ? `${name}-error` : undefined;
   const shared = { name, id: name, 'aria-invalid': error ? true : undefined, 'aria-describedby': describedBy };
   return (

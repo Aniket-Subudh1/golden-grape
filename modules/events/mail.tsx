@@ -3,6 +3,7 @@ import { render, sendMail } from '@/lib/mail';
 import { formatMoney } from '@/lib/money';
 import { eventDate } from '@/lib/time';
 import { mailContext } from '@/modules/notifications/context';
+import { dueOf } from '@/modules/payments/balance';
 import { type EventBookingMail, EventBookingCustomer, EventBookingStaff } from '@/modules/notifications/templates/event-booking';
 import type { Event, EventBooking } from '@/payload-types';
 
@@ -11,6 +12,9 @@ import type { Event, EventBooking } from '@/payload-types';
  * separate e-mail sent when staff record the payment (APPLUX audit 10 Nov, §7): payment received, booking confirmed.
  */
 export async function mailEventBooking(booking: EventBooking, eventIn: { fr: Event; customer: Event }, { staff, payment = false }: { staff: boolean; payment?: boolean }) {
+  // The payment just recorded is the last "charge" row.
+  const last = payment ? (booking.payments ?? []).findLast((p) => p.kind === 'charge') : null;
+  const due = dueOf({ totalCents: booking.amountCents ?? 0, paidCents: booking.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 });
   const locale = (booking.locale ?? 'fr') as Locale;
   const ctx = await mailContext(locale);
   const shared = { business: ctx.business, logoUrl: ctx.logoUrl };
@@ -27,13 +31,13 @@ export async function mailEventBooking(booking: EventBooking, eventIn: { fr: Eve
       amount: booking.amountCents ? formatMoney(booking.amountCents, l) : null,
       status: booking.status ?? 'pending',
       notes: booking.notes,
-      payment:
-        payment && booking.payment?.amountCents
-          ? {
-              amount: formatMoney(booking.payment.amountCents, l),
-              on: new Intl.DateTimeFormat(l, { dateStyle: 'long', timeZone: 'Europe/Luxembourg' }).format(new Date(booking.payment.at ?? Date.now())),
-            }
-          : null,
+      payment: last
+        ? {
+            amount: formatMoney(last.amountCents, l),
+            on: new Intl.DateTimeFormat(l, { dateStyle: 'long', timeZone: 'Europe/Luxembourg' }).format(new Date(last.at ?? Date.now())),
+            due: due > 0 ? formatMoney(due, l) : null,
+          }
+        : null,
     };
   };
   const customer = data(eventIn.customer, locale);

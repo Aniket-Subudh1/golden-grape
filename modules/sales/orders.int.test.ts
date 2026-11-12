@@ -4,13 +4,13 @@ import { beforeAll, describe, expect, it, vi } from 'vitest';
 // signUpFromOrder signs the new account in (a cookie): outside a request there is no cookie jar.
 vi.mock('next/headers', () => ({ cookies: async () => ({ set: () => {}, get: () => undefined, delete: () => {} }), headers: async () => new Headers() }));
 import { model } from '@/lib/tx';
-import { bookEvent, recordBookingPayment } from '@/modules/events/service';
+import { bookEvent, recordBookingPayment, recordBookingRefund, setBookingStatus } from '@/modules/events/service';
 import { onHand } from '@/modules/inventory/service';
 import { getTestPayload, makeStaff, makeVariant, parallel } from '@/tests/helpers';
 import { transitionReservation } from './reservations';
 import { signUpFromOrder } from '@/modules/customers/service';
 import { paymentsOf } from '@/modules/payments/service';
-import { checkOrderToken, historyOf, orderToken, type PlaceOrderInput, placeOrder, recordPayment, recordRefund, requestRefund, returnItems, slotCalendar, transition } from './service';
+import { setOrderBankAccount, checkOrderToken, historyOf, orderToken, type PlaceOrderInput, placeOrder, recordPayment, recordRefund, requestRefund, returnItems, slotCalendar, transition } from './service';
 
 const payload = await getTestPayload();
 
@@ -104,6 +104,43 @@ describe('placeOrder', () => {
     await expect(placeOrder(payload, order({ time: '08:30' }), { now: NOW })).rejects.toMatchObject({ message: 'slotUnavailable' });
     await expect(placeOrder(payload, order({ time: '19:00' }), { now: NOW })).rejects.toMatchObject({ message: 'slotUnavailable' });
     await expect(placeOrder(payload, order({ date: '2026-12-30' }), { now: NOW })).rejects.toMatchObject({ message: 'slotUnavailable' });
+  });
+
+  it('a transfer order keeps the default bank account; staff can choose another active one; a deactivated one is refused (APPLUX, 12 Nov)', async () => {
+    const saved = await payload.updateGlobal({
+      slug: 'BusinessSettings',
+      overrideAccess: true,
+      data: {
+        business: {
+          name: 'Golden Grape',
+          street: '25 Zac Klengbousbierg',
+          postalCode: '7795',
+          city: 'Bissen',
+          bankAccounts: [
+            { holder: 'Golden Grape Sàrl', bankName: 'BCEE', iban: 'LU12 0010 0012 3456 7891', bic: 'BCEELULL', active: true, isDefault: false },
+            { holder: 'Golden Grape Events', iban: 'BE68 5390 0754 7034', active: true, isDefault: true },
+            { holder: 'Old account', iban: 'NL91 ABNA 0417 1643 00', active: false, isDefault: true },
+          ],
+        },
+      } as never,
+    });
+    const read = (id: string) => payload.findByID({ collection: 'orders', id, overrideAccess: true, depth: 0 });
+    const accounts = saved.business.bankAccounts ?? [];
+    // One default only, never a deactivated one.
+    expect(accounts.map((a) => a.isDefault)).toEqual([false, true, false]);
+    const placed = await placeOrder(payload, order({ time: '16:30', payment: 'transfer' }), { now: NOW });
+    expect((await read(placed.id)).payment?.bankAccount).toMatchObject({ holder: 'Golden Grape Events', iban: 'BE68 5390 0754 7034' });
+    const changed = await setOrderBankAccount(payload, placed.id, accounts[0].id!, staff.id);
+    expect(changed.payment?.bankAccount).toMatchObject({ holder: 'Golden Grape Sàrl', bankName: 'BCEE', bic: 'BCEELULL' });
+    expect(changed.status).toBe('awaiting_payment');
+    await expect(setOrderBankAccount(payload, placed.id, accounts[2].id!, staff.id)).rejects.toMatchObject({ code: 'VALIDATION' });
+    // Paid on site: no bank account to choose.
+    const onsite = await placeOrder(payload, order({ time: '17:00' }), { now: NOW });
+    expect((await read(onsite.id)).payment?.bankAccount?.iban ?? null).toBeNull();
+    await expect(setOrderBankAccount(payload, onsite.id, accounts[0].id!, staff.id)).rejects.toMatchObject({ code: 'CONFLICT' });
+    // A later change of the settings never alters what an order's customer was told.
+    await payload.updateGlobal({ slug: 'BusinessSettings', overrideAccess: true, data: { business: { name: 'Golden Grape', street: '25 Zac Klengbousbierg', postalCode: '7795', city: 'Bissen', bankAccounts: [] } } as never });
+    expect((await read(placed.id)).payment?.bankAccount).toMatchObject({ holder: 'Golden Grape Sàrl' });
   });
 
   it('bank transfer → awaiting_payment, no stock; the full amount recorded → confirmed, stock posted, one payment row with date, reference and user (AC-08, GG-003)', async () => {
@@ -364,14 +401,50 @@ describe('event bookings', () => {
       overrideAccess: true,
     });
     const { booking } = await bookEvent(payload, { idempotencyKey: randomUUID(), event: event.id, guests: 2, name: 'Hans Müller', email: 'hans@example.test', phone: '+352 621 123 456', locale: 'de' });
-    expect(booking).toMatchObject({ status: 'pending', label: 'Noite de Fado · Hans Müller (2 places)' });
+    expect(booking).toMatchObject({ status: 'pending', paymentStatus: 'pending', label: 'Noite de Fado · Hans Müller (2 places)' });
     const pay = () => recordBookingPayment(payload, booking.id, { amountCents: 4800, at: new Date('2026-11-10T12:00:00Z'), method: 'transfer', reference: 'FADO-2', user: staff.id });
     const results = await parallel(2, pay);
     expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
-    expect((results.find((r) => r.status === 'rejected') as PromiseRejectedResult).reason).toMatchObject({ code: 'CONFLICT' });
     const stored = await payload.findByID({ collection: 'eventBookings', id: booking.id, depth: 0, overrideAccess: true });
-    expect(stored).toMatchObject({ status: 'confirmed', payment: { amountCents: 4800, method: 'transfer', reference: 'FADO-2', user: staff.id } });
-    expect(stored.payment?.at?.slice(0, 10)).toBe('2026-11-10');
+    expect(stored).toMatchObject({ status: 'confirmed', paymentStatus: 'paid', paidCents: 4800 });
+    expect(stored.payments).toHaveLength(1);
+    expect(stored.payments?.[0]).toMatchObject({ kind: 'charge', amountCents: 4800, method: 'transfer', reference: 'FADO-2', user: staff.id });
+    expect(stored.payments?.[0].at?.slice(0, 10)).toBe('2026-11-10');
+  });
+
+  it('status and payment are separate (APPLUX report 4, §4): 100 € of 140 € leaves 40 € due; the rest pays it; refunds never exceed what came in', async () => {
+    const event = await payload.create({
+      collection: 'events',
+      data: { title: 'Dîner vigneron', slug: 'diner-partial', startsAt: '2030-04-10T19:00:00Z', priceCents: 7000, capacity: 10, _status: 'published' },
+      overrideAccess: true,
+    });
+    const { booking } = await bookEvent(payload, { idempotencyKey: randomUUID(), event: event.id, guests: 2, name: 'Ana Costa', email: 'ana@example.test', phone: '+352 621 123 456', locale: 'fr' });
+    const pay = (amountCents: number) => recordBookingPayment(payload, booking.id, { amountCents, at: new Date('2026-11-12T12:00:00Z'), method: 'onsite', user: staff.id });
+    const refund = (amountCents: number) => recordBookingRefund(payload, booking.id, { amountCents, at: new Date('2026-11-12T12:00:00Z'), method: 'transfer', reason: 'Client malade', user: staff.id });
+
+    // A part payment: partly paid, 40 € due, and the booking still waits for staff.
+    expect(await pay(10000)).toMatchObject({ confirmed: false, dueCents: 4000, booking: { status: 'pending', paymentStatus: 'partial', paidCents: 10000 } });
+    // Confirmed while only partly paid.
+    expect(await setBookingStatus(payload, booking.id, 'confirmed')).toMatchObject({ status: 'confirmed', paymentStatus: 'partial' });
+    // More than what is due is refused; nothing changes.
+    await expect(pay(4001)).rejects.toMatchObject({ code: 'VALIDATION' });
+    expect(await pay(4000)).toMatchObject({ confirmed: false, dueCents: 0, booking: { status: 'confirmed', paymentStatus: 'paid', paidCents: 14000 } });
+    await expect(pay(1)).rejects.toMatchObject({ code: 'VALIDATION' });
+
+    await expect(refund(14001)).rejects.toMatchObject({ code: 'VALIDATION' });
+    expect(await refund(4000)).toMatchObject({ booking: { status: 'confirmed', paymentStatus: 'partially_refunded', refundedCents: 4000 } });
+    const done = await refund(10000);
+    expect(done.booking).toMatchObject({ paymentStatus: 'refunded', refundedCents: 14000 });
+    expect(done.booking.payments?.map((p) => p.amountCents)).toEqual([10000, 4000, -4000, -10000]);
+    // No payment on a cancelled booking.
+    await setBookingStatus(payload, booking.id, 'cancelled');
+    await expect(pay(100)).rejects.toMatchObject({ code: 'CONFLICT' });
+  });
+
+  it('a free booking is "free" and confirmed at once', async () => {
+    const event = await payload.create({ collection: 'events', data: { title: 'Portes ouvertes', slug: 'free-event', startsAt: '2030-05-10T19:00:00Z', priceCents: 0, _status: 'published' }, overrideAccess: true });
+    const { booking } = await bookEvent(payload, { idempotencyKey: randomUUID(), event: event.id, guests: 3, name: 'Rui', email: 'rui@example.test', phone: '+352 621 123 456', locale: 'pt' });
+    expect(booking).toMatchObject({ status: 'confirmed', paymentStatus: 'free' });
   });
 });
 

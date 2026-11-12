@@ -47,8 +47,8 @@ Brand motifs added for personality (Aniket's request): the azulejo tile (`bg-azu
 | `Button` | `components/ui/button.tsx` (cva) | 15+ pill class strings, plus the square translucent gold CTA of Hero, Store and Happy Hour | `variant`: `solid` \| `outline` \| `gold` \| `goldGlass` \| `ghost` \| `chip` \| `icon`; `size`: `sm` (h-9) \| `md` (h-11) \| `lg` (h-12); `active` (chip); `asChild` |
 | `Field` | `components/ui/field.tsx` | `F` in events.tsx, `Field` in catering.tsx and contact.tsx, cart inputs | `label`, `name`, `error?`, `as?: 'input' \| 'textarea' \| 'select'`, plus native props. Shows `fieldErrors[name]` from `useActionState`. |
 | `Container` | `components/site/container.tsx` | repeated `mx-auto max-w-[1400px] px-6 md:px-10` | `size?: 'md' \| 'lg'`, `as?` |
-| `PageHero` | `components/site/page-hero.tsx` | page headers in shop/snack/events/catering + `PageShell` | `eyebrow`, `title: [string, string?]` (second half rendered italic gold-deep), `subtitle?`, `children?` (CTAs) |
-| `MediaCard` | `components/site/media-card.tsx` | ProductCard (shop), MenuCard (snack), event card | `image`, `alt`, `ratio: '4/5' \| '4/3'`, `tag?`, `overlay?` (event style: gradient + text over image), `children` (body), `action?` (corner button slot) |
+| `PageHero` | `components/site/page-hero.tsx` | page headers in shop/snack/events/catering + `PageShell` | `eyebrow`, `title: [string, string?]` (second half rendered italic gold-deep), `subtitle?`, `children?` (CTAs), `compact?` (listing pages: the shop, where the products are the priority) |
+| `MediaCard` | `components/site/media-card.tsx` | ProductCard (shop), MenuCard (snack), event card | `image`, `alt`, `ratio: '4/5' \| '4/3'`, `tag?`, `overlay?` (event style: gradient + text over image), `children` (body), `action?` (corner button slot), `ribbon?` (the sold-out corner band, `Ribbon`, colour `burgundy`: the photo stays visible and the card has no add control) |
 | `MediaGrid` | `components/site/media-grid.tsx` | grids in shop (gap-6/8) and hairline grids (snack/events) | `cols: 3 \| 4`, `hairline?: boolean` |
 | `QtyStepper` | `components/site/qty-stepper.tsx` | snack MenuCard stepper, cart line stepper, events guests | `value`, `onChange`, `min?`, `max?`, `size?` |
 | `PriceTag` | inline `formatMoney` call; **no component** | `fmtEUR` | use `formatMoney(cents, locale)` from `lib/money.ts` |
@@ -139,6 +139,15 @@ Route group `app/(staff)/staff/`, protected by staff auth in `proxy.ts` plus a s
 - Visible focus ring: `focus-visible:outline-gold-deep`.
 - Honour `prefers-reduced-motion` in `Reveal` and in `animate-slow-zoom`.
 - Use `next/image` with `sizes` for every CMS and product image.
+
+### Corrections of 12 Nov (APPLUX report 4)
+- **Palette:** one colour added, `--burgundy` (`bg-burgundy`, `text-burgundy`), used only for "Épuisé".
+- **Availability:** a sold-out product shows the diagonal `Ribbon` on its photo (shop, Comptoir, related products, the product page's gallery) and has no add control; the product page always says "En stock", "Plus que n" or "Épuisé".
+- **Shop filters:** one compact bar; Region and Colour are offered only when the selected category has such values; prices are digit-only text fields (no spinner).
+- **Checkout:** compact heading and steps; order of steps: mode, (guests), when, contact, (address), payment; the first 5 free times on one row then "Voir plus d’horaires"; a missing field is marked in red once left or after a try to confirm, and the confirm button takes the customer to the first one (`Field` takes an `error`); the payment method is repeated in the summary. The floating cart is hidden on the checkout.
+- **Admin summaries:** `DocHead` takes labelled status pills (`DocBadge`: the document's status and its payment's), the money figures (`DocFigures`: total, received, still due) and a "next step" sentence. Lists get stage tabs: Orders (`order-tabs.tsx`), bookings of one event (`booking-tabs.tsx`), reservations and catering requests (`statusTabs()` → `components/admin/status-tabs.tsx`).
+- **Event reservations:** `/admin/event-bookings` (`modules/events/admin/events-board.tsx`) is the sidebar's entry: "À venir" / "Archives", one card per event (seats reserved, remaining, to confirm, money received) with "Voir les réservations".
+- **Status colours, everywhere:** amber = waits for staff, blue = in progress, green = done or paid, red = refused or cancelled, grey = closed or neutral.
 
 ### Documents written by services (M2.3)
 Orders, table reservations and event bookings are never edited field by field. Their admin page is one summary (`components/admin/doc-panel.tsx`): a header with the status badge and a one-line summary, three cards (customer, slot, payment), the items with totals and VAT, the customer's message and the history (when, what, who, why). Under the header, `components/admin/decision-bar.tsx` offers only the moves the state machine allows; each one first says what will happen (stock, e-mail), asks for an optional reason when it undoes something, then reloads the page.

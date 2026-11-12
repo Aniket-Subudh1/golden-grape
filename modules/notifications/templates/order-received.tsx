@@ -26,7 +26,7 @@ export type OrderMail = {
   /** Waiting for a bank transfer. */
   awaiting: boolean;
   /** How to pay by transfer. Without an IBAN in the settings, only the reference and amount (staff send the bank details: GG-014). */
-  transfer?: { beneficiary: string; iban?: string | null; bic?: string | null; reference: string; amount: string } | null;
+  transfer?: { beneficiary: string; bank?: string | null; iban?: string | null; bic?: string | null; reference: string; amount: string } | null;
   notes?: string | null;
   url: string;
 };
@@ -89,6 +89,7 @@ export function TransferDetails({ t, transfer }: { t: T; transfer: NonNullable<O
           ...(transfer.iban
             ? ([
                 [t.labels.beneficiary, transfer.beneficiary],
+                ...(transfer.bank ? [[t.labels.bank, transfer.bank]] : []),
                 [t.labels.iban, transfer.iban],
                 ...(transfer.bic ? [[t.labels.bic, transfer.bic]] : []),
               ] as [string, string][])

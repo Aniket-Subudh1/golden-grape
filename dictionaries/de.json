@@ -322,7 +322,8 @@
       "perUnit": "{{price}} pro Stück",
       "add": "In den Warenkorb",
       "added": "In den Warenkorb gelegt",
-      "left": "Nur noch {{count}} verfügbar"
+      "left": "Nur noch {{count}} verfügbar",
+      "inStock": "Auf Lager"
     },
     "related": {
       "eyebrow": "Aus demselben Keller",
@@ -346,7 +347,7 @@
     },
     "add": "Hinzufügen",
     "allergensLabel": "Allergene",
-    "soldOut": "Nicht verfügbar",
+    "soldOut": "Ausverkauft",
     "empty": "Die Thekenkarte kommt in Kürze.",
     "allergens": {
       "gluten": "Gluten",
@@ -643,6 +644,7 @@
       "vat": "inkl. MwSt. {{rate}} %",
       "payment": "Zahlung",
       "beneficiary": "Empfänger",
+      "bank": "Bank",
       "iban": "IBAN",
       "bic": "BIC",
       "reference": "Verwendungszweck",
@@ -650,7 +652,8 @@
       "status": "Status",
       "event": "Veranstaltung",
       "amountPaid": "Bezahlter Betrag",
-      "paidOn": "Bezahlt am"
+      "paidOn": "Bezahlt am",
+      "balance": "Restbetrag"
     },
     "reset": {
       "subject": "Wählen Sie ein neues Passwort",
@@ -733,7 +736,10 @@
       "staffSubject": "Neue Buchung: {{title}} — {{name}} ({{guests}})",
       "paymentSubject": "Zahlung erhalten — Ihre Buchung für {{title}} ist bestätigt",
       "paymentBody": "Wir haben Ihre Zahlung erhalten: Ihre Buchung ist bestätigt. Wir freuen uns auf Sie!",
-      "statusConfirmed": "Bestätigt"
+      "statusConfirmed": "Bestätigt",
+      "statusPending": "Wartet auf Bestätigung",
+      "paymentPartialSubject": "Zahlung erhalten — Ihre Buchung für {{title}}",
+      "paymentPartialBody": "Wir haben Ihre Zahlung erhalten, vielen Dank. Der unten genannte Restbetrag ist noch offen."
     },
     "staffBanner": "Interne Benachrichtigung — für das Golden-Grape-Team (nicht an den Kunden weiterleiten)",
     "welcome": {
@@ -863,7 +869,7 @@
     "titleTable": "Ihr Tisch",
     "eyebrowTable": "Reservierung",
     "steps": {
-      "mode": "Wie möchten Sie sie erhalten?",
+      "mode": "Wie möchten Sie Ihre Bestellung erhalten?",
       "when": "Wann?",
       "guests": "Wie viele Personen?",
       "address": "Wohin liefern wir?",
@@ -943,6 +949,8 @@
     },
     "moreDates": "Weitere Termine",
     "fewerDates": "Weniger Termine",
+    "moreTimes": "Weitere Uhrzeiten",
+    "fewerTimes": "Weniger Uhrzeiten",
     "address": {
       "hint": "Geben Sie Ihre Straße ein: Wir schlagen offizielle luxemburgische Adressen vor. Alles bleibt änderbar.",
       "searching": "Suche…",
@@ -955,6 +963,32 @@
     "noSlots": "Eine Online-Buchung ist nicht möglich: Es ist keine Zeit verfügbar. Rufen Sie uns zum Buchen an."
   },
   "order": {
+    "next": {
+      "title": "Wie geht es weiter?",
+      "payDue": "Zu überweisen: {{amount}}",
+      "transfer": [
+        "Überweisen Sie {{amount}} mit dem Verwendungszweck {{number}}.",
+        "Sobald die Zahlung eingeht, bestätigen wir Ihre Bestellung per E-Mail.",
+        "Anschließend bereiten wir sie für das gewählte Zeitfenster vor."
+      ],
+      "pickup": [
+        "Wir bereiten Ihre Bestellung für das gewählte Zeitfenster vor.",
+        "Sie erhalten eine E-Mail, sobald sie bereit ist.",
+        "Sie bezahlen bei der Abholung im Geschäft."
+      ],
+      "delivery": [
+        "Wir bereiten Ihre Bestellung für das gewählte Zeitfenster vor.",
+        "Sie erhalten eine E-Mail, wenn die Lieferung unterwegs ist."
+      ],
+      "table": [
+        "Das Haus bestätigt Ihren Tisch per E-Mail, meist am selben Tag.",
+        "Sie bezahlen am Tisch am Ende Ihres Besuchs."
+      ],
+      "accepted": [
+        "Kommen Sie zur reservierten Uhrzeit: Ihr Tisch erwartet Sie.",
+        "Etwas dazwischengekommen? Geben Sie uns telefonisch oder per E-Mail Bescheid."
+      ]
+    },
     "eyebrow": "Bestellung {{number}}",
     "reservationEyebrow": "Reservierung {{number}}",
     "thanks": "Danke, {{name}}",
@@ -1005,6 +1039,7 @@
     "transfer": {
       "title": "Bankverbindung für die Überweisung",
       "beneficiary": "Empfänger",
+      "bank": "Bank",
       "iban": "IBAN",
       "bic": "BIC",
       "reference": "Verwendungszweck",

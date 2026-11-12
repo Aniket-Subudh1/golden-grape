@@ -12,8 +12,8 @@ export type EventBookingMail = {
   amount?: string | null;
   status: 'pending' | 'confirmed' | 'cancelled';
   notes?: string | null;
-  /** Set on the payment e-mail only (§7): what was received and when. */
-  payment?: { amount: string; on: string } | null;
+  /** Set on the payment e-mail only (§7): what was received and when, and what is still due (null when all is paid). */
+  payment?: { amount: string; on: string; due: string | null } | null;
 };
 
 type Props = { t: Dictionary['mail']; business: MailBusiness; logoUrl: string; data: EventBookingMail };
@@ -27,11 +27,19 @@ const rows = (t: Dictionary['mail'], d: EventBookingMail): [string, string | num
 
 export function EventBookingCustomer({ t, business, logoUrl, data }: Props) {
   const e = t.eventBooking;
-  const title = data.payment ? e.paymentSubject : data.status === 'cancelled' ? e.cancelledSubject : e.subject;
-  const body = data.payment ? e.paymentBody : { pending: e.pendingBody, confirmed: e.confirmedBody, cancelled: e.cancelledBody }[data.status];
-  // The payment e-mail: the event, the guests, what was paid and when, and the booking's final status.
+  // The payment e-mail says "confirmed" only when the booking is; a part payment says what is still due.
+  const confirmed = data.status === 'confirmed';
+  const title = data.payment ? (confirmed ? e.paymentSubject : e.paymentPartialSubject) : data.status === 'cancelled' ? e.cancelledSubject : e.subject;
+  const body = data.payment ? (data.payment.due ? e.paymentPartialBody : e.paymentBody) : { pending: e.pendingBody, confirmed: e.confirmedBody, cancelled: e.cancelledBody }[data.status];
+  // The payment e-mail: the event, the guests, what was paid and when, the balance, and the booking's status.
   const details: [string, string | number][] = data.payment
-    ? [...rows(t, { ...data, amount: null }), [t.labels.amountPaid, data.payment.amount], [t.labels.paidOn, data.payment.on], [t.labels.status, e.statusConfirmed]]
+    ? [
+        ...rows(t, data),
+        [t.labels.amountPaid, data.payment.amount],
+        [t.labels.paidOn, data.payment.on],
+        ...(data.payment.due ? [[t.labels.balance, data.payment.due] as [string, string]] : []),
+        [t.labels.status, confirmed ? e.statusConfirmed : e.statusPending],
+      ]
     : rows(t, data);
   return (
     <MailLayout business={business} logoUrl={logoUrl}>

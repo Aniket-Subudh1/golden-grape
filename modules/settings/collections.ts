@@ -103,6 +103,7 @@ const users: CollectionConfig = {
 // GG-046: the activity log, written only by lib/audit.ts. Managers can read it (who changed what, and why).
 export const AUDIT_LABELS: Record<AuditAction, Label> = {
   'order.status': l('Commande : statut', 'Order: status', 'Bestellung: Status', 'Encomenda: estado'),
+  'order.bankAccount': l('Commande : compte bancaire du virement', 'Order: bank account for the transfer', 'Bestellung: Bankkonto der Überweisung', 'Encomenda: conta bancária da transferência'),
   'order.payment': l('Commande : paiement reçu', 'Order: payment received', 'Bestellung: Zahlung erhalten', 'Encomenda: pagamento recebido'),
   'order.refundRequest': l('Commande : remboursement demandé', 'Order: refund requested', 'Bestellung: Erstattung angefordert', 'Encomenda: reembolso pedido'),
   'order.refund': l('Commande : remboursement envoyé', 'Order: refund sent', 'Bestellung: Erstattung gesendet', 'Encomenda: reembolso enviado'),
@@ -110,6 +111,7 @@ export const AUDIT_LABELS: Record<AuditAction, Label> = {
   'reservation.status': l('Réservation : statut', 'Reservation: status', 'Reservierung: Status', 'Reserva: estado'),
   'booking.status': l('Réservation d’événement : statut', 'Event booking: status', 'Veranstaltungsbuchung: Status', 'Reserva de evento: estado'),
   'booking.payment': l('Réservation d’événement : paiement reçu', 'Event booking: payment received', 'Veranstaltungsbuchung: Zahlung erhalten', 'Reserva de evento: pagamento recebido'),
+  'booking.refund': l('Réservation d’événement : remboursement', 'Event booking: refund', 'Veranstaltungsbuchung: Erstattung', 'Reserva de evento: reembolso'),
   'stock.adjust': l('Stock : correction', 'Stock: adjustment', 'Bestand: Korrektur', 'Stock: correção'),
   'stock.count': l('Stock : inventaire validé', 'Stock: count posted', 'Bestand: Inventur gebucht', 'Stock: inventário validado'),
   'catalogue.import': l('Catalogue : import de fichier', 'Catalogue: file import', 'Katalog: Dateiimport', 'Catálogo: importação de ficheiro'),

@@ -88,11 +88,11 @@ function useIdempotencyKey() {
   return [key, renew] as const;
 }
 
-function Step({ n, title, children, aside }: { n: number; title: string; children: ReactNode; aside?: ReactNode }) {
+function Step({ n, title, children, aside, id }: { n: number; title: string; children: ReactNode; aside?: ReactNode; id?: string }) {
   return (
-    <section className="border-t border-border/70 pt-8">
-      <div className="mb-6 flex items-baseline justify-between gap-4">
-        <h2 className="flex items-baseline gap-4 font-serif text-2xl md:text-3xl">
+    <section id={id} className="scroll-mt-28 border-t border-border/70 pt-5">
+      <div className="mb-4 flex items-baseline justify-between gap-4">
+        <h2 className="flex items-baseline gap-3 font-serif text-xl md:text-2xl">
           <span className="font-sans text-[11px] tracking-[0.3em] text-gold-deep tabular-nums">{String(n).padStart(2, '0')}</span>
           {title}
         </h2>
@@ -129,7 +129,7 @@ const sameAddress = (a: Address, b: Address) => a.line1.trim() === b.line1.trim(
  * Street and number with official Luxembourg suggestions (GG-007): typing 3 characters or more asks the server
  * (Geoportail), picking one fills street, postcode and town. Nothing is forced: the fields stay editable.
  */
-function StreetField({ value, onChange, onPick, label, t }: { value: string; onChange: (v: string) => void; onPick: (a: AddressSuggestion) => void; label: string; t: Dictionary['checkout']['address'] }) {
+function StreetField({ value, onChange, onPick, label, t, error }: { value: string; onChange: (v: string) => void; onPick: (a: AddressSuggestion) => void; label: string; t: Dictionary['checkout']['address']; error?: string | false }) {
   const [focused, setFocused] = useState(false);
   const [found, setFound] = useState<AddressSuggestion[]>([]);
   const [searching, setSearching] = useState(false);
@@ -154,7 +154,7 @@ function StreetField({ value, onChange, onPick, label, t }: { value: string; onC
   const open = focused && value.trim().length >= 3 && value.trim() !== picked && (found.length > 0 || searching);
   return (
     <div className="relative sm:col-span-2" onFocus={() => setFocused(true)} onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setFocused(false)}>
-      <Field name="line1" label={label} autoComplete="address-line1" value={value} onChange={(e) => onChange(e.target.value)} required aria-autocomplete="list" aria-expanded={open} />
+      <Field name="line1" label={label} autoComplete="address-line1" value={value} onChange={(e) => onChange(e.target.value)} required aria-autocomplete="list" aria-expanded={open} error={error} />
       {open && (
         <ul role="listbox" aria-label={t.pick} className="absolute inset-x-0 top-full z-20 mt-1 max-h-72 overflow-auto rounded-xl border border-border bg-bone py-1 shadow-lg">
           {searching && found.length === 0 && <li className="px-4 py-2 text-xs text-ink/50">{t.searching}</li>}
@@ -217,6 +217,9 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
   const [choice, setChoice] = useState<PaymentChoice>('onsite');
   const [summary, setSummary] = useState<Summary | null>(null);
   const [pricing, setPricing] = useState(false);
+  // Missing fields are marked once left empty or after a try to confirm (APPLUX report 4, §2).
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [tried, setTried] = useState(false);
   const asked = useRef(0);
   const money = (cents: number) => formatMoney(cents, locale);
 
@@ -311,9 +314,9 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
   // The heading follows the mode: a table booking reads "Réservation · Votre table", not "Votre commande" (APPLUX §3).
   const asTable = (ready ? mode : (initialMode ?? mode)) === 'table';
   const heading = (
-    <header className="mb-12 md:mb-16">
-      <p className="eyebrow mb-4 text-gold-deep">{asTable ? t.eyebrowTable : t.eyebrow}</p>
-      <h1 className="font-serif text-5xl leading-[0.95] tracking-tight md:text-7xl">{asTable ? t.titleTable : t.title}</h1>
+    <header className="mb-6">
+      <p className="eyebrow mb-2 text-gold-deep">{asTable ? t.eyebrowTable : t.eyebrow}</p>
+      <h1 className="font-serif text-3xl leading-tight tracking-tight md:text-4xl">{asTable ? t.titleTable : t.title}</h1>
     </header>
   );
 
@@ -355,20 +358,37 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
   // What still stops the order (GG-006): the same checks as the server, so the button only works when it can succeed.
   // Loaded, and not one free time in the whole window (GG-022): the order cannot be placed online at all.
   const noSlots = Boolean(days[mode]) && !days[mode]!.some((d) => d.slots.some((s) => s.available > 0));
+  // In page order: the first one is where the customer is taken when confirming too early.
+  const fieldErrors = {
+    name: !contact.name.trim() && formT.fields.required,
+    email: !isEmail(contact.email) && (contact.email.trim() ? formT.fields.email : formT.fields.required),
+    phone: !isPhone(contact.phone.trim()) && (contact.phone.trim() ? formT.fields.phone : formT.fields.required),
+    line1: mode === 'delivery' && !addr.line1.trim() && formT.fields.required,
+    postalCode: mode === 'delivery' && !addr.postalCode.trim() && formT.fields.required,
+    city: mode === 'delivery' && !addr.city.trim() && formT.fields.required,
+  };
   const missing = [
-    !slot.time && !noSlots && t.check.time,
-    !contact.name.trim() && t.check.name,
-    !isEmail(contact.email) && t.check.email,
-    !isPhone(contact.phone.trim()) && t.check.phone,
-    ...(mode === 'delivery' ? [!addr.line1.trim() && t.check.line1, !addr.postalCode.trim() && t.check.postalCode, !addr.city.trim() && t.check.city] : []),
-  ].filter((m): m is string => Boolean(m));
+    !slot.time && !noSlots && { id: 'checkout-when', label: t.check.time },
+    ...(Object.keys(fieldErrors) as (keyof typeof fieldErrors)[]).map((id) => fieldErrors[id] && { id, label: t.check[id] }),
+  ].filter((m): m is { id: string; label: string } => Boolean(m));
+  const shown = (id: keyof typeof fieldErrors) => (tried || touched[id]) && fieldErrors[id];
+  const touch = (id: string) => () => setTouched((f) => (f[id] ? f : { ...f, [id]: true }));
+  // What makes the order impossible for now: the button stays disabled. Missing fields do not disable it: a click
+  // marks them and goes to the first one.
   const blockers = [
     noSlots ? t.noSlots : null,
     withLines && lines.length === 0 ? t.preorder.empty : null,
     outside ? t.zone.outside : null,
     zone?.belowMinimum ? interpolate(t.zone.belowMin, { missing: money(zone.minOrderCents - (quote?.subtotalCents ?? 0)), min: money(zone.minOrderCents) }) : null,
-    missing.length > 0 ? interpolate(t.missing, { fields: missing.join(', ') }) : null,
   ].filter((b): b is string => Boolean(b));
+  const notes = [...blockers, ...(missing.length > 0 ? [interpolate(t.missing, { fields: missing.map((m) => m.label).join(', ') })] : [])];
+  const goToFirstMissing = () => {
+    setTried(true);
+    const target = document.getElementById(missing[0].id);
+    if (!target) return;
+    target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    if (target instanceof HTMLInputElement) target.focus({ preventScroll: true });
+  };
   const req = (label: string) => `${label} *`;
 
   let n = 0;
@@ -387,7 +407,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
           renewKey();
           router.push(`${localePath(locale, `/order/${data.id}`)}?t=${data.token}`);
         }}
-        className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-16"
+        className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-14"
       >
         <input type="hidden" name="idempotencyKey" value={key} />
         <input type="hidden" name="mode" value={mode} />
@@ -398,7 +418,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
         {mode === 'table' && withPreorder && <input type="hidden" name="preorder" value="on" />}
         <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
 
-        <div className="min-w-0 space-y-12">
+        <div className="min-w-0 space-y-7">
           <Step n={++n} title={t.steps.mode}>
             <div className="grid grid-cols-3 gap-2 sm:gap-3" role="radiogroup" aria-label={t.steps.mode}>
               {MODES.map(({ id, icon: Icon }) => (
@@ -409,13 +429,15 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                   aria-checked={mode === id}
                   onClick={() => setMode(id)}
                   className={cn(
-                    'flex flex-col items-center gap-2 rounded-2xl border px-2 py-5 text-center transition sm:items-start sm:px-5 sm:text-left',
+                    'flex flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 text-center transition sm:items-start sm:px-4 sm:text-left',
                     mode === id ? 'border-ink bg-ink text-bone' : 'border-border bg-bone hover:border-ink',
                   )}
                 >
-                  <Icon className={cn('h-5 w-5', mode === id ? 'text-gold' : 'text-gold-deep')} />
-                  <span className="text-[11px] tracking-[0.22em] uppercase">{cartT.modes[id]}</span>
-                  <span className={cn('hidden text-xs leading-snug sm:block', mode === id ? 'text-bone/70' : 'text-ink/50')}>{cartT.hints[id]}</span>
+                  <span className="flex flex-col items-center gap-1.5 sm:flex-row sm:gap-2.5">
+                    <Icon className={cn('h-4 w-4', mode === id ? 'text-gold' : 'text-gold-deep')} />
+                    <span className="text-[11px] tracking-[0.22em] uppercase">{cartT.modes[id]}</span>
+                  </span>
+                  <span className={cn('hidden text-xs leading-snug sm:line-clamp-1', mode === id ? 'text-bone/70' : 'text-ink/50')}>{cartT.hints[id]}</span>
                 </button>
               ))}
             </div>
@@ -454,8 +476,40 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
             </Step>
           )}
 
-          <Step n={++n} title={t.steps.when}>
-            <SlotPicker days={days[mode] ?? null} value={slot} onChange={setSlot} locale={locale} t={t} phone={phone} />
+          <Step n={++n} title={t.steps.when} id="checkout-when">
+            <SlotPicker days={days[mode] ?? null} value={slot} onChange={setSlot} locale={locale} t={t} phone={phone} missing={tried} />
+          </Step>
+
+          <Step
+            n={++n}
+            title={t.steps.details}
+            aside={
+              !customer && (
+                <p className="hidden text-xs text-ink/55 sm:block">
+                  {t.signedOut}{' '}
+                  <Link href={signInHref} className="border-b border-gold-deep text-gold-deep">
+                    {t.signIn}
+                  </Link>
+                </p>
+              )
+            }
+          >
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field name="name" label={req(t.fields.name)} autoComplete="name" value={contact.name} onChange={(e) => setContact((c) => ({ ...c, name: e.target.value }))} onBlur={touch('name')} error={shown('name')} required className="sm:col-span-2" />
+              <Field name="email" type="email" label={req(t.fields.email)} autoComplete="email" value={contact.email} onChange={(e) => setContact((c) => ({ ...c, email: e.target.value }))} onBlur={touch('email')} error={shown('email')} required />
+              <Field name="phone" type="tel" label={req(t.fields.phone)} autoComplete="tel" value={contact.phone} onChange={(e) => setContact((c) => ({ ...c, phone: e.target.value }))} onBlur={touch('phone')} error={shown('phone')} required placeholder="+352 …" />
+              <Field as="textarea" name="notes" label={t.fields.notes} placeholder={t.fields.notesPh} className="sm:col-span-2 [&_textarea]:min-h-16" />
+            </div>
+            <p className="mt-4 text-xs text-ink/50">{t.requiredNote}</p>
+            {!customer && (
+              <p className="mt-6 text-xs text-ink/55 sm:hidden">
+                {t.signedOut}{' '}
+                <Link href={signInHref} className="border-b border-gold-deep text-gold-deep">
+                  {t.signIn}
+                </Link>{' '}
+                {t.signInHint}
+              </p>
+            )}
           </Step>
 
           {mode === 'delivery' && (
@@ -496,9 +550,10 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                   onPick={(found) => setAddr((a) => ({ ...a, ...found, cityFromCode: false }))}
                   label={req(t.fields.line1)}
                   t={t.address}
+                  error={shown('line1')}
                 />
                 <Field name="line2" label={t.fields.line2} autoComplete="address-line2" value={addr.line2} onChange={(e) => setAddr((a) => ({ ...a, line2: e.target.value }))} className="sm:col-span-2" />
-                <Field name="postalCode" label={req(t.fields.postalCode)} autoComplete="postal-code" inputMode="numeric" value={addr.postalCode} onChange={(e) => setAddr((a) => ({ ...a, postalCode: e.target.value }))} placeholder="L-7795" required />
+                <Field name="postalCode" label={req(t.fields.postalCode)} autoComplete="postal-code" inputMode="numeric" value={addr.postalCode} onChange={(e) => setAddr((a) => ({ ...a, postalCode: e.target.value }))} onBlur={touch('postalCode')} error={shown('postalCode')} placeholder="L-7795" required />
                 <div>
                   <Field
                     name="city"
@@ -506,6 +561,8 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                     autoComplete="address-level2"
                     value={addr.city}
                     onChange={(e) => setAddr((a) => ({ ...a, city: e.target.value, cityFromCode: false }))}
+                    onBlur={touch('city')}
+                    error={shown('city')}
                     required
                   />
                   {addr.cityFromCode && <p className="mt-1 text-xs text-ink/50">{t.address.cityFound}</p>}
@@ -551,38 +608,6 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
             </Step>
           )}
 
-          <Step
-            n={++n}
-            title={t.steps.details}
-            aside={
-              !customer && (
-                <p className="hidden text-xs text-ink/55 sm:block">
-                  {t.signedOut}{' '}
-                  <Link href={signInHref} className="border-b border-gold-deep text-gold-deep">
-                    {t.signIn}
-                  </Link>
-                </p>
-              )
-            }
-          >
-            <div className="grid gap-6 sm:grid-cols-2">
-              <Field name="name" label={req(t.fields.name)} autoComplete="name" value={contact.name} onChange={(e) => setContact((c) => ({ ...c, name: e.target.value }))} required className="sm:col-span-2" />
-              <Field name="email" type="email" label={req(t.fields.email)} autoComplete="email" value={contact.email} onChange={(e) => setContact((c) => ({ ...c, email: e.target.value }))} required />
-              <Field name="phone" type="tel" label={req(t.fields.phone)} autoComplete="tel" value={contact.phone} onChange={(e) => setContact((c) => ({ ...c, phone: e.target.value }))} required placeholder="+352 …" />
-              <Field as="textarea" name="notes" label={t.fields.notes} placeholder={t.fields.notesPh} className="sm:col-span-2" />
-            </div>
-            <p className="mt-4 text-xs text-ink/50">{t.requiredNote}</p>
-            {!customer && (
-              <p className="mt-6 text-xs text-ink/55 sm:hidden">
-                {t.signedOut}{' '}
-                <Link href={signInHref} className="border-b border-gold-deep text-gold-deep">
-                  {t.signIn}
-                </Link>{' '}
-                {t.signInHint}
-              </p>
-            )}
-          </Step>
-
           <Step n={++n} title={t.steps.payment}>
             <div className="grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label={t.steps.payment}>
               {payments.map((p) => {
@@ -596,7 +621,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                     role="radio"
                     aria-checked={payment === p}
                     onClick={() => setChoice(p)}
-                    className={cn('flex items-start gap-4 rounded-2xl border p-5 text-left transition', payment === p ? 'border-ink bg-bone shadow-[inset_0_0_0_1px_var(--color-ink)]' : 'border-border hover:border-ink')}
+                    className={cn('flex items-start gap-4 rounded-2xl border p-4 text-left transition', payment === p ? 'border-ink bg-bone shadow-[inset_0_0_0_1px_var(--color-ink)]' : 'border-border hover:border-ink')}
                   >
                     <span className={cn('mt-1 grid h-4 w-4 shrink-0 place-items-center rounded-full border', payment === p ? 'border-ink' : 'border-border')}>
                       {payment === p && <span className="h-2 w-2 rounded-full bg-ink" />}
@@ -655,6 +680,11 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                 <dt className="text-ink/60">{t.when}</dt>
                 <dd className="text-right">{slot.time ? slotLabel({ date: slot.date, from: slot.time }, locale, 'short') : <span className="text-ink/40">{t.toChoose}</span>}</dd>
               </div>
+              {/* The payment method, visible beside the button that confirms (APPLUX report 4, §2). */}
+              <div className="flex justify-between gap-4">
+                <dt className="text-ink/60">{t.steps.payment}</dt>
+                <dd className="text-right">{payment === 'transfer' ? t.payment.transfer : mode === 'table' ? t.payment.onsiteTable : t.payment.onsite}</dd>
+              </div>
               {quote && quote.lines.length > 0 && (
                 <>
                   <div className="flex justify-between gap-4">
@@ -689,14 +719,21 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
             )}
 
             <LinesError />
-            {blockers.map((b) => (
+            {notes.map((b) => (
               <p key={b} className="flex items-start gap-2 text-xs text-ink/70" role="status">
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold-deep" />
                 {b}
               </p>
             ))}
             {noSlots && phone && <CallUs phone={phone} />}
-            <SubmitButton label={mode === 'table' ? t.submitTable : t.submit} pendingLabel={t.sending} className="w-full" disabled={blockers.length > 0 || !key || pricing} />
+            {missing.length > 0 ? (
+              // Not a submit yet: mark what is missing and take the customer to the first field.
+              <Button type="button" className="w-full" disabled={blockers.length > 0} onClick={goToFirstMissing}>
+                {mode === 'table' ? t.submitTable : t.submit}
+              </Button>
+            ) : (
+              <SubmitButton label={mode === 'table' ? t.submitTable : t.submit} pendingLabel={t.sending} className="w-full" disabled={blockers.length > 0 || !key || pricing} />
+            )}
             <p className="text-center text-[11px] leading-relaxed text-ink/45">{t.footnote}</p>
           </div>
         </aside>

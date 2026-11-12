@@ -8,10 +8,12 @@ import { cn } from '@/lib/cn';
 import { addDays, today } from '@/lib/time';
 import type { SlotDay } from '@/modules/sales/service';
 
-export type SlotText = { pickTime: string; full: string; today: string; tomorrow: string; noDays: string; moreDates: string; fewerDates: string };
+export type SlotText = { pickTime: string; full: string; today: string; tomorrow: string; noDays: string; moreDates: string; fewerDates: string; moreTimes: string; fewerTimes: string };
 
 /** Open days shown before "See more dates": one week of chips, on every screen width (GG-008). */
 const FIRST_DAYS = 7;
+/** Times shown before "See more times": the first 5 free ones, on one row (APPLUX, 12 Nov). */
+const FIRST_TIMES = 5;
 
 type Props = {
   /** null while the days load. */
@@ -22,6 +24,8 @@ type Props = {
   t: SlotText;
   /** The shop's number, shown as a tap-to-call link when nothing can be booked online (GG-021). */
   phone?: string | null;
+  /** The customer tried to confirm without a time: the hint turns into an error. */
+  missing?: boolean;
 };
 
 /**
@@ -39,9 +43,10 @@ export function CallUs({ phone }: { phone: string }) {
   );
 }
 
-export function SlotPicker({ days, value, onChange, locale, t, phone }: Props) {
+export function SlotPicker({ days, value, onChange, locale, t, phone, missing }: Props) {
   const errors = [useFieldError('slot'), useFieldError('time'), useFieldError('date')];
   const [expanded, setExpanded] = useState(false);
+  const [allTimes, setAllTimes] = useState(false);
   const error = errors.find(Boolean);
   const first = today();
   const weekday = new Intl.DateTimeFormat(locale, { weekday: 'short', timeZone: 'UTC' });
@@ -52,7 +57,7 @@ export function SlotPicker({ days, value, onChange, locale, t, phone }: Props) {
       <div className="space-y-5" aria-busy>
         <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
           {Array.from({ length: FIRST_DAYS }, (_, i) => (
-            <span key={i} className="h-[76px] animate-pulse rounded-2xl bg-champagne/70" />
+            <span key={i} className="h-[60px] animate-pulse rounded-2xl bg-champagne/70" />
           ))}
         </div>
         <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
@@ -82,8 +87,17 @@ export function SlotPicker({ days, value, onChange, locale, t, phone }: Props) {
   const forced = days.findIndex((d) => d.date === value.date) >= FIRST_DAYS;
   const open = expanded || forced;
   const shown = open ? days : days.slice(0, FIRST_DAYS);
+  // The first free times; the rest of the day (full times included) behind "See more times". A chosen later time keeps
+  // the whole day open.
+  const slots = day?.slots ?? [];
+  const firstTimes = slots.filter((s) => s.available > 0).slice(0, FIRST_TIMES);
+  const later = slots.length - firstTimes.length;
+  const timeForced = Boolean(value.time) && !firstTimes.some((s) => s.from === value.time);
+  const timesOpen = allTimes || timeForced;
+  const times = timesOpen ? slots : firstTimes;
+  const toggle = 'flex items-center gap-1.5 border-b border-gold-deep text-[11px] tracking-[0.22em] text-gold-deep uppercase';
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <input type="hidden" name="date" value={value.date} />
       <input type="hidden" name="time" value={value.time} />
       <div className="grid grid-cols-4 gap-2 sm:grid-cols-7" role="radiogroup" aria-label={t.pickTime}>
@@ -102,12 +116,12 @@ export function SlotPicker({ days, value, onChange, locale, t, phone }: Props) {
               disabled={full}
               onClick={() => onChange({ date: d.date, time: d.slots.some((s) => s.from === value.time && s.available > 0) ? value.time : '' })}
               className={cn(
-                'flex h-[76px] min-w-0 flex-col items-center justify-center rounded-2xl border transition disabled:cursor-not-allowed disabled:opacity-35',
+                'flex h-[60px] min-w-0 flex-col items-center justify-center rounded-2xl border transition disabled:cursor-not-allowed disabled:opacity-35',
                 active ? 'border-ink bg-ink text-bone' : 'border-border bg-bone hover:border-ink',
               )}
             >
               <span className={cn('max-w-full truncate px-1 text-[9px] tracking-[0.12em] uppercase', active ? 'text-bone/70' : 'text-ink/50')}>{label}</span>
-              <span className="font-serif text-2xl leading-none">{dd}</span>
+              <span className="font-serif text-xl leading-none">{dd}</span>
               <span className={cn('text-[9px] tracking-[0.18em] uppercase', active ? 'text-gold' : 'text-gold-deep')}>{month.format(at)}</span>
             </button>
           );
@@ -118,7 +132,7 @@ export function SlotPicker({ days, value, onChange, locale, t, phone }: Props) {
           type="button"
           aria-expanded={open}
           onClick={() => setExpanded(!open)}
-          className="flex items-center gap-1.5 border-b border-gold-deep text-[11px] tracking-[0.22em] text-gold-deep uppercase"
+          className={toggle}
         >
           {open ? t.fewerDates : `${t.moreDates} (${days.length - FIRST_DAYS})`}
           <ChevronDown className={cn('h-3.5 w-3.5 transition', open && 'rotate-180')} />
@@ -126,8 +140,8 @@ export function SlotPicker({ days, value, onChange, locale, t, phone }: Props) {
       )}
 
       {day && (
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-5" role="radiogroup" aria-label={t.pickTime}>
-          {day.slots.map((s) => {
+        <div className="grid grid-cols-5 gap-2" role="radiogroup" aria-label={t.pickTime}>
+          {times.map((s) => {
             const full = s.available === 0;
             return (
               <Button
@@ -149,7 +163,17 @@ export function SlotPicker({ days, value, onChange, locale, t, phone }: Props) {
           })}
         </div>
       )}
-      {!value.time && !error && <p className="text-xs text-ink/50">{t.pickTime}</p>}
+      {day && later > 0 && !timeForced && (
+        <button type="button" aria-expanded={timesOpen} onClick={() => setAllTimes(!timesOpen)} className={toggle}>
+          {timesOpen ? t.fewerTimes : `${t.moreTimes} (${later})`}
+          <ChevronDown className={cn('h-3.5 w-3.5 transition', timesOpen && 'rotate-180')} />
+        </button>
+      )}
+      {!value.time && !error && (
+        <p className={cn('text-xs', missing ? 'text-red-700' : 'text-ink/50')} role={missing ? 'alert' : undefined}>
+          {t.pickTime}
+        </p>
+      )}
       {error && (
         <p className="text-xs text-red-700" role="alert">
           {error}

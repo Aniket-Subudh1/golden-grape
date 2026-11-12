@@ -1,7 +1,7 @@
 import type { PayloadRequest, Field, GlobalConfig } from 'payload';
 import { hiddenUnless, isStaff } from '@/lib/access';
 import { type Label, l, say, timeOfDay, WEEKDAYS } from '@/lib/admin';
-import { isBic, isIban } from './iban';
+import { isBic, isIban, withOneDefault } from './iban';
 import { revalidateTagHook } from '@/lib/revalidate';
 
 export const MODULES = ['b2b', 'purchasing', 'promotions', 'loyalty', 'giftCards', 'reviews', 'attendance', 'pos'] as const;
@@ -132,47 +132,69 @@ export const businessSettings: GlobalConfig = {
                     },
                   },
                 ),
-                // Shown to customers who pay by bank transfer (order page and e-mail), with the order number as reference.
-                row(
-                  {
-                    name: 'iban',
-                    type: 'text',
-                    label: l('IBAN (pour les virements)', 'IBAN (for bank transfers)', 'IBAN (für Überweisungen)', 'IBAN (para transferências)'),
-                    // GG-014: only a real IBAN (check digits verified, published examples refused) reaches customers.
-                    validate: (value: string | null | undefined, { req }: { req: PayloadRequest }) =>
-                      !value ||
-                      isIban(value) ||
-                      say(
-                        req,
-                        l(
-                          'IBAN invalide : vérifiez-le sur votre relevé bancaire (LU suivi de 18 chiffres).',
-                          'Invalid IBAN: check it on your bank statement (LU followed by 18 digits).',
-                          'Ungültige IBAN: Bitte auf dem Kontoauszug prüfen (LU gefolgt von 18 Ziffern).',
-                          'IBAN inválido: verifique-o no extrato bancário (LU seguido de 18 algarismos).',
-                        ),
-                      ),
-                    admin: {
-                      width: '60%',
-                      placeholder: 'LU.. .... .... .... ....',
-                      description: l(
-                        'Affiché aux clients qui paient par virement, avec le numéro de commande comme communication.',
-                        'Shown to customers who pay by transfer, with the order number as the reference.',
-                        'Wird Kunden mit Überweisung angezeigt, mit der Bestellnummer als Verwendungszweck.',
-                        'Mostrado aos clientes que pagam por transferência, com o número da encomenda como referência.',
-                      ),
-                    },
+                // The accounts customers pay into by bank transfer (APPLUX, 12 Nov): as many as needed, one default. A
+                // new transfer order gets the default one; staff can choose another on the order. Only the order's own
+                // account is shown to its customer (order page and e-mail), with the order number as reference.
+                {
+                  name: 'bankAccounts',
+                  type: 'array',
+                  label: l('Comptes bancaires (pour les virements)', 'Bank accounts (for transfers)', 'Bankkonten (für Überweisungen)', 'Contas bancárias (para transferências)'),
+                  labels: {
+                    singular: l('Compte bancaire', 'Bank account', 'Bankkonto', 'Conta bancária'),
+                    plural: l('Comptes bancaires', 'Bank accounts', 'Bankkonten', 'Contas bancárias'),
                   },
-                  {
-                    name: 'bic',
-                    type: 'text',
-                    label: l('BIC', 'BIC', 'BIC', 'BIC'),
-                    validate: (value: string | null | undefined, { req }: { req: PayloadRequest }) =>
-                      !value ||
-                      isBic(value) ||
-                      say(req, l('BIC invalide : 8 ou 11 caractères.', 'Invalid BIC: 8 or 11 characters.', 'Ungültiger BIC: 8 oder 11 Zeichen.', 'BIC inválido: 8 ou 11 caracteres.')),
-                    admin: { width: '40%', placeholder: 'XXXXLULL' },
+                  hooks: { beforeChange: [({ value }) => (Array.isArray(value) ? withOneDefault(value) : value)] },
+                  admin: {
+                    components: { RowLabel: '@/components/admin/row-label' },
+                    description: l(
+                      'Le compte « par défaut » est proposé aux clients qui paient par virement. Un compte désactivé n’est plus proposé ; les commandes déjà passées gardent le leur.',
+                      'The “default” account is given to customers who pay by transfer. A deactivated account is no longer offered; orders already placed keep theirs.',
+                      'Das „Standard“-Konto wird Kunden mit Überweisung genannt. Ein deaktiviertes Konto wird nicht mehr angeboten; bestehende Bestellungen behalten ihres.',
+                      'A conta «predefinida» é indicada aos clientes que pagam por transferência. Uma conta desativada deixa de ser proposta; as encomendas já feitas mantêm a sua.',
+                    ),
                   },
-                ),
+                  fields: [
+                    row(
+                      { name: 'holder', type: 'text', required: true, label: l('Titulaire du compte', 'Account holder', 'Kontoinhaber', 'Titular da conta'), admin: { width: '50%' } },
+                      { name: 'bankName', type: 'text', label: l('Banque (facultatif)', 'Bank (optional)', 'Bank (optional)', 'Banco (opcional)'), admin: { width: '50%' } },
+                    ),
+                    row(
+                      {
+                        name: 'iban',
+                        type: 'text',
+                        required: true,
+                        label: l('IBAN', 'IBAN', 'IBAN', 'IBAN'),
+                        // GG-014: only a real IBAN (check digits verified, published examples refused) reaches customers.
+                        validate: (value: string | null | undefined, { req }: { req: PayloadRequest }) =>
+                          (Boolean(value) && isIban(value!)) ||
+                          say(
+                            req,
+                            l(
+                              'IBAN invalide : vérifiez-le sur votre relevé bancaire (LU suivi de 18 chiffres).',
+                              'Invalid IBAN: check it on your bank statement (LU followed by 18 digits).',
+                              'Ungültige IBAN: Bitte auf dem Kontoauszug prüfen (LU gefolgt von 18 Ziffern).',
+                              'IBAN inválido: verifique-o no extrato bancário (LU seguido de 18 algarismos).',
+                            ),
+                          ),
+                        admin: { width: '60%', placeholder: 'LU.. .... .... .... ....' },
+                      },
+                      {
+                        name: 'bic',
+                        type: 'text',
+                        label: l('BIC', 'BIC', 'BIC', 'BIC'),
+                        validate: (value: string | null | undefined, { req }: { req: PayloadRequest }) =>
+                          !value ||
+                          isBic(value) ||
+                          say(req, l('BIC invalide : 8 ou 11 caractères.', 'Invalid BIC: 8 or 11 characters.', 'Ungültiger BIC: 8 oder 11 Zeichen.', 'BIC inválido: 8 ou 11 caracteres.')),
+                        admin: { width: '40%', placeholder: 'XXXXLULL' },
+                      },
+                    ),
+                    row(
+                      { name: 'active', type: 'checkbox', defaultValue: true, label: l('Actif', 'Active', 'Aktiv', 'Ativa'), admin: { width: '50%' } },
+                      { name: 'isDefault', type: 'checkbox', defaultValue: false, label: l('Compte par défaut', 'Default account', 'Standardkonto', 'Conta predefinida'), admin: { width: '50%' } },
+                    ),
+                  ],
+                },
               ],
             },
           ],

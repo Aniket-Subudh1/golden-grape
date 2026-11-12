@@ -213,7 +213,7 @@ const COUNTERS: Counter[] = [
   {
     key: 'toPrepare',
     collection: 'orders',
-    where: { and: orderTabWhere(ORDER_TABS[1]) },
+    where: { and: orderTabWhere(ORDER_TABS.find((t) => t.key === 'preparing')!) },
     href: listUrl('orders', { 'where[and][0][status][in][0]': 'confirmed', sort: 'slotAt' }),
     unit: 'cents',
     value: total,

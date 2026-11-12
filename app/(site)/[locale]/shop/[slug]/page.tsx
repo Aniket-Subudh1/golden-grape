@@ -104,7 +104,7 @@ async function Product({ params }: Pick<Props, 'params'>) {
             </span>
           </nav>
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
-            <Gallery photos={photos} name={product.name} />
+            <Gallery photos={photos} name={product.name} ribbon={inStock ? undefined : s.outOfStock} />
             <div className="lg:pt-6">
               {tag && <p className="eyebrow mb-4 text-gold-deep">{tag}</p>}
               <h1 className="font-serif text-4xl leading-[1] tracking-tight md:text-6xl">{product.name}</h1>

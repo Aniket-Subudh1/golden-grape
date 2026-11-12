@@ -134,10 +134,11 @@ export async function listProducts(payload: Payload, f: ProductFilters) {
 }
 
 /** The values the shop filters offer: regions and colours of active wines, in the visitor's language. */
-export async function shopFacets(payload: Payload, locale: Locale) {
+export async function shopFacets(payload: Payload, locale: Locale, category?: string) {
   const { docs } = await payload.find({
     collection: 'products',
-    where: { status: { equals: 'active' }, kind: { equals: 'wine' } },
+    // Within a category, only the values its wines have: no Region or Colour on groceries (APPLUX report 4, §1).
+    where: { status: { equals: 'active' }, kind: { equals: 'wine' }, ...(category ? { category: { equals: category } } : {}) },
     locale,
     limit: 0,
     depth: 0,
