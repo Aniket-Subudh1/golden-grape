@@ -952,7 +952,8 @@
     "moreTimes": "See more times",
     "fewerTimes": "Fewer times",
     "address": {
-      "hint": "Type your street: we suggest official Luxembourg addresses. You can correct anything.",
+      "hint": "Start typing your street or town, then pick your address from the list: the postcode and town fill in by themselves. You can still correct everything.",
+      "placeholder": "e.g. 12 rue de la Gare, Bissen",
       "searching": "Searching…",
       "pick": "Addresses found",
       "cityFound": "Town filled in from the postcode (you can change it).",
@@ -1053,14 +1054,14 @@
     "myOrders": "My orders",
     "print": "Print",
     "account": {
-      "title": "Save time next time",
-      "text": "Just choose a password: your details and address will be ready for your next order, and you can follow this one from your account.",
-      "note": "Optional: you can always order without an account.",
+      "title": "Create an account (optional)",
+      "text": "Your order is saved and you can follow it with the link in your e-mail: no account is needed. If you like, choose a password to activate an account with {{email}}: your details will be ready next time and this order will be in your account.",
+      "note": "Without a password nothing changes: your order stands and you can always order without an account.",
       "password": "Password",
-      "submit": "Create my account",
-      "sending": "Creating…",
-      "done": "Account created: you are signed in.",
-      "exists": "An account already exists with this e-mail.",
+      "submit": "Activate my account",
+      "sending": "Activating…",
+      "done": "Account activated: you are signed in.",
+      "exists": "You already have an account with this e-mail address.",
       "signIn": "Sign in"
     }
   },

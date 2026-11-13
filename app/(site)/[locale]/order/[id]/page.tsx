@@ -282,14 +282,16 @@ async function Confirmation({ params, searchParams }: Pick<Props, 'params' | 'se
       )}
 
       {!customer && !doc.customer && typeof sp.t === 'string' && (
+        // Optional, and said so (QA 12 Nov, GG-17): the account would use the e-mail already given; signing in to an
+        // existing account comes back to this order.
         <OrderAccount
           id={id}
           token={sp.t}
           locale={locale}
-          t={t.account}
+          t={{ ...t.account, text: interpolate(t.account.text, { email: doc.contact?.email ?? '' }) }}
           m={dict.form}
           errors={dict.auth.errors}
-          signInHref={`${localePath(locale, '/auth')}?next=${encodeURIComponent(localePath(locale, '/account/orders'))}`}
+          signInHref={`${localePath(locale, '/auth')}?next=${encodeURIComponent(`${localePath(locale, `/order/${id}`)}?t=${sp.t}`)}`}
         />
       )}
 

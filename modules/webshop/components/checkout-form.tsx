@@ -154,7 +154,7 @@ function StreetField({ value, onChange, onPick, label, t, error }: { value: stri
   const open = focused && value.trim().length >= 3 && value.trim() !== picked && (found.length > 0 || searching);
   return (
     <div className="relative sm:col-span-2" onFocus={() => setFocused(true)} onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setFocused(false)}>
-      <Field name="line1" label={label} autoComplete="address-line1" value={value} onChange={(e) => onChange(e.target.value)} required aria-autocomplete="list" aria-expanded={open} error={error} />
+      <Field name="line1" label={label} hint={t.hint} placeholder={t.placeholder} autoComplete="address-line1" value={value} onChange={(e) => onChange(e.target.value)} required aria-autocomplete="list" aria-expanded={open} error={error} />
       {open && (
         <ul role="listbox" aria-label={t.pick} className="absolute inset-x-0 top-full z-20 mt-1 max-h-72 overflow-auto rounded-xl border border-border bg-bone py-1 shadow-lg">
           {searching && found.length === 0 && <li className="px-4 py-2 text-xs text-ink/50">{t.searching}</li>}
@@ -568,7 +568,6 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                   {addr.cityFromCode && <p className="mt-1 text-xs text-ink/50">{t.address.cityFound}</p>}
                 </div>
               </div>
-              <p className="mt-3 text-xs text-ink/50">{t.address.hint}</p>
               {customer && !savedMatch && (
                 <label className="mt-4 flex items-center gap-3 text-sm">
                   <input type="checkbox" checked={keepAddress} onChange={(e) => setKeepAddress(e.target.checked)} className="h-4 w-4 accent-ink" />

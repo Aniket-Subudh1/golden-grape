@@ -18,7 +18,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 /** Only paths of this site, never another host. */
-const safeNext = (value: unknown, locale: Locale) => (typeof value === 'string' && /^\/(fr|en|de|pt)\/[\w/-]*$/.test(value) ? value : localePath(locale, '/account'));
+// A page of this site only; an order's link keeps its token, so signing in from a confirmation comes back to it (GG-17).
+const safeNext = (value: unknown, locale: Locale) => (typeof value === 'string' && /^\/(fr|en|de|pt)\/[\w/-]*(\?t=[\w-]+)?$/.test(value) ? value : localePath(locale, '/account'));
 
 async function Forms({ locale, searchParams }: { locale: Locale; searchParams: Props['searchParams'] }) {
   const sp = await searchParams;

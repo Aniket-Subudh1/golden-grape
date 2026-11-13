@@ -13,25 +13,33 @@ const SIZES = {
   lg: { label: 'mb-2', control: 'text-base', height: 'h-11' },
 };
 
-/** `error`: a message decided in the browser (the checkout's missing fields); otherwise the ActionForm error for `name`. */
-type Common = { label: string; name: string; size?: 'md' | 'lg'; error?: string | false | null };
+/**
+ * `error`: a message decided in the browser (the checkout's missing fields); otherwise the ActionForm error for `name`.
+ * `hint`: how to fill it in, between the label and the field (the delivery address, QA 12 Nov GG-16).
+ */
+type Common = { label: string; name: string; size?: 'md' | 'lg'; error?: string | false | null; hint?: string };
 type Props =
   | (Common & { as?: 'input' } & Omit<ComponentProps<'input'>, 'size'>)
   | (Common & { as: 'textarea' } & ComponentProps<'textarea'>)
   | (Common & { as: 'select' } & Omit<ComponentProps<'select'>, 'size'>);
 
 /** Underline field with its label and the ActionForm error for `name`. */
-export function Field({ label, name, className, as = 'input', size = 'md', error: own, ...props }: Props) {
+export function Field({ label, name, className, as = 'input', size = 'md', error: own, hint, ...props }: Props) {
   const sz = SIZES[size];
   const fromAction = useFieldError(name);
   const error = own || fromAction;
-  const describedBy = error ? `${name}-error` : undefined;
+  const describedBy = [hint && `${name}-hint`, error && `${name}-error`].filter(Boolean).join(' ') || undefined;
   const shared = { name, id: name, 'aria-invalid': error ? true : undefined, 'aria-describedby': describedBy };
   return (
     <div className={className}>
       <label htmlFor={name} className={cn('eyebrow block text-ink/60', sz.label)}>
         {label}
       </label>
+      {hint && (
+        <p id={`${name}-hint`} className="mb-1.5 text-xs text-ink/55">
+          {hint}
+        </p>
+      )}
       {as === 'textarea' ? (
         <textarea {...shared} {...(props as ComponentProps<'textarea'>)} className={cn(control, sz.control, 'min-h-28 resize-none py-2')} />
       ) : as === 'select' ? (
@@ -40,7 +48,7 @@ export function Field({ label, name, className, as = 'input', size = 'md', error
         <input {...shared} {...(props as ComponentProps<'input'>)} className={cn(control, sz.control, sz.height)} />
       )}
       {error && (
-        <p id={describedBy} className="mt-1 text-xs text-red-700">
+        <p id={`${name}-error`} className="mt-1 text-xs text-red-700">
           {error}
         </p>
       )}

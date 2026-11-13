@@ -952,7 +952,8 @@
     "moreTimes": "Weitere Uhrzeiten",
     "fewerTimes": "Weniger Uhrzeiten",
     "address": {
-      "hint": "Geben Sie Ihre Straße ein: Wir schlagen offizielle luxemburgische Adressen vor. Alles bleibt änderbar.",
+      "hint": "Beginnen Sie mit Ihrer Straße oder Ihrem Ort und wählen Sie dann Ihre Adresse aus der Liste: Postleitzahl und Ort werden automatisch ausgefüllt. Sie können danach alles korrigieren.",
+      "placeholder": "z. B. 12 rue de la Gare, Bissen",
       "searching": "Suche…",
       "pick": "Gefundene Adressen",
       "cityFound": "Ort aus der Postleitzahl ergänzt (änderbar).",
@@ -1053,14 +1054,14 @@
     "myOrders": "Meine Bestellungen",
     "print": "Drucken",
     "account": {
-      "title": "Beim nächsten Mal schneller",
-      "text": "Wählen Sie einfach ein Passwort: Ihre Daten und Ihre Adresse sind bei der nächsten Bestellung bereit, und Sie verfolgen diese Bestellung in Ihrem Konto.",
-      "note": "Freiwillig: Sie können immer ohne Konto bestellen.",
+      "title": "Konto erstellen (freiwillig)",
+      "text": "Ihre Bestellung ist gespeichert und Sie verfolgen sie über den Link in Ihrer E-Mail: ein Konto ist nicht nötig. Wenn Sie möchten, wählen Sie ein Passwort, um ein Konto mit {{email}} zu aktivieren: Ihre Daten sind beim nächsten Mal bereit und diese Bestellung finden Sie in Ihrem Konto.",
+      "note": "Ohne Passwort ändert sich nichts: Ihre Bestellung bleibt gültig und Sie können jederzeit ohne Konto bestellen.",
       "password": "Passwort",
-      "submit": "Konto erstellen",
-      "sending": "Wird erstellt…",
-      "done": "Konto erstellt: Sie sind angemeldet.",
-      "exists": "Mit dieser E-Mail gibt es bereits ein Konto.",
+      "submit": "Mein Konto aktivieren",
+      "sending": "Wird aktiviert…",
+      "done": "Konto aktiviert: Sie sind angemeldet.",
+      "exists": "Sie haben bereits ein Konto mit dieser E-Mail-Adresse.",
       "signIn": "Anmelden"
     }
   },

@@ -952,7 +952,8 @@
     "moreTimes": "Ver mais horários",
     "fewerTimes": "Menos horários",
     "address": {
-      "hint": "Escreva a sua rua: sugerimos moradas oficiais do Luxemburgo. Pode corrigir tudo.",
+      "hint": "Comece a escrever a sua rua ou localidade e escolha a morada na lista: o código postal e a localidade preenchem-se sozinhos. Pode depois corrigir tudo.",
+      "placeholder": "Ex.: 12 rue de la Gare, Bissen",
       "searching": "A procurar…",
       "pick": "Moradas encontradas",
       "cityFound": "Localidade preenchida a partir do código postal (pode alterar).",
@@ -1053,14 +1054,14 @@
     "myOrders": "As minhas encomendas",
     "print": "Imprimir",
     "account": {
-      "title": "Ganhe tempo da próxima vez",
-      "text": "Escolha apenas uma palavra-passe: os seus dados e a sua morada ficam prontos para a próxima encomenda, e acompanha esta na sua conta.",
-      "note": "Opcional: pode sempre encomendar sem conta.",
+      "title": "Criar uma conta (opcional)",
+      "text": "A sua encomenda está registada e pode segui-la com o link recebido por e-mail: não precisa de conta. Se quiser, escolha uma palavra-passe para ativar uma conta com {{email}}: os seus dados ficam prontos para a próxima vez e encontrará esta encomenda na sua conta.",
+      "note": "Sem palavra-passe nada muda: a sua encomenda mantém-se e pode sempre encomendar sem conta.",
       "password": "Palavra-passe",
-      "submit": "Criar a minha conta",
-      "sending": "A criar…",
-      "done": "Conta criada: tem sessão iniciada.",
-      "exists": "Já existe uma conta com este e-mail.",
+      "submit": "Ativar a minha conta",
+      "sending": "A ativar…",
+      "done": "Conta ativada: está ligado(a).",
+      "exists": "Já tem uma conta com este endereço de e-mail.",
       "signIn": "Iniciar sessão"
     }
   },

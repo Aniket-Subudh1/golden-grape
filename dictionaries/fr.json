@@ -952,7 +952,8 @@
     "moreTimes": "Voir plus d’horaires",
     "fewerTimes": "Moins d’horaires",
     "address": {
-      "hint": "Tapez votre rue : nous proposons les adresses officielles du Luxembourg. Vous pouvez tout corriger.",
+      "hint": "Commencez à taper votre rue ou votre localité, puis choisissez votre adresse dans la liste : le code postal et la localité se remplissent seuls. Vous pouvez ensuite tout corriger.",
+      "placeholder": "Ex. : 12 rue de la Gare, Bissen",
       "searching": "Recherche…",
       "pick": "Adresses trouvées",
       "cityFound": "Localité remplie d’après le code postal (modifiable).",
@@ -1053,14 +1054,14 @@
     "myOrders": "Mes commandes",
     "print": "Imprimer",
     "account": {
-      "title": "Gagnez du temps la prochaine fois",
-      "text": "Choisissez simplement un mot de passe : vos coordonnées et votre adresse seront prêtes pour votre prochaine commande, et vous suivrez celle-ci depuis votre compte.",
-      "note": "Facultatif : vous pouvez toujours commander sans compte.",
+      "title": "Créer un compte (facultatif)",
+      "text": "Votre commande est enregistrée et vous la suivez avec le lien reçu par e-mail : aucun compte n’est nécessaire. Si vous le souhaitez, choisissez un mot de passe pour activer un compte avec {{email}} : vos coordonnées seront prêtes la prochaine fois et vous retrouverez cette commande dans votre espace.",
+      "note": "Sans mot de passe, rien ne change : votre commande reste valable et vous pouvez toujours commander sans compte.",
       "password": "Mot de passe",
-      "submit": "Créer mon compte",
-      "sending": "Création…",
-      "done": "Compte créé : vous êtes connecté(e).",
-      "exists": "Un compte existe déjà avec cet e-mail.",
+      "submit": "Activer mon compte",
+      "sending": "Activation…",
+      "done": "Compte activé : vous êtes connecté(e).",
+      "exists": "Vous avez déjà un compte avec cette adresse e-mail.",
       "signIn": "Se connecter"
     }
   },
