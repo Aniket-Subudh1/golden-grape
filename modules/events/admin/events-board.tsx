@@ -19,10 +19,10 @@ export const bookingsHref = (event: string, status?: 'pending' | 'confirmed') =>
   `/admin/collections/eventBookings?where[and][0][event][equals]=${event}${status ? `&where[and][1][status][equals]=${status}` : ''}`;
 
 const TEXT = {
-  fr: { title: 'Réservations d’événements', subtitle: 'Un événement par carte : les places, ce qui reste à confirmer et les paiements reçus.', upcoming: 'À venir', archives: 'Archives', reserved: 'Places réservées', remaining: 'Places restantes', unlimited: 'Illimité', toConfirm: 'À confirmer', received: 'Encaissé', free: 'Gratuit', of: 'sur', view: 'Voir les réservations', confirmNow: (n: number) => `${n} à confirmer`, none: 'Aucune réservation', bookings: (n: number) => `${n} réservation${n > 1 ? 's' : ''}`, draft: 'Brouillon', emptyUpcoming: 'Aucun événement à venir.', emptyArchives: 'Aucun événement passé.', forbidden: 'Votre rôle ne permet pas de voir les réservations.' },
-  en: { title: 'Event bookings', subtitle: 'One card per event: the seats, what is still to confirm and the payments received.', upcoming: 'Upcoming', archives: 'Archives', reserved: 'Seats booked', remaining: 'Seats left', unlimited: 'Unlimited', toConfirm: 'To confirm', received: 'Received', free: 'Free', of: 'of', view: 'View bookings', confirmNow: (n: number) => `${n} to confirm`, none: 'No bookings', bookings: (n: number) => `${n} booking${n > 1 ? 's' : ''}`, draft: 'Draft', emptyUpcoming: 'No upcoming events.', emptyArchives: 'No past events.', forbidden: 'Your role cannot see bookings.' },
-  de: { title: 'Veranstaltungsbuchungen', subtitle: 'Eine Karte pro Veranstaltung: Plätze, offene Bestätigungen und erhaltene Zahlungen.', upcoming: 'Bevorstehend', archives: 'Archiv', reserved: 'Gebuchte Plätze', remaining: 'Freie Plätze', unlimited: 'Unbegrenzt', toConfirm: 'Zu bestätigen', received: 'Erhalten', free: 'Kostenlos', of: 'von', view: 'Buchungen ansehen', confirmNow: (n: number) => `${n} zu bestätigen`, none: 'Keine Buchungen', bookings: (n: number) => `${n} Buchung${n > 1 ? 'en' : ''}`, draft: 'Entwurf', emptyUpcoming: 'Keine bevorstehenden Veranstaltungen.', emptyArchives: 'Keine vergangenen Veranstaltungen.', forbidden: 'Ihre Rolle darf Buchungen nicht sehen.' },
-  pt: { title: 'Reservas de eventos', subtitle: 'Um cartão por evento: os lugares, o que falta confirmar e os pagamentos recebidos.', upcoming: 'Próximos', archives: 'Arquivo', reserved: 'Lugares reservados', remaining: 'Lugares livres', unlimited: 'Ilimitado', toConfirm: 'Por confirmar', received: 'Recebido', free: 'Grátis', of: 'de', view: 'Ver as reservas', confirmNow: (n: number) => `${n} por confirmar`, none: 'Sem reservas', bookings: (n: number) => `${n} reserva${n > 1 ? 's' : ''}`, draft: 'Rascunho', emptyUpcoming: 'Sem eventos próximos.', emptyArchives: 'Sem eventos passados.', forbidden: 'A sua função não permite ver as reservas.' },
+  fr: { title: 'Réservations d’événements', subtitle: 'Un événement par carte : les places, ce qui reste à confirmer et les paiements reçus.', upcoming: 'À venir', archives: 'Archives', reserved: 'Places réservées', remaining: 'Places restantes', unlimited: 'Illimité', toConfirm: 'À confirmer', received: 'Encaissé', refund: 'À rembourser (annulées)', waiting: (n: number) => `${n} réservation${n > 1 ? 's' : ''} à confirmer :`, free: 'Gratuit', of: 'sur', view: 'Voir les réservations', confirmNow: (n: number) => `${n} à confirmer`, none: 'Aucune réservation', bookings: (n: number) => `${n} réservation${n > 1 ? 's' : ''}`, draft: 'Brouillon', emptyUpcoming: 'Aucun événement à venir.', emptyArchives: 'Aucun événement passé.', forbidden: 'Votre rôle ne permet pas de voir les réservations.' },
+  en: { title: 'Event bookings', subtitle: 'One card per event: the seats, what is still to confirm and the payments received.', upcoming: 'Upcoming', archives: 'Archives', reserved: 'Seats booked', remaining: 'Seats left', unlimited: 'Unlimited', toConfirm: 'To confirm', received: 'Received', refund: 'To refund (cancelled)', waiting: (n: number) => `${n} booking${n > 1 ? 's' : ''} to confirm:`, free: 'Free', of: 'of', view: 'View bookings', confirmNow: (n: number) => `${n} to confirm`, none: 'No bookings', bookings: (n: number) => `${n} booking${n > 1 ? 's' : ''}`, draft: 'Draft', emptyUpcoming: 'No upcoming events.', emptyArchives: 'No past events.', forbidden: 'Your role cannot see bookings.' },
+  de: { title: 'Veranstaltungsbuchungen', subtitle: 'Eine Karte pro Veranstaltung: Plätze, offene Bestätigungen und erhaltene Zahlungen.', upcoming: 'Bevorstehend', archives: 'Archiv', reserved: 'Gebuchte Plätze', remaining: 'Freie Plätze', unlimited: 'Unbegrenzt', toConfirm: 'Zu bestätigen', received: 'Erhalten', refund: 'Zu erstatten (storniert)', waiting: (n: number) => `${n} Buchung${n > 1 ? 'en' : ''} zu bestätigen:`, free: 'Kostenlos', of: 'von', view: 'Buchungen ansehen', confirmNow: (n: number) => `${n} zu bestätigen`, none: 'Keine Buchungen', bookings: (n: number) => `${n} Buchung${n > 1 ? 'en' : ''}`, draft: 'Entwurf', emptyUpcoming: 'Keine bevorstehenden Veranstaltungen.', emptyArchives: 'Keine vergangenen Veranstaltungen.', forbidden: 'Ihre Rolle darf Buchungen nicht sehen.' },
+  pt: { title: 'Reservas de eventos', subtitle: 'Um cartão por evento: os lugares, o que falta confirmar e os pagamentos recebidos.', upcoming: 'Próximos', archives: 'Arquivo', reserved: 'Lugares reservados', remaining: 'Lugares livres', unlimited: 'Ilimitado', toConfirm: 'Por confirmar', received: 'Recebido', refund: 'A reembolsar (canceladas)', waiting: (n: number) => `${n} reserva${n > 1 ? 's' : ''} por confirmar:`, free: 'Grátis', of: 'de', view: 'Ver as reservas', confirmNow: (n: number) => `${n} por confirmar`, none: 'Sem reservas', bookings: (n: number) => `${n} reserva${n > 1 ? 's' : ''}`, draft: 'Rascunho', emptyUpcoming: 'Sem eventos próximos.', emptyArchives: 'Sem eventos passados.', forbidden: 'A sua função não permite ver as reservas.' },
 };
 
 export default async function EventsBoard({ initPageResult, params, searchParams }: AdminViewServerProps) {
@@ -38,22 +38,29 @@ export default async function EventsBoard({ initPageResult, params, searchParams
     ? await Promise.all([
         // The published documents: `booked` is counted there by the booking service, never on a draft copy.
         req.payload.find({ collection: 'events', limit: 0, depth: 0, locale: lang, overrideAccess: true, select: { title: true, startsAt: true, endsAt: true, capacity: true, booked: true, priceCents: true, _status: true } }),
-        req.payload.find({ collection: 'eventBookings', where: { status: { not_equals: 'cancelled' } }, limit: 0, depth: 0, overrideAccess: true, select: { event: true, guests: true, status: true, amountCents: true, paidCents: true, refundedCents: true } }),
+        // Every booking: a cancelled one still counts in the money while it holds some (a refund to send, GG-11).
+        req.payload.find({ collection: 'eventBookings', limit: 0, depth: 0, overrideAccess: true, select: { event: true, guests: true, status: true, amountCents: true, paidCents: true, refundedCents: true } }),
       ])
     : [null, null];
 
-  // Per event: bookings, guests still to confirm, money expected and received (cancelled bookings left out).
-  const byEvent = new Map<string, { count: number; pending: number; pendingGuests: number; totalCents: number; paidCents: number }>();
+  // Per event: bookings, guests still to confirm, money expected and received (less refunds) on the active bookings,
+  // and apart, what cancelled bookings still hold: a refund to send, no longer lost from the figures (QA 12 Nov, GG-11).
+  const EMPTY = { count: 0, pending: 0, pendingGuests: 0, totalCents: 0, paidCents: 0, refundCents: 0 };
+  const byEvent = new Map<string, typeof EMPTY>();
   for (const b of bookings?.docs ?? []) {
     const key = String(typeof b.event === 'object' && b.event ? b.event.id : b.event);
-    const sum = byEvent.get(key) ?? { count: 0, pending: 0, pendingGuests: 0, totalCents: 0, paidCents: 0 };
-    sum.count++;
-    if (b.status === 'pending') {
-      sum.pending++;
-      sum.pendingGuests += b.guests ?? 0;
+    const sum = byEvent.get(key) ?? { ...EMPTY };
+    const held = (b.paidCents ?? 0) - (b.refundedCents ?? 0);
+    if (b.status === 'cancelled') sum.refundCents += Math.max(0, held);
+    else {
+      sum.count++;
+      sum.totalCents += b.amountCents ?? 0;
+      sum.paidCents += held;
+      if (b.status === 'pending') {
+        sum.pending++;
+        sum.pendingGuests += b.guests ?? 0;
+      }
     }
-    sum.totalCents += b.amountCents ?? 0;
-    sum.paidCents += (b.paidCents ?? 0) - (b.refundedCents ?? 0);
     byEvent.set(key, sum);
   }
   const over = (e: { startsAt: string; endsAt?: string | null }) => new Date(e.endsAt ?? e.startsAt).getTime() < now;
@@ -86,9 +93,22 @@ export default async function EventsBoard({ initPageResult, params, searchParams
                 </Link>
               </nav>
               {shown.length === 0 && <p className="gg-card__empty">{archives ? t.emptyArchives : t.emptyUpcoming}</p>}
+              {/* What waits for a decision, first and actionable (GG-11): each event's bookings to confirm. */}
+              {!archives && waiting > 0 && (
+                <p className="gg-events__waiting">
+                  <b>{t.waiting(waiting)}</b>
+                  {upcoming
+                    .filter((e) => (byEvent.get(e.id)?.pending ?? 0) > 0)
+                    .map((e) => (
+                      <a key={e.id} href={bookingsHref(e.id, 'pending')}>
+                        {e.title} ({byEvent.get(e.id)!.pending})
+                      </a>
+                    ))}
+                </p>
+              )}
               <div className="gg-events">
                 {shown.map((e) => {
-                  const sum = byEvent.get(e.id) ?? { count: 0, pending: 0, pendingGuests: 0, totalCents: 0, paidCents: 0 };
+                  const sum = byEvent.get(e.id) ?? EMPTY;
                   const when = eventDate(e.startsAt, e.endsAt, lang);
                   const booked = e.booked ?? 0;
                   const left = e.capacity ? Math.max(0, e.capacity - booked) : null;
@@ -141,6 +161,12 @@ export default async function EventsBoard({ initPageResult, params, searchParams
                             )}
                           </dd>
                         </div>
+                        {sum.refundCents > 0 && (
+                          <div data-tone="due">
+                            <dt>{t.refund}</dt>
+                            <dd>{formatMoney(sum.refundCents, lang)}</dd>
+                          </div>
+                        )}
                       </dl>
                       <footer>
                         <a className="gg-btn gg-btn--primary" href={bookingsHref(e.id)}>

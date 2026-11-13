@@ -3273,6 +3273,28 @@ body:has(.gg-create) .no-results__actions {
   color: #8a5800;
   background: #fff8ea;
 }
+.gg-events__waiting {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border: 1px solid #f0d49a;
+  border-radius: 10px;
+  background: #fff8ea;
+  font-size: 13px;
+  color: #8a5800;
+}
+.gg-events__waiting a {
+  padding: 3px 10px;
+  border: 1px solid #d98a00;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #8a5800;
+  font-weight: 600;
+  text-decoration: none;
+}
 .gg-crumb {
   display: flex;
   flex-wrap: wrap;
