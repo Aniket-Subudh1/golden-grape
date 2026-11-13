@@ -45,9 +45,12 @@ import { ReasonCell as ReasonCell_5bea5cab201ede96546b31bd184de260 } from '@/mod
 import { default as default_4c47180b2e77f55067f27acaa2019504 } from '@/modules/inventory/admin/post-count-button'
 import { default as default_d70d7a107c8e989d5b795a0688b5fa32 } from '@/modules/inventory/admin/count-row-label'
 import { default as default_7bc2721c8713877962a76a55647681b3 } from '@/modules/sales/admin/order-panel'
+import { ModeCell as ModeCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@/modules/sales/admin/cells'
 import { ContactCell as ContactCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@/modules/sales/admin/cells'
+import { AddressCell as AddressCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@/modules/sales/admin/cells'
 import { SlotCell as SlotCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@/modules/sales/admin/cells'
 import { TotalCell as TotalCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@/modules/sales/admin/cells'
+import { PaymentCell as PaymentCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@/modules/sales/admin/cells'
 import { default as default_17c7c564cab176c87d2ca60abf0e7c3a } from '@/modules/sales/admin/order-tabs'
 import { default as default_1032e7f4a7ea2c2fe5848dd9521e5ee8 } from '@/modules/sales/admin/reservation-panel'
 import { PreorderCell as PreorderCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@/modules/sales/admin/cells'
@@ -121,9 +124,12 @@ export const importMap = {
   "@/modules/inventory/admin/post-count-button#default": default_4c47180b2e77f55067f27acaa2019504,
   "@/modules/inventory/admin/count-row-label#default": default_d70d7a107c8e989d5b795a0688b5fa32,
   "@/modules/sales/admin/order-panel#default": default_7bc2721c8713877962a76a55647681b3,
+  "@/modules/sales/admin/cells#ModeCell": ModeCell_2af359ddeeb3df48a49ffdf99c6a1917,
   "@/modules/sales/admin/cells#ContactCell": ContactCell_2af359ddeeb3df48a49ffdf99c6a1917,
+  "@/modules/sales/admin/cells#AddressCell": AddressCell_2af359ddeeb3df48a49ffdf99c6a1917,
   "@/modules/sales/admin/cells#SlotCell": SlotCell_2af359ddeeb3df48a49ffdf99c6a1917,
   "@/modules/sales/admin/cells#TotalCell": TotalCell_2af359ddeeb3df48a49ffdf99c6a1917,
+  "@/modules/sales/admin/cells#PaymentCell": PaymentCell_2af359ddeeb3df48a49ffdf99c6a1917,
   "@/modules/sales/admin/order-tabs#default": default_17c7c564cab176c87d2ca60abf0e7c3a,
   "@/modules/sales/admin/reservation-panel#default": default_1032e7f4a7ea2c2fe5848dd9521e5ee8,
   "@/modules/sales/admin/cells#PreorderCell": PreorderCell_2af359ddeeb3df48a49ffdf99c6a1917,

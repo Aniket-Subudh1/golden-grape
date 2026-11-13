@@ -1,4 +1,4 @@
-import type { CollectionConfig, Field, PayloadRequest } from 'payload';
+import { baseIDField, type CollectionConfig, type Field, type PayloadRequest } from 'payload';
 import { hiddenUnless, isStaff, none, staffOrSelf } from '@/lib/access';
 import { addButton, badgeCell, boolCell, emptyList, l, type Label, listOnly, say, scaledNumber, type StatusTab, statusTabs, timeOfDay, WEEKDAYS } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
@@ -158,6 +158,20 @@ const localeField: Field = {
   options: LOCALES.map((value) => ({ value, label: LOCALE_NAMES[value] })),
 };
 
+/** Kept for the services, never a list column or filter: technical values (cents, ids, copies) staff never pick (GG-07). */
+const internal = { disableListColumn: true, disableListFilter: true } as const;
+
+/**
+ * `internal` on a list's or group's fields too: Payload offers nested fields in its filters even when the parent is
+ * not. `rows`: the fields of a list (array), with Payload's own row id (generated as usual) hidden as well.
+ */
+const hidden = (fields: Field[], rows = false): Field[] => [
+  ...fields.map((f) => ({ ...f, admin: { ...('admin' in f ? f.admin : {}), ...internal }, ...('fields' in f ? { fields: hidden(f.fields) } : {}) }) as Field),
+  ...(rows ? [{ ...baseIDField, admin: { ...baseIDField.admin, ...internal } } as Field] : []),
+];
+
+const historyFields = hidden([{ name: 'at', type: 'date' }, { name: 'from', type: 'text' }, { name: 'to', type: 'text' }, { name: 'user', type: 'relationship', relationTo: 'users' }, { name: 'reason', type: 'text' }], true);
+
 const lineFields: Field[] = [
   { name: 'variant', type: 'relationship', relationTo: 'variants', required: true },
   { name: 'unit', type: 'relationship', relationTo: 'packagingUnits' },
@@ -176,7 +190,8 @@ export const orders: CollectionConfig = {
   labels: { singular: l('Commande', 'Order', 'Bestellung', 'Encomenda'), plural: l('Commandes', 'Orders', 'Bestellungen', 'Encomendas') },
   admin: {
     useAsTitle: 'number',
-    defaultColumns: ['number', 'slot', 'mode', 'contact', 'totals', 'status', 'channel'],
+    // What staff act on (QA 12 Nov, GG-07): number, slot, pickup or delivery, customer, payment, total, stage.
+    defaultColumns: ['number', 'slot', 'mode', 'contact', 'payment', 'totals', 'status'],
     hidden: hiddenUnless('sales'),
     listSearchableFields: ['number', 'contact.name', 'contact.email', 'contact.phone'],
     description: l(
@@ -218,21 +233,22 @@ export const orders: CollectionConfig = {
           { value: 'pos', label: l('Caisse', 'Till', 'Kasse', 'Caixa') },
         ],
       },
-      { name: 'mode', type: 'select', required: true, label: l('Type', 'Type', 'Art', 'Tipo'), options: options(MODE_LABELS) },
-      { name: 'idempotencyKey', type: 'text', required: true, unique: true, admin: { disableListColumn: true, disableListFilter: true } },
+      { name: 'mode', type: 'select', required: true, label: l('Type', 'Type', 'Art', 'Tipo'), options: options(MODE_LABELS), admin: { components: { Cell: '@/modules/sales/admin/cells#ModeCell' } } },
+      { name: 'idempotencyKey', type: 'text', required: true, unique: true, admin: internal },
       { name: 'customer', type: 'relationship', relationTo: 'customers', index: true, label: l('Compte client', 'Customer account', 'Kundenkonto', 'Conta de cliente') },
       contactGroup('@/modules/sales/admin/cells#ContactCell'),
       {
         name: 'address',
         type: 'group',
         label: l('Adresse de livraison', 'Delivery address', 'Lieferadresse', 'Morada de entrega'),
-        admin: { disableListColumn: true },
+        // An optional column on one line (GG-07); the code postal and the town can be filtered.
+        admin: { components: { Cell: '@/modules/sales/admin/cells#AddressCell' } },
         fields: [
-          { name: 'line1', type: 'text' },
-          { name: 'line2', type: 'text' },
-          { name: 'postalCode', type: 'text' },
-          { name: 'city', type: 'text' },
-          { name: 'country', type: 'text' },
+          { name: 'line1', type: 'text', label: l('Rue et numéro', 'Street and number', 'Straße und Nummer', 'Rua e número'), admin: { disableListColumn: true } },
+          { name: 'line2', type: 'text', label: l('Complément', 'Address line 2', 'Adresszusatz', 'Complemento'), admin: internal },
+          { name: 'postalCode', type: 'text', label: l('Code postal', 'Postcode', 'Postleitzahl', 'Código postal'), admin: { disableListColumn: true } },
+          { name: 'city', type: 'text', label: l('Localité', 'Town', 'Ort', 'Localidade'), admin: { disableListColumn: true } },
+          { name: 'country', type: 'text', label: l('Pays', 'Country', 'Land', 'País'), admin: internal },
         ],
       },
       {
@@ -241,62 +257,66 @@ export const orders: CollectionConfig = {
         label: l('Créneau', 'Time slot', 'Zeitfenster', 'Horário'),
         admin: { components: { Cell: '@/modules/sales/admin/cells#SlotCell' } },
         fields: [
-          { name: 'date', type: 'text', label: l('Jour', 'Day', 'Tag', 'Dia') },
-          { name: 'from', type: 'text', label: l('De', 'From', 'Von', 'De') },
-          { name: 'to', type: 'text', label: l('À', 'To', 'Bis', 'Até') },
+          // The slot is one column (its cell); its day stays a filter.
+          { name: 'date', type: 'text', label: l('Jour', 'Day', 'Tag', 'Dia'), admin: { disableListColumn: true } },
+          { name: 'from', type: 'text', label: l('De', 'From', 'Von', 'De'), admin: internal },
+          { name: 'to', type: 'text', label: l('À', 'To', 'Bis', 'Até'), admin: internal },
         ],
       },
       // `YYYY-MM-DDTHH:mm` of the slot: the list's "today and upcoming" filter and its sort.
       { name: 'slotAt', type: 'text', index: true, label: l('Créneau', 'Time slot', 'Zeitfenster', 'Horário'), admin: { disableListColumn: true } },
-      { name: 'lines', type: 'array', label: l('Articles', 'Items', 'Artikel', 'Artigos'), admin: { disableListColumn: true }, fields: lineFields },
+      { name: 'lines', type: 'array', label: l('Articles', 'Items', 'Artikel', 'Artigos'), admin: internal, fields: hidden(lineFields, true) },
       {
         name: 'totals',
         type: 'group',
         label: l('Total', 'Total', 'Summe', 'Total'),
         admin: { components: { Cell: '@/modules/sales/admin/cells#TotalCell' } },
+        // The total shows in euros through its cell; the amounts in cents behind it are never columns (GG-07).
         fields: [
-          { name: 'subtotalCents', type: 'number', required: true },
-          { name: 'discountCents', type: 'number', defaultValue: 0 },
-          { name: 'deliveryCents', type: 'number', defaultValue: 0 },
-          { name: 'vatCents', type: 'number', required: true },
-          { name: 'totalCents', type: 'number', required: true },
-          { name: 'vatBreakdown', type: 'array', fields: [{ name: 'rateBp', type: 'number' }, { name: 'baseCents', type: 'number' }, { name: 'vatCents', type: 'number' }] },
+          { name: 'subtotalCents', type: 'number', required: true, admin: internal },
+          { name: 'discountCents', type: 'number', defaultValue: 0, admin: internal },
+          { name: 'deliveryCents', type: 'number', defaultValue: 0, admin: internal },
+          { name: 'vatCents', type: 'number', required: true, admin: internal },
+          { name: 'totalCents', type: 'number', required: true, admin: internal },
+          { name: 'vatBreakdown', type: 'array', admin: internal, fields: hidden([{ name: 'rateBp', type: 'number' }, { name: 'baseCents', type: 'number' }, { name: 'vatCents', type: 'number' }], true) },
         ],
       },
       {
         name: 'payment',
         type: 'group',
         label: l('Paiement', 'Payment', 'Zahlung', 'Pagamento'),
-        admin: { disableListColumn: true },
+        // One column: the payment's state as a badge and its method (GG-07/08: transfers awaited stand out).
+        admin: { components: { Cell: { path: '@/modules/sales/admin/cells#PaymentCell', clientProps: { tones: PAYMENT_STATUS_TONES, states: PAYMENT_STATUS_LABELS, methods: PAYMENT_METHOD_LABELS } } } },
         fields: [
-          { name: 'provider', type: 'select', defaultValue: 'manual', options: ['manual', 'wallee'] },
-          { name: 'method', type: 'select', options: options(PAYMENT_METHOD_LABELS), label: l('Moyen', 'Method', 'Art', 'Meio') },
-          { name: 'status', type: 'select', defaultValue: 'none', options: options(PAYMENT_STATUS_LABELS), label: l('État', 'State', 'Stand', 'Estado') },
-          { name: 'ref', type: 'text' },
+          { name: 'provider', type: 'select', defaultValue: 'manual', options: ['manual', 'wallee'], admin: internal },
+          { name: 'method', type: 'select', options: options(PAYMENT_METHOD_LABELS), label: l('Moyen de paiement', 'Payment method', 'Zahlungsart', 'Meio de pagamento'), admin: { disableListColumn: true } },
+          { name: 'status', type: 'select', defaultValue: 'none', options: options(PAYMENT_STATUS_LABELS), label: l('État du paiement', 'Payment state', 'Zahlungsstand', 'Estado do pagamento'), admin: { disableListColumn: true } },
+          { name: 'ref', type: 'text', admin: internal },
           // Kept equal to the sums of the order's `payments` rows (service.ts), plus the refund staff asked for.
-          { name: 'paidCents', type: 'number', defaultValue: 0 },
-          { name: 'refundedCents', type: 'number', defaultValue: 0 },
-          { name: 'refundDueCents', type: 'number', defaultValue: 0 },
-          { name: 'refundReason', type: 'text' },
+          { name: 'paidCents', type: 'number', defaultValue: 0, admin: internal },
+          { name: 'refundedCents', type: 'number', defaultValue: 0, admin: internal },
+          { name: 'refundDueCents', type: 'number', defaultValue: 0, admin: internal },
+          { name: 'refundReason', type: 'text', admin: internal },
           // The bank account this order's customer was told to pay into (transfer orders): a copy taken when the
           // order is placed or when staff choose another one, so a later change of the settings never alters it.
           {
             name: 'bankAccount',
             type: 'group',
-            fields: [
+            admin: internal,
+            fields: hidden([
               { name: 'holder', type: 'text' },
               { name: 'bankName', type: 'text' },
               { name: 'iban', type: 'text' },
               { name: 'bic', type: 'text' },
-            ],
+            ]),
           },
         ],
       },
       localeField,
-      { name: 'staff', type: 'relationship', relationTo: 'users', admin: { disableListColumn: true } },
-      { name: 'stockPosted', type: 'checkbox', defaultValue: false, admin: { disableListColumn: true } },
+      { name: 'staff', type: 'relationship', relationTo: 'users', admin: internal },
+      { name: 'stockPosted', type: 'checkbox', defaultValue: false, admin: internal },
       { name: 'notes', type: 'textarea', label: l('Message du client', 'Customer’s message', 'Nachricht des Kunden', 'Mensagem do cliente') },
-      { name: 'history', type: 'array', admin: { disableListColumn: true }, fields: [{ name: 'at', type: 'date' }, { name: 'from', type: 'text' }, { name: 'to', type: 'text' }, { name: 'user', type: 'relationship', relationTo: 'users' }, { name: 'reason', type: 'text' }] },
+      { name: 'history', type: 'array', admin: internal, fields: historyFields },
     ].map((f) => listOnly(f as Field)),
   ],
   custom: {
@@ -343,7 +363,7 @@ export const reservations: CollectionConfig = {
         options: options(RESERVATION_STATUS_LABELS),
         admin: { components: badgeCell(RESERVATION_STATUS_TONES) },
       },
-      { name: 'idempotencyKey', type: 'text', required: true, unique: true, admin: { disableListColumn: true, disableListFilter: true } },
+      { name: 'idempotencyKey', type: 'text', required: true, unique: true, admin: internal },
       { name: 'customer', type: 'relationship', relationTo: 'customers', index: true, label: l('Compte client', 'Customer account', 'Kundenkonto', 'Conta de cliente') },
       contactGroup('@/modules/sales/admin/cells#ContactCell'),
       {
@@ -352,9 +372,9 @@ export const reservations: CollectionConfig = {
         label: l('Date et heure', 'Date and time', 'Datum und Uhrzeit', 'Data e hora'),
         admin: { components: { Cell: '@/modules/sales/admin/cells#SlotCell' } },
         fields: [
-          { name: 'date', type: 'text', required: true, label: l('Jour', 'Day', 'Tag', 'Dia') },
-          { name: 'from', type: 'text', required: true, label: l('Heure', 'Time', 'Uhrzeit', 'Hora') },
-          { name: 'to', type: 'text', label: l('Jusqu’à', 'Until', 'Bis', 'Até') },
+          { name: 'date', type: 'text', required: true, label: l('Jour', 'Day', 'Tag', 'Dia'), admin: { disableListColumn: true } },
+          { name: 'from', type: 'text', required: true, label: l('Heure', 'Time', 'Uhrzeit', 'Hora'), admin: internal },
+          { name: 'to', type: 'text', label: l('Jusqu’à', 'Until', 'Bis', 'Até'), admin: internal },
         ],
       },
       { name: 'slotAt', type: 'text', index: true, label: l('Date et heure', 'Date and time', 'Datum und Uhrzeit', 'Data e hora'), admin: { disableListColumn: true } },
@@ -368,7 +388,7 @@ export const reservations: CollectionConfig = {
       },
       { name: 'notes', type: 'textarea', label: l('Message du client', 'Customer’s message', 'Nachricht des Kunden', 'Mensagem do cliente') },
       localeField,
-      { name: 'history', type: 'array', admin: { disableListColumn: true, disableListFilter: true }, fields: [{ name: 'at', type: 'date' }, { name: 'from', type: 'text' }, { name: 'to', type: 'text' }, { name: 'user', type: 'relationship', relationTo: 'users' }, { name: 'reason', type: 'text' }] },
+      { name: 'history', type: 'array', admin: internal, fields: historyFields },
       // Arrived / absent straight from the list during service (GG-05): buttons on accepted rows, nothing stored.
       { name: 'attendance', type: 'ui', label: l('Présence', 'Attendance', 'Anwesenheit', 'Presença'), admin: { components: { Cell: '@/modules/sales/admin/cells#AttendanceCell' } } },
     ].map((f) => listOnly(f as Field)),

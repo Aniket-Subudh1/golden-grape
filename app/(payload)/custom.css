@@ -2068,13 +2068,14 @@ body:has(.gg-create) .no-results__actions {
 /* ---- Document summary (orders, reservations, event bookings: components/admin/doc-panel.tsx) ------------- */
 .gg-doc {
   display: grid;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 12px;
+  margin-bottom: 20px;
 }
+/* Compact (QA 12 Nov, GG-09): status, money, next step and buttons fit the first screen. */
 .gg-doc__head {
   display: grid;
-  gap: 16px;
-  padding: 20px;
+  gap: 10px;
+  padding: 14px 18px;
   border-radius: 8px;
   background: #ffffff;
   box-shadow: 0 0 0 1px var(--gg-line);
@@ -2108,11 +2109,11 @@ body:has(.gg-create) .no-results__actions {
 .gg-doc__figures {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 10px;
+  gap: 8px;
   margin: 0;
 }
 .gg-doc__figures > div {
-  padding: 12px 14px;
+  padding: 8px 12px;
   border: 1px solid var(--gg-line);
   border-left: 3px solid var(--gg-line-2);
   border-radius: 8px;
@@ -2125,8 +2126,8 @@ body:has(.gg-create) .no-results__actions {
   color: var(--gg-text-2);
 }
 .gg-doc__figures dd {
-  margin: 6px 0 0;
-  font: 600 20px/1.2 var(--font-body);
+  margin: 4px 0 0;
+  font: 600 18px/1.2 var(--font-body);
   font-variant-numeric: tabular-nums;
   color: var(--gg-ink);
 }
@@ -2145,9 +2146,11 @@ body:has(.gg-create) .no-results__actions {
   background: var(--gg-danger-tint);
 }
 .gg-doc__next {
-  display: grid;
-  gap: 2px;
-  padding: 12px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  padding: 8px 12px;
   border-radius: 8px;
   background: var(--gg-primary-tint);
   font-size: 13px;
@@ -2173,11 +2176,11 @@ body:has(.gg-create) .no-results__actions {
 .gg-doc__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 12px;
 }
 .gg-doc__card {
   min-width: 0;
-  padding: 16px 18px;
+  padding: 14px 16px;
   border-radius: 8px;
   background: #ffffff;
   box-shadow: 0 0 0 1px var(--gg-line);
@@ -2186,7 +2189,7 @@ body:has(.gg-create) .no-results__actions {
   grid-column: 1 / -1;
 }
 .gg-doc__card h3 {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   font: 600 11px/1 var(--font-body);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2194,7 +2197,7 @@ body:has(.gg-create) .no-results__actions {
 }
 .gg-doc__facts {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
 }
 .gg-doc__facts > div {
@@ -2364,7 +2367,7 @@ body:has(.gg-create) .no-results__actions {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  padding-top: 16px;
+  padding-top: 12px;
   border-top: 1px solid var(--gg-line);
 }
 .gg-decide--note p {
@@ -2481,6 +2484,20 @@ body:has(.gg-create) .no-results__actions {
 .collection-list--reservations td,
 .collection-list--eventBookings td {
   vertical-align: middle;
+}
+/* Columns as wide as their content, not Payload's 150 px each: the stage and status stay on screen at 1280 px (GG-07). */
+.collection-list--orders .table :is(th, td),
+.collection-list--reservations .table :is(th, td),
+.collection-list--eventBookings .table :is(th, td) {
+  min-width: 80px;
+  padding-inline: 6px;
+}
+:is(.collection-list--orders, .collection-list--reservations, .collection-list--eventBookings) .table :is(th, td):first-child {
+  min-width: 0;
+  width: 40px;
+}
+:is(.collection-list--orders, .collection-list--reservations) .table :is(td.cell-number, td.cell-contact small) {
+  white-space: nowrap;
 }
 
 /* ---- Order stage tabs and slot-day filter (modules/sales/admin/order-tabs.tsx) --------------------------- */
@@ -2607,6 +2624,24 @@ body:has(.gg-create) .no-results__actions {
   align-items: stretch;
   gap: 4px;
   white-space: nowrap;
+}
+.gg-cell-stack .gg-late {
+  color: var(--gg-danger);
+  font-weight: 600;
+}
+.gg-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.gg-mode svg {
+  width: 16px;
+  height: 16px;
+  color: var(--gg-text-2);
+}
+.gg-mode--delivery svg {
+  color: var(--gg-primary);
 }
 .gg-attend > span {
   font-size: 12px;
