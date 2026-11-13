@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { Container } from '@/components/site/container';
@@ -8,6 +7,7 @@ import { MediaGrid } from '@/components/site/media-grid';
 import { PageHero } from '@/components/site/page-hero';
 import { alternates, type Dictionary, getDictionary, interpolate, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
+import { stripMarkdown } from '@/lib/rich-text';
 import { eventDate } from '@/lib/time';
 import { mediaOf } from '@/modules/cms/service';
 import { ReserveDialog } from '@/modules/events/components/reserve-dialog';
@@ -31,41 +31,38 @@ async function EventList({ locale, t, dict }: { locale: Locale; t: Dictionary['e
     <MediaGrid cols={cols} hairline className={events.length === 1 ? 'sm:grid-cols-1 max-w-2xl' : undefined}>
       {events.map((e) => {
         const { date, time } = eventDate(e.startsAt, e.endsAt, locale);
+        const seats = left[e.id];
         return (
+          // The whole card opens the event (QA 12 Nov, GG-13); the poster is shown whole, shorter (GG-12).
           <MediaCard
             key={e.id}
             image={mediaOf(e.image)?.src}
             alt={e.title}
-            ratio={cols === 2 ? '4/3' : '4/5'}
-            overlay={
-              <>
-                <p className="eyebrow text-gold">{date}</p>
-                <h3 className="mt-2 font-serif text-3xl font-light">
-                  {/* The link covers the whole card. */}
-                  <Link href={localePath(locale, `/events/${e.slug}`)} className="after:absolute after:inset-0">
-                    {e.title}
-                  </Link>
-                </h3>
-                <p className="mt-1 text-xs opacity-80">{time}</p>
-                {left[e.id] != null && left[e.id]! <= 10 && (
-                  <p className="mt-3 inline-flex rounded-full bg-gold/90 px-3 py-1 text-[10px] tracking-[0.18em] text-ink uppercase">
-                    {left[e.id] === 0 ? t.dialog.soldOut : interpolate(left[e.id] === 1 ? t.dialog.seatsLeft_one : t.dialog.seatsLeft_other, { count: left[e.id]! })}
-                  </p>
-                )}
-              </>
-            }
+            ratio={cols === 2 ? '16/9' : '4/3'}
+            fit="contain"
+            href={localePath(locale, `/events/${e.slug}`)}
+            sizes={events.length === 1 ? '(min-width: 640px) 672px, 100vw' : cols === 2 ? '(min-width: 640px) 50vw, 100vw' : '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw'}
           >
             <div className="flex flex-1 flex-col p-6">
-              {/* A short preview; the whole text is on the event's page. */}
-              <p className="line-clamp-3 text-sm font-light whitespace-pre-line text-ink/60">{e.description}</p>
-              <Link href={localePath(locale, `/events/${e.slug}`)} className="relative z-10 mt-3 mb-auto self-start text-[11px] tracking-[0.22em] text-gold-deep uppercase hover:text-ink">
+              <p className="eyebrow text-gold-deep">
+                {date} · {time}
+              </p>
+              <h3 className="mt-2 font-serif text-2xl font-light transition-colors group-hover:text-gold-deep">{e.title}</h3>
+              {seats != null && seats <= 10 && (
+                <p className="mt-2 self-start rounded-full bg-gold/90 px-3 py-1 text-[10px] tracking-[0.18em] text-ink uppercase">
+                  {seats === 0 ? t.dialog.soldOut : interpolate(seats === 1 ? t.dialog.seatsLeft_one : t.dialog.seatsLeft_other, { count: seats })}
+                </p>
+              )}
+              {/* A short preview in plain words (no Markdown marks, GG-14); the whole text is on the event's page. */}
+              {e.description && <p className="mt-3 line-clamp-3 text-sm font-light text-ink/60">{stripMarkdown(e.description).replace(/\s+/g, ' ')}</p>}
+              <span aria-hidden className="mt-3 mb-auto self-start text-[11px] tracking-[0.22em] text-gold-deep uppercase transition-colors group-hover:text-ink">
                 {t.more} →
-              </Link>
+              </span>
               <div className="relative z-10 mt-5 flex items-center justify-between">
                 <span className="font-serif text-xl">{e.priceCents ? formatMoney(e.priceCents, locale, { compact: true }) : t.free}</span>
                 <ReserveDialog
                   event={{ id: e.id, title: e.title, when: `${date} · ${time}`, priceCents: e.priceCents }}
-                  left={left[e.id] ?? null}
+                  left={seats ?? null}
                   locale={locale}
                   t={t}
                   form={dict.form}

@@ -57,11 +57,12 @@ export const events: CollectionConfig = {
       localized: true,
       label: l('Description', 'Description', 'Beschreibung', 'Descrição'),
       admin: {
+        // Light Markdown is rendered on the event page and stripped from previews (QA 12 Nov, GG-14).
         description: l(
-          'Deux ou trois phrases, affichées sous le nom.',
-          'Two or three sentences, shown under the name.',
-          'Zwei oder drei Sätze, unter dem Namen angezeigt.',
-          'Duas ou três frases, mostradas por baixo do nome.',
+          'Le début sert d’aperçu sur la carte. Mise en forme possible : ## Titre, **gras**, *italique*, - liste.',
+          'The beginning is the card’s preview. Formatting: ## Heading, **bold**, *italics*, - list.',
+          'Der Anfang dient als Vorschau auf der Karte. Formatierung: ## Überschrift, **fett**, *kursiv*, - Liste.',
+          'O início serve de pré-visualização no cartão. Formatação: ## Título, **negrito**, *itálico*, - lista.',
         ),
       },
     },

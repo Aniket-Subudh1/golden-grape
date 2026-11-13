@@ -2,6 +2,7 @@ import { RichText } from '@payloadcms/richtext-lexical/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ComponentProps } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
 import { type Locale, localePath } from '@/lib/i18n';
@@ -13,18 +14,29 @@ import { Reveal } from './reveal';
 type Block = NonNullable<Page['layout']>[number];
 type Heading = { eyebrow?: string | null; titleA?: string | null; titleB?: string | null };
 
+const PROSE = [
+  'space-y-6 text-lg leading-relaxed font-light text-ink/70',
+  '[&_a]:text-gold-deep [&_a]:underline [&_h2]:font-serif [&_h2]:text-3xl [&_h2]:text-ink [&_h3]:font-serif [&_h3]:text-2xl [&_h3]:text-ink [&_li]:ml-5 [&_ol]:list-decimal [&_ul]:list-disc [&_strong]:font-medium [&_strong]:text-ink',
+  '[&_blockquote]:border-l-2 [&_blockquote]:border-gold-deep [&_blockquote]:pl-6 [&_blockquote]:font-serif [&_blockquote]:text-2xl [&_blockquote]:text-ink [&_blockquote]:italic',
+];
+
 /** Lexical rich text with the site's typography (pages and legal texts). */
 export function Prose({ data, className }: { data: ComponentProps<typeof RichText>['data']; className?: string }) {
+  return <RichText data={data} className={cn(...PROSE, className)} />;
+}
+
+/**
+ * Text typed with light Markdown (`## Titre`, `**gras**`, `*italique*`, `- liste`) in the same typography: event
+ * descriptions (QA 12 Nov, GG-14). Rendered on the server; HTML typed in the text stays text, images are not shown,
+ * and a `#` title becomes a section heading under the page's own.
+ */
+export function Markdown({ text, className }: { text: string; className?: string }) {
   return (
-    <RichText
-      data={data}
-      className={cn(
-        'space-y-6 text-lg leading-relaxed font-light text-ink/70',
-        '[&_a]:text-gold-deep [&_a]:underline [&_h2]:font-serif [&_h2]:text-3xl [&_h2]:text-ink [&_h3]:font-serif [&_h3]:text-2xl [&_h3]:text-ink [&_li]:ml-5 [&_ol]:list-decimal [&_ul]:list-disc',
-        '[&_blockquote]:border-l-2 [&_blockquote]:border-gold-deep [&_blockquote]:pl-6 [&_blockquote]:font-serif [&_blockquote]:text-2xl [&_blockquote]:text-ink [&_blockquote]:italic',
-        className,
-      )}
-    />
+    <div className={cn(...PROSE, className)}>
+      <ReactMarkdown disallowedElements={['img']} unwrapDisallowed components={{ h1: 'h2' }}>
+        {text}
+      </ReactMarkdown>
+    </div>
   );
 }
 
