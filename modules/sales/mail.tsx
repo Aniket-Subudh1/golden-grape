@@ -27,6 +27,9 @@ async function orderMail(order: Order, locale: Locale, url: string): Promise<Ord
   const totals = order.totals ?? { subtotalCents: 0, vatCents: 0, totalCents: 0 };
   const mode = (order.mode ?? 'pickup') as keyof typeof t.modes;
   const awaiting = order.status === 'awaiting_payment';
+  const due = dueOf({ totalCents: totals.totalCents, paidCents: order.payment?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 });
+  // The transfer details while a transfer is still due, also once staff prepared the order before it (GG-01).
+  const transferDue = order.payment?.method === 'transfer' && due > 0 && order.status !== 'cancelled' && order.status !== 'refunded';
   const account = orderBankAccount(order, business.bankAccounts);
   const a = order.address;
   return {
@@ -47,14 +50,14 @@ async function orderMail(order: Order, locale: Locale, url: string): Promise<Ord
     awaiting,
     // GG-014: the reference and what is still due always; the bank details only when an account is configured.
     // Only this order's account (APPLUX, 12 Nov), never the list.
-    transfer: awaiting
+    transfer: transferDue
       ? {
           beneficiary: account?.holder || business.legalName || business.name,
           bank: account?.bankName,
           iban: account?.iban ? formatIban(account.iban) : null,
           bic: account?.bic,
           reference: order.number ?? '',
-          amount: money(dueOf({ totalCents: totals.totalCents, paidCents: order.payment?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 })),
+          amount: money(due),
         }
       : null,
     notes: order.notes,

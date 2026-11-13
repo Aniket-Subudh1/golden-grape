@@ -114,13 +114,22 @@ export const placeOrderAction = publicAction(checkout, async ({ website, line1, 
   return { ...placed, token: orderToken(placed.id) };
 });
 
+const METHODS = ['transfer', 'onsite', 'card'] as const;
+/** Money taken at a handover or a table visit (GG-02): optional, only what staff typed in the dialog. */
+const collected = { amount: eurosField.optional(), at: bankDayField.optional(), method: z.enum(METHODS).optional() };
+const collectOf = ({ amount, at, method }: { amount?: number; at?: Date; method?: (typeof METHODS)[number] }) =>
+  amount ? { amountCents: amount, at: at ?? new Date(), method: method ?? 'onsite' } : undefined;
+const collectedAudit = (collect: ReturnType<typeof collectOf>) =>
+  collect ? { amountCents: collect.amountCents, at: collect.at.toISOString().slice(0, 10), method: collect.method } : {};
+
 /** Staff move an order along (admin buttons); the customer is told when the state machine says so. */
 export const transitionOrder = action(
-  z.object({ order: z.string().min(1), to: z.enum(ORDER_STATUSES), reason: optionalText(300) }),
+  z.object({ order: z.string().min(1), to: z.enum(ORDER_STATUSES), reason: optionalText(300), ...collected }),
   { roles: ['sales'] },
-  async ({ order, to, reason }, { payload, user }) => {
-    const result = await transition(payload, order, to, { user: user.id, reason });
-    await audit(payload, { user: user.id, action: 'order.status', collection: 'orders', id: order, ref: result.order.number, reason, before: { status: result.from }, after: { status: to } });
+  async ({ order, to, reason, ...money }, { payload, user }) => {
+    const collect = collectOf(money);
+    const result = await transition(payload, order, to, { user: user.id, reason, collect });
+    await audit(payload, { user: user.id, action: 'order.status', collection: 'orders', id: order, ref: result.order.number, reason, before: { status: result.from }, after: { status: to, ...collectedAudit(collect) } });
     if (result.effects.includes('mailCustomer')) after(() => mailOrderStatus(result.order).catch(logMail('order status')));
     return { status: result.order.status };
   },
@@ -136,11 +145,11 @@ const mailMoved = (result: MoneyResult) => {
 
 /** Money received for an order: a transfer, a deposit or the rest. Paid in full → a waiting order is confirmed. */
 export const recordOrderPayment = action(
-  z.object({ order: z.string().min(1), amount: euros, at: bankDay, reference: optionalText(80) }),
+  z.object({ order: z.string().min(1), amount: euros, at: bankDay, method: z.enum(METHODS), reference: optionalText(80) }),
   { roles: ['sales'] },
-  async ({ order, amount, at, reference }, { payload, user }) => {
-    const result = await recordPayment(payload, order, { amountCents: amount, at, reference, user: user.id });
-    await audit(payload, { user: user.id, action: 'order.payment', collection: 'orders', id: order, ref: result.order.number, after: { amountCents: amount, at: at.toISOString().slice(0, 10), reference, payment: result.order.payment?.status, status: result.order.status } });
+  async ({ order, amount, at, method, reference }, { payload, user }) => {
+    const result = await recordPayment(payload, order, { amountCents: amount, at, method, reference, user: user.id });
+    await audit(payload, { user: user.id, action: 'order.payment', collection: 'orders', id: order, ref: result.order.number, after: { amountCents: amount, at: at.toISOString().slice(0, 10), method, reference, payment: result.order.payment?.status, status: result.order.status } });
     mailMoved(result);
     return { status: result.order.status };
   },
@@ -168,7 +177,7 @@ export const requestOrderRefund = action(
 
 /** A refund actually sent; once everything is paid back, a handed-over order becomes "refunded" (customer e-mail). */
 export const recordOrderRefund = action(
-  z.object({ order: z.string().min(1), amount: euros, at: bankDay, method: z.enum(['transfer', 'onsite', 'card']), reference: optionalText(80), reason: reasonText }),
+  z.object({ order: z.string().min(1), amount: euros, at: bankDay, method: z.enum(METHODS), reference: optionalText(80), reason: reasonText }),
   { roles: ['sales'] },
   async ({ order, amount, at, method, reference, reason }, { payload, user }) => {
     const result = await recordRefund(payload, order, { amountCents: amount, at, method, reference, reason, user: user.id });
@@ -200,11 +209,12 @@ export const returnOrderItems = action(
 
 /** Staff accept, decline, cancel or complete a table reservation; its pre-order follows in the same transaction. */
 export const decideReservation = action(
-  z.object({ reservation: z.string().min(1), to: z.enum(['accepted', 'rejected', 'cancelled', 'completed', 'no_show']), reason: optionalText(300) }),
+  z.object({ reservation: z.string().min(1), to: z.enum(['accepted', 'rejected', 'cancelled', 'completed', 'no_show']), reason: optionalText(300), ...collected }),
   { roles: ['sales'] },
-  async ({ reservation, to, reason }, { payload, user }) => {
-    const result = await transitionReservation(payload, reservation, to, { user: user.id, reason });
-    await audit(payload, { user: user.id, action: 'reservation.status', collection: 'reservations', id: reservation, ref: result.reservation.number, reason, before: { status: result.from }, after: { status: to } });
+  async ({ reservation, to, reason, ...money }, { payload, user }) => {
+    const collect = collectOf(money);
+    const result = await transitionReservation(payload, reservation, to, { user: user.id, reason, collect });
+    await audit(payload, { user: user.id, action: 'reservation.status', collection: 'reservations', id: reservation, ref: result.reservation.number, reason, before: { status: result.from }, after: { status: to, ...collectedAudit(collect) } });
     // No e-mail for a visit (completed) or a no-show: the customer is not told they did not come.
     if (to !== 'completed' && to !== 'no_show') after(() => mailReservation(payload, result.reservation, to).catch(logMail('reservation status')));
     return { status: result.reservation.status };

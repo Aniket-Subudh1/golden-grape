@@ -5,9 +5,11 @@ import { hasRole } from '@/lib/access';
 import { LOCALE_NAMES, type Locale } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { slotLabel } from '@/lib/time';
+import { dueOf } from '@/modules/payments/service';
 import { decideReservation } from '../actions';
 import { ORDER_STATUS_LABELS, RESERVATION_STATUS_LABELS, RESERVATION_STATUS_TONES } from '../collections';
 import { type OrderStatus, RESERVATION_FLOW, type ReservationStatus } from '../order-states';
+import { collectFields } from './order-panel';
 import { langOf, salesText } from './text';
 
 // A table reservation's edit view (ui field `panel`): status and the decisions RESERVATION_FLOW allows, the guests'
@@ -28,11 +30,15 @@ export default async function ReservationPanel({ id, payload, i18n, user }: UIFi
   const staffName = new Map(staff.docs.map((u) => [u.id, u.name]));
   const when = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Luxembourg' });
   const money = (cents: number | null | undefined) => formatMoney(cents ?? 0, lang);
+  // What the pre-order still waits for: on "Client arrivé" staff say what the guests paid for it (GG-02).
+  const preorderDue = preorder && preorder.status !== 'cancelled' ? dueOf({ totalCents: preorder.totals?.totalCents ?? 0, paidCents: preorder.payment?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 }) : 0;
   const decisions: Decision[] = hasRole(user, ['sales'])
     ? (RESERVATION_FLOW[status] as readonly ReservationStatus[]).map((to) => {
         const tone = to === 'rejected' || to === 'cancelled' || to === 'no_show' ? ('danger' as const) : ('primary' as const);
+        const words = t.reservations[to as keyof typeof t.reservations];
+        if (to === 'completed' && preorderDue > 0) return { to, ...words, hint: `${words.hint} ${t.collect.preorder(money(preorderDue))}`, tone, fields: collectFields(t, preorderDue, preorder?.payment?.method) };
         // A reason is kept in the history when the visit does not happen (GG-019); optional.
-        return { to, ...t.reservations[to as keyof typeof t.reservations], tone, reason: tone === 'danger' };
+        return { to, ...words, tone, reason: tone === 'danger' };
       })
     : [];
 

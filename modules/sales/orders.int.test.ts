@@ -133,6 +133,10 @@ describe('placeOrder', () => {
     const changed = await setOrderBankAccount(payload, placed.id, accounts[0].id!, staff.id);
     expect(changed.payment?.bankAccount).toMatchObject({ holder: 'Golden Grape Sàrl', bankName: 'BCEE', bic: 'BCEELULL' });
     expect(changed.status).toBe('awaiting_payment');
+    // The same account again only sends the details again, and the history says so (GG-01).
+    const resent = await setOrderBankAccount(payload, placed.id, accounts[0].id!, staff.id);
+    expect(resent.history?.at(-1)).toMatchObject({ to: 'bank_resent' });
+    expect(resent.payment?.bankAccount).toMatchObject({ holder: 'Golden Grape Sàrl' });
     await expect(setOrderBankAccount(payload, placed.id, accounts[2].id!, staff.id)).rejects.toMatchObject({ code: 'VALIDATION' });
     // Paid on site: no bank account to choose.
     const onsite = await placeOrder(payload, order({ time: '17:00' }), { now: NOW });
@@ -230,6 +234,25 @@ describe('payments and refunds (GG-003, GG-004)', () => {
     expect(await paymentsOf(payload, placed.id)).toHaveLength(0);
   });
 
+  it('a handover never records money by itself (GG-02): a transfer with 10 € of 30 € received is handed over with 20 € still due', async () => {
+    const placed = await placeOrder(payload, order({ date: DAY2, payment: 'transfer', time: '10:00' }), { now: NOW });
+    await recordPayment(payload, placed.id, { amountCents: 1000, at: AT, user: staff.id });
+    await transition(payload, placed.id, 'confirmed', { user: staff.id });
+    await transition(payload, placed.id, 'completed', { user: staff.id });
+    expect(await read(placed.id)).toMatchObject({ status: 'completed', payment: { status: 'partial', paidCents: 1000 } });
+    expect((await paymentsOf(payload, placed.id)).map((p) => p.amountCents)).toEqual([1000]);
+  });
+
+  it('the amount staff confirm at the handover is recorded with its method and day; above what is due → refused and nothing changes', async () => {
+    const placed = await placeOrder(payload, order({ date: DAY2, time: '10:30' }), { now: NOW }); // to pay on site, 30 €
+    await expect(transition(payload, placed.id, 'completed', { user: staff.id, collect: { amountCents: 3001, at: AT, method: 'onsite' } })).rejects.toMatchObject({ message: 'amountTooHigh' });
+    expect(await read(placed.id)).toMatchObject({ status: 'confirmed' });
+    expect(await paymentsOf(payload, placed.id)).toHaveLength(0);
+    await transition(payload, placed.id, 'completed', { user: staff.id, collect: { amountCents: 3000, at: AT, method: 'card' } });
+    expect(await read(placed.id)).toMatchObject({ status: 'completed', payment: { status: 'paid', paidCents: 3000 } });
+    expect((await paymentsOf(payload, placed.id)).map((p) => [p.amountCents, p.method, p.at])).toEqual([[3000, 'card', AT.toISOString()]]);
+  });
+
   it('a deposit → partially paid, still waiting; the rest → paid and confirmed once; more than due → refused', async () => {
     const before = await stock();
     const placed = await placeOrder(payload, order({ date: DAY2, payment: 'transfer', time: '15:30' }), { now: NOW });
@@ -254,7 +277,7 @@ describe('payments and refunds (GG-003, GG-004)', () => {
 
   it('a delivered order refunded: request → pending, nothing sent, no stock; part sent → partially refunded; rest → refunded; stock never moves', async () => {
     const placed = await placeOrder(payload, order({ date: DAY2, time: '16:30' }), { now: NOW });
-    await transition(payload, placed.id, 'completed', { user: staff.id }); // paid on site at handover
+    await transition(payload, placed.id, 'completed', { user: staff.id, collect: { amountCents: 3000, at: AT, method: 'onsite' } }); // paid on site at handover
     expect(await read(placed.id)).toMatchObject({ status: 'completed', payment: { status: 'paid', paidCents: 3000 } });
     const afterSale = await stock();
     const moves = (await movementsOf(placed.id)).length;
@@ -281,7 +304,7 @@ describe('payments and refunds (GG-003, GG-004)', () => {
 
   it('a partial refund on a handed-over order keeps it completed, "partially refunded"', async () => {
     const placed = await placeOrder(payload, order({ date: DAY2, time: '17:00' }), { now: NOW });
-    await transition(payload, placed.id, 'completed', { user: staff.id });
+    await transition(payload, placed.id, 'completed', { user: staff.id, collect: { amountCents: 3000, at: AT, method: 'onsite' } });
     await requestRefund(payload, placed.id, { amountCents: 500, reason: 'Geste', user: staff.id });
     await recordRefund(payload, placed.id, { amountCents: 500, at: AT, method: 'onsite', reason: 'Geste', user: staff.id });
     expect(await read(placed.id)).toMatchObject({ status: 'completed', payment: { status: 'partially_refunded', refundedCents: 500 } });
@@ -335,6 +358,21 @@ describe('reservations', () => {
     expect(preorder?.status).toBe('cancelled');
     expect(await movementsOf(preorder!.id)).toHaveLength(0);
     expect((await payload.count({ collection: 'payments', where: { order: { equals: preorder!.id } }, overrideAccess: true })).totalDocs).toBe(0);
+  });
+
+  it('"Client arrivé" records only the pre-order payment staff confirm (GG-02); without it the pre-order stays due', async () => {
+    const AT = new Date('2026-11-09T12:00:00Z');
+    const paid = await placeOrder(payload, table({ time: '13:30' }), { now: NOW }); // 2 × 6,50 €
+    await transitionReservation(payload, paid.id, 'accepted', { user: staff.id });
+    await expect(transitionReservation(payload, paid.id, 'completed', { user: staff.id, collect: { amountCents: 1301, at: AT, method: 'onsite' } })).rejects.toMatchObject({ message: 'amountTooHigh' });
+    const { preorder } = await transitionReservation(payload, paid.id, 'completed', { user: staff.id, collect: { amountCents: 1300, at: AT, method: 'onsite' } });
+    expect(preorder).toMatchObject({ status: 'completed', payment: { status: 'paid', paidCents: 1300 } });
+
+    const unpaid = await placeOrder(payload, table({ time: '14:30' }), { now: NOW });
+    await transitionReservation(payload, unpaid.id, 'accepted', { user: staff.id });
+    const later = await transitionReservation(payload, unpaid.id, 'completed', { user: staff.id });
+    expect(later.preorder).toMatchObject({ status: 'completed', payment: { paidCents: 0 } });
+    expect(await paymentsOf(payload, later.preorder!.id)).toHaveLength(0);
   });
 
   it('accept → the pre-order is confirmed and its movements equal its lines', async () => {
@@ -543,7 +581,7 @@ describe('stock across the whole order life (GG-042)', () => {
     const start = await stock();
     const placed = await placeOrder(payload, order({ date: DAY4, time: '11:00', lines: [{ variant: wine.variant.id, qty: 3 }] }), { now: NOW });
     await expect(returnItems(payload, placed.id, { lines: [{ id: 'x', qty: 1 }], reason: 'Bouchon', user: staff.id })).rejects.toMatchObject({ code: 'CONFLICT' }); // not handed over yet
-    await transition(payload, placed.id, 'completed', { user: staff.id });
+    await transition(payload, placed.id, 'completed', { user: staff.id, collect: { amountCents: 4500, at: AT, method: 'onsite' } });
     const line = (await payload.findByID({ collection: 'orders', id: placed.id, overrideAccess: true, depth: 0 })).lines![0];
     expect(await stock()).toBe(start - 3);
 

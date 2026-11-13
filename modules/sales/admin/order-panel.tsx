@@ -1,6 +1,6 @@
 import type { UIFieldServerProps } from 'payload';
 import type { ReactNode } from 'react';
-import DecisionBar, { type Decision } from '@/components/admin/decision-bar';
+import DecisionBar, { type Decision, type DecisionField } from '@/components/admin/decision-bar';
 import { DocBadge, DocCard, DocFacts, DocFigures, DocGrid, DocHead, DocHistory, DocPanel } from '@/components/admin/doc-panel';
 import { hasRole } from '@/lib/access';
 import { LOCALE_NAMES, type Locale } from '@/lib/i18n';
@@ -8,7 +8,7 @@ import { formatMoney } from '@/lib/money';
 import { isBeforeSlot, slotLabel, today } from '@/lib/time';
 import type { Order } from '@/payload-types';
 import { dueOf, paymentsOf, refundableOf } from '@/modules/payments/service';
-import { activeAccounts, type BankAccount, formatIban } from '@/modules/settings/service';
+import { activeAccounts, type BankAccount, formatIban, transferAccount } from '@/modules/settings/service';
 import { changeOrderBankAccount, recordOrderPayment, recordOrderRefund, requestOrderRefund, returnOrderItems, transitionOrder } from '../actions';
 import { orderBankAccount, returnableLines } from '../service';
 import { MODE_LABELS, ORDER_STATUS_LABELS, ORDER_STATUS_TONES, PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS, PAYMENT_STATUS_TONES, type PaymentStatus, RESERVATION_STATUS_LABELS, RESERVATION_STATUS_TONES } from '../collections';
@@ -22,6 +22,23 @@ const percent = (bp: number, locale: string) => new Intl.NumberFormat(locale, { 
 
 const euros = (cents: number) => (cents / 100).toFixed(2).replace('.', ',');
 
+type Text = ReturnType<typeof salesText>;
+
+const methodOptions = (t: Text) => (['transfer', 'onsite', 'card'] as const).map((v) => ({ value: v, label: t.money.methods[v] }));
+
+/**
+ * The money taken now, on a handover or a table visit (GG-02): amount, method and day, as staff type them. The amount
+ * is prefilled only when the customer was to pay on site; left empty, nothing is recorded and the balance stays due.
+ */
+export function collectFields(t: Text, dueCents: number, method: string | null | undefined): DecisionField[] {
+  const day = today();
+  return [
+    { name: 'amount', label: t.collect.amount, kind: 'money', value: method === 'onsite' ? euros(dueCents) : '' },
+    { name: 'method', label: t.money.method, kind: 'select', value: method === 'onsite' ? 'onsite' : 'transfer', options: methodOptions(t) },
+    { name: 'at', label: t.money.date, kind: 'date', value: day, max: day, required: true },
+  ];
+}
+
 /**
  * The moves offered for an order: ORDER_FLOW minus those that do not fit its mode ("refunded" follows the money,
  * never a button), then the money forms (GG-003/004): record a payment while something is due, ask for a refund
@@ -29,20 +46,29 @@ const euros = (cents: number) => (cents / 100).toFixed(2).replace('.', ',');
  */
 type Returnable = Awaited<ReturnType<typeof returnableLines>>;
 
-function decisionsFor(order: Order, t: ReturnType<typeof salesText>, returnable: Returnable, accounts: BankAccount[]): Decision[] {
+function decisionsFor(order: Order, t: Text, returnable: Returnable, accounts: BankAccount[], fmt: (cents: number) => string): Decision[] {
   const from = (order.status ?? 'pending') as OrderStatus;
+  const f = { totalCents: order.totals?.totalCents ?? 0, paidCents: order.payment?.paidCents ?? 0, refundedCents: order.payment?.refundedCents ?? 0, refundDueCents: order.payment?.refundDueCents ?? 0 };
   const moves: Decision[] = (ORDER_FLOW[from] as readonly OrderStatus[])
     .filter((to) => to !== 'refunded')
     .filter((to) => !(to === 'ready' && order.mode === 'delivery') && !(to === 'out_for_delivery' && order.mode !== 'delivery'))
     .map((to) => {
-      const base = to === 'confirmed' && from === 'awaiting_payment' ? t.orders.paid : t.orders[to as keyof typeof t.orders];
+      const base =
+        to === 'confirmed' && from === 'awaiting_payment'
+          ? t.orders.paid
+          : to === 'completed' && order.mode === 'delivery'
+            ? t.orders.delivered
+            : t.orders[to as Exclude<keyof typeof t.orders, 'delivered'>];
+      const tone = to === 'cancelled' ? ('danger' as const) : from === 'awaiting_payment' ? undefined : ('primary' as const);
+      // Handed over with money still due (GG-02): staff say what they took now; nothing is assumed.
+      if (to === 'completed' && dueOf(f) > 0) {
+        return { to, ...base, hint: `${base.hint} ${t.collect.due(fmt(dueOf(f)))}`, tone, fields: collectFields(t, dueOf(f), order.payment?.method) };
+      }
       // Ready before the requested slot (GG-027): still allowed; staff are told what the customer will hear.
       const words = to === 'ready' && isBeforeSlot(order.slotAt) ? { ...base, hint: t.readyEarlyHint } : base;
-      const tone = to === 'cancelled' ? ('danger' as const) : from === 'awaiting_payment' ? undefined : ('primary' as const);
       return { to, ...words, tone, reason: tone === 'danger' };
     });
 
-  const f = { totalCents: order.totals?.totalCents ?? 0, paidCents: order.payment?.paidCents ?? 0, refundedCents: order.payment?.refundedCents ?? 0, refundDueCents: order.payment?.refundDueCents ?? 0 };
   const day = today();
   const m = t.money;
   const money: Decision[] = [];
@@ -55,20 +81,22 @@ function decisionsFor(order: Order, t: ReturnType<typeof salesText>, returnable:
       action: recordOrderPayment,
       fields: [
         { name: 'amount', label: m.amount, kind: 'money', value: euros(dueOf(f)), required: true },
+        { name: 'method', label: m.method, kind: 'select', value: order.payment?.method === 'onsite' ? 'onsite' : 'transfer', options: methodOptions(t) },
         { name: 'at', label: m.date, kind: 'date', value: day, max: day, required: true },
         { name: 'reference', label: m.bankRef, kind: 'text' },
       ],
     });
   }
-  // Another of the shop's accounts for this transfer (APPLUX, 12 Nov): offered while money is expected and there is a choice.
-  const current = order.payment?.bankAccount?.iban;
-  const others = accounts.filter((a) => a.iban !== current);
-  if (open && dueOf(f) > 0 && order.payment?.method === 'transfer' && others.length > 0) {
+  // Which of the shop's active accounts this transfer is paid into (APPLUX, 12 Nov; GG-01): every one of them, the
+  // order's own preselected (else the default). Choosing the same one sends the details again.
+  const current = order.payment?.bankAccount?.iban ?? transferAccount(accounts)?.iban;
+  if (open && dueOf(f) > 0 && order.payment?.method === 'transfer' && accounts.length > 0) {
+    const options = accounts.map((a) => ({ value: a.id ?? '', label: [a.holder, a.bankName, formatIban(a.iban ?? ''), a.iban === current ? `(${t.bank.current})` : ''].filter(Boolean).join(' · ') }));
     money.push({
       to: 'bank_account',
       ...t.bank,
       action: changeOrderBankAccount,
-      fields: [{ name: 'account', label: t.bank.account, kind: 'select', value: others[0].id ?? '', options: others.map((a) => ({ value: a.id ?? '', label: [a.holder, a.bankName, formatIban(a.iban ?? '')].filter(Boolean).join(' · ') })) }],
+      fields: [{ name: 'account', label: t.bank.account, kind: 'select', value: accounts.find((a) => a.iban === current)?.id ?? options[0].value, options }],
     });
   }
   if (f.refundDueCents > 0) {
@@ -82,7 +110,7 @@ function decisionsFor(order: Order, t: ReturnType<typeof salesText>, returnable:
       fields: [
         { name: 'amount', label: m.amount, kind: 'money', value: euros(Math.min(f.refundDueCents, refundableOf(f))), required: true },
         { name: 'at', label: m.date, kind: 'date', value: day, max: day, required: true },
-        { name: 'method', label: m.method, kind: 'select', value: order.payment?.method === 'onsite' ? 'onsite' : 'transfer', options: (['transfer', 'onsite', 'card'] as const).map((v) => ({ value: v, label: m.methods[v] })) },
+        { name: 'method', label: m.method, kind: 'select', value: order.payment?.method === 'onsite' ? 'onsite' : 'transfer', options: methodOptions(t) },
         { name: 'reference', label: m.bankRef, kind: 'text' },
       ],
     });
@@ -140,7 +168,7 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
   const when = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Luxembourg' });
   const returnable = order.status === 'completed' || order.status === 'refunded' ? await returnableLines(payload, order) : [];
   const account = order.payment?.method === 'transfer' ? orderBankAccount(order, settings.business?.bankAccounts) : null;
-  const decisions = reservation || !hasRole(user, ['sales']) ? [] : decisionsFor(order, t, returnable, activeAccounts(settings.business?.bankAccounts));
+  const decisions = reservation || !hasRole(user, ['sales']) ? [] : decisionsFor(order, t, returnable, activeAccounts(settings.business?.bankAccounts), money);
   // When the order was made ready, if it was (kept after handover too: the history shows the whole story).
   const readyAt = [...(order.history ?? [])].reverse().find((h) => h.to === 'ready')?.at ?? null;
   const totals = order.totals;

@@ -6,7 +6,7 @@ import { formatNumber, nextNumber } from '@/lib/numbering';
 import { addDays, today } from '@/lib/time';
 import { model, type Tx, withTx } from '@/lib/tx';
 import { postMovements } from '@/modules/inventory/service';
-import { provider } from '@/modules/payments/provider';
+import { type Movement, provider } from '@/modules/payments/provider';
 import { dueOf, type Figures, paymentState, refundableOf } from '@/modules/payments/service';
 import { quoteCart } from '@/modules/promotions/service';
 import { NUMBERING } from '@/modules/settings/globals';
@@ -324,7 +324,10 @@ export type Transitioned = { order: Order; from: OrderStatus; effects: Effect[] 
  * change with a conditional update (of two clicks, the second is refused), runs the listed effects and the payment
  * bookkeeping, and records who did it.
  */
-export async function applyTransition(tx: Tx, orderId: string, to: OrderStatus, { user, reason }: { user?: string; reason?: string } = {}): Promise<Transitioned> {
+/** What staff took at the handover, as they typed it in its dialog (APPLUX 12 Nov, GG-02): amount, method, day. */
+export type Collected = Pick<Movement, 'amountCents' | 'at' | 'method'>;
+
+export async function applyTransition(tx: Tx, orderId: string, to: OrderStatus, { user, reason, collect }: { user?: string; reason?: string; collect?: Collected } = {}): Promise<Transitioned> {
   const order = await tx.req.payload.findByID({ collection: 'orders', id: orderId, depth: 0, req: tx.req, overrideAccess: true, disableErrors: true });
   if (!order) throw new AppError('NOT_FOUND', 'order');
   const from = (order.status ?? 'pending') as OrderStatus;
@@ -336,15 +339,19 @@ export async function applyTransition(tx: Tx, orderId: string, to: OrderStatus, 
   if (list.includes('postSale')) await postSale(tx, order, user);
   if (list.includes('returnStock')) await returnStock(tx, order, user, reason);
 
-  // Money (GG-003/004). A move never invents a payment: a transfer counts only once recorded (recordPayment). Two
-  // exceptions, both staff confirming money in hand: handing over an order paid on site records what was still due;
-  // cancelling an order that was (partly) paid leaves that amount as a refund to send, with the cancel's reason.
+  // Money (GG-003/004, APPLUX 12 Nov GG-02). A move never records money by itself, whatever the payment method: a
+  // handover records only the amount staff confirm in its dialog (never above what is still due), and an order can
+  // be handed over with a balance left, which stays visible. Cancelling an order that was (partly) paid leaves that
+  // amount as a refund to send, with the cancel's reason.
   const pay = provider(order.payment?.provider);
   const money = figuresOf(order);
+  const history = [...(order.history ?? [])];
   let paymentStatus = order.payment?.status ?? 'none';
-  if (to === 'completed' && order.payment?.method === 'onsite' && dueOf(money) > 0) {
-    await pay.capture(tx, order, { amountCents: dueOf(money), at: new Date(), user });
-    money.paidCents += dueOf(money);
+  if (collect) {
+    if (to !== 'completed' || collect.amountCents <= 0 || collect.amountCents > dueOf(money)) throw new AppError('VALIDATION', 'amountTooHigh', 'amount');
+    await pay.capture(tx, order, { ...collect, user });
+    money.paidCents += collect.amountCents;
+    history.push(historyRow('payment', user));
   } else if (to === 'cancelled' && paymentStatus === 'authorized') {
     await pay.void(tx, order, user);
     paymentStatus = 'voided';
@@ -352,7 +359,7 @@ export async function applyTransition(tx: Tx, orderId: string, to: OrderStatus, 
   if (to === 'cancelled' && refundableOf(money) > 0) {
     money.refundDueCents = refundableOf(money);
   }
-  if (paymentStatus !== 'voided' && paymentStatus !== 'authorized' && (paymentStatus !== 'none' || to === 'confirmed')) paymentStatus = paymentState(money);
+  if (paymentStatus !== 'voided' && paymentStatus !== 'authorized' && (paymentStatus !== 'none' || to === 'confirmed' || collect)) paymentStatus = paymentState(money);
 
   const updated = await setOrder(tx, order.id, {
     status: to,
@@ -363,7 +370,7 @@ export async function applyTransition(tx: Tx, orderId: string, to: OrderStatus, 
       refundDueCents: money.refundDueCents,
       refundReason: to === 'cancelled' && money.refundDueCents > 0 ? (reason ?? order.payment?.refundReason) : order.payment?.refundReason,
     },
-    history: [...(order.history ?? []), { at: new Date().toISOString(), from, to, user, reason }],
+    history: [...history, { at: new Date().toISOString(), from, to, user, reason }],
   });
   return { order: updated, from, effects: list };
 }
@@ -372,7 +379,7 @@ export async function applyTransition(tx: Tx, orderId: string, to: OrderStatus, 
  * Staff move an order (admin buttons). A table's pre-order follows its reservation (reservations.ts), never alone.
  * The e-mail goes out after commit, from the action.
  */
-export async function transition(payload: Payload, orderId: string, to: OrderStatus, ctx: { user?: string; reason?: string } = {}) {
+export async function transition(payload: Payload, orderId: string, to: OrderStatus, ctx: { user?: string; reason?: string; collect?: Collected } = {}) {
   // "Refunded" follows the money (recordRefund), never a button (GG-004).
   if (to === 'refunded') throw new AppError('CONFLICT', 'transition', 'status');
   return withTx(payload, async (tx) => {
@@ -413,7 +420,7 @@ export const orderBankAccount = (order: Pick<Order, 'payment'>, accounts: BankAc
 
 /**
  * Staff choose which of the shop's active accounts a transfer order is paid into (APPLUX, 12 Nov). Only while money
- * is still expected by transfer; the customer's page shows it at once and the caller e-mails the new details.
+ * is still expected by transfer; the customer's page shows it at once and the caller e-mails the details.
  */
 export function setOrderBankAccount(payload: Payload, orderId: string, accountId: string, user: string): Promise<Order> {
   return withTx(payload, async (tx) => {
@@ -422,14 +429,16 @@ export function setOrderBankAccount(payload: Payload, orderId: string, accountId
     const { business } = await getSettingsPrivate();
     const account = activeAccounts(business.bankAccounts).find((a) => a.id === accountId);
     if (!account) throw new AppError('VALIDATION', 'invalid', 'account');
+    // The account already on the order: its details are only sent again (the history says so, nothing changed).
+    const same = order.payment?.bankAccount?.iban === account.iban;
     return setOrder(tx, order.id, {
       payment: { ...order.payment, bankAccount: accountCopy(account) },
-      history: [...(order.history ?? []), historyRow('bank_account', user, [account.holder, account.bankName].filter(Boolean).join(' · '))],
+      history: [...(order.history ?? []), historyRow(same ? 'bank_resent' : 'bank_account', user, [account.holder, account.bankName].filter(Boolean).join(' · '))],
     });
   });
 }
 
-export type MoneyInput = { amountCents: number; at: Date; reference?: string; user?: string };
+export type MoneyInput = { amountCents: number; at: Date; method?: string; reference?: string; user?: string };
 export type MoneyResult = { order: Order; effects: Effect[] };
 
 /**
@@ -442,7 +451,7 @@ export function recordPayment(payload: Payload, orderId: string, input: MoneyInp
     if (order.status === 'cancelled' || order.status === 'refunded') throw new AppError('CONFLICT', 'transition', 'status');
     const money = figuresOf(order);
     if (input.amountCents <= 0 || input.amountCents > dueOf(money)) throw new AppError('VALIDATION', 'amountTooHigh', 'amount');
-    await provider(order.payment?.provider).capture(tx, order, { ...input, method: order.payment?.method ?? undefined });
+    await provider(order.payment?.provider).capture(tx, order, { ...input, method: input.method ?? order.payment?.method ?? undefined });
     money.paidCents += input.amountCents;
     let updated = await setOrder(tx, order.id, {
       payment: { ...order.payment, status: paymentState(money), paidCents: money.paidCents },

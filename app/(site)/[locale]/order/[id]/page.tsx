@@ -137,7 +137,10 @@ async function Confirmation({ params, searchParams }: Pick<Props, 'params' | 'se
   const status = (doc.status ?? 'pending') as string;
   const statusName = reservation ? t.reservationStatus[status as keyof typeof t.reservationStatus] : t.status[status as keyof typeof t.status];
   const awaiting = order?.status === 'awaiting_payment';
-  const { business } = awaiting ? await getSettingsPrivate() : { business: null };
+  const due = order ? dueOf({ totalCents: order.totals?.totalCents ?? 0, paidCents: order.payment?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 }) : 0;
+  // The transfer details while a transfer is still due, also once staff prepared the order before it (GG-01).
+  const transferDue = order?.payment?.method === 'transfer' && due > 0 && status !== 'cancelled' && status !== 'refunded';
+  const { business } = transferDue ? await getSettingsPrivate() : { business: null };
   // Only the account chosen for this order (APPLUX, 12 Nov), never the shop's list.
   const account = order && business ? orderBankAccount(order, business.bankAccounts) : null;
   const name = doc.contact?.name?.split(' ')[0] ?? '';
@@ -160,10 +163,9 @@ async function Confirmation({ params, searchParams }: Pick<Props, 'params' | 'se
           : t.intro.pickup;
   const address = order?.mode === 'delivery' ? order.address : null;
   const money = (c: number | null | undefined) => formatMoney(c ?? 0, locale);
-  const due = order ? dueOf({ totalCents: order.totals?.totalCents ?? 0, paidCents: order.payment?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 }) : 0;
   // The payment, said beside the status (APPLUX report 4, §6): paid, a transfer to make, or to pay on site.
   const paymentName =
-    shown?.payment?.status === 'paid' ? t.paid : awaiting ? interpolate(t.next.payDue, { amount: money(due) }) : shown?.payment?.method === 'transfer' ? t.payTransfer : reservation ? t.payTable : t.payOnsite;
+    shown?.payment?.status === 'paid' ? t.paid : transferDue ? interpolate(t.next.payDue, { amount: money(due) }) : shown?.payment?.method === 'transfer' ? t.payTransfer : reservation ? t.payTable : t.payOnsite;
   // What happens next, while something still does.
   const steps = reservation
     ? status === 'pending'
@@ -213,7 +215,7 @@ async function Confirmation({ params, searchParams }: Pick<Props, 'params' | 'se
         </section>
       )}
 
-      {awaiting && order && (
+      {transferDue && order && (
         <section className="mt-6 border border-gold-deep/40 bg-gold/10 p-5 md:p-6">
           <p className="eyebrow mb-4 flex items-center gap-2 text-gold-deep">
             <Landmark className="h-3.5 w-3.5" /> {t.transfer.title}
