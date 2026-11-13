@@ -68,6 +68,10 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-14 · Ad hoc marketing asset (non-product)
+- Created `deliverables/heritage-co-instagram-reel/` for a separate The Heritage Co. request: a 48 s, 1080×1920 Instagram Reel using the live site's imagery and verified Jatni delivery/subscription details, with an ElevenLabs multilingual Hindi voice-over, original background music, source script and a post-ready caption. The revised copy says "cloud kitchen" rather than "Raja Bazar kitchen". The API key remains only in the gitignored `.env.elevenlabs.local`; no Golden Grape application code changed.
+- Verified: H.264/AAC export decodes as 1080×1920 at 30 fps with 48 kHz stereo audio; `npm run check` passes (17 files, 256 unit tests).
+
 ### 2026-11-13 · APPLUX consolidated QA report of 12 Nov (GG-01 … GG-21)
 APPLUX's report (21 points, priorities 1–3) was traced point by point before any change. Decisions (Aniket, 13 Nov): money is recorded at a handover only when staff confirm an amount in its dialog; the Markdown typed into event descriptions is rendered (no migration); the dashboard keeps "Ventes" as order value and adds money received and still owed. Nothing that passed QA (§9 of the report) was rebuilt.
 
