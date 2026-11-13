@@ -4,7 +4,9 @@ import {
   ClipboardList,
   Euro,
   ExternalLink,
+  HandCoins,
   Landmark,
+  PiggyBank,
   LayoutDashboard,
   PackageCheck,
   Receipt,
@@ -22,7 +24,7 @@ import type { ReactNode } from 'react';
 import { hasRole } from '@/lib/access';
 import { formatMoney } from '@/lib/money';
 import { REQUEST_STATUS } from '@/modules/catering/collections';
-import { SOLD, salesOverview } from '@/modules/reporting/service';
+import { SOLD, salesOverview, UNPAID } from '@/modules/reporting/service';
 import type { Range } from '@/modules/reporting/summary';
 import CreateButton from './create-button';
 import { actionCounts, type CounterKey, listUrl } from './alerts';
@@ -105,6 +107,13 @@ const soldUrl = ({ from, to }: Range) =>
     ...Object.fromEntries(SOLD.map((status, i) => [`where[and][2][status][in][${i}]`, status])),
     sort: '-slotAt',
   });
+
+/** The sold orders not (fully) paid yet: the list "Reste à encaisser" equals (GG-21). */
+const dueUrl = listUrl('orders', {
+  ...Object.fromEntries(SOLD.map((status, i) => [`where[and][0][status][in][${i}]`, status])),
+  ...Object.fromEntries(UNPAID.map((status, i) => [`where[and][1][payment.status][in][${i}]`, status])),
+  sort: 'slotAt',
+});
 
 export default async function Dashboard({ initPageResult }: AdminViewServerProps) {
   const { req } = initPageResult;
@@ -328,6 +337,16 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
               hint={k.compare(rangeLabel(overview.periods.lastMonth), money(overview.lastMonth.grossCents))}
               trend={trend(overview.month.grossCents, overview.lastMonth.grossCents)}
             />
+            {/* Money in, apart from the value sold (QA 12 Nov, GG-21). */}
+            <Tile
+              href={listUrl('payments', { sort: '-at' })}
+              icon={<PiggyBank />}
+              label={k.cashMonth}
+              value={money(overview.cash.netCents)}
+              hint={k.compare(rangeLabel(overview.periods.lastMonth), money(overview.lastCash.netCents))}
+              trend={trend(overview.cash.netCents, overview.lastCash.netCents)}
+            />
+            <Tile href={dueUrl} icon={<HandCoins />} label={k.due} value={money(overview.due.dueCents)} hint={k.dueHint(overview.due.orders)} tone={overview.due.dueCents > 0 ? 'warning' : undefined} />
             <Tile
               href={soldUrl(overview.periods.today)}
               icon={<ShoppingBag />}

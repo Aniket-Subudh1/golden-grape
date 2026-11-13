@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { add } from '@/lib/money';
 import { model } from '@/lib/tx';
 import { getTestPayload } from '@/tests/helpers';
-import { SOLD, salesOverview, salesSummary } from './service';
+import { cashSummary, outstanding, SOLD, salesOverview, salesSummary } from './service';
 
 const payload = await getTestPayload();
 
@@ -88,5 +88,35 @@ describe('salesOverview', () => {
     expect(o.yesterday).toMatchObject({ orders: 1, grossCents: 18900 });
     expect(o.month).toMatchObject({ orders: 7, grossCents: 48950 + 18900 + 6600 });
     expect(o.lastMonth).toMatchObject({ orders: 1, grossCents: 4000 });
+  });
+});
+
+describe('money received and still owed (QA 12 Nov, GG-21)', () => {
+  // Their own days (December), so the sales figures above never see these orders.
+  beforeAll(async () => {
+    const [onsite, partial, waiting] = [
+      { ...order('2026-12-05', 'confirmed', 16500, 1650), payment: { provider: 'manual', method: 'onsite', status: 'pending', paidCents: 0 } }, // a table pre-order to pay on site
+      { ...order('2026-12-05', 'completed', 2550, 371), payment: { provider: 'manual', method: 'transfer', status: 'partial', paidCents: 1000 } }, // handed over, 15,50 € still due
+      { ...order('2026-12-05', 'awaiting_payment', 4000, 581), payment: { provider: 'manual', method: 'transfer', status: 'pending', paidCents: 0 } }, // not sold yet
+    ];
+    const ids = (await model(payload, 'orders').insertMany([onsite, partial, waiting])).map((o) => o._id);
+    const pay = (kind: string, amountCents: number, at: string) => ({ order: ids[1], provider: 'manual', kind, amountCents, status: 'paid', at: new Date(at), method: 'transfer' });
+    await model(payload, 'payments').insertMany([
+      pay('charge', 1000, '2026-12-05T11:00:00Z'),
+      pay('charge', 1550, '2026-12-05T22:30:00Z'), // 23:30 in Luxembourg: still 5 December
+      pay('refund', -500, '2026-12-04T23:30:00Z'), // 00:30 in Luxembourg: already 5 December
+      pay('charge', 999, '2026-12-05T23:30:00Z'), // 00:30 on 6 December: another day
+      pay('void', 0, '2026-12-05T12:00:00Z'),
+    ]);
+  });
+
+  it('received and refunded by the Luxembourg day of the payment', async () => {
+    expect(await cashSummary(payload, { from: '2026-12-05', to: '2026-12-05' })).toEqual({ receivedCents: 2550, refundedCents: 500, netCents: 2050 });
+    expect(await cashSummary(payload, { from: '2026-12-01', to: '2026-12-31' })).toEqual({ receivedCents: 3549, refundedCents: 500, netCents: 3049 });
+    expect(await cashSummary(payload, { from: '2026-12-07', to: '2026-12-07' })).toEqual({ receivedCents: 0, refundedCents: 0, netCents: 0 });
+  });
+
+  it('still owed: sold orders not fully paid, never an order still waiting to be confirmed', async () => {
+    expect(await outstanding(payload)).toEqual({ orders: 2, dueCents: 16500 + 1550 });
   });
 });
