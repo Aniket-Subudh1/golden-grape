@@ -26,6 +26,8 @@ import { SOLD, salesOverview } from '@/modules/reporting/service';
 import type { Range } from '@/modules/reporting/summary';
 import CreateButton from './create-button';
 import { actionCounts, type CounterKey, listUrl } from './alerts';
+import { statusTabQuery } from './status-tabs';
+import { RESERVATION_TABS } from '@/modules/sales/collections';
 import { adminText, type AdminLanguage } from './text';
 import { eventDate, toLocal, today, TZ } from '@/lib/time';
 import { transferAccount } from '@/modules/settings/service';
@@ -291,7 +293,7 @@ export default async function Dashboard({ initPageResult }: AdminViewServerProps
             ))}
             {booked && (
               <Tile
-                href={listUrl('reservations', { 'where[slot.date][equals]': day, sort: 'slotAt' })}
+                href={`/admin/collections/reservations${statusTabQuery(RESERVATION_TABS[0])}`}
                 icon={<UsersRound />}
                 label={k.guestsToday}
                 value={String(tables.reduce((sum, r) => sum + (r.guests ?? 0), 0))}

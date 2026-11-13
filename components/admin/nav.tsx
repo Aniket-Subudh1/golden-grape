@@ -1,10 +1,11 @@
 import type { I18nClient } from '@payloadcms/translations';
 import type { Payload, TypedUser, VisibleEntities } from 'payload';
 import { hasRole, type Role } from '@/lib/access';
-import { today } from '@/lib/time';
 import { ORDER_TABS, orderTabQuery, orderTabWhere } from '@/modules/sales/admin/order-tabs';
+import { RESERVATION_TABS } from '@/modules/sales/collections';
 import { getAlerts } from './alerts';
 import { type NavGroup, NavClient } from './nav-client';
+import { statusTabQuery } from './status-tabs';
 import { adminText } from './text';
 
 type Key = keyof ReturnType<typeof adminText>['nav'];
@@ -44,10 +45,10 @@ const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean;
   {
     label: 'sales',
     items: [
-      // Orders open on the first stage that has something to do ({orders}, below); reservations on today and what
-      // is coming (the filter can be cleared).
+      // Orders open on the first stage that has something to do ({orders}, below); reservations on their "À venir"
+      // tab (today and later), a tab like the others, so its count and its list always agree (GG-04).
       { label: 'orders', slug: 'orders', icon: 'orders', query: '{orders}' },
-      { label: 'reservations', slug: 'reservations', icon: 'reservations', query: '?where[slotAt][greater_than_equal]={today}&sort=slotAt' },
+      { label: 'reservations', slug: 'reservations', icon: 'reservations', query: '{reservations}' },
       // By event first (events-board.tsx); the list of one event's bookings opens from its card.
       { label: 'eventBookings', slug: 'eventBookings', path: '/admin/event-bookings', roles: ['sales'], icon: 'bookings' },
     ],
@@ -96,7 +97,7 @@ export default async function AdminNav({ visibleEntities, i18n, payload, user }:
     label: t.nav[g.label],
     items: g.items
       .filter((i) => (i.path ? hasRole(user, i.roles ?? []) : ((i.global ? visibleEntities.globals : visibleEntities.collections) as string[]).includes(i.slug)))
-      .map((i) => ({ label: t.nav[i.label], icon: i.icon, slug: i.slug, href: i.path ?? `/admin/${i.global ? 'globals' : 'collections'}/${i.slug}${(i.query ?? '').replace('{today}', today()).replace('{orders}', orderTabQuery(ordersTab))}` })),
+      .map((i) => ({ label: t.nav[i.label], icon: i.icon, slug: i.slug, href: i.path ?? `/admin/${i.global ? 'globals' : 'collections'}/${i.slug}${(i.query ?? '').replace('{reservations}', statusTabQuery(RESERVATION_TABS.find((tab) => tab.opens)!)).replace('{orders}', orderTabQuery(ordersTab))}` })),
   })).filter((g) => g.items.length > 0);
   return <NavClient groups={groups} alerts={alerts} text={{ ...t.nav, brandSub: t.brandSub }} />;
 }

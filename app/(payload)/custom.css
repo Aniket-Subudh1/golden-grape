@@ -2558,6 +2558,60 @@ body:has(.gg-create) .no-results__actions {
   text-decoration: underline;
   cursor: pointer;
 }
+/* A filter that matches no tab (status-tabs.tsx, GG-04): said, with the way back. */
+.gg-tabs__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--gg-warning-tint);
+  color: var(--gg-warning);
+  font-size: 13px;
+  font-weight: 600;
+}
+.gg-tabs__filter a {
+  color: inherit;
+}
+/* An empty tab points to the tabs that have something (GG-04, GG-08). */
+.gg-empty .gg-empty__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.gg-empty__links a {
+  padding: 5px 12px;
+  border: 1px solid var(--gg-line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--gg-ink);
+  font-size: 13px;
+  text-decoration: none;
+}
+.gg-empty__links a:hover {
+  border-color: var(--gg-primary);
+}
+/* Arrived / absent buttons in the reservations list (GG-05). */
+.gg-btn--sm {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+/* Stacked, so the column stays narrow beside the others at 1280 px. */
+.gg-attend {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  white-space: nowrap;
+}
+.gg-attend > span {
+  font-size: 12px;
+  font-weight: 600;
+}
 
 /* ---- What waits: sidebar counters and the header bell (components/admin/alerts-client.tsx) ---------------- */
 .gg-nav__count {

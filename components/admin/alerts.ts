@@ -7,7 +7,8 @@ import { QUOTATION_STATUS } from '@/modules/documents/collections';
 import { dueOf } from '@/modules/payments/service';
 import { BOOKING_STATUS } from '@/modules/events/collections';
 import { ORDER_TABS, orderTabWhere } from '@/modules/sales/admin/order-tabs';
-import { ORDER_STATUS_LABELS, RESERVATION_STATUS_LABELS } from '@/modules/sales/collections';
+import { ORDER_STATUS_LABELS, RESERVATION_STATUS_LABELS, RESERVATION_TABS } from '@/modules/sales/collections';
+import { statusTabQuery } from './status-tabs';
 
 // What waits for staff (GG-002, GG-017): the counts beside the sidebar items and the bell's list. Only what the
 // user's role may open is counted. Orders count as waiting exactly when they sit in the Orders "To do" tab.
@@ -219,7 +220,7 @@ const COUNTERS: Counter[] = [
     value: total,
     since: 'updatedAt',
   },
-  { key: 'reservations', collection: 'reservations', where: WAITING.reservations, href: listUrl('reservations', { 'where[status][equals]': 'pending', sort: 'slotAt' }), unit: 'guests', value: guests },
+  { key: 'reservations', collection: 'reservations', where: WAITING.reservations, href: `/admin/collections/reservations${statusTabQuery(RESERVATION_TABS.find((t) => t.urgent)!)}`, unit: 'guests', value: guests },
   { key: 'catering', collection: 'cateringRequests', where: WAITING.cateringRequests, href: listUrl('cateringRequests', { 'where[status][equals]': 'new' }), unit: 'cents', value: (d) => d.estimateCents ?? 0 },
   { key: 'eventBookings', collection: 'eventBookings', where: WAITING.eventBookings, href: listUrl('eventBookings', { 'where[status][equals]': 'pending' }), unit: 'guests', value: guests },
   {

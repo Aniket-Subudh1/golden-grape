@@ -1,6 +1,6 @@
 import type { CollectionConfig, Field, PayloadRequest } from 'payload';
 import { hiddenUnless, isStaff, none, staffOrSelf } from '@/lib/access';
-import { addButton, badgeCell, boolCell, emptyList, l, type Label, listOnly, say, scaledNumber, statusTabs, timeOfDay, WEEKDAYS } from '@/lib/admin';
+import { addButton, badgeCell, boolCell, emptyList, l, type Label, listOnly, say, scaledNumber, type StatusTab, statusTabs, timeOfDay, WEEKDAYS } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { ORDER_STATUSES, RESERVATION_STATUSES } from './order-states';
 import { isLuxPostalCode, splitPostalCodes } from './zones';
@@ -35,9 +35,61 @@ export const RESERVATION_STATUS_LABELS: Record<(typeof RESERVATION_STATUSES)[num
   accepted: l('Acceptée', 'Accepted', 'Angenommen', 'Aceite'),
   rejected: l('Refusée', 'Declined', 'Abgelehnt', 'Recusada'),
   cancelled: l('Annulée', 'Cancelled', 'Storniert', 'Cancelada'),
-  completed: l('Venue', 'Completed', 'Erledigt', 'Concluída'),
-  no_show: l('Pas venu (no-show)', 'No-show', 'Nicht erschienen', 'Não compareceu'),
+  completed: l('Client arrivé', 'Guests arrived', 'Gäste erschienen', 'Cliente chegou'),
+  no_show: l('Client absent', 'No-show', 'Nicht erschienen', 'Não compareceu'),
 };
+
+/**
+ * The table reservations list (QA 12 Nov, GG-04/06): today, what is coming (the sidebar opens it), each stage, and
+ * the whole history. A day is a plain condition of its tab, so the counts always equal the lists.
+ */
+export const RESERVATION_TABS: StatusTab[] = [
+  {
+    label: l('Aujourd’hui', 'Today', 'Heute', 'Hoje'),
+    statuses: ['pending', 'accepted', 'completed', 'no_show'],
+    day: 'today',
+    sort: 'slotAt',
+    empty: l('Aucune réservation aujourd’hui', 'No reservations today', 'Heute keine Reservierungen', 'Sem reservas hoje'),
+  },
+  {
+    label: l('À venir', 'Upcoming', 'Anstehend', 'Próximas'),
+    statuses: ['pending', 'accepted'],
+    day: 'fromToday',
+    sort: 'slotAt',
+    opens: true,
+    empty: l('Aucune réservation à venir', 'No upcoming reservations', 'Keine anstehenden Reservierungen', 'Sem reservas futuras'),
+  },
+  {
+    label: l('À confirmer', 'To confirm', 'Zu bestätigen', 'Por confirmar'),
+    statuses: ['pending'],
+    sort: 'slotAt',
+    urgent: true,
+    empty: l('Aucune réservation à confirmer', 'No reservations to confirm', 'Keine Reservierungen zu bestätigen', 'Sem reservas por confirmar'),
+  },
+  {
+    label: l('Acceptées', 'Accepted', 'Angenommen', 'Aceites'),
+    statuses: ['accepted'],
+    sort: 'slotAt',
+    empty: l('Aucune réservation acceptée en cours', 'No accepted reservations open', 'Keine offenen angenommenen Reservierungen', 'Sem reservas aceites em aberto'),
+  },
+  {
+    label: l('Terminées', 'Completed', 'Abgeschlossen', 'Concluídas'),
+    statuses: ['completed', 'no_show'],
+    sort: '-slotAt',
+    empty: l('Aucune réservation terminée', 'No completed reservations', 'Keine abgeschlossenen Reservierungen', 'Sem reservas concluídas'),
+  },
+  {
+    label: l('Refusées / annulées', 'Declined / cancelled', 'Abgelehnt / storniert', 'Recusadas / canceladas'),
+    statuses: ['rejected', 'cancelled'],
+    sort: '-slotAt',
+    empty: l('Aucune réservation refusée ou annulée', 'No declined or cancelled reservations', 'Keine abgelehnten oder stornierten Reservierungen', 'Sem reservas recusadas ou canceladas'),
+  },
+  {
+    label: l('Toutes (historique)', 'All (history)', 'Alle (Verlauf)', 'Todas (histórico)'),
+    sort: '-slotAt',
+    empty: l('Aucune réservation pour l’instant', 'No reservations yet', 'Noch keine Reservierungen', 'Ainda sem reservas'),
+  },
+];
 export const RESERVATION_STATUS_TONES = { pending: 'warning', accepted: 'success', rejected: 'danger', cancelled: 'danger', completed: 'neutral', no_show: 'danger' } as const;
 
 export const MODE_LABELS = {
@@ -264,7 +316,7 @@ export const reservations: CollectionConfig = {
   labels: { singular: l('Réservation', 'Reservation', 'Reservierung', 'Reserva'), plural: l('Réservations', 'Reservations', 'Reservierungen', 'Reservas') },
   admin: {
     useAsTitle: 'number',
-    defaultColumns: ['number', 'slot', 'guests', 'contact', 'preorder', 'status'],
+    defaultColumns: ['number', 'slot', 'contact', 'guests', 'status', 'attendance', 'preorder'],
     hidden: hiddenUnless('sales'),
     listSearchableFields: ['number', 'contact.name', 'contact.email', 'contact.phone'],
     description: l(
@@ -273,29 +325,8 @@ export const reservations: CollectionConfig = {
       'Tischanfragen von der Website. Annehmen oder ablehnen: der Kunde erhält eine E-Mail in seiner Sprache.',
       'Pedidos de mesa do site. Aceite ou recuse: o cliente recebe um e-mail na sua língua.',
     ),
-    // Stage tabs instead of the filter builder (APPLUX report 4, §7), then the first-use state.
-    components: {
-      beforeListTable: [
-        statusTabs('reservations', [
-          { label: l('À confirmer', 'To confirm', 'Zu bestätigen', 'Por confirmar'), statuses: ['pending'], sort: 'slotAt', urgent: true },
-          { label: l('Acceptées', 'Accepted', 'Angenommen', 'Aceites'), statuses: ['accepted'], sort: 'slotAt' },
-          { label: l('Terminées', 'Completed', 'Abgeschlossen', 'Concluídas'), statuses: ['completed', 'no_show'], sort: '-slotAt' },
-          { label: l('Refusées / annulées', 'Declined / cancelled', 'Abgelehnt / storniert', 'Recusadas / canceladas'), statuses: ['rejected', 'cancelled'], sort: '-slotAt' },
-          { label: l('Toutes', 'All', 'Alle', 'Todas'), sort: '-slotAt' },
-        ]),
-        ...emptyList({
-      icon: 'reservations',
-      title: l('Aucune réservation à venir', 'No upcoming reservations', 'Keine anstehenden Reservierungen', 'Sem reservas futuras'),
-      text: l(
-        'Les demandes de table envoyées depuis le site apparaissent ici. Retirez le filtre pour voir les anciennes.',
-        'Table requests sent from the website appear here. Remove the filter to see past ones.',
-        'Tischanfragen von der Website erscheinen hier. Entfernen Sie den Filter für ältere.',
-        'Os pedidos de mesa enviados pelo site aparecem aqui. Retire o filtro para ver os antigos.',
-      ),
-      evenFiltered: true,
-    }).beforeListTable,
-      ],
-    },
+    // Stage tabs instead of the filter builder (APPLUX report 4, §7), each with its own empty message (GG-04).
+    components: { beforeListTable: [statusTabs('reservations', RESERVATION_TABS, 'reservations')] },
   },
   access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
   defaultSort: '-createdAt',
@@ -337,7 +368,9 @@ export const reservations: CollectionConfig = {
       },
       { name: 'notes', type: 'textarea', label: l('Message du client', 'Customer’s message', 'Nachricht des Kunden', 'Mensagem do cliente') },
       localeField,
-      { name: 'history', type: 'array', admin: { disableListColumn: true }, fields: [{ name: 'at', type: 'date' }, { name: 'from', type: 'text' }, { name: 'to', type: 'text' }, { name: 'user', type: 'relationship', relationTo: 'users' }, { name: 'reason', type: 'text' }] },
+      { name: 'history', type: 'array', admin: { disableListColumn: true, disableListFilter: true }, fields: [{ name: 'at', type: 'date' }, { name: 'from', type: 'text' }, { name: 'to', type: 'text' }, { name: 'user', type: 'relationship', relationTo: 'users' }, { name: 'reason', type: 'text' }] },
+      // Arrived / absent straight from the list during service (GG-05): buttons on accepted rows, nothing stored.
+      { name: 'attendance', type: 'ui', label: l('Présence', 'Attendance', 'Anwesenheit', 'Presença'), admin: { components: { Cell: '@/modules/sales/admin/cells#AttendanceCell' } } },
     ].map((f) => listOnly(f as Field)),
   ],
   custom: { indexes: [{ fields: { 'slot.date': 1, status: 1 } }] },

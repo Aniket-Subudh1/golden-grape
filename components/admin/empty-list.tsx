@@ -1,4 +1,5 @@
 import { ArrowLeftRight, CalendarCheck, ClipboardCheck, MapPin, Package, ShoppingBag, Store, Tags, Ticket, TriangleAlert, UsersRound } from 'lucide-react';
+import Link from 'next/link';
 import type { PaginatedDocs } from 'payload';
 import type { Label } from '@/lib/admin';
 import CreateButton from './create-button';
@@ -33,9 +34,11 @@ type Props = {
   action?: Label;
   /** Also shown when a filter is applied (the low-stock list is always opened with one). */
   evenFiltered?: boolean;
+  /** Where the documents are instead: the stage tabs that have some, with their counts (QA 12 Nov, GG-04/08). */
+  links?: { href: string; label: string }[];
 };
 
-export default function EmptyList({ data, searchParams = {}, collectionConfig, i18n, icon, title, text, action, evenFiltered }: Props) {
+export default function EmptyList({ data, searchParams = {}, collectionConfig, i18n, icon, title, text, action, evenFiltered, links = [] }: Props) {
   const filtered = Boolean(searchParams.search || searchParams.where);
   if (!data || data.totalDocs > 0 || (filtered && !evenFiltered)) return null;
   const lang = (i18n?.language ?? 'fr') as keyof Label;
@@ -47,6 +50,15 @@ export default function EmptyList({ data, searchParams = {}, collectionConfig, i
       </span>
       <h2>{title[lang] ?? title.fr}</h2>
       <p>{text[lang] ?? text.fr}</p>
+      {links.length > 0 && (
+        <p className="gg-empty__links">
+          {links.map((link) => (
+            <Link key={link.href} href={link.href}>
+              {link.label}
+            </Link>
+          ))}
+        </p>
+      )}
       {action && collectionConfig && <CreateButton collectionSlug={collectionConfig.slug} label={action} />}
     </section>
   );

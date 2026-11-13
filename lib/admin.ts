@@ -129,10 +129,16 @@ export const emptyList = (empty: { icon: string; title: Label; text: Label; acti
   beforeListTable: [{ path: '@/components/admin/empty-list', clientProps: empty }],
 });
 
-/** Stage tabs above a list, each a plain `status` query (components/admin/status-tabs.tsx). */
-export const statusTabs = (collection: string, tabs: { label: Label; statuses?: string[]; sort?: string; urgent?: boolean }[]) => ({
+/**
+ * A stage tab above a list (components/admin/status-tabs.tsx): statuses, optionally a day on `slot.date` (today, or
+ * from today on), the sort, whether a count calls for action, the empty message, and the tab the sidebar opens.
+ */
+export type StatusTab = { label: Label; statuses?: string[]; day?: 'today' | 'fromToday'; sort?: string; urgent?: boolean; empty?: Label; opens?: boolean };
+
+/** Stage tabs above a list, each a plain query on `status` (and the day), so search, columns and paging keep working. */
+export const statusTabs = (collection: string, tabs: StatusTab[], icon?: string) => ({
   path: '@/components/admin/status-tabs',
-  serverProps: { collection, tabs },
+  serverProps: { collection, tabs, icon },
 });
 
 /**

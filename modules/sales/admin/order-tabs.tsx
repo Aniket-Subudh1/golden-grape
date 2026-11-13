@@ -105,15 +105,15 @@ export function orderTabQuery(tab: Tab, keep: { search?: string; day?: string } 
 
 // Next hands Payload's list the raw query (`where[and][0][status][in]` as a flat key), in our shape or in the one
 // Payload's filter builder writes (`where[or][0][and][0][status][in][0]`): read the values whatever the nesting.
-// An already-parsed `where` object is flattened to the same bracket keys first.
-const flat = (value: unknown, key: string): [string, unknown][] =>
-  value && typeof value === 'object' && !Array.isArray(value) ? Object.entries(value).flatMap(([k, v]) => flat(v, `${key}[${k}]`)) : [[key, value]];
+// An already-parsed `where` object, or a key repeated in the URL (an array), is flattened to bracket keys first.
+const flat = (value: unknown, key: string): [string, string][] =>
+  value && typeof value === 'object' ? Object.entries(value).flatMap(([k, v]) => flat(v, `${key}[${k}]`)) : [[key, String(value)]];
+/** The query as flat bracket keys and their values. */
+export const entriesOf = (searchParams: Record<string, unknown>) => Object.entries(searchParams).flatMap(([key, value]) => flat(value, key));
 export const valuesOf = (searchParams: Record<string, unknown>, test: RegExp) =>
-  Object.entries(searchParams)
-    .flatMap(([key, value]) => flat(value, key))
+  entriesOf(searchParams)
     .filter(([key]) => test.test(key))
-    .flatMap(([, v]) => (Array.isArray(v) ? v : [v]))
-    .flatMap((v) => String(v).split(','))
+    .flatMap(([, v]) => v.split(','))
     .filter(Boolean);
 
 type Props = {
@@ -174,11 +174,15 @@ export default async function OrderTabs({ payload, data, searchParams = {}, list
           icon="orders"
           title={active.empty}
           text={l(
-            'Les autres commandes sont dans les onglets ci-dessus. « Toutes » permet de retrouver n’importe laquelle.',
-            'Other orders are in the tabs above. “All” finds any order.',
-            'Die übrigen Bestellungen finden Sie in den Reitern oben. „Alle“ findet jede Bestellung.',
-            'As outras encomendas estão nos separadores acima. «Todas» encontra qualquer encomenda.',
+            'Les autres commandes sont dans ces onglets :',
+            'The other orders are in these tabs:',
+            'Die übrigen Bestellungen finden Sie in diesen Reitern:',
+            'As outras encomendas estão nestes separadores:',
           )}
+          // Where the orders are instead (QA 12 Nov, GG-08): the stages that have some, "All" left out.
+          links={ORDER_TABS.map((t, i) => ({ t, count: counts[i] }))
+            .filter(({ t, count }) => count > 0 && t !== active && t.statuses)
+            .map(({ t, count }) => ({ href: orderTabQuery(t, { day }), label: `${say(t.label)} (${count})` }))}
           evenFiltered
         />
       )}
