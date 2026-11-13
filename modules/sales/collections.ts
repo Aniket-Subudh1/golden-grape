@@ -1,4 +1,4 @@
-import { baseIDField, type CollectionConfig, type Field, type PayloadRequest } from 'payload';
+import type { CollectionConfig, Field, PayloadRequest } from 'payload';
 import { hiddenUnless, isStaff, none, staffOrSelf } from '@/lib/access';
 import { addButton, badgeCell, boolCell, emptyList, l, type Label, listOnly, say, scaledNumber, type StatusTab, statusTabs, timeOfDay, WEEKDAYS } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
@@ -161,16 +161,8 @@ const localeField: Field = {
 /** Kept for the services, never a list column or filter: technical values (cents, ids, copies) staff never pick (GG-07). */
 const internal = { disableListColumn: true, disableListFilter: true } as const;
 
-/**
- * `internal` on a list's or group's fields too: Payload offers nested fields in its filters even when the parent is
- * not. `rows`: the fields of a list (array), with Payload's own row id (generated as usual) hidden as well.
- */
-const hidden = (fields: Field[], rows = false): Field[] => [
-  ...fields.map((f) => ({ ...f, admin: { ...('admin' in f ? f.admin : {}), ...internal }, ...('fields' in f ? { fields: hidden(f.fields) } : {}) }) as Field),
-  ...(rows ? [{ ...baseIDField, admin: { ...baseIDField.admin, ...internal } } as Field] : []),
-];
-
-const historyFields = hidden([{ name: 'at', type: 'date' }, { name: 'from', type: 'text' }, { name: 'to', type: 'text' }, { name: 'user', type: 'relationship', relationTo: 'users' }, { name: 'reason', type: 'text' }], true);
+// What is inside an `internal` group or list, and every list's row id, stays out too (payload.config.ts, listFields).
+const historyFields: Field[] = [{ name: 'at', type: 'date' }, { name: 'from', type: 'text' }, { name: 'to', type: 'text' }, { name: 'user', type: 'relationship', relationTo: 'users' }, { name: 'reason', type: 'text' }];
 
 const lineFields: Field[] = [
   { name: 'variant', type: 'relationship', relationTo: 'variants', required: true },
@@ -265,7 +257,7 @@ export const orders: CollectionConfig = {
       },
       // `YYYY-MM-DDTHH:mm` of the slot: the list's "today and upcoming" filter and its sort.
       { name: 'slotAt', type: 'text', index: true, label: l('Créneau', 'Time slot', 'Zeitfenster', 'Horário'), admin: { disableListColumn: true } },
-      { name: 'lines', type: 'array', label: l('Articles', 'Items', 'Artikel', 'Artigos'), admin: internal, fields: hidden(lineFields, true) },
+      { name: 'lines', type: 'array', label: l('Articles', 'Items', 'Artikel', 'Artigos'), admin: internal, fields: lineFields },
       {
         name: 'totals',
         type: 'group',
@@ -278,7 +270,7 @@ export const orders: CollectionConfig = {
           { name: 'deliveryCents', type: 'number', defaultValue: 0, admin: internal },
           { name: 'vatCents', type: 'number', required: true, admin: internal },
           { name: 'totalCents', type: 'number', required: true, admin: internal },
-          { name: 'vatBreakdown', type: 'array', admin: internal, fields: hidden([{ name: 'rateBp', type: 'number' }, { name: 'baseCents', type: 'number' }, { name: 'vatCents', type: 'number' }], true) },
+          { name: 'vatBreakdown', type: 'array', admin: internal, fields: [{ name: 'rateBp', type: 'number' }, { name: 'baseCents', type: 'number' }, { name: 'vatCents', type: 'number' }] },
         ],
       },
       {
@@ -303,12 +295,12 @@ export const orders: CollectionConfig = {
             name: 'bankAccount',
             type: 'group',
             admin: internal,
-            fields: hidden([
+            fields: [
               { name: 'holder', type: 'text' },
               { name: 'bankName', type: 'text' },
               { name: 'iban', type: 'text' },
               { name: 'bic', type: 'text' },
-            ]),
+            ],
           },
         ],
       },

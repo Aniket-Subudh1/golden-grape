@@ -1,7 +1,7 @@
 import { AUDIT_ACTIONS, type AuditAction } from '@/lib/audit';
 import { APIError, type CollectionConfig, type FieldAccess } from 'payload';
 import { hasRole, hiddenUnless, isStaff, none, ROLES } from '@/lib/access';
-import { addButton, boolCell, l, type Label } from '@/lib/admin';
+import { addButton, boolCell, l, type Label, listOnly } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 
 const adminOnly: FieldAccess = ({ req }) => hasRole(req.user, ['admin']);
@@ -155,10 +155,13 @@ const auditLogs: CollectionConfig = {
     },
     { name: 'ref', type: 'text', index: true, label: l('Référence', 'Reference', 'Referenz', 'Referência') },
     { name: 'reason', type: 'text', label: l('Raison', 'Reason', 'Grund', 'Motivo') },
-    { name: 'targetCollection', type: 'text', required: true, label: l('Où', 'Where', 'Wo', 'Onde'), admin: { components: { Cell: '@/components/admin/cells#CollectionCell' } } },
+    // Named in the list by its cell and on the entry's page by "Changements" (GG-18), never as the raw slug.
+    listOnly({ name: 'targetCollection', type: 'text', required: true, label: l('Où', 'Where', 'Wo', 'Onde'), admin: { components: { Cell: '@/components/admin/cells#CollectionCell' } } }),
     { name: 'docId', type: 'text', required: true, index: true, admin: { hidden: true } },
-    { name: 'before', type: 'json', label: l('Avant', 'Before', 'Vorher', 'Antes') },
-    { name: 'after', type: 'json', label: l('Après', 'After', 'Nachher', 'Depois') },
+    // Raw data, read through "Changements" in words (GG-18): never a column, a filter or a field on screen.
+    { name: 'before', type: 'json', label: l('Avant', 'Before', 'Vorher', 'Antes'), admin: { hidden: true, disableListColumn: true, disableListFilter: true } },
+    { name: 'after', type: 'json', label: l('Après', 'After', 'Nachher', 'Depois'), admin: { hidden: true, disableListColumn: true, disableListFilter: true } },
+    { name: 'changes', type: 'ui', admin: { components: { Field: '@/components/admin/audit-trail#AuditChanges' } } },
   ],
 };
 

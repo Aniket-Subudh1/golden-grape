@@ -9,7 +9,7 @@ import { fr } from '@payloadcms/translations/languages/fr';
 import { pt } from '@payloadcms/translations/languages/pt';
 import { s3Storage } from '@payloadcms/storage-s3';
 import type { CreateIndexesOptions, IndexSpecification } from 'mongodb';
-import { buildConfig, type CollectionConfig, type GlobalConfig } from 'payload';
+import { baseIDField, buildConfig, type CollectionConfig, type Field, type GlobalConfig } from 'payload';
 import sharp from 'sharp';
 import { auditGlobalHook, auditHooks } from '@/lib/audit';
 import { env, isBuildPhase, s3Configured, smtpConfigured } from '@/lib/env';
@@ -44,6 +44,27 @@ const withAudit = (c: CollectionConfig): CollectionConfig => {
   return { ...c, hooks: { ...c.hooks, afterChange: [...(c.hooks?.afterChange ?? []), ...hooks.afterChange], afterDelete: [...(c.hooks?.afterDelete ?? []), ...hooks.afterDelete] } };
 };
 const withGlobalAudit = (g: GlobalConfig): GlobalConfig => ({ ...g, hooks: { ...g.hooks, afterChange: [...(g.hooks?.afterChange ?? []), auditGlobalHook()] } });
+
+// QA 12 Nov (GG-07, GG-18): list columns and filters offer only what staff use, in their words. Payload offers the
+// unnamed fields hidden in the admin, the fields inside a hidden group or a list kept out of the lists, every list's row
+// id ("… > ID") and the panels of the edit view; all of these are kept out here, once for every collection.
+const OUT = { disableListColumn: true, disableListFilter: true };
+const ROW_ID = { ...baseIDField, admin: { ...baseIDField.admin, ...OUT } } as Field;
+function listFields(fields: Field[], out = false): Field[] {
+  return fields.map((f) => {
+    const admin = ('admin' in f ? f.admin : undefined) ?? {};
+    const hasCell = Boolean(admin.components && 'Cell' in admin.components);
+    const hidden = 'hidden' in admin && Boolean(admin.hidden);
+    // Hidden and unnamed: a technical value ("raw", "docId", timestamps). Hidden but named: shown in a panel, still useful.
+    const technical = hidden && !('label' in f && f.label);
+    const flags = out ? OUT : technical ? { disableListFilter: true, ...(hasCell ? {} : { disableListColumn: true }) } : f.type === 'ui' && !hasCell ? { disableListColumn: true } : {};
+    const next = { ...f, admin: { ...admin, ...flags } } as Field;
+    if (!('fields' in f)) return next;
+    const inner = listFields(f.fields, out || hidden || ('disableListFilter' in admin && Boolean(admin.disableListFilter)));
+    return { ...next, fields: f.type === 'array' && !f.fields.some((c) => 'name' in c && c.name === 'id') ? [...inner, ROW_ID] : inner } as Field;
+  });
+}
+const withListFields = (c: CollectionConfig): CollectionConfig => ({ ...c, fields: listFields(c.fields) });
 
 export default buildConfig({
   admin: {
@@ -83,7 +104,9 @@ export default buildConfig({
     eventBookings,
     payments,
     ...documentCollections,
-  ].map(withAudit),
+  ]
+    .map(withAudit)
+    .map(withListFields),
   globals: [businessSettings, ...cmsGlobals].map(withGlobalAudit),
   db: mongooseAdapter({
     url: isBuildPhase ? false : env.DATABASE_URL,

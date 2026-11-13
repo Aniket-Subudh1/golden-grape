@@ -8,6 +8,11 @@ export type Label = { fr: string; en: string; de: string; pt: string };
 /** A label in the four admin languages, in the order fr, en, de, pt (Payload picks the user's language). */
 export const l = (fr: string, en: string, de: string, pt: string): Label => ({ fr, en, de, pt });
 
+const YES_NO = { fr: ['Oui', 'Non'], en: ['Yes', 'No'], de: ['Ja', 'Nein'], pt: ['Sim', 'Não'] } as const;
+
+/** A yes/no value in the admin's language, never Payload's raw "vrai" / "true" (lists, histories: GG-18). */
+export const yesNo = (lang: string, value: unknown) => YES_NO[(lang in YES_NO ? lang : 'fr') as keyof typeof YES_NO][value ? 0 : 1];
+
 /** A validation message in the language of the person saving (Payload `validate` returns the text to show). */
 export const say = (req: PayloadRequest | undefined, label: Label) => label[(req?.i18n?.language ?? 'fr') as keyof Label] ?? label.fr;
 

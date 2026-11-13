@@ -189,7 +189,8 @@ export const eventBookings: CollectionConfig = {
           name: 'payments',
           type: 'array',
           label: l('Paiements', 'Payments', 'Zahlungen', 'Pagamentos'),
-          admin: { disableListColumn: true },
+          // Shown on the booking's page; never a list column or filter (QA 12 Nov, GG-18).
+          admin: { disableListColumn: true, disableListFilter: true },
           fields: [
             { name: 'kind', type: 'select', required: true, options: ['charge', 'refund'] },
             // The labels are what the booking's history prints for each payment line (audit-trail.tsx).
