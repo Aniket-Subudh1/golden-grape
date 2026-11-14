@@ -1,13 +1,13 @@
 'use client';
 
 import { toast } from '@payloadcms/ui';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ActionResult } from '@/lib/action';
 
 // The buttons for the moves a document may make next (only those the state machine allows are passed in). Each one
 // first says what will happen — stock, e-mail — and asks for a reason when it undoes something, plus any details the
 // move needs (an amount, the bank's date…); then it runs the staff action and reloads the page so the summary shows
-// the new state.
+// the new state. In a list row (`modal`), the confirmation opens in a dialog above the page, so the row keeps its size.
 
 type Action = (prev: unknown, input: FormData) => Promise<ActionResult<unknown>>;
 
@@ -45,12 +45,18 @@ type Props = {
   target: Record<string, string>;
   decisions: Decision[];
   text: DecisionText;
+  /** In a list row: the confirmation step opens in a dialog instead of in place (reservations list, GG-23). */
+  modal?: boolean;
 };
 
-export default function DecisionBar({ action, target, decisions, text }: Props) {
+export default function DecisionBar({ action, target, decisions, text, modal }: Props) {
   const [open, setOpen] = useState<Decision | null>(null);
   const [busy, setBusy] = useState(false);
   const box = useRef<HTMLDivElement>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (open && modal && !dialog.current?.open) dialog.current?.showModal();
+  }, [open, modal]);
   if (decisions.length === 0) return null;
 
   // Not a <form>: the panel sits inside Payload's edit form, and a form inside a form never submits.
@@ -77,72 +83,7 @@ export default function DecisionBar({ action, target, decisions, text }: Props) 
     else window.location.reload();
   }
 
-  if (open) {
-    return (
-      <div
-        ref={box}
-        className={`gg-decide gg-decide--confirm${open.tone === 'danger' ? ' gg-decide--danger' : ''}`}
-        onKeyDown={(e) => {
-          // Enter confirms here instead of submitting Payload's form around the panel.
-          if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
-            e.preventDefault();
-            void submit();
-          }
-        }}
-      >
-        <p>
-          <b>{open.label}</b> — {open.hint}
-        </p>
-        {(open.fields ?? []).length > 0 && (
-          <div className="gg-decide__fields">
-            {open.fields!.map((f) => (
-              <label key={f.name} className="gg-decide__reason">
-                <span>{f.label}</span>
-                {f.kind === 'select' ? (
-                  <select name={f.name} defaultValue={f.value} required={f.required}>
-                    {f.options?.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    name={f.name}
-                    defaultValue={f.value}
-                    required={f.required}
-                    type={f.kind === 'date' ? 'date' : f.kind === 'qty' ? 'number' : 'text'}
-                    min={f.kind === 'qty' ? 0 : undefined}
-                    step={f.kind === 'qty' ? 1 : undefined}
-                    max={f.kind === 'date' || f.kind === 'qty' ? f.max : undefined}
-                    inputMode={f.kind === 'money' ? 'decimal' : undefined}
-                    pattern={f.kind === 'money' ? '\\s*\\d+([.,]\\d{1,2})?\\s*€?\\s*' : undefined}
-                    maxLength={f.kind === 'text' ? 80 : undefined}
-                  />
-                )}
-              </label>
-            ))}
-          </div>
-        )}
-        {open.reason && (
-          <label className="gg-decide__reason">
-            <span>{open.reason === 'required' ? (text.reasonMandatory ?? text.reason) : text.reason}</span>
-            <input name="reason" defaultValue={open.reasonValue} required={open.reason === 'required'} minLength={open.reason === 'required' ? 3 : undefined} placeholder={text.reasonPh} maxLength={300} />
-          </label>
-        )}
-        <div className="gg-decide__buttons">
-          <button type="button" className={`gg-btn ${open.tone === 'danger' ? 'gg-btn--danger' : 'gg-btn--primary'}`} disabled={busy} onClick={submit}>
-            {text.confirm}
-          </button>
-          <button type="button" className="gg-btn" disabled={busy} onClick={() => setOpen(null)}>
-            {text.back}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
+  const buttons = (
     <div className="gg-decide">
       {decisions.map((d) => (
         <button
@@ -155,5 +96,85 @@ export default function DecisionBar({ action, target, decisions, text }: Props) 
         </button>
       ))}
     </div>
+  );
+  if (!open) return buttons;
+
+  const confirm = (
+    <div
+      ref={box}
+      className={`gg-decide gg-decide--confirm${open.tone === 'danger' ? ' gg-decide--danger' : ''}`}
+      onKeyDown={(e) => {
+        // Enter confirms here instead of submitting Payload's form around the panel.
+        if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
+          e.preventDefault();
+          void submit();
+        }
+      }}
+    >
+      <p>
+        <b>{open.label}</b> — {open.hint}
+      </p>
+      {(open.fields ?? []).length > 0 && (
+        <div className="gg-decide__fields">
+          {open.fields!.map((f) => (
+            <label key={f.name} className="gg-decide__reason">
+              <span>{f.label}</span>
+              {f.kind === 'select' ? (
+                <select name={f.name} defaultValue={f.value} required={f.required}>
+                  {f.options?.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  name={f.name}
+                  defaultValue={f.value}
+                  required={f.required}
+                  type={f.kind === 'date' ? 'date' : f.kind === 'qty' ? 'number' : 'text'}
+                  min={f.kind === 'qty' ? 0 : undefined}
+                  step={f.kind === 'qty' ? 1 : undefined}
+                  max={f.kind === 'date' || f.kind === 'qty' ? f.max : undefined}
+                  inputMode={f.kind === 'money' ? 'decimal' : undefined}
+                  pattern={f.kind === 'money' ? '\\s*\\d+([.,]\\d{1,2})?\\s*€?\\s*' : undefined}
+                  maxLength={f.kind === 'text' ? 80 : undefined}
+                />
+              )}
+            </label>
+          ))}
+        </div>
+      )}
+      {open.reason && (
+        <label className="gg-decide__reason">
+          <span>{open.reason === 'required' ? (text.reasonMandatory ?? text.reason) : text.reason}</span>
+          <input name="reason" defaultValue={open.reasonValue} required={open.reason === 'required'} minLength={open.reason === 'required' ? 3 : undefined} placeholder={text.reasonPh} maxLength={300} />
+        </label>
+      )}
+      <div className="gg-decide__buttons">
+        <button type="button" className={`gg-btn ${open.tone === 'danger' ? 'gg-btn--danger' : 'gg-btn--primary'}`} disabled={busy} onClick={submit}>
+          {text.confirm}
+        </button>
+        <button type="button" className="gg-btn" disabled={busy} onClick={() => setOpen(null)}>
+          {text.back}
+        </button>
+      </div>
+    </div>
+  );
+  if (!modal) return confirm;
+  // Escape, "Retour" and a click on the backdrop close it (not while it is sending); nothing is sent.
+  return (
+    <>
+      {buttons}
+      <dialog
+        ref={dialog}
+        className="gg-dialog"
+        onCancel={(e) => busy && e.preventDefault()}
+        onClose={() => setOpen(null)}
+        onClick={(e) => e.target === e.currentTarget && !busy && setOpen(null)}
+      >
+        {confirm}
+      </dialog>
+    </>
   );
 }

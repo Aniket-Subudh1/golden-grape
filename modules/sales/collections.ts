@@ -381,8 +381,8 @@ export const reservations: CollectionConfig = {
       { name: 'notes', type: 'textarea', label: l('Message du client', 'Customer’s message', 'Nachricht des Kunden', 'Mensagem do cliente') },
       localeField,
       { name: 'history', type: 'array', admin: internal, fields: historyFields },
-      // Arrived / absent straight from the list during service (GG-05): buttons on accepted rows, nothing stored.
-      { name: 'attendance', type: 'ui', label: l('Présence', 'Attendance', 'Anwesenheit', 'Presença'), admin: { components: { Cell: '@/modules/sales/admin/cells#AttendanceCell' } } },
+      // Arrived / absent straight from the list during service (GG-05, GG-23): buttons on accepted rows, nothing stored.
+      { name: 'attendance', type: 'ui', label: l('Présence', 'Attendance', 'Anwesenheit', 'Presença'), admin: { components: { Cell: '@/modules/sales/admin/reservation-panel#AttendanceCell' } } },
     ].map((f) => listOnly(f as Field)),
   ],
   custom: { indexes: [{ fields: { 'slot.date': 1, status: 1 } }] },

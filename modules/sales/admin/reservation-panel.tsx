@@ -1,19 +1,41 @@
-import type { UIFieldServerProps } from 'payload';
+import type { DefaultServerCellComponentProps, UIFieldServerProps } from 'payload';
 import DecisionBar, { type Decision } from '@/components/admin/decision-bar';
 import { DocCard, DocFacts, DocGrid, DocHead, DocHistory, DocPanel } from '@/components/admin/doc-panel';
 import { hasRole } from '@/lib/access';
 import { LOCALE_NAMES, type Locale } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
-import { slotLabel } from '@/lib/time';
+import { slotLabel, today } from '@/lib/time';
+import type { Order } from '@/payload-types';
 import { dueOf } from '@/modules/payments/service';
 import { decideReservation } from '../actions';
 import { ORDER_STATUS_LABELS, RESERVATION_STATUS_LABELS, RESERVATION_STATUS_TONES } from '../collections';
 import { type OrderStatus, RESERVATION_FLOW, type ReservationStatus } from '../order-states';
 import { collectFields } from './order-panel';
-import { langOf, salesText } from './text';
+import { type Lang, langOf, salesText } from './text';
 
 // A table reservation's edit view (ui field `panel`): status and the decisions RESERVATION_FLOW allows, the guests'
-// details, the pre-order with its total, and the history.
+// details, the pre-order with its total, and the history. The list's "Client arrivé" / "Client absent" (AttendanceCell
+// below) offer the same moves with the same dialog.
+
+type Preorder = Pick<Order, 'status' | 'totals' | 'payment'> | null;
+
+/**
+ * The moves RESERVATION_FLOW allows from `status` (or only those of `only`), worded for staff. "Client arrivé" with a
+ * pre-order still owing money asks what the guests paid for it (GG-02); a visit that does not happen takes an optional
+ * reason, kept in the history (GG-019).
+ */
+export function reservationDecisions(status: ReservationStatus, preorder: Preorder, lang: Lang, only?: ReservationStatus[]): Decision[] {
+  const t = salesText(lang);
+  const preorderDue = preorder && preorder.status !== 'cancelled' ? dueOf({ totalCents: preorder.totals?.totalCents ?? 0, paidCents: preorder.payment?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 }) : 0;
+  return (RESERVATION_FLOW[status] as readonly ReservationStatus[])
+    .filter((to) => !only || only.includes(to))
+    .map((to) => {
+      const tone = to === 'rejected' || to === 'cancelled' || to === 'no_show' ? ('danger' as const) : ('primary' as const);
+      const words = t.reservations[to as keyof typeof t.reservations];
+      if (to === 'completed' && preorderDue > 0) return { to, ...words, hint: `${words.hint} ${t.collect.preorder(formatMoney(preorderDue, lang))}`, tone, fields: collectFields(t, preorderDue, preorder?.payment?.method) };
+      return { to, ...words, tone, reason: tone === 'danger' };
+    });
+}
 
 export default async function ReservationPanel({ id, payload, i18n, user }: UIFieldServerProps) {
   if (!id) return null;
@@ -30,17 +52,7 @@ export default async function ReservationPanel({ id, payload, i18n, user }: UIFi
   const staffName = new Map(staff.docs.map((u) => [u.id, u.name]));
   const when = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Luxembourg' });
   const money = (cents: number | null | undefined) => formatMoney(cents ?? 0, lang);
-  // What the pre-order still waits for: on "Client arrivé" staff say what the guests paid for it (GG-02).
-  const preorderDue = preorder && preorder.status !== 'cancelled' ? dueOf({ totalCents: preorder.totals?.totalCents ?? 0, paidCents: preorder.payment?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 }) : 0;
-  const decisions: Decision[] = hasRole(user, ['sales'])
-    ? (RESERVATION_FLOW[status] as readonly ReservationStatus[]).map((to) => {
-        const tone = to === 'rejected' || to === 'cancelled' || to === 'no_show' ? ('danger' as const) : ('primary' as const);
-        const words = t.reservations[to as keyof typeof t.reservations];
-        if (to === 'completed' && preorderDue > 0) return { to, ...words, hint: `${words.hint} ${t.collect.preorder(money(preorderDue))}`, tone, fields: collectFields(t, preorderDue, preorder?.payment?.method) };
-        // A reason is kept in the history when the visit does not happen (GG-019); optional.
-        return { to, ...words, tone, reason: tone === 'danger' };
-      })
-    : [];
+  const decisions = hasRole(user, ['sales']) ? reservationDecisions(status, preorder, lang) : [];
 
   return (
     <DocPanel>
@@ -148,4 +160,18 @@ export default async function ReservationPanel({ id, payload, i18n, user }: UIFi
       </DocGrid>
     </DocPanel>
   );
+}
+
+/**
+ * "Client arrivé" / "Client absent" in the reservations list (QA 12 Nov GG-05, 14 Nov GG-23): on an accepted
+ * reservation whose day has come, the page's two moves in a dialog, so staff never have to open the reservation, a
+ * pre-order included (its dialog asks what was paid). The action itself is refused to roles other than sales.
+ */
+export async function AttendanceCell({ rowData, payload, i18n }: DefaultServerCellComponentProps) {
+  const row = rowData as { id?: string; status?: string; slot?: { date?: string | null } | null; preorder?: string | { id: string } | null };
+  if (!row?.id || row.status !== 'accepted' || !row.slot?.date || row.slot.date > today()) return null;
+  const preorderId = typeof row.preorder === 'object' ? row.preorder?.id : row.preorder;
+  const preorder = preorderId ? await payload.findByID({ collection: 'orders', id: preorderId, depth: 0, overrideAccess: true, disableErrors: true, select: { status: true, totals: true, payment: true } }) : null;
+  const lang = langOf(i18n.language);
+  return <DecisionBar action={decideReservation} target={{ reservation: row.id }} decisions={reservationDecisions('accepted', preorder, lang, ['completed', 'no_show'])} text={salesText(lang).decide} modal />;
 }

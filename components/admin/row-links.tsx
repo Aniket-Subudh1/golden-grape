@@ -16,8 +16,8 @@ export default function RowLinks({ children }: { children?: ReactNode }) {
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       const el = e.target instanceof Element ? e.target : null;
-      // Links navigate on their own; controls keep their click; only list rows are concerned.
-      if (!el || el.closest('a[href], button, input, textarea, select, label, [role="menuitem"]')) return;
+      // Links navigate on their own; controls and a row's dialog (GG-23) keep their click; only list rows are concerned.
+      if (!el || el.closest('a[href], button, input, textarea, select, label, dialog, [role="menuitem"]')) return;
       const cell = el.closest('td');
       if (!cell || cell.querySelector('input[type="checkbox"]')) return;
       const link = [...(el.closest('tbody tr')?.querySelectorAll('a[href]') ?? [])].find(

@@ -834,12 +834,13 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
 .table tbody tr:hover td {
   background: var(--gg-head);
 }
-.table a {
+.table a:not(.gg-btn) {
   color: var(--gg-ink);
   font-weight: 500;
   text-decoration: none;
 }
-.table a:hover {
+/* A button-styled link in a row keeps its own colours (GG-23: "Client arrivé" was ink on ink until hovered). */
+.table a:not(.gg-btn):hover {
   color: var(--gg-primary);
   text-decoration: underline;
 }
@@ -2631,19 +2632,45 @@ body:has(.gg-create) .no-results__actions {
 .gg-empty__links a:hover {
   border-color: var(--gg-primary);
 }
-/* Arrived / absent buttons in the reservations list (GG-05). */
-.gg-btn--sm {
-  height: 28px;
-  padding: 0 10px;
-  font-size: 12px;
-}
-/* Stacked, so the column stays narrow beside the others at 1280 px. */
-.gg-attend {
+/* Arrived / absent in the reservations list (GG-05, GG-23): the decision bar's buttons, small and stacked, so the
+ * column stays narrow beside the others at 1280 px; the confirmation opens in a dialog (.gg-dialog). */
+.table .gg-decide {
   display: inline-flex;
   flex-direction: column;
   align-items: stretch;
   gap: 4px;
-  white-space: nowrap;
+  padding-top: 0;
+  border-top: 0;
+}
+.table .gg-decide > .gg-btn {
+  justify-content: center;
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+.table .gg-decide > .gg-btn--quiet-danger {
+  margin-left: 0;
+}
+/* A decision's confirmation above the page (decision-bar.tsx `modal`): the card of Payload's confirmation dialog. */
+.gg-dialog {
+  width: min(480px, calc(100vw - 32px));
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  box-shadow: 0 24px 80px rgb(26 28 32 / 0.24);
+}
+.gg-dialog::backdrop {
+  background: rgb(26 28 32 / 0.35);
+}
+.gg-dialog > .gg-decide--confirm {
+  padding: 20px 24px;
+  border-top: 3px solid var(--gg-gold);
+  border-radius: 14px;
+  background: var(--gg-frame);
+}
+.gg-dialog > .gg-decide--danger {
+  border-top-color: var(--gg-danger);
 }
 .gg-cell-stack .gg-late {
   color: var(--gg-danger);
@@ -2662,10 +2689,6 @@ body:has(.gg-create) .no-results__actions {
 }
 .gg-mode--delivery svg {
   color: var(--gg-primary);
-}
-.gg-attend > span {
-  font-size: 12px;
-  font-weight: 600;
 }
 
 /* ---- What waits: sidebar counters and the header bell (components/admin/alerts-client.tsx) ---------------- */
