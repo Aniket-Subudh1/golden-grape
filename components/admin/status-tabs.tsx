@@ -1,8 +1,7 @@
 import Link from 'next/link';
 import type { CollectionSlug, PaginatedDocs, Payload, Where } from 'payload';
-import { l, type Label, type StatusTab } from '@/lib/admin';
+import { entriesOf, l, type Label, type StatusTab } from '@/lib/admin';
 import { today } from '@/lib/time';
-import { entriesOf } from '@/modules/sales/admin/order-tabs';
 import EmptyList, { type EmptyIcon } from './empty-list';
 
 // Stage tabs above a list (APPLUX report 4, §7; QA 12 Nov GG-04/06): table reservations and catering requests get the
@@ -38,7 +37,7 @@ const DAY = /\[slot\.date\]\[(equals|greater_than_equal)\]$/;
 /** What identifies a tab in a URL: its statuses (any order) and its day condition. */
 const keyOf = (statuses: string[], day: string) => `${statuses.toSorted().join(',')}|${day}`;
 
-const TEXT = {
+export const TAB_TEXT = {
   filter: l('Filtre actif', 'Filter on', 'Filter aktiv', 'Filtro ativo'),
   clear: l('Effacer le filtre', 'Clear the filter', 'Filter entfernen', 'Limpar o filtro'),
   others: l('Voir les autres onglets :', 'See the other tabs:', 'Andere Reiter ansehen:', 'Ver os outros separadores:'),
@@ -89,12 +88,12 @@ export default async function StatusTabs({ payload, data, searchParams = {}, lis
         ))}
         {filtered && (
           <span className="gg-tabs__filter">
-            {say(TEXT.filter)} · <Link href={statusTabQuery(tabs.find((t) => t.opens) ?? tabs[0], search)}>{say(TEXT.clear)}</Link>
+            {say(TAB_TEXT.filter)} · <Link href={statusTabQuery(tabs.find((t) => t.opens) ?? tabs[0], search)}>{say(TAB_TEXT.clear)}</Link>
           </span>
         )}
       </nav>
       {active?.empty && icon && !search && (
-        <EmptyList data={data} i18n={i18n} icon={icon} title={active.empty} text={others.length ? TEXT.others : TEXT.nothing} links={others.map(({ href, label }) => ({ href, label }))} evenFiltered />
+        <EmptyList data={data} i18n={i18n} icon={icon} title={active.empty} text={others.length ? TAB_TEXT.others : TAB_TEXT.nothing} links={others.map(({ href, label }) => ({ href, label }))} evenFiltered />
       )}
     </>
   );

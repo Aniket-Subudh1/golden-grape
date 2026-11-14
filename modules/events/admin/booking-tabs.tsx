@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import type { Payload, Where } from 'payload';
-import { l, type Label } from '@/lib/admin';
-import { valuesOf } from '@/modules/sales/admin/order-tabs';
+import { l, type Label, valuesOf } from '@/lib/admin';
 import { BOARD, bookingsHref } from './events-board';
 
 // Above the bookings list (APPLUX report 4, §4): the event the list is filtered on, with a way back to the events,

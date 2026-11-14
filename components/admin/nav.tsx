@@ -1,7 +1,7 @@
 import type { I18nClient } from '@payloadcms/translations';
 import type { Payload, TypedUser, VisibleEntities } from 'payload';
 import { hasRole, type Role } from '@/lib/access';
-import { ORDER_TABS, orderTabQuery, orderTabWhere } from '@/modules/sales/admin/order-tabs';
+import { ORDER_TABS, orderTabQuery, orderTabWhere } from '@/modules/sales/admin/order-filters';
 import { RESERVATION_TABS } from '@/modules/sales/collections';
 import { getAlerts } from './alerts';
 import { type NavGroup, NavClient } from './nav-client';

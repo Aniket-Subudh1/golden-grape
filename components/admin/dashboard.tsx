@@ -24,7 +24,8 @@ import type { ReactNode } from 'react';
 import { hasRole } from '@/lib/access';
 import { formatMoney } from '@/lib/money';
 import { REQUEST_STATUS } from '@/modules/catering/collections';
-import { SOLD, salesOverview, UNPAID } from '@/modules/reporting/service';
+import { salesOverview } from '@/modules/reporting/service';
+import { orderViewUrl } from '@/modules/sales/admin/order-filters';
 import type { Range } from '@/modules/reporting/summary';
 import CreateButton from './create-button';
 import { actionCounts, type CounterKey, listUrl } from './alerts';
@@ -100,20 +101,10 @@ const COUNTER_ICONS: Record<CounterKey, ReactNode> = {
 };
 
 /** The sold orders of a range in the order list: the list the sales figures equal (AC-M3.3-06). */
-const soldUrl = ({ from, to }: Range) =>
-  listUrl('orders', {
-    'where[and][0][slot.date][greater_than_equal]': from,
-    'where[and][1][slot.date][less_than_equal]': to,
-    ...Object.fromEntries(SOLD.map((status, i) => [`where[and][2][status][in][${i}]`, status])),
-    sort: '-slotAt',
-  });
+const soldUrl = (range: Range) => orderViewUrl('sold', range);
 
 /** The sold orders not (fully) paid yet: the list "Reste à encaisser" equals (GG-21). */
-const dueUrl = listUrl('orders', {
-  ...Object.fromEntries(SOLD.map((status, i) => [`where[and][0][status][in][${i}]`, status])),
-  ...Object.fromEntries(UNPAID.map((status, i) => [`where[and][1][payment.status][in][${i}]`, status])),
-  sort: 'slotAt',
-});
+const dueUrl = orderViewUrl('due');
 
 export default async function Dashboard({ initPageResult }: AdminViewServerProps) {
   const { req } = initPageResult;

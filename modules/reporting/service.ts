@@ -1,7 +1,7 @@
 import type { Payload } from 'payload';
 import { addDays, fromLocal, today } from '@/lib/time';
 import { model } from '@/lib/tx';
-import type { OrderStatus } from '@/modules/sales/order-states';
+import { SOLD, UNPAID } from '@/modules/sales/order-states';
 import { periods, type Range, type SalesRow, type SalesTotals, totals } from './summary';
 
 // Sales figures (R8, M3.3 T4): read-only aggregations over `orders` (and their `payments`), no collection of its own.
@@ -9,8 +9,8 @@ import { periods, type Range, type SalesRow, type SalesTotals, totals } from './
 // figures for a range equal that list's totals (AC-M3.3-06). Fully refunded orders have status `refunded` and drop
 // out; partial refunds are deducted. Built early for the dashboard's key figures; T4 adds the group-by.
 
-/** The statuses that make a sale. */
-export const SOLD = ['confirmed', 'ready', 'out_for_delivery', 'completed'] as const satisfies readonly OrderStatus[];
+// The statuses that make a sale and the payment states still owing live with the order states (one list).
+export { SOLD, UNPAID };
 
 /** Totals of the orders sold over a range of Luxembourg days (inclusive). */
 export async function salesSummary(payload: Payload, { from, to }: Range): Promise<SalesTotals> {
@@ -56,9 +56,6 @@ export async function cashSummary(payload: Payload, { from, to }: Range) {
   const refundedCents = row?.refundedCents ?? 0;
   return { receivedCents, refundedCents, netCents: receivedCents - refundedCents };
 }
-
-/** The orders sold whose money is not (all) in yet, and what they still owe: the order list's "awaiting payment" view. */
-export const UNPAID = ['pending', 'partial'] as const;
 
 /** What customers still owe on orders sold (confirmed to handed over): each order's total less what it received. */
 export async function outstanding(payload: Payload) {

@@ -2591,6 +2591,26 @@ body:has(.gg-create) .no-results__actions {
 .gg-tabs__filter a {
   color: inherit;
 }
+/* Orders: the chip follows the tabs; the day picker keeps the right edge. */
+.gg-tabs__filter:has(+ .gg-tabs__day) {
+  margin-left: 0;
+}
+/* A dashboard or bell shortcut that is not a stage (order-tabs.tsx, GG-22): named like the selected tab. */
+.gg-tabs__filter[data-active] {
+  border: 1px solid var(--gg-primary);
+  background: var(--gg-primary-tint);
+  color: var(--gg-ink);
+  font-weight: 500;
+}
+.gg-tabs__filter[data-active] b {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+.gg-tabs__filter[data-active] a {
+  color: var(--gg-primary);
+}
 /* An empty tab points to the tabs that have something (GG-04, GG-08). */
 .gg-empty .gg-empty__links {
   display: flex;

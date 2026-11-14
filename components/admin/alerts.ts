@@ -6,7 +6,7 @@ import { REQUEST_STATUS } from '@/modules/catering/collections';
 import { QUOTATION_STATUS } from '@/modules/documents/collections';
 import { dueOf } from '@/modules/payments/service';
 import { BOOKING_STATUS } from '@/modules/events/collections';
-import { ORDER_TABS, orderTabWhere } from '@/modules/sales/admin/order-tabs';
+import { ORDER_TABS, orderTabQuery, orderTabWhere, orderViewUrl } from '@/modules/sales/admin/order-filters';
 import { ORDER_STATUS_LABELS, RESERVATION_STATUS_LABELS, RESERVATION_TABS } from '@/modules/sales/collections';
 import { statusTabQuery } from './status-tabs';
 
@@ -191,14 +191,14 @@ type Counter = {
 
 const total = (d: Waiting) => d.totals?.totalCents ?? 0;
 const guests = (d: Waiting) => d.guests ?? 0;
-const TODO_URL = { 'where[and][1][mode][not_equals]': 'table', sort: 'slotAt' };
+const PREPARING = ORDER_TABS.find((t) => t.key === 'preparing')!;
 const COUNTERS: Counter[] = [
   // Orders split by what staff do next: confirm, check the bank for the transfer, prepare.
   {
     key: 'toConfirm',
     collection: 'orders',
     where: { and: [...WAITING.orders.and, { status: { equals: 'pending' } }] },
-    href: listUrl('orders', { 'where[and][0][status][in][0]': 'pending', ...TODO_URL }),
+    href: orderViewUrl('toConfirm'),
     unit: 'cents',
     value: total,
   },
@@ -206,7 +206,7 @@ const COUNTERS: Counter[] = [
     key: 'awaitingPayment',
     collection: 'orders',
     where: { and: [...WAITING.orders.and, { status: { equals: 'awaiting_payment' } }] },
-    href: listUrl('orders', { 'where[and][0][status][in][0]': 'awaiting_payment', ...TODO_URL }),
+    href: orderViewUrl('awaitingPayment'),
     unit: 'cents',
     // What to look for on the bank statement.
     value: (d) => dueOf({ totalCents: total(d), paidCents: d.payment?.paidCents ?? 0, refundedCents: d.payment?.refundedCents ?? 0, refundDueCents: 0 }),
@@ -214,8 +214,8 @@ const COUNTERS: Counter[] = [
   {
     key: 'toPrepare',
     collection: 'orders',
-    where: { and: orderTabWhere(ORDER_TABS.find((t) => t.key === 'preparing')!) },
-    href: listUrl('orders', { 'where[and][0][status][in][0]': 'confirmed', sort: 'slotAt' }),
+    where: { and: orderTabWhere(PREPARING) },
+    href: `/admin/collections/orders${orderTabQuery(PREPARING)}`,
     unit: 'cents',
     value: total,
     since: 'updatedAt',
@@ -227,7 +227,7 @@ const COUNTERS: Counter[] = [
     key: 'refunds',
     collection: 'orders',
     where: WAITING.refunds,
-    href: listUrl('orders', { 'where[payment.status][equals]': 'refund_pending' }),
+    href: orderViewUrl('refunds'),
     unit: 'cents',
     value: (d) => d.payment?.refundDueCents ?? 0,
     since: 'updatedAt',

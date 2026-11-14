@@ -151,3 +151,17 @@ export const statusTabs = (collection: string, tabs: StatusTab[], icon?: string)
  * shows the document instead: orders, reservations and bookings, which only their services write.
  */
 export const listOnly = (field: Field): Field => ({ ...field, admin: { ...('admin' in field ? field.admin : {}), condition: () => false } }) as Field;
+
+// Next hands a list's server components the raw query (`where[and][0][status][in]` as a flat key), in our shape or in
+// the one Payload's filter builder writes (`where[or][0][and][0][status][in][0]`): read the values whatever the
+// nesting. An already-parsed `where` object, or a key repeated in the URL (an array), is flattened to bracket keys.
+const flat = (value: unknown, key: string): [string, string][] =>
+  value && typeof value === 'object' ? Object.entries(value).flatMap(([k, v]) => flat(v, `${key}[${k}]`)) : [[key, String(value)]];
+/** A list query as flat bracket keys and their values. */
+export const entriesOf = (searchParams: Record<string, unknown>) => Object.entries(searchParams).flatMap(([key, value]) => flat(value, key));
+/** The values of the query keys that match `test` (comma lists split). */
+export const valuesOf = (searchParams: Record<string, unknown>, test: RegExp) =>
+  entriesOf(searchParams)
+    .filter(([key]) => test.test(key))
+    .flatMap(([, v]) => v.split(','))
+    .filter(Boolean);

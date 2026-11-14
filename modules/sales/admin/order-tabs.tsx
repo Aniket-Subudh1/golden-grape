@@ -1,120 +1,15 @@
 import Link from 'next/link';
 import type { PaginatedDocs, Payload, Where } from 'payload';
+import { TAB_TEXT } from '@/components/admin/status-tabs';
 import EmptyList from '@/components/admin/empty-list';
+import { adminText } from '@/components/admin/text';
 import { l, type Label } from '@/lib/admin';
-import type { OrderStatus } from '../order-states';
+import { matchOrderQuery, ORDER_TABS, orderTabQuery, orderTabWhere, type OrderView } from './order-filters';
 import OrderDay from './order-day';
 
-// The Orders list split by what staff must do (GG-001): one tab per stage, opened on "To do". Each tab is a plain
-// Payload list query (`where[status][in]` + sort), so Payload's own search, filters, columns and paging keep
-// working; the tabs keep the search and the chosen day, and their counts follow both. "All" finds any order.
-
-/**
- * `skipTable`: a table's pre-order waits for its reservation (counted under Table reservations), not for this tab
- * (GG-020). `onlyTable`: those pre-orders, in a tab of their own so they stay visible (APPLUX audit 10 Nov, §2).
- */
-type Tab = { key: string; label: Label; statuses?: OrderStatus[]; skipTable?: boolean; onlyTable?: boolean; sort: string; empty: Label };
-
-export const ORDER_TABS: Tab[] = [
-  {
-    key: 'todo',
-    label: l('À traiter', 'To do', 'Zu erledigen', 'A tratar'),
-    statuses: ['pending', 'awaiting_payment'],
-    skipTable: true,
-    sort: 'slotAt',
-    empty: l('Rien à confirmer pour le moment.', 'Nothing to confirm right now.', 'Im Moment nichts zu bestätigen.', 'Nada para confirmar de momento.'),
-  },
-  {
-    key: 'tables',
-    label: l('Pré-commandes de table', 'Table pre-orders', 'Tisch-Vorbestellungen', 'Pré-encomendas de mesa'),
-    statuses: ['pending'],
-    onlyTable: true,
-    sort: 'slotAt',
-    empty: l(
-      'Aucune pré-commande en attente. Une pré-commande est acceptée ou refusée avec sa réservation de table.',
-      'No pre-order waiting. A pre-order is accepted or declined with its table reservation.',
-      'Keine Vorbestellung offen. Eine Vorbestellung wird mit ihrer Tischreservierung angenommen oder abgelehnt.',
-      'Nenhuma pré-encomenda à espera. Uma pré-encomenda é aceite ou recusada com a sua reserva de mesa.',
-    ),
-  },
-  {
-    key: 'preparing',
-    label: l('À préparer', 'Preparing', 'In Vorbereitung', 'Em preparação'),
-    statuses: ['confirmed'],
-    sort: 'slotAt',
-    empty: l('Aucune commande à préparer.', 'No orders to prepare.', 'Keine Bestellungen vorzubereiten.', 'Sem encomendas para preparar.'),
-  },
-  {
-    key: 'ready',
-    label: l('Prêtes / en livraison', 'Ready / out for delivery', 'Bereit / in Zustellung', 'Prontas / em entrega'),
-    statuses: ['ready', 'out_for_delivery'],
-    sort: 'slotAt',
-    empty: l('Aucune commande en attente de remise.', 'No orders waiting to be handed over.', 'Keine Bestellungen warten auf Übergabe.', 'Sem encomendas à espera de entrega.'),
-  },
-  {
-    key: 'completed',
-    label: l('Terminées', 'Completed', 'Abgeschlossen', 'Concluídas'),
-    statuses: ['completed'],
-    sort: '-slotAt',
-    empty: l('Aucune commande terminée.', 'No completed orders.', 'Keine abgeschlossenen Bestellungen.', 'Sem encomendas concluídas.'),
-  },
-  {
-    key: 'cancelled',
-    label: l('Annulées', 'Cancelled', 'Storniert', 'Canceladas'),
-    statuses: ['cancelled'],
-    sort: '-slotAt',
-    empty: l('Aucune commande annulée.', 'No cancelled orders.', 'Keine stornierten Bestellungen.', 'Sem encomendas canceladas.'),
-  },
-  {
-    key: 'refunded',
-    label: l('Remboursées', 'Refunded', 'Erstattet', 'Reembolsadas'),
-    statuses: ['refunded'],
-    sort: '-slotAt',
-    empty: l('Aucune commande remboursée.', 'No refunded orders.', 'Keine erstatteten Bestellungen.', 'Sem encomendas reembolsadas.'),
-  },
-  {
-    key: 'all',
-    label: l('Toutes', 'All', 'Alle', 'Todas'),
-    sort: '-createdAt',
-    empty: l('Aucune commande pour l’instant.', 'No orders yet.', 'Noch keine Bestellungen.', 'Ainda sem encomendas.'),
-  },
-];
-
-/** A tab's conditions as a Payload `where` (its counts here, the sidebar and bell figures in alerts.ts). */
-export const orderTabWhere = (tab: Tab): Where[] => [
-  ...(tab.statuses ? [{ status: { in: tab.statuses } }] : []),
-  ...(tab.skipTable ? [{ mode: { not_equals: 'table' } }] : []),
-  ...(tab.onlyTable ? [{ mode: { equals: 'table' } }] : []),
-];
-
-/** The list URL's query for a tab, keeping the search and the slot day. The sidebar opens the first tab. */
-export function orderTabQuery(tab: Tab, keep: { search?: string; day?: string } = {}) {
-  const params = new URLSearchParams();
-  let i = 0;
-  if (tab.statuses) {
-    tab.statuses.forEach((status, n) => params.set(`where[and][${i}][status][in][${n}]`, status));
-    i++;
-  }
-  if (tab.skipTable) params.set(`where[and][${i++}][mode][not_equals]`, 'table');
-  if (tab.onlyTable) params.set(`where[and][${i++}][mode][equals]`, 'table');
-  if (keep.day) params.set(`where[and][${i}][slot.date][equals]`, keep.day);
-  if (keep.search) params.set('search', keep.search);
-  params.set('sort', tab.sort);
-  return `?${params.toString()}`;
-}
-
-// Next hands Payload's list the raw query (`where[and][0][status][in]` as a flat key), in our shape or in the one
-// Payload's filter builder writes (`where[or][0][and][0][status][in][0]`): read the values whatever the nesting.
-// An already-parsed `where` object, or a key repeated in the URL (an array), is flattened to bracket keys first.
-const flat = (value: unknown, key: string): [string, string][] =>
-  value && typeof value === 'object' ? Object.entries(value).flatMap(([k, v]) => flat(v, `${key}[${k}]`)) : [[key, String(value)]];
-/** The query as flat bracket keys and their values. */
-export const entriesOf = (searchParams: Record<string, unknown>) => Object.entries(searchParams).flatMap(([key, value]) => flat(value, key));
-export const valuesOf = (searchParams: Record<string, unknown>, test: RegExp) =>
-  entriesOf(searchParams)
-    .filter(([key]) => test.test(key))
-    .flatMap(([, v]) => v.split(','))
-    .filter(Boolean);
+// The Orders list split by what staff must do (GG-001): one tab per stage, opened on "To do". Which tab is lit, or
+// which shortcut is named, is `matchOrderQuery` (order-filters.ts): a lit tab is always exactly what is listed
+// (GG-22). The tabs keep the search and the chosen day, and their counts follow both. "All" finds any order.
 
 type Props = {
   payload: Payload;
@@ -127,11 +22,10 @@ type Props = {
 export default async function OrderTabs({ payload, data, searchParams = {}, listSearchableFields = [], i18n }: Props) {
   const lang = (i18n?.language ?? 'fr') as keyof Label;
   const say = (label: Label) => label[lang] ?? label.fr;
+  const t = adminText(lang).home;
   const search = typeof searchParams.search === 'string' ? searchParams.search.trim() : '';
-  const day = valuesOf(searchParams, /^where\[.*\]\[slot\.date\]\[equals\]$/)[0] ?? '';
-  const statuses = valuesOf(searchParams, /^where\[.*\]\[status\]\[(in|equals)\](\[\d+\])?$/).sort().join(',');
-  const active = ORDER_TABS.find((t) => (t.statuses ?? []).toSorted().join(',') === statuses);
-  // The day picker stays on this tab ("All" when the status filter was set by hand in Payload's filters).
+  const { tab: active, view, filtered, day, range } = matchOrderQuery(searchParams);
+  // The day picker stays on this tab ("All" under a shortcut or a filter set by hand in Payload's filters).
   const current = active ?? ORDER_TABS[ORDER_TABS.length - 1];
 
   // The counts match what the tab will show: same search (Payload's: `like` on the searchable fields) and day.
@@ -139,26 +33,43 @@ export default async function OrderTabs({ payload, data, searchParams = {}, list
   if (day) base.push({ 'slot.date': { equals: day } });
   if (search) base.push({ or: listSearchableFields.map((f) => ({ [f]: { like: search } })) });
   const counts = await Promise.all(
-    ORDER_TABS.map((t) =>
-      payload.count({ collection: 'orders', where: { and: [...base, ...orderTabWhere(t)] } }).then((r) => r.totalDocs),
-    ),
+    ORDER_TABS.map((tab) => payload.count({ collection: 'orders', where: { and: [...base, ...orderTabWhere(tab)] } }).then((r) => r.totalDocs)),
   );
+
+  // A shortcut is named with the words of the tile or bell line that opened it, and its count is the rows listed.
+  const VIEW_LABEL: Record<OrderView, string> = { toConfirm: t.counters.toConfirm, awaitingPayment: t.counters.awaitingPayment, refunds: t.counters.refunds, due: t.kpi.due, sold: t.kpi.sold };
+  const dayLabel = (d: string) => new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(`${d}T12:00:00Z`));
+  const rangeLabel = range ? t.kpi.slots(dayLabel(range.from), dayLabel(range.to)) : null;
 
   return (
     <>
       <nav className="gg-tabs" aria-label={say(l('Étapes des commandes', 'Order stages', 'Bestellschritte', 'Etapas das encomendas'))}>
-        {ORDER_TABS.map((t, i) => (
+        {ORDER_TABS.map((tab, i) => (
           <Link
-            key={t.key}
-            href={orderTabQuery(t, { search, day })}
+            key={tab.key}
+            href={orderTabQuery(tab, { search, day })}
             className="gg-tabs__tab"
-            data-active={t === active || undefined}
+            data-active={tab === active || undefined}
             data-urgent={(i === 0 && counts[i] > 0) || undefined}
           >
-            {say(t.label)}
+            {say(tab.label)}
             <span className="gg-tabs__count">{counts[i]}</span>
           </Link>
         ))}
+        {(view || filtered) && (
+          <span className="gg-tabs__filter" data-active={view ? true : undefined}>
+            {view ? (
+              <b>
+                {VIEW_LABEL[view]}
+                {rangeLabel && ` · ${rangeLabel}`}
+                <span className="gg-tabs__count">{data?.totalDocs ?? 0}</span>
+              </b>
+            ) : (
+              say(TAB_TEXT.filter)
+            )}{' '}
+            · <Link href={orderTabQuery(ORDER_TABS[0], { search })}>{say(TAB_TEXT.clear)}</Link>
+          </span>
+        )}
         <OrderDay
           day={day}
           anyDay={orderTabQuery(current, { search })}
@@ -180,9 +91,9 @@ export default async function OrderTabs({ payload, data, searchParams = {}, list
             'As outras encomendas estão nestes separadores:',
           )}
           // Where the orders are instead (QA 12 Nov, GG-08): the stages that have some, "All" left out.
-          links={ORDER_TABS.map((t, i) => ({ t, count: counts[i] }))
-            .filter(({ t, count }) => count > 0 && t !== active && t.statuses)
-            .map(({ t, count }) => ({ href: orderTabQuery(t, { day }), label: `${say(t.label)} (${count})` }))}
+          links={ORDER_TABS.map((tab, i) => ({ tab, count: counts[i] }))
+            .filter(({ tab, count }) => count > 0 && tab !== active && tab.statuses)
+            .map(({ tab, count }) => ({ href: orderTabQuery(tab, { day }), label: `${say(tab.label)} (${count})` }))}
           evenFiltered
         />
       )}

@@ -17,6 +17,11 @@ export const ORDER_FLOW = {
   refunded: [],
 } as const satisfies Record<OrderStatus, readonly OrderStatus[]>;
 
+/** The statuses that make a sale (reporting, and the Orders list's "sold" shortcut). */
+export const SOLD = ['confirmed', 'ready', 'out_for_delivery', 'completed'] as const satisfies readonly OrderStatus[];
+/** The payment states of an order whose money is not (all) in yet. */
+export const UNPAID = ['pending', 'partial'] as const;
+
 // `no_show` (GG-019): accepted, and the guests never came. Not a cancellation: kept apart for reporting.
 export const RESERVATION_STATUSES = ['pending', 'accepted', 'rejected', 'cancelled', 'completed', 'no_show'] as const;
 export type ReservationStatus = (typeof RESERVATION_STATUSES)[number];
