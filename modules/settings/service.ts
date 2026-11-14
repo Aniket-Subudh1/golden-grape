@@ -43,6 +43,9 @@ export async function isModuleOn(name: ModuleName) {
   return modules?.[name] === true;
 }
 
-/** The configured Google Maps link, or a Maps search for the address. */
-export const directionsUrl = (b: { mapsUrl?: string | null; street: string; postalCode: string; city: string; country?: string | null }) =>
-  b.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${b.street}, ${b.postalCode} ${b.city}, ${b.country ?? 'Luxembourg'}`)}`;
+/**
+ * The configured Google Maps link (the shop's own listing, exact), or a Maps search for the shop's name and address,
+ * so Google opens the business rather than the bare address when it knows it (QA 14 Nov, GG-27).
+ */
+export const directionsUrl = (b: { mapsUrl?: string | null; name?: string | null; street: string; postalCode: string; city: string; country?: string | null }) =>
+  b.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${b.name ? `${b.name}, ` : ''}${b.street}, ${b.postalCode} ${b.city}, ${b.country ?? 'Luxembourg'}`)}`;

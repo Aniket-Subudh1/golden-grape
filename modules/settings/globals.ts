@@ -88,10 +88,10 @@ export const businessSettings: GlobalConfig = {
                     admin: {
                       width: '50%',
                       description: l(
-                        'Vide : l’itinéraire est cherché avec l’adresse.',
-                        'Empty: directions are found from the address.',
-                        'Leer: die Route wird über die Adresse gesucht.',
-                        'Vazio: o caminho é procurado pela morada.',
+                        'Pour ouvrir exactement votre fiche : sur Google Maps, votre établissement › Partager › Copier le lien. Vide : recherche du nom et de l’adresse.',
+                        'To open your exact listing: on Google Maps, your business › Share › Copy link. Empty: a search for the name and address.',
+                        'Für genau Ihren Eintrag: in Google Maps Ihr Geschäft › Teilen › Link kopieren. Leer: Suche nach Name und Adresse.',
+                        'Para abrir exatamente a sua ficha: no Google Maps, o seu estabelecimento › Partilhar › Copiar link. Vazio: pesquisa do nome e da morada.',
                       ),
                     },
                   },
