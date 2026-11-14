@@ -15,7 +15,7 @@ export const events: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'startsAt', 'priceCents', '_status'],
+    defaultColumns: ['title', 'startsAt', 'timing', 'priceCents', '_status'],
     hidden: hiddenUnless('manager'),
     description: l(
       'Les soirées et dégustations affichées sur la page Événements et sur la page d’accueil.',
@@ -101,6 +101,13 @@ export const events: CollectionConfig = {
       { name: 'title', type: 'text', localized: true, label: l('Titre dans Google', 'Title in Google', 'Titel bei Google', 'Título no Google') },
       { name: 'description', type: 'textarea', localized: true, label: l('Texte dans Google', 'Text in Google', 'Text bei Google', 'Texto no Google') },
     ]),
+    // A past event stands apart from the upcoming ones in the list (QA 14 Nov, GG-24): computed, nothing stored.
+    listOnly({
+      name: 'timing',
+      type: 'ui',
+      label: l('Passé / à venir', 'Past / upcoming', 'Vorbei / bevorstehend', 'Passado / próximo'),
+      admin: { components: { Cell: '@/modules/events/admin/events-board#EventTimingCell' } },
+    }),
   ],
 };
 

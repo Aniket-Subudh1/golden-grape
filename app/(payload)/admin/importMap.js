@@ -29,6 +29,7 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { default as default_fe401d340ce00cc899cf727d6137f487 } from '@/components/admin/row-label'
 import { NumberCell as NumberCell_f2a5de4e6cd5b225ec768dfc00185072 } from '@/components/admin/number-field'
 import { default as default_f2a5de4e6cd5b225ec768dfc00185072 } from '@/components/admin/number-field'
+import { EventTimingCell as EventTimingCell_3ee16c206b08a67611daf03ad27771c6 } from '@/modules/events/admin/events-board'
 import { BadgeCell as BadgeCell_e05f6ac9ede25467f55f09817b54f69f } from '@/components/admin/cells'
 import { default as default_fd74764ae39eafa331c7675092856f1d } from '@/modules/documents/admin/request-quotations'
 import { default as default_a5d8806efdc56df6c24d184bfb005004 } from '@/components/admin/audit-trail'
@@ -109,6 +110,7 @@ export const importMap = {
   "@/components/admin/row-label#default": default_fe401d340ce00cc899cf727d6137f487,
   "@/components/admin/number-field#NumberCell": NumberCell_f2a5de4e6cd5b225ec768dfc00185072,
   "@/components/admin/number-field#default": default_f2a5de4e6cd5b225ec768dfc00185072,
+  "@/modules/events/admin/events-board#EventTimingCell": EventTimingCell_3ee16c206b08a67611daf03ad27771c6,
   "@/components/admin/cells#BadgeCell": BadgeCell_e05f6ac9ede25467f55f09817b54f69f,
   "@/modules/documents/admin/request-quotations#default": default_fd74764ae39eafa331c7675092856f1d,
   "@/components/admin/audit-trail#default": default_a5d8806efdc56df6c24d184bfb005004,

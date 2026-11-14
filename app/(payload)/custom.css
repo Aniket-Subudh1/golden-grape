@@ -3238,6 +3238,14 @@ body:has(.gg-create) .no-results__actions {
 .gg-event[data-waiting] {
   border-left-color: #d98a00;
 }
+/* An archived event: greyed, with its "Passé" badge, never mistaken for an upcoming one (GG-24). */
+.gg-event[data-past] {
+  border-left-color: var(--gg-line);
+  background: var(--gg-stripe);
+}
+.gg-event[data-past] h2 {
+  color: var(--gg-text-2);
+}
 .gg-event header {
   display: flex;
   align-items: flex-start;

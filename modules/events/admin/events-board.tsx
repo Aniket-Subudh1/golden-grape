@@ -2,7 +2,7 @@ import { DefaultTemplate } from '@payloadcms/next/templates';
 import { Gutter } from '@payloadcms/ui';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import type { AdminViewServerProps } from 'payload';
+import type { AdminViewServerProps, DefaultServerCellComponentProps } from 'payload';
 import { hasRole } from '@/lib/access';
 import { formatMoney } from '@/lib/money';
 import { eventDate } from '@/lib/time';
@@ -14,15 +14,18 @@ import { langOf } from '@/modules/sales/admin/text';
 
 export const BOARD = '/admin/event-bookings';
 
+/** An event is over once its end, or its start when it has no end, has passed: the archives here, "Passé" in the Events list. */
+export const eventOver = (e: { startsAt: string; endsAt?: string | null }, now = Date.now()) => new Date(e.endsAt ?? e.startsAt).getTime() < now;
+
 /** The bookings list of one event, optionally on one status (the list's tabs, booking-tabs.tsx). */
 export const bookingsHref = (event: string, status?: 'pending' | 'confirmed') =>
   `/admin/collections/eventBookings?where[and][0][event][equals]=${event}${status ? `&where[and][1][status][equals]=${status}` : ''}`;
 
 const TEXT = {
-  fr: { title: 'Réservations d’événements', subtitle: 'Un événement par carte : les places, ce qui reste à confirmer et les paiements reçus.', upcoming: 'À venir', archives: 'Archives', reserved: 'Places réservées', remaining: 'Places restantes', unlimited: 'Illimité', toConfirm: 'À confirmer', received: 'Encaissé', refund: 'À rembourser (annulées)', waiting: (n: number) => `${n} réservation${n > 1 ? 's' : ''} à confirmer :`, free: 'Gratuit', of: 'sur', view: 'Voir les réservations', confirmNow: (n: number) => `${n} à confirmer`, none: 'Aucune réservation', bookings: (n: number) => `${n} réservation${n > 1 ? 's' : ''}`, draft: 'Brouillon', emptyUpcoming: 'Aucun événement à venir.', emptyArchives: 'Aucun événement passé.', forbidden: 'Votre rôle ne permet pas de voir les réservations.' },
-  en: { title: 'Event bookings', subtitle: 'One card per event: the seats, what is still to confirm and the payments received.', upcoming: 'Upcoming', archives: 'Archives', reserved: 'Seats booked', remaining: 'Seats left', unlimited: 'Unlimited', toConfirm: 'To confirm', received: 'Received', refund: 'To refund (cancelled)', waiting: (n: number) => `${n} booking${n > 1 ? 's' : ''} to confirm:`, free: 'Free', of: 'of', view: 'View bookings', confirmNow: (n: number) => `${n} to confirm`, none: 'No bookings', bookings: (n: number) => `${n} booking${n > 1 ? 's' : ''}`, draft: 'Draft', emptyUpcoming: 'No upcoming events.', emptyArchives: 'No past events.', forbidden: 'Your role cannot see bookings.' },
-  de: { title: 'Veranstaltungsbuchungen', subtitle: 'Eine Karte pro Veranstaltung: Plätze, offene Bestätigungen und erhaltene Zahlungen.', upcoming: 'Bevorstehend', archives: 'Archiv', reserved: 'Gebuchte Plätze', remaining: 'Freie Plätze', unlimited: 'Unbegrenzt', toConfirm: 'Zu bestätigen', received: 'Erhalten', refund: 'Zu erstatten (storniert)', waiting: (n: number) => `${n} Buchung${n > 1 ? 'en' : ''} zu bestätigen:`, free: 'Kostenlos', of: 'von', view: 'Buchungen ansehen', confirmNow: (n: number) => `${n} zu bestätigen`, none: 'Keine Buchungen', bookings: (n: number) => `${n} Buchung${n > 1 ? 'en' : ''}`, draft: 'Entwurf', emptyUpcoming: 'Keine bevorstehenden Veranstaltungen.', emptyArchives: 'Keine vergangenen Veranstaltungen.', forbidden: 'Ihre Rolle darf Buchungen nicht sehen.' },
-  pt: { title: 'Reservas de eventos', subtitle: 'Um cartão por evento: os lugares, o que falta confirmar e os pagamentos recebidos.', upcoming: 'Próximos', archives: 'Arquivo', reserved: 'Lugares reservados', remaining: 'Lugares livres', unlimited: 'Ilimitado', toConfirm: 'Por confirmar', received: 'Recebido', refund: 'A reembolsar (canceladas)', waiting: (n: number) => `${n} reserva${n > 1 ? 's' : ''} por confirmar:`, free: 'Grátis', of: 'de', view: 'Ver as reservas', confirmNow: (n: number) => `${n} por confirmar`, none: 'Sem reservas', bookings: (n: number) => `${n} reserva${n > 1 ? 's' : ''}`, draft: 'Rascunho', emptyUpcoming: 'Sem eventos próximos.', emptyArchives: 'Sem eventos passados.', forbidden: 'A sua função não permite ver as reservas.' },
+  fr: { title: 'Réservations d’événements', subtitle: 'Un événement par carte : les places, ce qui reste à confirmer et les paiements reçus.', upcoming: 'À venir', archives: 'Archives', soon: 'À venir', ongoing: 'En cours', past: 'Passé', reserved: 'Places réservées', remaining: 'Places restantes', unlimited: 'Illimité', toConfirm: 'À confirmer', received: 'Encaissé', refund: 'À rembourser (annulées)', waiting: (n: number) => `${n} réservation${n > 1 ? 's' : ''} à confirmer :`, free: 'Gratuit', of: 'sur', view: 'Voir les réservations', confirmNow: (n: number) => `${n} à confirmer`, none: 'Aucune réservation', bookings: (n: number) => `${n} réservation${n > 1 ? 's' : ''}`, draft: 'Brouillon', emptyUpcoming: 'Aucun événement à venir.', emptyArchives: 'Aucun événement passé.', forbidden: 'Votre rôle ne permet pas de voir les réservations.' },
+  en: { title: 'Event bookings', subtitle: 'One card per event: the seats, what is still to confirm and the payments received.', upcoming: 'Upcoming', archives: 'Archives', soon: 'Upcoming', ongoing: 'Ongoing', past: 'Past', reserved: 'Seats booked', remaining: 'Seats left', unlimited: 'Unlimited', toConfirm: 'To confirm', received: 'Received', refund: 'To refund (cancelled)', waiting: (n: number) => `${n} booking${n > 1 ? 's' : ''} to confirm:`, free: 'Free', of: 'of', view: 'View bookings', confirmNow: (n: number) => `${n} to confirm`, none: 'No bookings', bookings: (n: number) => `${n} booking${n > 1 ? 's' : ''}`, draft: 'Draft', emptyUpcoming: 'No upcoming events.', emptyArchives: 'No past events.', forbidden: 'Your role cannot see bookings.' },
+  de: { title: 'Veranstaltungsbuchungen', subtitle: 'Eine Karte pro Veranstaltung: Plätze, offene Bestätigungen und erhaltene Zahlungen.', upcoming: 'Bevorstehend', archives: 'Archiv', soon: 'Bevorstehend', ongoing: 'Läuft', past: 'Vorbei', reserved: 'Gebuchte Plätze', remaining: 'Freie Plätze', unlimited: 'Unbegrenzt', toConfirm: 'Zu bestätigen', received: 'Erhalten', refund: 'Zu erstatten (storniert)', waiting: (n: number) => `${n} Buchung${n > 1 ? 'en' : ''} zu bestätigen:`, free: 'Kostenlos', of: 'von', view: 'Buchungen ansehen', confirmNow: (n: number) => `${n} zu bestätigen`, none: 'Keine Buchungen', bookings: (n: number) => `${n} Buchung${n > 1 ? 'en' : ''}`, draft: 'Entwurf', emptyUpcoming: 'Keine bevorstehenden Veranstaltungen.', emptyArchives: 'Keine vergangenen Veranstaltungen.', forbidden: 'Ihre Rolle darf Buchungen nicht sehen.' },
+  pt: { title: 'Reservas de eventos', subtitle: 'Um cartão por evento: os lugares, o que falta confirmar e os pagamentos recebidos.', upcoming: 'Próximos', archives: 'Arquivo', soon: 'Próximo', ongoing: 'A decorrer', past: 'Passado', reserved: 'Lugares reservados', remaining: 'Lugares livres', unlimited: 'Ilimitado', toConfirm: 'Por confirmar', received: 'Recebido', refund: 'A reembolsar (canceladas)', waiting: (n: number) => `${n} reserva${n > 1 ? 's' : ''} por confirmar:`, free: 'Grátis', of: 'de', view: 'Ver as reservas', confirmNow: (n: number) => `${n} por confirmar`, none: 'Sem reservas', bookings: (n: number) => `${n} reserva${n > 1 ? 's' : ''}`, draft: 'Rascunho', emptyUpcoming: 'Sem eventos próximos.', emptyArchives: 'Sem eventos passados.', forbidden: 'A sua função não permite ver as reservas.' },
 };
 
 export default async function EventsBoard({ initPageResult, params, searchParams }: AdminViewServerProps) {
@@ -63,10 +66,9 @@ export default async function EventsBoard({ initPageResult, params, searchParams
     }
     byEvent.set(key, sum);
   }
-  const over = (e: { startsAt: string; endsAt?: string | null }) => new Date(e.endsAt ?? e.startsAt).getTime() < now;
   const all = events?.docs ?? [];
-  const upcoming = all.filter((e) => !over(e)).sort((a, b) => a.startsAt.localeCompare(b.startsAt));
-  const past = all.filter(over).sort((a, b) => b.startsAt.localeCompare(a.startsAt));
+  const upcoming = all.filter((e) => !eventOver(e, now)).sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+  const past = all.filter((e) => eventOver(e, now)).sort((a, b) => b.startsAt.localeCompare(a.startsAt));
   const shown = archives ? past : upcoming;
   const waiting = upcoming.reduce((n, e) => n + (byEvent.get(e.id)?.pending ?? 0), 0);
 
@@ -113,12 +115,14 @@ export default async function EventsBoard({ initPageResult, params, searchParams
                   const booked = e.booked ?? 0;
                   const left = e.capacity ? Math.max(0, e.capacity - booked) : null;
                   return (
-                    <article key={e.id} className="gg-event" data-waiting={sum.pending > 0 || undefined}>
+                    <article key={e.id} className="gg-event" data-waiting={sum.pending > 0 || undefined} data-past={archives || undefined}>
                       <header>
                         <div>
                           <h2>{e.title}</h2>
                           <p>
                             {when.date} · {when.time}
+                            {/* An archived event says so at a glance (QA 14 Nov, GG-24). */}
+                            {archives && <span className="gg-badge gg-badge--neutral">{t.past}</span>}
                             {e._status === 'draft' && <span className="gg-badge gg-badge--neutral">{t.draft}</span>}
                           </p>
                         </div>
@@ -188,4 +192,14 @@ export default async function EventsBoard({ initPageResult, params, searchParams
       </Gutter>
     </DefaultTemplate>
   );
+}
+
+/** "À venir", "En cours" or "Passé" in the Events list (QA 14 Nov, GG-24), by the same rule as the archives here. */
+export async function EventTimingCell({ rowData, i18n }: DefaultServerCellComponentProps) {
+  const e = rowData as { startsAt?: string; endsAt?: string | null };
+  if (!e?.startsAt) return null;
+  const t = TEXT[langOf(i18n.language)];
+  const now = new Date().getTime();
+  const [tone, label] = eventOver({ startsAt: e.startsAt, endsAt: e.endsAt }, now) ? ['neutral', t.past] : new Date(e.startsAt).getTime() <= now ? ['info', t.ongoing] : ['success', t.soon];
+  return <span className={`gg-badge gg-badge--${tone}`}>{label}</span>;
 }
