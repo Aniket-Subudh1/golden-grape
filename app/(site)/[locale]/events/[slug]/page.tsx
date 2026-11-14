@@ -43,7 +43,7 @@ async function EventDetail({ params }: Pick<Props, 'params'>) {
   // beside the text on large screens (both staying in view while it is read); on phones box, poster, then text.
   return (
     <>
-      <PageHero compact eyebrow={`${date} · ${time}`} title={[event.title]} />
+      <PageHero eyebrow={`${date} · ${time}`} title={[event.title]} />
       <section className="pb-20">
         <Container className="grid gap-8 px-6 lg:grid-cols-12 lg:gap-12">
           <div className="space-y-6 self-start lg:sticky lg:top-28 lg:col-span-5">

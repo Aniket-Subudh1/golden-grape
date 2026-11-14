@@ -236,7 +236,7 @@ async function QuotationView({ params, searchParams }: Pick<Props, 'params' | 's
 
 export default function QuotationPage({ params, searchParams }: Props) {
   return (
-    <section className="pt-36 pb-32 md:pt-44">
+    <section className="pt-header pb-32">
       <Container>
         <Suspense fallback={<div className="min-h-[60vh]" />}>
           <QuotationView params={params} searchParams={searchParams} />

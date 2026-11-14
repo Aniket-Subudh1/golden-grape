@@ -39,7 +39,7 @@ export default async function SnackPage({ params }: Props) {
   const t = await getDictionary(locale);
   return (
     <>
-      <PageHero eyebrow={t.snackPage.eyebrow} title={[t.snackPage.titleA, t.snackPage.titleB]} subtitle={t.snackPage.subtitle} className="md:pb-16">
+      <PageHero eyebrow={t.snackPage.eyebrow} title={[t.snackPage.titleA, t.snackPage.titleB]} subtitle={t.snackPage.subtitle}>
         <CounterCtas t={t.snackPage.ctas} hints={t.cart.hints} />
       </PageHero>
       <section className="pb-32">

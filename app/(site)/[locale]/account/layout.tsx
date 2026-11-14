@@ -56,7 +56,7 @@ export default async function AccountLayout({ params, children }: LayoutProps<'/
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   return (
-    <section className="pt-36 pb-32 md:pt-44">
+    <section className="pt-header pb-32">
       <Container size="md">
         <Suspense fallback={<div className="min-h-[60vh]" />}>
           <Shell locale={locale}>{children}</Shell>

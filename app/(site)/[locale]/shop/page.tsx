@@ -95,7 +95,7 @@ export default async function ShopPage({ params, searchParams }: Props) {
   const t = await getDictionary(locale);
   return (
     <>
-      <PageHero eyebrow={t.shop.eyebrow} title={[t.shop.titleA, t.shop.titleB]} subtitle={t.shop.subtitle} compact />
+      <PageHero eyebrow={t.shop.eyebrow} title={[t.shop.titleA, t.shop.titleB]} subtitle={t.shop.subtitle} />
       <Suspense fallback={<div className="min-h-[60vh] border-y border-border/60" />}>
         <Results locale={locale} t={t} searchParams={searchParams} />
       </Suspense>

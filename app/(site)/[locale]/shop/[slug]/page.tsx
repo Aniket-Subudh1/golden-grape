@@ -84,7 +84,7 @@ async function Product({ params }: Pick<Props, 'params'>) {
           ]}
         />
       )}
-      <section className="pt-32 pb-20 md:pt-40">
+      <section className="pt-header pb-20">
         <Container>
           <nav aria-label={s.breadcrumb} className="eyebrow mb-10 flex flex-wrap items-center gap-2 text-ink/40">
             <Link href={localePath(locale, '/shop')} className="hover:text-gold-deep">

@@ -85,6 +85,15 @@
   }
 }
 
+/* The space under the fixed header (components/site/nav.tsx: 80 px, 96 px from md), the Boutique's: one value on every
+ * page below the home's hero (QA 14 Nov, GG-25). */
+@utility pt-header {
+  padding-top: 7rem;
+  @variant md {
+    padding-top: 8rem;
+  }
+}
+
 @utility eyebrow {
   font-family: var(--font-sans);
   font-size: 0.7rem;

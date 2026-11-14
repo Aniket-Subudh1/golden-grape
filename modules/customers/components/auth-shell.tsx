@@ -14,7 +14,7 @@ export function AuthShell({ eyebrow, title, subtitle, children }: { eyebrow: str
           <p className="mt-5 max-w-sm text-sm font-light text-bone/70">{subtitle}</p>
         </div>
       </div>
-      <div className="flex items-center justify-center px-5 pt-36 pb-20 md:px-10 lg:pt-40">
+      <div className="flex items-center justify-center px-5 pt-header pb-20 md:px-10">
         <div className="w-full max-w-md">{children}</div>
       </div>
     </section>

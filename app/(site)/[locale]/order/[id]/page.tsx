@@ -311,7 +311,7 @@ async function Confirmation({ params, searchParams }: Pick<Props, 'params' | 'se
 
 export default function OrderPage({ params, searchParams }: Props) {
   return (
-    <section className="pt-28 pb-24 md:pt-32">
+    <section className="pt-header pb-24">
       <Container>
         <Suspense fallback={<div className="min-h-[60vh]" />}>
           <Confirmation params={params} searchParams={searchParams} />

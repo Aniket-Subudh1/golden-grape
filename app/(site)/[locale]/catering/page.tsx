@@ -35,7 +35,7 @@ export default async function CateringPage({ params }: PageProps<'/[locale]/cate
   const p = t.cateringPage;
   return (
     <>
-      <PageHero eyebrow={p.eyebrow} title={[p.titleA, p.titleB]} subtitle={p.subtitle} className="pb-16" />
+      <PageHero eyebrow={p.eyebrow} title={[p.titleA, p.titleB]} subtitle={p.subtitle} />
       <Suspense fallback={<div className="min-h-[60vh]" />}>
         <Packages locale={locale} t={t} />
       </Suspense>
