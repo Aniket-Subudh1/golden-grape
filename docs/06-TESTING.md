@@ -33,6 +33,7 @@ A test that cannot fail for a realistic bug is deleted.
 | M1.2 | `lib/i18n.test.ts` | `alternates('/shop')` gives 4 hreflang entries + x-default; `isLocale('es') = false` |
 | M2.1 | `modules/catalogue/packaging.test.ts` | box6 × 2 → 12; box12 × 1 → 12; base × 5 → 5; factor < 2 is rejected |
 | M2.3 | `modules/sales/slots.test.ts`, `zones.test.ts`, `order-states.test.ts` | see M2.3 T1–T3 |
+| M2.3 | `modules/sales/admin/order-filters.test.ts` | every Orders tab URL lights that tab; every dashboard and bell shortcut (refunds, still to collect, sold over a range…) is named and lights no tab, also in the nested form Payload writes back; a hand-made filter lights nothing. A lit tab over a different list hid a refund owed twice (QA 12 Nov GG-04, 14 Nov GG-22) |
 | M3.2 | `modules/promotions/pricing.test.ts` | the vector table in M3.2 T4 (≥ 15 rows) |
 | M3.3 | `modules/attendance/qr-token.test.ts`, `modules/pos/csv.test.ts`, `modules/reporting/summary.test.ts` | see M3.3 |
 | M4.1 | `modules/payments/wallee-signature.test.ts` | valid, tampered, expired |
@@ -74,6 +75,17 @@ A test that cannot fail for a realistic bug is deleted.
 3. `scripts/rebuild-stock.ts --check` reports 0 differences on staging (from P2 onward).
 4. Every acceptance criterion of the three sub-milestones is marked pass in `PROGRESS.md`, with how it was verified.
 5. The staging URL is updated and the human validation checklists are sent to APPLUX as one list.
+
+## 5a. Before every delivery: journeys in the browser (QA 14 Nov, GG-28)
+
+APPLUX validates the business rules and the final experience; finding interface slips is ours. Before any update is announced, on a production build (`npm run build && npm start`) against a throwaway replica set (never `.env`'s database) with realistic data (orders in every state, today's accepted reservations with and without a pre-order owing money, past/ongoing/upcoming events, a catering request), walk these and record the result in the `PROGRESS.md` gate line:
+
+1. **Shortcuts:** every dashboard tile and bell line, and every sidebar entry, opens a list whose lit tab or named chip says what is listed and whose count equals the rows; "Effacer le filtre" returns to the first tab; a hand-made filter says "Filtre actif".
+2. **List ↔ page:** open a row, come back (breadcrumb, browser back, after an action): the same tab or chip.
+3. **Buttons and statuses:** every button in a list is readable without hovering; status badges follow the colour code (`05-UI-SYSTEM.md`); a dialog or decision does what its text says (check the record and the history).
+4. **Words:** French everywhere, no raw codes or field names, references DEM / DEV / CMD / RES.
+5. **Public pages at 390 and 1280 px:** the same gap under the header on every inner page, no horizontal scroll, no console error.
+6. **Already validated:** checkout (e2e), the order payment flow, the event page and its booking, the quotation and its e-signature still work.
 
 ## 6. CI (`.github/workflows/ci.yml`)
 
