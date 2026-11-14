@@ -2634,7 +2634,8 @@ body:has(.gg-create) .no-results__actions {
 }
 /* Arrived / absent in the reservations list (GG-05, GG-23): the decision bar's buttons, small and stacked, so the
  * column stays narrow beside the others at 1280 px; the confirmation opens in a dialog (.gg-dialog). */
-.table .gg-decide {
+/* The buttons only: the confirmation box (also .gg-decide, in the row's dialog) keeps its own layout. */
+.table .gg-decide:not(.gg-decide--confirm) {
   display: inline-flex;
   flex-direction: column;
   align-items: stretch;
