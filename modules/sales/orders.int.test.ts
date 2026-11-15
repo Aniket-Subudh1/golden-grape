@@ -360,19 +360,18 @@ describe('reservations', () => {
     expect((await payload.count({ collection: 'payments', where: { order: { equals: preorder!.id } }, overrideAccess: true })).totalDocs).toBe(0);
   });
 
-  it('"Client arrivé" records only the pre-order payment staff confirm (GG-02); without it the pre-order stays due', async () => {
+  it('"Client arrivé" records no money; "Encaisser" records the pre-order payment after the visit, never more than is due (APPLUX 15 Nov)', async () => {
     const AT = new Date('2026-11-09T12:00:00Z');
-    const paid = await placeOrder(payload, table({ time: '13:30' }), { now: NOW }); // 2 × 6,50 €
-    await transitionReservation(payload, paid.id, 'accepted', { user: staff.id });
-    await expect(transitionReservation(payload, paid.id, 'completed', { user: staff.id, collect: { amountCents: 1301, at: AT, method: 'onsite' } })).rejects.toMatchObject({ message: 'amountTooHigh' });
-    const { preorder } = await transitionReservation(payload, paid.id, 'completed', { user: staff.id, collect: { amountCents: 1300, at: AT, method: 'onsite' } });
-    expect(preorder).toMatchObject({ status: 'completed', payment: { status: 'paid', paidCents: 1300 } });
+    const placed = await placeOrder(payload, table({ time: '13:30' }), { now: NOW }); // 2 × 6,50 €
+    await transitionReservation(payload, placed.id, 'accepted', { user: staff.id });
+    const { preorder } = await transitionReservation(payload, placed.id, 'completed', { user: staff.id });
+    expect(preorder).toMatchObject({ status: 'completed', payment: { paidCents: 0 } });
+    expect(await paymentsOf(payload, preorder!.id)).toHaveLength(0);
 
-    const unpaid = await placeOrder(payload, table({ time: '14:30' }), { now: NOW });
-    await transitionReservation(payload, unpaid.id, 'accepted', { user: staff.id });
-    const later = await transitionReservation(payload, unpaid.id, 'completed', { user: staff.id });
-    expect(later.preorder).toMatchObject({ status: 'completed', payment: { paidCents: 0 } });
-    expect(await paymentsOf(payload, later.preorder!.id)).toHaveLength(0);
+    await expect(recordPayment(payload, preorder!.id, { amountCents: 1301, at: AT, method: 'onsite', user: staff.id })).rejects.toMatchObject({ message: 'amountTooHigh' });
+    const paid = await recordPayment(payload, preorder!.id, { amountCents: 1300, at: AT, method: 'onsite', user: staff.id });
+    expect(paid.order).toMatchObject({ status: 'completed', payment: { status: 'paid', paidCents: 1300 } });
+    expect((await paymentsOf(payload, preorder!.id)).map((p) => [p.amountCents, p.method])).toEqual([[1300, 'onsite']]);
   });
 
   it('accept → the pre-order is confirmed and its movements equal its lines', async () => {

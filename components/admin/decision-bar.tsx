@@ -8,6 +8,7 @@ import type { ActionResult } from '@/lib/action';
 // first says what will happen — stock, e-mail — and asks for a reason when it undoes something, plus any details the
 // move needs (an amount, the bank's date…); then it runs the staff action and reloads the page so the summary shows
 // the new state. In a list row (`modal`), the confirmation opens in a dialog above the page, so the row keeps its size.
+// An `instant` move has nothing to say or ask ("Client arrivé", APPLUX 15 Nov): one click runs it.
 
 type Action = (prev: unknown, input: FormData) => Promise<ActionResult<unknown>>;
 
@@ -34,6 +35,10 @@ export type Decision = {
   fields?: DecisionField[];
   /** Runs instead of the bar's action (money forms beside the status moves). */
   action?: Action;
+  /** Added to the bar's target: another document this action works on (a reservation's pre-order). */
+  target?: Record<string, string>;
+  /** Runs on the click, with no confirmation step (no fields, no reason). */
+  instant?: boolean;
 };
 
 /** `reasonMandatory`: the label when a reason is required (refunds, returns); without it the optional label is used. */
@@ -60,15 +65,14 @@ export default function DecisionBar({ action, target, decisions, text, modal }: 
   if (decisions.length === 0) return null;
 
   // Not a <form>: the panel sits inside Payload's edit form, and a form inside a form never submits.
-  async function submit() {
-    if (!open || !box.current) return;
-    const fields = [...box.current.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input[name], select[name]')];
+  async function submit(d: Decision) {
+    const fields = [...(box.current?.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input[name], select[name]') ?? [])];
     if (!fields.every((f) => f.reportValidity())) return;
     setBusy(true);
     const input = new FormData();
     for (const f of fields) if (f.value.trim() !== '') input.set(f.name, f.value.trim());
-    for (const [key, value] of Object.entries({ ...target, to: open.to })) input.set(key, value);
-    const result = await (open.action ?? action)(null, input);
+    for (const [key, value] of Object.entries({ ...target, ...d.target, to: d.to })) input.set(key, value);
+    const result = await (d.action ?? action)(null, input);
     if (!result.ok) {
       setBusy(false);
       const field = Object.values(result.fieldErrors ?? {})[0]?.[0];
@@ -90,7 +94,8 @@ export default function DecisionBar({ action, target, decisions, text, modal }: 
           key={d.to}
           type="button"
           className={`gg-btn${d.tone === 'primary' ? ' gg-btn--primary' : d.tone === 'danger' ? ' gg-btn--quiet-danger' : ''}`}
-          onClick={() => setOpen(d)}
+          disabled={busy}
+          onClick={() => (d.instant ? void submit(d) : setOpen(d))}
         >
           {d.label}
         </button>
@@ -107,7 +112,7 @@ export default function DecisionBar({ action, target, decisions, text, modal }: 
         // Enter confirms here instead of submitting Payload's form around the panel.
         if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
           e.preventDefault();
-          void submit();
+          void submit(open);
         }
       }}
     >
@@ -152,7 +157,7 @@ export default function DecisionBar({ action, target, decisions, text, modal }: 
         </label>
       )}
       <div className="gg-decide__buttons">
-        <button type="button" className={`gg-btn ${open.tone === 'danger' ? 'gg-btn--danger' : 'gg-btn--primary'}`} disabled={busy} onClick={submit}>
+        <button type="button" className={`gg-btn ${open.tone === 'danger' ? 'gg-btn--danger' : 'gg-btn--primary'}`} disabled={busy} onClick={() => submit(open)}>
           {text.confirm}
         </button>
         <button type="button" className="gg-btn" disabled={busy} onClick={() => setOpen(null)}>

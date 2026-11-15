@@ -30,12 +30,23 @@ const methodOptions = (t: Text) => (['transfer', 'onsite', 'card'] as const).map
  * The money taken now, on a handover or a table visit (GG-02): amount, method and day, as staff type them. The amount
  * is prefilled only when the customer was to pay on site; left empty, nothing is recorded and the balance stays due.
  */
-export function collectFields(t: Text, dueCents: number, method: string | null | undefined): DecisionField[] {
+function collectFields(t: Text, dueCents: number, method: string | null | undefined): DecisionField[] {
   const day = today();
   return [
     { name: 'amount', label: t.collect.amount, kind: 'money', value: method === 'onsite' ? euros(dueCents) : '' },
     { name: 'method', label: t.money.method, kind: 'select', value: method === 'onsite' ? 'onsite' : 'transfer', options: methodOptions(t) },
     { name: 'at', label: t.money.date, kind: 'date', value: day, max: day, required: true },
+  ];
+}
+
+/** A payment received (`recordOrderPayment`): an order's "Enregistrer un paiement reçu", a reservation's "Encaisser". */
+export function paymentFields(t: Text, dueCents: number, method: string | null | undefined): DecisionField[] {
+  const day = today();
+  return [
+    { name: 'amount', label: t.money.amount, kind: 'money', value: euros(dueCents), required: true },
+    { name: 'method', label: t.money.method, kind: 'select', value: method === 'onsite' ? 'onsite' : 'transfer', options: methodOptions(t) },
+    { name: 'at', label: t.money.date, kind: 'date', value: day, max: day, required: true },
+    { name: 'reference', label: t.money.bankRef, kind: 'text' },
   ];
 }
 
@@ -74,18 +85,7 @@ function decisionsFor(order: Order, t: Text, returnable: Returnable, accounts: B
   const money: Decision[] = [];
   const open = from !== 'cancelled' && from !== 'refunded';
   if (open && dueOf(f) > 0) {
-    money.push({
-      to: 'payment',
-      ...m.payment,
-      tone: 'primary',
-      action: recordOrderPayment,
-      fields: [
-        { name: 'amount', label: m.amount, kind: 'money', value: euros(dueOf(f)), required: true },
-        { name: 'method', label: m.method, kind: 'select', value: order.payment?.method === 'onsite' ? 'onsite' : 'transfer', options: methodOptions(t) },
-        { name: 'at', label: m.date, kind: 'date', value: day, max: day, required: true },
-        { name: 'reference', label: m.bankRef, kind: 'text' },
-      ],
-    });
+    money.push({ to: 'payment', ...m.payment, tone: 'primary', action: recordOrderPayment, fields: paymentFields(t, dueOf(f), order.payment?.method) });
   }
   // Which of the shop's active accounts this transfer is paid into (APPLUX, 12 Nov; GG-01): every one of them, the
   // order's own preselected (else the default). Choosing the same one sends the details again.

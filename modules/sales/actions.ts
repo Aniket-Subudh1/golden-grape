@@ -115,7 +115,7 @@ export const placeOrderAction = publicAction(checkout, async ({ website, line1, 
 });
 
 const METHODS = ['transfer', 'onsite', 'card'] as const;
-/** Money taken at a handover or a table visit (GG-02): optional, only what staff typed in the dialog. */
+/** Money taken at a handover (GG-02): optional, only what staff typed in the dialog. A table's is "Encaisser" (recordOrderPayment). */
 const collected = { amount: eurosField.optional(), at: bankDayField.optional(), method: z.enum(METHODS).optional() };
 const collectOf = ({ amount, at, method }: { amount?: number; at?: Date; method?: (typeof METHODS)[number] }) =>
   amount ? { amountCents: amount, at: at ?? new Date(), method: method ?? 'onsite' } : undefined;
@@ -207,14 +207,16 @@ export const returnOrderItems = action(
   },
 );
 
-/** Staff accept, decline, cancel or complete a table reservation; its pre-order follows in the same transaction. */
+/**
+ * Staff accept, decline, cancel or complete a table reservation; its pre-order follows in the same transaction. No money
+ * moves here: what the guests pay is "Encaisser" (`recordOrderPayment` on the pre-order, APPLUX 15 Nov).
+ */
 export const decideReservation = action(
-  z.object({ reservation: z.string().min(1), to: z.enum(['accepted', 'rejected', 'cancelled', 'completed', 'no_show']), reason: optionalText(300), ...collected }),
+  z.object({ reservation: z.string().min(1), to: z.enum(['accepted', 'rejected', 'cancelled', 'completed', 'no_show']), reason: optionalText(300) }),
   { roles: ['sales'] },
-  async ({ reservation, to, reason, ...money }, { payload, user }) => {
-    const collect = collectOf(money);
-    const result = await transitionReservation(payload, reservation, to, { user: user.id, reason, collect });
-    await audit(payload, { user: user.id, action: 'reservation.status', collection: 'reservations', id: reservation, ref: result.reservation.number, reason, before: { status: result.from }, after: { status: to, ...collectedAudit(collect) } });
+  async ({ reservation, to, reason }, { payload, user }) => {
+    const result = await transitionReservation(payload, reservation, to, { user: user.id, reason });
+    await audit(payload, { user: user.id, action: 'reservation.status', collection: 'reservations', id: reservation, ref: result.reservation.number, reason, before: { status: result.from }, after: { status: to } });
     // No e-mail for a visit (completed) or a no-show: the customer is not told they did not come.
     if (to !== 'completed' && to !== 'no_show') after(() => mailReservation(payload, result.reservation, to).catch(logMail('reservation status')));
     return { status: result.reservation.status };
