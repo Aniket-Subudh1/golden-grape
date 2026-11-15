@@ -122,6 +122,8 @@ function queryOf(conditions: Condition[], keep: { search?: string; day?: string;
     params.set(`where[and][${i++}][slot.date][greater_than_equal]`, keep.range.from);
     params.set(`where[and][${i++}][slot.date][less_than_equal]`, keep.range.to);
   }
+  // No condition ("Toutes"): an empty `where`, so the link loads in full (list-link.tsx). Read as no condition.
+  if (i === 0) params.set('where', '');
   if (keep.search) params.set('search', keep.search);
   if (keep.sort) params.set('sort', keep.sort);
   return `?${params.toString()}`;
@@ -160,7 +162,8 @@ export function matchOrderQuery(searchParams: Record<string, unknown>): OrderQue
   let to = '';
   let unknown = false;
   for (const [key, value] of entriesOf(searchParams)) {
-    if (!key.startsWith('where')) continue;
+    // `where=`: no condition (orderTabQuery of "Toutes").
+    if (!key.startsWith('where') || value === '') continue;
     const m = KEY.exec(key);
     if (!m || /\[or\]\[[1-9]\d*\]/.test(m[1])) {
       unknown = true;

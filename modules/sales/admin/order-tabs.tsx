@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import type { PaginatedDocs, Payload, Where } from 'payload';
 import { TAB_TEXT } from '@/components/admin/status-tabs';
 import EmptyList from '@/components/admin/empty-list';
+import ListLink from '@/components/admin/list-link';
 import { adminText } from '@/components/admin/text';
 import { l, type Label } from '@/lib/admin';
 import { matchOrderQuery, ORDER_TABS, orderTabQuery, orderTabWhere, type OrderView } from './order-filters';
@@ -46,7 +46,7 @@ export default async function OrderTabs({ payload, data, searchParams = {}, list
     <>
       <nav className="gg-tabs" aria-label={say(l('Étapes des commandes', 'Order stages', 'Bestellschritte', 'Etapas das encomendas'))}>
         {ORDER_TABS.map((tab, i) => (
-          <Link
+          <ListLink
             key={tab.key}
             href={orderTabQuery(tab, { search, day })}
             className="gg-tabs__tab"
@@ -55,7 +55,7 @@ export default async function OrderTabs({ payload, data, searchParams = {}, list
           >
             {say(tab.label)}
             <span className="gg-tabs__count">{counts[i]}</span>
-          </Link>
+          </ListLink>
         ))}
         {(view || filtered) && (
           <span className="gg-tabs__filter" data-active={view ? true : undefined}>
@@ -68,7 +68,7 @@ export default async function OrderTabs({ payload, data, searchParams = {}, list
             ) : (
               say(TAB_TEXT.filter)
             )}{' '}
-            · <Link href={orderTabQuery(ORDER_TABS.find((tab) => tab.opens)!, { search })}>{say(TAB_TEXT.clear)}</Link>
+            · <ListLink href={orderTabQuery(ORDER_TABS.find((tab) => tab.opens)!, { search })}>{say(TAB_TEXT.clear)}</ListLink>
           </span>
         )}
         <OrderDay

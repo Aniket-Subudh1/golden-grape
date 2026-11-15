@@ -40,6 +40,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import ListLink from './list-link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useLayoutEffect, useSyncExternalStore } from 'react';
 import type { Alerts } from './alerts';
@@ -89,7 +90,7 @@ const ICONS = {
 function Item({ item, active, external, count }: { item: NavItem; active: boolean; external?: boolean; count?: number }) {
   const Icon = ICONS[item.icon as keyof typeof ICONS] ?? FileText;
   return (
-    <Link
+    <ListLink
       href={item.href}
       className="gg-nav__item"
       data-active={active || undefined}
@@ -101,7 +102,7 @@ function Item({ item, active, external, count }: { item: NavItem; active: boolea
       </span>
       <span className="gg-nav__label">{item.label}</span>
       {count ? <span className="gg-nav__count">{count}</span> : null}
-    </Link>
+    </ListLink>
   );
 }
 

@@ -1,8 +1,8 @@
-import Link from 'next/link';
 import type { CollectionSlug, PaginatedDocs, Payload, Where } from 'payload';
 import { entriesOf, l, type Label, type StatusTab } from '@/lib/admin';
 import { today } from '@/lib/time';
 import EmptyList, { type EmptyIcon } from './empty-list';
+import ListLink from './list-link';
 
 // Stage tabs above a list (APPLUX report 4, §7; QA 12 Nov GG-04/06): table reservations and catering requests get the
 // clarity of the Orders tabs without Payload's filter builder. A tab is a plain list query on `status`, optionally on
@@ -27,6 +27,8 @@ export function statusTabQuery(tab: StatusTab, search = '') {
     i++;
   }
   if (tab.day) params.set(`where[and][${i}][slot.date][${DAY_OP[tab.day]}]`, today());
+  // No condition ("Toutes"): an empty `where`, so the link loads in full (list-link.tsx).
+  if (!tab.statuses && !tab.day) params.set('where', '');
   if (search) params.set('search', search);
   if (tab.sort) params.set('sort', tab.sort);
   return `?${params.toString()}`;
@@ -62,8 +64,8 @@ export default async function StatusTabs({ payload, data, searchParams = {}, lis
   const day = today();
   const search = typeof searchParams.search === 'string' ? searchParams.search.trim() : '';
 
-  // Which tab the URL is: its statuses and day, and nothing else filtered.
-  const where = entriesOf(searchParams).filter(([key]) => key.startsWith('where'));
+  // Which tab the URL is: its statuses and day, and nothing else filtered (`where=` is no condition).
+  const where = entriesOf(searchParams).filter(([key, value]) => key.startsWith('where') && value !== '');
   const statuses = where.filter(([key]) => STATUS.test(key)).flatMap(([, value]) => value.split(','));
   const dayEntry = where.find(([key]) => DAY.test(key));
   const custom = where.some(([key]) => !STATUS.test(key) && !DAY.test(key));
@@ -81,14 +83,14 @@ export default async function StatusTabs({ payload, data, searchParams = {}, lis
     <>
       <nav className="gg-tabs">
         {tabs.map((t, i) => (
-          <Link key={i} href={statusTabQuery(t, search)} className="gg-tabs__tab" data-active={t === active || undefined} data-urgent={(t.urgent && counts[i] > 0) || undefined}>
+          <ListLink key={i} href={statusTabQuery(t, search)} className="gg-tabs__tab" data-active={t === active || undefined} data-urgent={(t.urgent && counts[i] > 0) || undefined}>
             {say(t.label)}
             <span className="gg-tabs__count">{counts[i]}</span>
-          </Link>
+          </ListLink>
         ))}
         {filtered && (
           <span className="gg-tabs__filter">
-            {say(TAB_TEXT.filter)} · <Link href={statusTabQuery(tabs.find((t) => t.opens) ?? tabs[0], search)}>{say(TAB_TEXT.clear)}</Link>
+            {say(TAB_TEXT.filter)} · <ListLink href={statusTabQuery(tabs.find((t) => t.opens) ?? tabs[0], search)}>{say(TAB_TEXT.clear)}</ListLink>
           </span>
         )}
       </nav>

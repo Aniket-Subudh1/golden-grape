@@ -1,5 +1,5 @@
 import { ArrowLeftRight, CalendarCheck, ClipboardCheck, MapPin, Package, ShoppingBag, Store, Tags, Ticket, TriangleAlert, UsersRound } from 'lucide-react';
-import Link from 'next/link';
+import ListLink from './list-link';
 import type { PaginatedDocs } from 'payload';
 import type { Label } from '@/lib/admin';
 import CreateButton from './create-button';
@@ -53,9 +53,9 @@ export default function EmptyList({ data, searchParams = {}, collectionConfig, i
       {links.length > 0 && (
         <p className="gg-empty__links">
           {links.map((link) => (
-            <Link key={link.href} href={link.href}>
+            <ListLink key={link.href} href={link.href}>
               {link.label}
-            </Link>
+            </ListLink>
           ))}
         </p>
       )}

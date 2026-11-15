@@ -37,4 +37,12 @@ describe('matchOrderQuery', () => {
   it('no condition is "All"', () => {
     expect(matchOrderQuery({ sort: '-createdAt' }).tab?.key).toBe('all');
   });
+
+  it('"All" carries an empty `where` (a full load, list-link.tsx), read as no condition (QA 15 Nov)', () => {
+    const all = ORDER_TABS.find((t) => t.opens)!;
+    expect(new URLSearchParams(orderTabQuery(all)).get('where')).toBe('');
+    expect(matchOrderQuery({ where: '', sort: '-createdAt' }).tab?.key).toBe('all');
+    // With a day there is a condition: no empty `where`.
+    expect(new URLSearchParams(orderTabQuery(all, { day: '2026-11-14' })).has('where')).toBe(false);
+  });
 });
