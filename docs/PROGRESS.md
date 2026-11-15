@@ -68,6 +68,27 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-15 · APPLUX validation of 15 Nov: three UX changes
+APPLUX validated the 14 Nov delivery: "everything else is validated on my side". The Google Maps link (GG-27) is settled between APPLUX and Golden Grape. APPLUX asked for three UX changes:
+
+| # | Asked | Change |
+|---|---|---|
+| 1 | Orders open on "Toutes", not "À traiter" | The "Toutes" `OrderTab` carries `opens`; the sidebar and "Effacer le filtre" open it. The sidebar no longer counts the later stages to choose the first non-empty one (up to 3 counts on every admin page). "À traiter" keeps its red count |
+| 2 | Table reservations open on "Toutes (historique)", not "À venir" | `opens` moved to that `RESERVATION_TABS` entry |
+| 3 | "Client arrivé" one click, without the payment window; a separate "Encaisser" opens it | `DecisionBar` `instant` (runs on the click) and `target` (another document for the action). "Client arrivé" records no money; "Encaisser" is the order page's payment form (`paymentFields`) running `recordOrderPayment` on the pre-order, offered while the pre-order of an accepted or completed reservation owes money: in the list before and after the arrival, and on the reservation page, whose pre-order card now shows its payment state. `decideReservation` and `transitionReservation` lose `collect`. The pre-order page says "Décidez et encaissez sur la réservation" |
+
+- **Found in the browser check and fixed (before delivery).** Now that "Toutes" is where the sidebar and "Effacer le filtre" land, a client-side navigation from a filtered list to a list with no condition kept the old filter. The rows shown were all of them, but Payload's list wrote the old filter back into the address, and a reload, the next page or a sort applied it again. This was already true of a click on the "Toutes" tab. Payload drops an empty `where` before its client sees it, so only a fresh mount resets the list. Condition-free list URLs now carry an empty `where=` (read as no condition by both tab matchers) and `ListLink` (`components/admin/list-link.tsx`) loads them in full: tabs, "Effacer le filtre", empty-list links, the sidebar, and the day picker's "Tous les jours". Every other list link stays client-side.
+- **Trade-off, to tell APPLUX.** A completed reservation is final. Without the confirmation step, "Client arrivé" clicked on the wrong row cannot be undone from the admin. "Client absent" keeps its dialog.
+- **Tests.** `orders.int.test.ts`: the GG-02 arrival test is replaced by: arrival records nothing (pre-order completed, 0 paid, no payment row); a payment on the completed pre-order is refused at 13,01 € and recorded at 13,00 € (paid, still completed). `order-filters.test.ts` +1: "Toutes" carries `where=` and is still "Toutes"; with a day it has none.
+- **Gate (local, 15 Nov):** `npm run check` 274, `npm run test:int` 106, `npm run build`, e2e 28 passed / 2 skipped, against a production build on a throwaway replica set (:27018, seeded, opening stock, QA data through the services: orders confirmed, awaiting transfer and ready; reservations accepted on a past day with and without a pre-order, pending and accepted next week, completed with its pre-order unpaid). Browser (Playwright, 1280 px), 65 checks, no console error. One check first failed on the script's own timing and passed when re-run with polling:
+  - the sidebar opens "Toutes" (Orders, 8 = 8 rows; "À traiter" red) and "Toutes (historique)" (Reservations, 5 = 5 rows);
+  - from a hand-made filter, from another tab and from "Tous les jours": "Toutes" lit, the address without the old filter, the same after a reload and after a column sort;
+  - every dashboard tile and counter still shows a lit tab or named chip whose count equals the rows (11 links); back from a reservation keeps "Toutes (historique)";
+  - list buttons per row (arrival · Encaisser · absent; arrival · absent without a pre-order; Encaisser alone after the visit; none on pending or later rows), readable at rest;
+  - "Client arrivé" in one click: no dialog, RES-2026-00001 completed with its history row, pre-order CMD-2026-00005 completed with 0 paid. Then "Encaisser": dialog prefilled 14,00 €, on site, today, reference; confirmed: CMD-2026-00005 paid 1 400 cents and still completed, one payment row, activity log "order.payment" after "reservation.status", no button left on the row. "Client absent" still asks a reason, and "Retour" sends nothing;
+  - reservation pages: accepted with a pre-order, Client arrivé · Encaisser · Client absent · Annuler and "En attente de paiement"; completed unpaid, "Encaisser", then "Payé" and "Plus rien à faire"; the pre-order page says where to collect.
+- **Not deployed yet.** Production waits for Aniket's go: push `main`, CI, auto-deploy; no migration needed.
+
 ### 2026-11-14 · APPLUX QA report of 14 Nov (GG-22 … GG-28)
 APPLUX retested the 13 Nov build: the event page, the order payment flow and the signed quotation pass; 7 points remain, and APPLUX asks us to own interface QA before each delivery. Every point was traced to its cause before any change. Decisions (Aniket, 14 Nov): numbers issued before the French formats are rewritten (test data only, nothing launched); the recurring "tab ≠ list" bug gets one unit test; a written browser-journey checklist runs before every delivery (`06-TESTING.md` §5a).
 
