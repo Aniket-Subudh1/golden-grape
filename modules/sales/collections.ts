@@ -40,8 +40,8 @@ export const RESERVATION_STATUS_LABELS: Record<(typeof RESERVATION_STATUSES)[num
 };
 
 /**
- * The table reservations list (QA 12 Nov, GG-04/06): today, what is coming (the sidebar opens it), each stage, and
- * the whole history. A day is a plain condition of its tab, so the counts always equal the lists.
+ * The table reservations list (QA 12 Nov, GG-04/06): today, what is coming, each stage, and the whole history (the
+ * sidebar opens it, APPLUX 15 Nov). A day is a plain condition of its tab, so the counts always equal the lists.
  */
 export const RESERVATION_TABS: StatusTab[] = [
   {
@@ -56,7 +56,6 @@ export const RESERVATION_TABS: StatusTab[] = [
     statuses: ['pending', 'accepted'],
     day: 'fromToday',
     sort: 'slotAt',
-    opens: true,
     empty: l('Aucune réservation à venir', 'No upcoming reservations', 'Keine anstehenden Reservierungen', 'Sem reservas futuras'),
   },
   {
@@ -87,6 +86,7 @@ export const RESERVATION_TABS: StatusTab[] = [
   {
     label: l('Toutes (historique)', 'All (history)', 'Alle (Verlauf)', 'Todas (histórico)'),
     sort: '-slotAt',
+    opens: true,
     empty: l('Aucune réservation pour l’instant', 'No reservations yet', 'Noch keine Reservierungen', 'Ainda sem reservas'),
   },
 ];
