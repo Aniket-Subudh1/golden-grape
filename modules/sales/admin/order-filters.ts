@@ -14,8 +14,9 @@ type Range = { from: string; to: string };
 /**
  * `skipTable`: a table's pre-order waits for its reservation (counted under Table reservations), not for this tab
  * (GG-020). `onlyTable`: those pre-orders, in a tab of their own so they stay visible (APPLUX audit 10 Nov, §2).
+ * `opens`: the tab the sidebar and "Effacer le filtre" open ("Toutes", APPLUX 15 Nov).
  */
-export type OrderTab = { key: string; label: Label; statuses?: OrderStatus[]; skipTable?: boolean; onlyTable?: boolean; sort: string; empty: Label };
+export type OrderTab = { key: string; label: Label; statuses?: OrderStatus[]; skipTable?: boolean; onlyTable?: boolean; sort: string; empty: Label; opens?: boolean };
 
 export const ORDER_TABS: OrderTab[] = [
   {
@@ -78,6 +79,7 @@ export const ORDER_TABS: OrderTab[] = [
     key: 'all',
     label: l('Toutes', 'All', 'Alle', 'Todas'),
     sort: '-createdAt',
+    opens: true,
     empty: l('Aucune commande pour l’instant.', 'No orders yet.', 'Noch keine Bestellungen.', 'Ainda sem encomendas.'),
   },
 ];
@@ -125,7 +127,7 @@ function queryOf(conditions: Condition[], keep: { search?: string; day?: string;
   return `?${params.toString()}`;
 }
 
-/** The list URL's query for a tab, keeping the search and the slot day. The sidebar opens the first tab. */
+/** The list URL's query for a tab, keeping the search and the slot day. */
 export const orderTabQuery = (tab: OrderTab, keep: { search?: string; day?: string } = {}) => queryOf(conditionsOfTab(tab), { ...keep, sort: tab.sort });
 
 /** The Orders list opened on a shortcut (dashboard tiles, the bell). */

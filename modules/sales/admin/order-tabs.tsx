@@ -7,7 +7,8 @@ import { l, type Label } from '@/lib/admin';
 import { matchOrderQuery, ORDER_TABS, orderTabQuery, orderTabWhere, type OrderView } from './order-filters';
 import OrderDay from './order-day';
 
-// The Orders list split by what staff must do (GG-001): one tab per stage, opened on "To do". Which tab is lit, or
+// The Orders list split by what staff must do (GG-001): one tab per stage, opened on "All" (APPLUX 15 Nov), "To do"
+// counted in red while it has orders. Which tab is lit, or
 // which shortcut is named, is `matchOrderQuery` (order-filters.ts): a lit tab is always exactly what is listed
 // (GG-22). The tabs keep the search and the chosen day, and their counts follow both. "All" finds any order.
 
@@ -67,7 +68,7 @@ export default async function OrderTabs({ payload, data, searchParams = {}, list
             ) : (
               say(TAB_TEXT.filter)
             )}{' '}
-            · <Link href={orderTabQuery(ORDER_TABS[0], { search })}>{say(TAB_TEXT.clear)}</Link>
+            · <Link href={orderTabQuery(ORDER_TABS.find((tab) => tab.opens)!, { search })}>{say(TAB_TEXT.clear)}</Link>
           </span>
         )}
         <OrderDay
