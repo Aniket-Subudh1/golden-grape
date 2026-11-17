@@ -3458,3 +3458,13 @@ body:has(.gg-create) .no-results__actions {
 .gg-sales tfoot td {
   border-top: 1px solid var(--gg-line);
 }
+
+/* Till sales import (M3.3 T5): the SKU or barcode typed for a code without an item. */
+.gg-pos__target {
+  width: 160px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--gg-line);
+  border-radius: 6px;
+  font: inherit;
+}

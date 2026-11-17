@@ -6,8 +6,8 @@
 import { getPayload } from 'payload';
 import { NUMBERING } from '@/modules/settings/globals';
 
-// The formats this migration knew on 9 Nov (the purchase-order series came later, M3.1).
-const OLD: Record<Exclude<keyof typeof NUMBERING, 'purchase'>, string> = {
+// The formats this migration knew on 9 Nov (the purchase-order and till series came later, M3.1 and M3.3).
+const OLD: Record<Exclude<keyof typeof NUMBERING, 'purchase' | 'pos'>, string> = {
   invoice: 'INV-{YYYY}-{00000}',
   creditNote: 'CN-{YYYY}-{00000}',
   quotation: 'QUO-{YYYY}-{00000}',

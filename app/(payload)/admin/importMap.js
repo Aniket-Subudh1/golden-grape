@@ -66,6 +66,8 @@ import { TotalCell as TotalCell_d6358e374739dc2aac8672e72d6cc454 } from '@/modul
 import { AccountingExport as AccountingExport_e0280cd7f0117a34dccb6bc7a9d49985 } from '@/modules/documents/admin/document-actions'
 import { InvoiceActions as InvoiceActions_e0280cd7f0117a34dccb6bc7a9d49985 } from '@/modules/documents/admin/document-actions'
 import { CorrectButton as CorrectButton_2d1e765cf2f5907dc8738db91b94eedc } from '@/modules/attendance/admin/correct-button'
+import { ContinueImport as ContinueImport_4c400b5e20548e9cf2e480a5a4246be8 } from '@/modules/pos/admin/retry-button'
+import { RetryButton as RetryButton_4c400b5e20548e9cf2e480a5a4246be8 } from '@/modules/pos/admin/retry-button'
 import { default as default_a2f0eccb7507197ce791108816851322 } from '@/components/admin/nav'
 import { default as default_0430f5fb3b8132a602107d7535a2a344 } from '@/components/admin/icon'
 import { default as default_334250e18ce0b45af3e0c04bb6fe8307 } from '@/components/admin/logo'
@@ -153,6 +155,8 @@ export const importMap = {
   "@/modules/documents/admin/document-actions#AccountingExport": AccountingExport_e0280cd7f0117a34dccb6bc7a9d49985,
   "@/modules/documents/admin/document-actions#InvoiceActions": InvoiceActions_e0280cd7f0117a34dccb6bc7a9d49985,
   "@/modules/attendance/admin/correct-button#CorrectButton": CorrectButton_2d1e765cf2f5907dc8738db91b94eedc,
+  "@/modules/pos/admin/retry-button#ContinueImport": ContinueImport_4c400b5e20548e9cf2e480a5a4246be8,
+  "@/modules/pos/admin/retry-button#RetryButton": RetryButton_4c400b5e20548e9cf2e480a5a4246be8,
   "@/components/admin/nav#default": default_a2f0eccb7507197ce791108816851322,
   "@/components/admin/icon#default": default_0430f5fb3b8132a602107d7535a2a344,
   "@/components/admin/logo#default": default_334250e18ce0b45af3e0c04bb6fe8307,

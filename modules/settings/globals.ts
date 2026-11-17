@@ -32,6 +32,8 @@ export const NUMBERING = {
   purchase: 'BCF-{YYYY}-{00000}',
   cateringRequest: 'DEM-{YYYY}-{0000}',
   reservation: 'RES-{YYYY}-{00000}',
+  // Till sales imported from the POS file (M3.3 T5): their own series, so the shop's CMD numbers stay the shop's.
+  pos: 'POS-{YYYY}-{00000}',
 } as const;
 
 const text = (name: string, label: Label, required = false, width = '50%'): Field => ({ name, type: 'text', required, label, admin: { width } });
@@ -360,7 +362,12 @@ export const businessSettings: GlobalConfig = {
                     admin: { width: '50%' },
                   },
                 ),
-                { name: 'outboxAlertEmail', type: 'email', admin: later },
+                {
+                  name: 'outboxAlertEmail',
+                  type: 'email',
+                  label: l('E-mail si la caisse ne reçoit plus les commandes', 'E-mail when the till stops receiving orders', 'E-Mail, wenn die Kasse keine Bestellungen mehr erhält', 'E-mail quando a caixa deixa de receber encomendas'),
+                  admin: { condition: (data) => data?.modules?.pos === true, description: l('Après 5 essais sans succès.', 'After 5 failed attempts.', 'Nach 5 erfolglosen Versuchen.', 'Após 5 tentativas falhadas.') },
+                },
               ],
             },
             {
@@ -401,6 +408,43 @@ export const businessSettings: GlobalConfig = {
               label: l('Cartes cadeaux', 'Gift cards', 'Geschenkkarten', 'Cartões-presente'),
               admin: { condition: (data) => data?.modules?.giftCards === true },
               fields: [{ name: 'validityMonths', type: 'number', defaultValue: 24, min: 1, label: l('Validité d’une carte (mois)', 'A card is valid for (months)', 'Gültigkeit einer Karte (Monate)', 'Validade de um cartão (meses)') }],
+            },
+            {
+              // The till's daily sales file (M3.3 T5): the column names of its export (A-10 until a real CashMag sample).
+              name: 'pos',
+              type: 'group',
+              label: l('Caisse (fichier des ventes)', 'Till (sales file)', 'Kasse (Verkaufsdatei)', 'Caixa (ficheiro de vendas)'),
+              admin: {
+                condition: (data) => data?.modules?.pos === true,
+                description: l(
+                  'Le nom de chaque colonne dans l’export journalier de la caisse. Majuscules, accents et espaces ne comptent pas.',
+                  'The name of each column in the till’s daily export. Case, accents and spaces do not matter.',
+                  'Der Name jeder Spalte im täglichen Kassenexport. Groß-/Kleinschreibung, Akzente und Leerzeichen zählen nicht.',
+                  'O nome de cada coluna na exportação diária da caixa. Maiúsculas, acentos e espaços não contam.',
+                ),
+              },
+              fields: [
+                {
+                  name: 'csvMapping',
+                  type: 'group',
+                  label: l('Colonnes', 'Columns', 'Spalten', 'Colunas'),
+                  fields: [
+                    row(
+                      { name: 'receipt', type: 'text', defaultValue: 'Ticket', label: l('N° de ticket', 'Receipt number', 'Bonnummer', 'N.º do talão'), admin: { width: '33%' } },
+                      { name: 'date', type: 'text', defaultValue: 'Date', label: l('Date', 'Date', 'Datum', 'Data'), admin: { width: '33%' } },
+                      { name: 'time', type: 'text', defaultValue: 'Heure', label: l('Heure (facultatif)', 'Time (optional)', 'Uhrzeit (optional)', 'Hora (opcional)'), admin: { width: '33%' } },
+                    ),
+                    row(
+                      { name: 'barcode', type: 'text', defaultValue: 'Code barre', label: l('Code-barres', 'Barcode', 'Strichcode', 'Código de barras'), admin: { width: '50%' } },
+                      { name: 'ref', type: 'text', defaultValue: 'Référence', label: l('Référence (SKU)', 'Reference (SKU)', 'Artikelnummer (SKU)', 'Referência (SKU)'), admin: { width: '50%' } },
+                    ),
+                    row(
+                      { name: 'qty', type: 'text', defaultValue: 'Quantité', label: l('Quantité', 'Quantity', 'Menge', 'Quantidade'), admin: { width: '50%' } },
+                      { name: 'unitPrice', type: 'text', defaultValue: 'Prix unitaire TTC', label: l('Prix unitaire TTC', 'Unit price incl. VAT', 'Stückpreis inkl. MwSt.', 'Preço unitário c/ IVA'), admin: { width: '50%' } },
+                    ),
+                  ],
+                },
+              ],
             },
           ],
         },

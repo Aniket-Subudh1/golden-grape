@@ -110,6 +110,9 @@ export interface Config {
     giftCardLedger: GiftCardLedger;
     attendance: Attendance;
     attendanceCorrections: AttendanceCorrection;
+    posImports: PosImport;
+    outbox: Outbox;
+    integrationLogs: IntegrationLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -175,6 +178,9 @@ export interface Config {
     giftCardLedger: GiftCardLedgerSelect<false> | GiftCardLedgerSelect<true>;
     attendance: AttendanceSelect<false> | AttendanceSelect<true>;
     attendanceCorrections: AttendanceCorrectionsSelect<false> | AttendanceCorrectionsSelect<true>;
+    posImports: PosImportsSelect<false> | PosImportsSelect<true>;
+    outbox: OutboxSelect<false> | OutboxSelect<true>;
+    integrationLogs: IntegrationLogsSelect<false> | IntegrationLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -313,6 +319,7 @@ export interface AuditLog {
     | 'creditNote.issued'
     | 'deliveryNote.issued'
     | 'attendance.corrected'
+    | 'pos.import'
     | 'doc.create'
     | 'doc.update'
     | 'doc.delete';
@@ -2009,6 +2016,123 @@ export interface AttendanceCorrection {
   createdAt: string;
 }
 /**
+ * The till’s sales files imported. To import one: Import / export › Till sales.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posImports".
+ */
+export interface PosImport {
+  id: string;
+  filename: string;
+  hash: string;
+  status: 'preview' | 'partial' | 'posted';
+  receipts?: number | null;
+  matched?: number | null;
+  unmatched?: number | null;
+  rows?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  errors?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  assignments?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  postedLines?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  confirms?: number | null;
+  user?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Orders sent to the till, every minute. With no till connected they become “Sent” (no till). A failed one can be retried (open it, “Retry now”).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "outbox".
+ */
+export interface Outbox {
+  id: string;
+  topic: string;
+  ref?: string | null;
+  payload:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  target: string;
+  status: 'pending' | 'sending' | 'sent' | 'failed' | 'dead';
+  attempts?: number | null;
+  nextAttemptAt?: string | null;
+  sentAt?: string | null;
+  note?: string | null;
+  lastError?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrationLogs".
+ */
+export interface IntegrationLog {
+  id: string;
+  target: string;
+  direction: 'out' | 'in';
+  outbox?: (string | null) | Outbox;
+  request?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  response?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  ok?: boolean | null;
+  ms?: number | null;
+  expiresAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -2199,6 +2323,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'attendanceCorrections';
         value: string | AttendanceCorrection;
+      } | null)
+    | ({
+        relationTo: 'posImports';
+        value: string | PosImport;
+      } | null)
+    | ({
+        relationTo: 'outbox';
+        value: string | Outbox;
+      } | null)
+    | ({
+        relationTo: 'integrationLogs';
+        value: string | IntegrationLog;
       } | null);
   globalSlug?: string | null;
   user:
@@ -3473,6 +3609,60 @@ export interface AttendanceCorrectionsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posImports_select".
+ */
+export interface PosImportsSelect<T extends boolean = true> {
+  filename?: T;
+  hash?: T;
+  status?: T;
+  receipts?: T;
+  matched?: T;
+  unmatched?: T;
+  rows?: T;
+  errors?: T;
+  assignments?: T;
+  postedLines?: T;
+  confirms?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "outbox_select".
+ */
+export interface OutboxSelect<T extends boolean = true> {
+  topic?: T;
+  ref?: T;
+  payload?: T;
+  target?: T;
+  status?: T;
+  attempts?: T;
+  nextAttemptAt?: T;
+  sentAt?: T;
+  note?: T;
+  lastError?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrationLogs_select".
+ */
+export interface IntegrationLogsSelect<T extends boolean = true> {
+  target?: T;
+  direction?: T;
+  outbox?: T;
+  request?: T;
+  response?: T;
+  ok?: T;
+  ms?: T;
+  expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -3800,6 +3990,9 @@ export interface BusinessSetting {
      */
     defaultLowStock?: number | null;
     lowStockEmail?: string | null;
+    /**
+     * After 5 failed attempts.
+     */
     outboxAlertEmail?: string | null;
   };
   loyalty?: {
@@ -3810,6 +4003,20 @@ export interface BusinessSetting {
   };
   giftCards?: {
     validityMonths?: number | null;
+  };
+  /**
+   * The name of each column in the till’s daily export. Case, accents and spaces do not matter.
+   */
+  pos?: {
+    csvMapping?: {
+      receipt?: string | null;
+      date?: string | null;
+      time?: string | null;
+      barcode?: string | null;
+      ref?: string | null;
+      qty?: string | null;
+      unitPrice?: string | null;
+    };
   };
   vat?:
     | {
@@ -3827,6 +4034,7 @@ export interface BusinessSetting {
     purchase?: string | null;
     cateringRequest?: string | null;
     reservation?: string | null;
+    pos?: string | null;
   };
   paymentTerms?:
     | {
@@ -4225,6 +4433,21 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
     | {
         validityMonths?: T;
       };
+  pos?:
+    | T
+    | {
+        csvMapping?:
+          | T
+          | {
+              receipt?: T;
+              date?: T;
+              time?: T;
+              barcode?: T;
+              ref?: T;
+              qty?: T;
+              unitPrice?: T;
+            };
+      };
   vat?:
     | T
     | {
@@ -4243,6 +4466,7 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
         purchase?: T;
         cateringRequest?: T;
         reservation?: T;
+        pos?: T;
       };
   paymentTerms?:
     | T

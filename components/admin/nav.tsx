@@ -98,6 +98,8 @@ const GROUPS: {
       { label: 'invoices', slug: 'invoices', icon: 'quotations', roles: ['sales', 'manager'] },
       { label: 'creditNotes', slug: 'creditNotes', icon: 'quotations', roles: ['sales', 'manager'] },
       { label: 'deliveryNotes', slug: 'deliveryNotes', icon: 'quotations', roles: ['sales', 'manager'] },
+      { label: 'posImports', slug: 'posImports', icon: 'importExport', module: 'pos' },
+      { label: 'outbox', slug: 'outbox', icon: 'movements', module: 'pos' },
     ],
   },
   {

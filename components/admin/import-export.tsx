@@ -6,6 +6,9 @@ import { hasRole } from '@/lib/access';
 import CatalogueFiles, { type FieldOptions } from '@/modules/catalogue/admin/catalogue-files';
 import { TEMPLATE_COLUMNS } from '@/modules/catalogue/import';
 import StockFiles from '@/modules/inventory/admin/stock-files';
+import PosFiles from '@/modules/pos/admin/pos-files';
+import { importPreview } from '@/modules/pos/service';
+import { isModuleOn } from '@/modules/settings/service';
 import { adminText } from './text';
 
 // The back-office Import / Export page (`admin.components.views.importExport`, /admin/import-export): products in and
@@ -39,6 +42,9 @@ export default async function ImportExportView({ initPageResult, params, searchP
   if (req.user?.collection !== 'users') redirect('/admin/login?redirect=%2Fadmin%2Fimport-export');
   const t = adminText(req.i18n.language).importExport;
   const allowed = hasRole(req.user, ['manager', 'stock']);
+  // The till's sales file (M3.3 T5): managers, with the POS module on; `?posImport=` reopens an import in progress.
+  const pos = hasRole(req.user, ['manager']) && (await isModuleOn('pos'));
+  const reopen = pos && typeof searchParams?.posImport === 'string' && /^[a-f0-9]{24}$/.test(searchParams.posImport) ? await importPreview(req.payload, searchParams.posImport).catch(() => null) : null;
 
   let columns: string[] = [];
   let options: FieldOptions | null = null;
@@ -77,6 +83,7 @@ export default async function ImportExportView({ initPageResult, params, searchP
             <>
               <CatalogueFiles columns={columns} options={options} />
               <StockFiles />
+              {pos && <PosFiles initial={reopen} />}
             </>
           ) : (
             <p className="gg-card__empty">{t.forbidden}</p>

@@ -8,6 +8,7 @@ import { model, type Tx, withTx } from '@/lib/tx';
 import { postMovements } from '@/modules/inventory/service';
 import { type Movement, provider } from '@/modules/payments/provider';
 import { dueOf, type Figures, paymentState, refundableOf } from '@/modules/payments/service';
+import { enqueue } from '@/modules/pos/service';
 import { creditRefundedOrder } from '@/modules/documents/invoicing';
 import { earn, giveBack, issueForOrder, takeBack } from '@/modules/promotions/rewards';
 import { quoteCart, redeem } from '@/modules/promotions/service';
@@ -282,8 +283,10 @@ export async function placeOrder(payload: Payload, input: PlaceOrderInput, { cus
       }
 
       const started = await provider(order!.payment?.provider).start(tx, order!);
-      await setOrder(tx, order!.id, { status: started.status, payment: { ...order!.payment, status: started.paymentStatus } });
+      const placed = await setOrder(tx, order!.id, { status: started.status, payment: { ...order!.payment, status: started.paymentStatus } });
       if (started.status === 'confirmed') await postSale(tx, order!);
+      // Mirrored to the till after commit by the outbox job (M3.3 T5), only with the POS module on.
+      await enqueue(tx, 'order.created', placed);
       return { kind: 'order', id: order!.id, number: order!.number ?? '', created: true };
     });
   } catch (error) {
@@ -372,6 +375,7 @@ export async function placeStaffOrder(payload: Payload, input: StaffSaleInput, {
         history,
       });
       if (started.status === 'confirmed') await postSale(tx, placed, staff);
+      await enqueue(tx, 'order.created', placed);
       // Paid at the till = handed over at once (Q-18, 17 Nov): the order closes as completed through the state machine
       // (its history row); the customer gets no handover e-mail, they are standing at the counter. Invoice later stays
       // confirmed until its invoice (M3.2).
@@ -501,6 +505,7 @@ export async function applyTransition(tx: Tx, orderId: string, to: OrderStatus, 
     },
     history: [...history, { at: new Date().toISOString(), from, to, user, reason }],
   });
+  if (to === 'confirmed' || to === 'cancelled' || to === 'refunded') await enqueue(tx, `order.${to}`, updated);
   return { order: updated, from, effects: list };
 }
 

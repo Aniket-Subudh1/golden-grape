@@ -128,6 +128,7 @@ export const AUDIT_LABELS: Record<AuditAction, Label> = {
   'creditNote.issued': l('Avoir : émis', 'Credit note: issued', 'Gutschrift: ausgestellt', 'Nota de crédito: emitida'),
   'deliveryNote.issued': l('Bon de livraison : émis', 'Delivery note: issued', 'Lieferschein: ausgestellt', 'Guia de remessa: emitida'),
   'attendance.corrected': l('Pointage : corrigé', 'Time clock: corrected', 'Zeiterfassung: korrigiert', 'Ponto: corrigido'),
+  'pos.import': l('Caisse : ventes importées', 'Till: sales imported', 'Kasse: Verkäufe importiert', 'Caixa: vendas importadas'),
   'doc.create': l('Ajout', 'Created', 'Erstellt', 'Criado'),
   'doc.update': l('Modification', 'Changed', 'Geändert', 'Alterado'),
   'doc.delete': l('Suppression', 'Deleted', 'Gelöscht', 'Eliminado'),
