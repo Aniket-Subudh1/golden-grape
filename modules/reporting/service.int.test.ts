@@ -2,8 +2,8 @@ import { randomUUID } from 'node:crypto';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { add } from '@/lib/money';
 import { model } from '@/lib/tx';
-import { getTestPayload } from '@/tests/helpers';
-import { cashSummary, outstanding, SOLD, salesOverview, salesSummary } from './service';
+import { getTestPayload, makeVariant } from '@/tests/helpers';
+import { cashSummary, outstanding, SOLD, salesBy, salesOverview, salesSummary } from './service';
 
 const payload = await getTestPayload();
 
@@ -118,5 +118,52 @@ describe('money received and still owed (QA 12 Nov, GG-21)', () => {
 
   it('still owed: sold orders not fully paid, never an order still waiting to be confirmed', async () => {
     expect(await outstanding(payload)).toEqual({ orders: 2, dueCents: 16500 + 1550 });
+  });
+});
+
+describe('salesBy (M3.3 T4)', () => {
+  // Their own days (20–21 December): three channels, two products, a code discount, a partial refund.
+  let a: Awaited<ReturnType<typeof makeVariant>>;
+  let b: Awaited<ReturnType<typeof makeVariant>>;
+  beforeAll(async () => {
+    a = await makeVariant(payload, { price: 1170 });
+    b = await makeVariant(payload, { price: 2000 });
+    const line = (v: typeof a, qty: number, totalCents: number, discountCents = 0, vatBp = 1700) => ({ variant: v.variant.id, unitQty: qty, baseQty: qty, name: 'x', unitPriceCents: totalCents / qty, vatBp, totalCents, discountCents });
+    const lines = (o: ReturnType<typeof order>, channel: string, l: unknown[]) => ({ ...o, channel, lines: l });
+    await model(payload, 'orders').insertMany([
+      lines(order('2026-12-20', 'completed', 4340, 631), 'webshop', [line(a, 2, 2340, 0), line(b, 1, 2000, 0)]),
+      lines(order('2026-12-20', 'completed', 3000, 436, 1000), 'mobile', [line(b, 2, 4000, 1000)]), // a 10 € code, 10 € refunded later
+      lines(order('2026-12-21', 'completed', 1170, 170), 'pos', [line(a, 1, 1170)]),
+      lines(order('2026-12-21', 'cancelled', 5000, 727), 'pos', [line(a, 5, 5000)]), // not sold
+    ]);
+  });
+  const range = { from: '2026-12-20', to: '2026-12-21', locale: 'en' };
+
+  it('by channel: webshop, mobile and pos apart, adding up to the totals (AC-M3.3-06)', async () => {
+    const { total, groups } = await salesBy(payload, { ...range, groupBy: 'channel' });
+    expect(groups.map((g) => [g.key, g.orders, g.grossCents])).toEqual([
+      ['webshop', 1, 4340],
+      ['mobile', 1, 2000],
+      ['pos', 1, 1170],
+    ]);
+    expect(add(...groups.map((g) => g.grossCents))).toBe(total.grossCents);
+    expect(add(...groups.map((g) => g.vatCents))).toBe(total.vatCents);
+    expect(total).toMatchObject({ orders: 3, grossCents: 7510, refundedCents: 1000 });
+  });
+
+  it('by day, and one channel only', async () => {
+    expect((await salesBy(payload, { ...range, groupBy: 'day' })).groups.map((g) => [g.key, g.grossCents])).toEqual([
+      ['2026-12-20', 6340],
+      ['2026-12-21', 1170],
+    ]);
+    const pos = await salesBy(payload, { ...range, channel: 'pos', groupBy: 'day' });
+    expect(pos.total).toMatchObject({ orders: 1, grossCents: 1170 });
+  });
+
+  it('by product: the lines as charged (after the code), VAT per line, bottles and orders', async () => {
+    const { groups } = await salesBy(payload, { ...range, groupBy: 'product' });
+    const byId = Object.fromEntries(groups.map((g) => [g.key, g]));
+    expect(byId[a.product.id]).toMatchObject({ label: a.product.name, orders: 2, qty: 3, grossCents: 3510, vatCents: 340 + 170 });
+    expect(byId[b.product.id]).toMatchObject({ orders: 2, qty: 3, grossCents: 2000 + 3000, vatCents: 291 + 436 });
   });
 });

@@ -2,7 +2,7 @@ import type { Payload } from 'payload';
 import { addDays, fromLocal, today } from '@/lib/time';
 import { model } from '@/lib/tx';
 import { SOLD, UNPAID } from '@/modules/sales/order-states';
-import { periods, type Range, type SalesRow, type SalesTotals, totals } from './summary';
+import { lineGroups, periods, type Range, type SalesRow, type SalesTotals, type SoldLine, totals } from './summary';
 
 // Sales figures (R8, M3.3 T4): read-only aggregations over `orders` (and their `payments`), no collection of its own.
 // A sale counts on its slot day (`slot.date`, a Luxembourg calendar day), the day the order list filters by, so the
@@ -12,13 +12,20 @@ import { periods, type Range, type SalesRow, type SalesTotals, totals } from './
 // The statuses that make a sale and the payment states still owing live with the order states (one list).
 export { SOLD, UNPAID };
 
-/** Totals of the orders sold over a range of Luxembourg days (inclusive). */
-export async function salesSummary(payload: Payload, { from, to }: Range): Promise<SalesTotals> {
-  const rows = await model(payload, 'orders').aggregate<SalesRow>([
-    { $match: { 'slot.date': { $gte: from, $lte: to }, status: { $in: [...SOLD] } } },
+export const GROUP_BY = ['day', 'channel', 'customer', 'product', 'brand', 'category'] as const;
+export type GroupBy = (typeof GROUP_BY)[number];
+export const CHANNELS = ['webshop', 'mobile', 'pos'] as const;
+export type SalesQuery = Range & { channel?: (typeof CHANNELS)[number] };
+
+const soldIn = ({ from, to, channel }: SalesQuery) => ({ 'slot.date': { $gte: from, $lte: to }, status: { $in: [...SOLD] }, ...(channel ? { channel } : {}) });
+
+/** One aggregation row per `key` (null: every order): sums over the sold orders, the partly refunded ones listed. */
+const orderRows = (payload: Payload, query: SalesQuery, key: string | null) =>
+  model(payload, 'orders').aggregate<SalesRow & { _id: unknown }>([
+    { $match: soldIn(query) },
     {
       $group: {
-        _id: null,
+        _id: key,
         orders: { $sum: 1 },
         totalCents: { $sum: '$totals.totalCents' },
         vatCents: { $sum: '$totals.vatCents' },
@@ -27,7 +34,73 @@ export async function salesSummary(payload: Payload, { from, to }: Range): Promi
     },
     { $set: { refunds: { $filter: { input: '$refunds', cond: { $gt: ['$$this.refundedCents', 0] } } } } },
   ]);
-  return totals(rows);
+
+/** Totals of the orders sold over a range of Luxembourg days (inclusive), optionally for one channel. */
+export async function salesSummary(payload: Payload, query: SalesQuery): Promise<SalesTotals> {
+  return totals(await orderRows(payload, query, null));
+}
+
+export type SalesGroup = { key: string | null; label: string; orders: number; qty: number | null; grossCents: number; vatCents: number; netCents: number; refundedCents: number };
+
+const nameIn = (name: unknown, locale: string) =>
+  typeof name === 'string' ? name : name && typeof name === 'object' ? ((name as Record<string, string>)[locale] ?? (name as Record<string, string>).fr ?? '') : '';
+
+/**
+ * The dashboard's breakdown (R8, M3.3 T4) and its totals row. By day, channel or customer the groups are orders (each
+ * with its refunds), so they add up to the totals. By product, brand or category they are the lines as charged (no
+ * delivery fee, refunds only in the totals row). `null` key: no customer account, no brand.
+ */
+export async function salesBy(payload: Payload, query: SalesQuery & { groupBy: GroupBy; locale: string }) {
+  const { groupBy, locale } = query;
+  const total = await salesSummary(payload, query);
+  let groups: SalesGroup[];
+  if (groupBy === 'day' || groupBy === 'channel' || groupBy === 'customer') {
+    const field = { day: '$slot.date', channel: '$channel', customer: '$customer' }[groupBy];
+    const rows = await orderRows(payload, query, field);
+    const ids = groupBy === 'customer' ? rows.map((r) => r._id).filter(Boolean) : [];
+    const people = ids.length ? await model(payload, 'customers').find({ _id: { $in: ids } }, { name: 1, company: 1 }).lean<{ _id: unknown; name?: string; company?: string }[]>() : [];
+    const who = new Map(people.map((c) => [String(c._id), c.company || c.name || '']));
+    groups = rows.map((r) => {
+      const key = r._id == null ? null : String(r._id);
+      const t = totals([r]);
+      return { key, label: groupBy === 'customer' ? (key ? (who.get(key) ?? '—') : '') : (key ?? ''), orders: t.orders, qty: null, grossCents: t.grossCents, vatCents: t.vatCents, netCents: t.netCents, refundedCents: t.refundedCents };
+    });
+    groups.sort((a, b) => (groupBy === 'day' ? (a.key ?? '').localeCompare(b.key ?? '') : b.grossCents - a.grossCents));
+  } else {
+    const field = { product: '$p._id', brand: '$p.brand', category: '$p.category' }[groupBy];
+    const lines = await model(payload, 'orders').aggregate<SoldLine>([
+      { $match: soldIn(query) },
+      { $unwind: '$lines' },
+      { $lookup: { from: 'variants', localField: 'lines.variant', foreignField: '_id', as: 'v', pipeline: [{ $project: { product: 1 } }] } },
+      { $lookup: { from: 'products', localField: 'v.product', foreignField: '_id', as: 'p', pipeline: [{ $project: { brand: 1, category: 1 } }] } },
+      { $unwind: { path: '$p', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 0,
+          key: { $ifNull: [{ $toString: field }, null] },
+          order: { $toString: '$_id' },
+          chargedCents: { $subtract: ['$lines.totalCents', { $ifNull: ['$lines.discountCents', 0] }] },
+          vatBp: '$lines.vatBp',
+          qty: '$lines.baseQty',
+        },
+      },
+    ]);
+    const folded = lineGroups(lines);
+    const ids = folded.map((g) => g.key).filter(Boolean) as string[];
+    const slug = ({ product: 'products', brand: 'brands', category: 'categories' } as const)[groupBy];
+    const named = ids.length ? await model(payload, slug).find({ _id: { $in: ids } }, { name: 1 }).lean<{ _id: unknown; name?: unknown }[]>() : [];
+    const label = new Map(named.map((d) => [String(d._id), nameIn(d.name, locale)]));
+    groups = folded.map((g) => ({ ...g, label: g.key ? (label.get(g.key) ?? '—') : '', refundedCents: 0 }));
+  }
+  return { total, groups };
+}
+
+/** The breakdown as CSV (amounts in euros with two decimals, as the accountant's export). */
+export function salesCsv(groups: SalesGroup[], total: SalesTotals, groupBy: GroupBy, labels: { none: string; total: string }) {
+  const euros = (cents: number) => (cents / 100).toFixed(2);
+  const rows = groups.map((g) => [g.label || labels.none, g.orders, g.qty ?? '', euros(g.grossCents), euros(g.vatCents), euros(g.netCents), euros(g.refundedCents)]);
+  rows.push([labels.total, total.orders, '', euros(total.grossCents), euros(total.vatCents), euros(total.netCents), euros(total.refundedCents)]);
+  return { headers: [groupBy, 'orders', 'bottles_or_units', 'gross', 'vat', 'net', 'refunded'], rows };
 }
 
 /** The instant a Luxembourg day (`YYYY-MM-DD`) starts. */

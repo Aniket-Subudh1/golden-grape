@@ -39,3 +39,26 @@ export function periods(day: string): { today: Range; yesterday: Range; month: R
     lastMonth: { from: `${prefix}-01`, to: `${prefix}-${String(Math.min(d, lastDay)).padStart(2, '0')}` },
   };
 }
+
+/** One sold line, as `salesBy` reads it for the product, brand and category views. */
+export type SoldLine = { key: string | null; order: string; chargedCents: number; vatBp: number; qty: number };
+export type LineGroup = { key: string | null; orders: number; qty: number; grossCents: number; vatCents: number; netCents: number };
+
+/**
+ * Lines folded per group (product, brand, category): what was charged for them (after promotions and the code), their
+ * VAT per line rate, bottles, and the orders they appear in. Delivery fees and refunds stay in the totals row.
+ */
+export function lineGroups(lines: SoldLine[]): LineGroup[] {
+  const groups = new Map<string | null, LineGroup & { ids: Set<string> }>();
+  for (const l of lines) {
+    const g = groups.get(l.key) ?? { key: l.key, orders: 0, qty: 0, grossCents: 0, vatCents: 0, netCents: 0, ids: new Set<string>() };
+    const vat = l.vatBp > 0 ? divRound(l.chargedCents * l.vatBp, 10000 + l.vatBp) : 0;
+    g.ids.add(l.order);
+    g.qty += l.qty;
+    g.grossCents += l.chargedCents;
+    g.vatCents += vat;
+    g.netCents += l.chargedCents - vat;
+    groups.set(l.key, g);
+  }
+  return [...groups.values()].map(({ ids, ...g }) => ({ ...g, orders: ids.size })).sort((a, b) => b.grossCents - a.grossCents);
+}

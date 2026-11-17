@@ -94,6 +94,8 @@ export default buildConfig({
         reorder: { Component: '@/modules/purchasing/admin/reorder-view', path: '/reorder' },
         // Monthly hours per person, who is in now, the CSV (M3.3 T3).
         attendanceReport: { Component: '@/modules/attendance/admin/report-view', path: '/attendance-report' },
+        // Sales by day, channel, customer, product, producer or category, with CSV (M3.3 T4).
+        sales: { Component: '@/modules/reporting/admin/sales-view', path: '/sales' },
       },
     },
   },

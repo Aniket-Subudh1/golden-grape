@@ -84,6 +84,7 @@ const GROUPS: {
       // Orders and reservations open on their "Toutes" tab (APPLUX 15 Nov), a tab like the others, so its count and its
       // list always agree (GG-04); what waits to be done stays counted in red on its own tab.
       { label: 'orders', slug: 'orders', icon: 'orders', query: '{orders}' },
+      { label: 'salesFigures', slug: 'sales-figures', path: '/admin/sales', roles: ['manager'], icon: 'chart' },
       { label: 'reservations', slug: 'reservations', icon: 'reservations', query: '{reservations}' },
       // By event first (events-board.tsx); the list of one event's bookings opens from its card.
       {

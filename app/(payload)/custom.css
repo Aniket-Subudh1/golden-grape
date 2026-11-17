@@ -3402,3 +3402,59 @@ body:has(.gg-create) .no-results__actions {
 .gg-reorder__error {
   color: var(--theme-error-500);
 }
+
+/* The sales dashboard (/admin/sales, M3.3 T4): filters in one card, a plain CSS bar per group, no chart library. */
+.gg-sales__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+}
+.gg-sales__filters .gg-tabs {
+  margin: 0;
+}
+.gg-sales__custom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+.gg-sales__custom select {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--gg-line);
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+}
+.gg-sales .gg-card__head {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.gg-sales .gg-card__head .gg-tabs {
+  margin: 0;
+}
+.gg-sales__note {
+  margin: 0;
+  padding: 0 20px 8px;
+  font-size: 12px;
+  color: var(--gg-text-2);
+}
+.gg-sales__barcell {
+  width: 30%;
+  min-width: 80px;
+}
+.gg-sales__bar {
+  display: block;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--gg-primary);
+}
+.gg-sales .gg-tiles {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+.gg-sales tfoot td {
+  border-top: 1px solid var(--gg-line);
+}
