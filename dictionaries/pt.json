@@ -760,6 +760,17 @@
       "signedBy": "Assinado por",
       "reason": "Motivo indicado",
       "open": "Abrir o orçamento na gestão"
+    },
+    "lowStock": {
+      "subject": "Stock baixo: {{count}} artigo(s) a encomendar",
+      "intro": "Estes artigos atingiram o nível de alerta esta manhã. A quantidade é uma sugestão (o dobro do nível, menos o stock): nada é encomendado automaticamente.",
+      "item": "Artigo",
+      "onHand": "Em stock",
+      "level": "Nível",
+      "supplier": "Fornecedor",
+      "suggest": "sugerido: {{what}}",
+      "open": "Abrir a lista a encomendar",
+      "units": "unidade(s)"
     }
   },
   "cookies": {
@@ -1254,7 +1265,7 @@
       "none": "Nada a encomendar.",
       "noSupplier": "Sem fornecedor conhecido",
       "stock": "Em stock {{onHand}} · nível {{level}}",
-      "bottle": "garrafa",
+      "units": "unidade(s)",
       "create": "Encomenda em rascunho",
       "creating": "A criar…",
       "error": "Não foi possível criar a encomenda."

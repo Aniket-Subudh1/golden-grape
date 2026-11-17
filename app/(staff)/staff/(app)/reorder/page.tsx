@@ -39,7 +39,7 @@ export default async function ReorderPage() {
                   </span>
                   <span className="shrink-0 text-right">
                     <strong className="tabular-nums">
-                      {r.suggested} × {r.offer?.unit?.label ?? t.reorder.bottle}
+                      {r.offer?.unit ? `${r.suggested} × ${r.offer.unit.label}` : `${r.suggested} ${t.reorder.units}`}
                     </strong>
                     {r.offer && <span className="block text-xs text-ink/55">{formatMoney(r.offer.costCents, locale)}</span>}
                   </span>

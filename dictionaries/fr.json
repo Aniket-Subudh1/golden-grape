@@ -760,6 +760,17 @@
       "signedBy": "Signé par",
       "reason": "Raison donnée",
       "open": "Ouvrir le devis dans l’espace gestion"
+    },
+    "lowStock": {
+      "subject": "Stock bas : {{count}} article(s) à recommander",
+      "intro": "Ces articles ont atteint leur seuil d’alerte ce matin. La quantité proposée est une suggestion (deux fois le seuil, moins le stock) : rien n’est commandé automatiquement.",
+      "item": "Article",
+      "onHand": "En stock",
+      "level": "Seuil",
+      "supplier": "Fournisseur",
+      "suggest": "suggéré : {{what}}",
+      "open": "Ouvrir la liste à recommander",
+      "units": "unité(s)"
     }
   },
   "cookies": {
@@ -1254,7 +1265,7 @@
       "none": "Rien à recommander.",
       "noSupplier": "Sans fournisseur connu",
       "stock": "En stock {{onHand}} · seuil {{level}}",
-      "bottle": "bouteille",
+      "units": "unité(s)",
       "create": "Commande brouillon",
       "creating": "Création…",
       "error": "La commande n’a pas pu être créée."

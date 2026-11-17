@@ -760,6 +760,17 @@
       "signedBy": "Signed by",
       "reason": "Reason given",
       "open": "Open the quotation in the back office"
+    },
+    "lowStock": {
+      "subject": "Low stock: {{count}} item(s) to reorder",
+      "intro": "These items reached their alert level this morning. The quantity shown is a suggestion (twice the level, minus the stock): nothing is ordered automatically.",
+      "item": "Item",
+      "onHand": "In stock",
+      "level": "Level",
+      "supplier": "Supplier",
+      "suggest": "suggested: {{what}}",
+      "open": "Open the reorder list",
+      "units": "unit(s)"
     }
   },
   "cookies": {
@@ -1254,7 +1265,7 @@
       "none": "Nothing to reorder.",
       "noSupplier": "No known supplier",
       "stock": "In stock {{onHand}} · level {{level}}",
-      "bottle": "bottle",
+      "units": "unit(s)",
       "create": "Draft order",
       "creating": "Creating…",
       "error": "The order could not be created."

@@ -760,6 +760,17 @@
       "signedBy": "Unterschrieben von",
       "reason": "Angegebener Grund",
       "open": "Angebot im Backoffice öffnen"
+    },
+    "lowStock": {
+      "subject": "Niedriger Bestand: {{count}} Artikel nachbestellen",
+      "intro": "Diese Artikel haben heute Morgen ihre Warnschwelle erreicht. Die Menge ist ein Vorschlag (doppelte Schwelle minus Bestand): nichts wird automatisch bestellt.",
+      "item": "Artikel",
+      "onHand": "Auf Lager",
+      "level": "Schwelle",
+      "supplier": "Lieferant",
+      "suggest": "Vorschlag: {{what}}",
+      "open": "Nachbestellliste öffnen",
+      "units": "Einheit(en)"
     }
   },
   "cookies": {
@@ -1254,7 +1265,7 @@
       "none": "Nichts nachzubestellen.",
       "noSupplier": "Kein Lieferant bekannt",
       "stock": "Auf Lager {{onHand}} · Schwelle {{level}}",
-      "bottle": "Flasche",
+      "units": "Einheit(en)",
       "create": "Bestellentwurf",
       "creating": "Wird angelegt…",
       "error": "Die Bestellung konnte nicht angelegt werden."
