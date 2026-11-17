@@ -1,22 +1,36 @@
 import { connection } from 'next/server';
-import { TabBar } from '@/components/staff/tab-bar';
+import { StaffNav, TabBar } from '@/components/staff/nav';
 import { getDictionary, type Locale } from '@/lib/i18n';
 import { currentStaff } from '@/modules/settings/service';
-import { SCREENS } from '../screens';
-import { tabsFor } from '../session';
+import { type Screen, SCREENS } from '../screens';
+import { navFor, tabsFor } from '../session';
 
 export const instant = false;
 
-/** Content above a bottom tab bar filtered by role and module. Each page checks access itself (session.ts). */
+/**
+ * The staff app's frame (owner decision, 17 Nov): phones get the bottom tab bar (at most five tabs), tablets an icon
+ * rail and laptops the back office's sidebar, both listing every screen the role and the modules allow. Each page
+ * checks access itself (session.ts).
+ */
 export default async function StaffAppLayout({ children }: LayoutProps<'/staff'>) {
   await connection();
   const user = await currentStaff();
-  const t = user ? (await getDictionary((user.locale ?? 'fr') as Locale)).staff : null;
-  const tabs = user && t ? (await tabsFor(user)).map((screen) => ({ screen, href: SCREENS[screen].href, label: t.tabs[screen as keyof typeof t.tabs] })) : [];
+  if (!user) return <>{children}</>;
+  const t = (await getDictionary((user.locale ?? 'fr') as Locale)).staff;
+  const label = (screen: Screen) => (screen in t.tabs ? t.tabs[screen as keyof typeof t.tabs] : screen);
+  const item = (screen: Screen) => ({ screen, href: SCREENS[screen].href, label: label(screen) });
+  const [tabs, nav] = await Promise.all([tabsFor(user), navFor(user)]);
   return (
-    <div className="mx-auto flex min-h-dvh max-w-md flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
-      {children}
-      {tabs.length > 0 && <TabBar tabs={tabs} />}
+    <div className="min-h-dvh md:flex">
+      <StaffNav
+        items={nav.map(item)}
+        user={{ name: user.name, email: user.email }}
+        t={{ app: t.login.app, menu: t.menu, signOut: t.signOut }}
+      />
+      <div className="flex min-w-0 flex-1 flex-col pb-[calc(4.25rem+env(safe-area-inset-bottom))] md:pb-0">
+        {children}
+      </div>
+      <TabBar tabs={tabs.map(item)} />
     </div>
   );
 }

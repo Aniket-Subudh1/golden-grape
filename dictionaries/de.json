@@ -1136,7 +1136,8 @@
       "orders": "Bestellungen",
       "receive": "Wareneingang",
       "count": "Inventur",
-      "customers": "Kunden"
+      "customers": "Kunden",
+      "reorder": "Nachbestellen"
     },
     "home": {
       "hello": "Hallo {{name}}",
@@ -1148,7 +1149,9 @@
       "lowStockHint": "Nachbestellen",
       "lowStockNone": "Nichts nachzubestellen",
       "deliveries": "Erwartete Lieferungen",
-      "deliveriesHint": "Heute oder überfällig"
+      "deliveriesHint": "Heute oder überfällig",
+      "subtitle": "Das wartet heute auf Sie.",
+      "quick": "Schnellzugriff"
     },
     "login": {
       "eyebrow": "Teambereich",
@@ -1345,6 +1348,7 @@
       "noReservations": "Keine kommenden Tische.",
       "details": "Details",
       "guests": "Pers."
-    }
+    },
+    "menu": "Menü"
   }
 }

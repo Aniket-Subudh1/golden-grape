@@ -4,7 +4,15 @@ import { Camera, ScanBarcode } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Sheet } from '@/components/ui/sheet';
 
-export type ScanTexts = { label: string; placeholder: string; camera: string; cameraTitle: string; cameraHint: string; cameraError: string; close: string };
+export type ScanTexts = {
+  label: string;
+  placeholder: string;
+  camera: string;
+  cameraTitle: string;
+  cameraHint: string;
+  cameraError: string;
+  close: string;
+};
 
 type Props = {
   /** A code from the scanner, the camera, or typed then Enter. */
@@ -41,11 +49,11 @@ export function ScanField({ onScan, t, busy = false }: Props) {
           void send(value);
         }}
       >
-        <label htmlFor="scan" className="eyebrow mb-1.5 block text-ink/60">
+        <label htmlFor="scan" className="eyebrow text-ink/60 mb-1.5 block">
           {t.label}
         </label>
-        <div className="flex h-12 items-center gap-2 rounded-xl border border-border bg-white/70 px-3 focus-within:border-gold-deep">
-          <ScanBarcode className="h-5 w-5 shrink-0 text-ink/40" />
+        <div className="gg-card focus-within:border-gold-deep flex h-12 items-center gap-2 px-3">
+          <ScanBarcode className="text-ink/40 h-5 w-5 shrink-0" />
           <input
             ref={input}
             id="scan"
@@ -56,7 +64,7 @@ export function ScanField({ onScan, t, busy = false }: Props) {
             enterKeyHint="search"
             disabled={busy}
             placeholder={t.placeholder}
-            className="h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-ink/35"
+            className="placeholder:text-ink/35 h-full min-w-0 flex-1 bg-transparent text-base outline-none"
           />
         </div>
       </form>
@@ -64,7 +72,7 @@ export function ScanField({ onScan, t, busy = false }: Props) {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={t.camera}
-        className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-ink text-bone transition active:scale-95"
+        className="bg-ink text-bone grid h-12 w-12 shrink-0 place-items-center rounded-xl transition active:scale-95"
       >
         <Camera className="h-5 w-5" />
       </button>
@@ -94,17 +102,29 @@ function CameraScanner({ t, onCode }: { t: ScanTexts; onCode: (code: string) => 
     const element = video.current;
     (async () => {
       try {
-        const [{ BrowserMultiFormatReader }, { BarcodeFormat, DecodeHintType }] = await Promise.all([import('@zxing/browser'), import('@zxing/library')]);
-        const hints = new Map([[DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.CODE_128]]]);
+        const [{ BrowserMultiFormatReader }, { BarcodeFormat, DecodeHintType }] = await Promise.all([
+          import('@zxing/browser'),
+          import('@zxing/library'),
+        ]);
+        const hints = new Map([
+          [
+            DecodeHintType.POSSIBLE_FORMATS,
+            [BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.CODE_128],
+          ],
+        ]);
         const reader = new BrowserMultiFormatReader(hints, { delayBetweenScanAttempts: 100 });
         if (stopped || !element) return;
-        controls = await reader.decodeFromConstraints({ video: { facingMode: { ideal: 'environment' } } }, element, (result, _error, ctl) => {
-          if (!result || stopped) return;
-          stopped = true;
-          ctl.stop();
-          navigator.vibrate?.(80);
-          onCode(result.getText());
-        });
+        controls = await reader.decodeFromConstraints(
+          { video: { facingMode: { ideal: 'environment' } } },
+          element,
+          (result, _error, ctl) => {
+            if (!result || stopped) return;
+            stopped = true;
+            ctl.stop();
+            navigator.vibrate?.(80);
+            onCode(result.getText());
+          },
+        );
         if (stopped) controls.stop();
       } catch {
         if (!stopped) setError(true);
@@ -125,10 +145,10 @@ function CameraScanner({ t, onCode }: { t: ScanTexts; onCode: (code: string) => 
   return (
     <div className="p-5 pt-6">
       <h2 className="mb-1 font-serif text-2xl">{t.cameraTitle}</h2>
-      <p className="mb-4 text-sm text-ink/60">{error ? t.cameraError : t.cameraHint}</p>
-      <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-ink">
+      <p className="text-ink/60 mb-4 text-sm">{error ? t.cameraError : t.cameraHint}</p>
+      <div className="bg-ink relative aspect-[3/4] overflow-hidden rounded-xl">
         <video ref={video} muted playsInline className="h-full w-full object-cover" />
-        <div className="pointer-events-none absolute inset-x-8 top-1/2 h-24 -translate-y-1/2 rounded-lg border-2 border-gold/80" />
+        <div className="border-gold/80 pointer-events-none absolute inset-x-8 top-1/2 h-24 -translate-y-1/2 rounded-lg border-2" />
       </div>
     </div>
   );

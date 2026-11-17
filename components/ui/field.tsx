@@ -20,7 +20,15 @@ const SIZES = {
  * `error`: a message decided in the browser (the checkout's missing fields); otherwise the ActionForm error for `name`.
  * `hint`: how to fill it in, between the label and the field (the delivery address, QA 12 Nov GG-16).
  */
-type Common = { label: string; name: string; size?: 'md' | 'lg'; look?: 'line' | 'box'; error?: string | false | null; hint?: string; trailing?: ReactNode };
+type Common = {
+  label: string;
+  name: string;
+  size?: 'md' | 'lg';
+  look?: 'line' | 'box';
+  error?: string | false | null;
+  hint?: string;
+  trailing?: ReactNode;
+};
 type Props =
   | (Common & { as?: 'input' } & Omit<ComponentProps<'input'>, 'size'>)
   | (Common & { as: 'textarea' } & ComponentProps<'textarea'>)
@@ -30,7 +38,18 @@ type Props =
  * Underline field (or `look="box"`) with its label and the ActionForm error for `name`. `trailing`: a button inside
  * the input's right edge (show password).
  */
-export function Field({ label, name, className, as = 'input', size = 'md', look = 'line', error: own, hint, trailing, ...props }: Props) {
+export function Field({
+  label,
+  name,
+  className,
+  as = 'input',
+  size = 'md',
+  look = 'line',
+  error: own,
+  hint,
+  trailing,
+  ...props
+}: Props) {
   const sz = SIZES[size];
   const base = look === 'box' ? boxed : control;
   const fromAction = useFieldError(name);
@@ -39,21 +58,32 @@ export function Field({ label, name, className, as = 'input', size = 'md', look 
   const shared = { name, id: name, 'aria-invalid': error ? true : undefined, 'aria-describedby': describedBy };
   return (
     <div className={className}>
-      <label htmlFor={name} className={cn(look === 'box' ? 'block text-sm font-medium text-ink/80' : 'eyebrow block text-ink/60', sz.label)}>
+      <label
+        htmlFor={name}
+        className={cn(look === 'box' ? 'text-ink/80 block text-sm font-medium' : 'eyebrow text-ink/60 block', sz.label)}
+      >
         {label}
       </label>
       {hint && (
-        <p id={`${name}-hint`} className="mb-1.5 text-xs text-ink/55">
+        <p id={`${name}-hint`} className="text-ink/55 mb-1.5 text-xs">
           {hint}
         </p>
       )}
       {as === 'textarea' ? (
-        <textarea {...shared} {...(props as ComponentProps<'textarea'>)} className={cn(base, sz.control, 'min-h-28 resize-none py-2')} />
+        <textarea
+          {...shared}
+          {...(props as ComponentProps<'textarea'>)}
+          className={cn(base, sz.control, 'min-h-28 resize-none py-2')}
+        />
       ) : as === 'select' ? (
         <select {...shared} {...(props as ComponentProps<'select'>)} className={cn(base, sz.control, sz.height)} />
       ) : trailing ? (
         <div className="relative">
-          <input {...shared} {...(props as ComponentProps<'input'>)} className={cn(base, sz.control, sz.height, 'pr-11')} />
+          <input
+            {...shared}
+            {...(props as ComponentProps<'input'>)}
+            className={cn(base, sz.control, sz.height, 'pr-11')}
+          />
           <span className="absolute inset-y-0 right-0 flex items-center pr-1">{trailing}</span>
         </div>
       ) : (

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { ReceiveScreen } from '@/components/staff/receive-screen';
-import { TopBar } from '@/components/staff/top-bar';
+import { StaffPage } from '@/components/staff/page';
 import { hasRole } from '@/lib/access';
 import { getPayloadClient } from '@/lib/payload';
 import { OPEN, orderToReceive } from '@/modules/purchasing/service';
@@ -17,11 +17,8 @@ export default async function ReceivePage({ params }: PageProps<'/staff/receive/
   if (!order) notFound();
   if (!OPEN.includes(order.status)) redirect('/staff/receive');
   return (
-    <>
-      <TopBar title={`${order.supplier} · ${order.number}`} back={{ href: '/staff/receive', label: t.back }} />
-      <main className="p-4">
-        <ReceiveScreen order={order} manager={hasRole(user, ['manager'])} t={{ ...t.receiveScreen, scan: t.scan }} />
-      </main>
-    </>
+    <StaffPage title={`${order.supplier} · ${order.number}`} back={{ href: '/staff/receive', label: t.back }}>
+      <ReceiveScreen order={order} manager={hasRole(user, ['manager'])} t={{ ...t.receiveScreen, scan: t.scan }} />
+    </StaffPage>
   );
 }

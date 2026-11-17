@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from 'next';
 import { connection } from 'next/server';
 import { Toaster } from '@/components/ui/sonner';
-import { sans, serif } from '../../fonts';
+import { sans } from '../../fonts';
 import '../../globals.css';
+import './staff.css';
 
-// The phone screens of the back office (05 §5): their own document, outside the website's layout. Per user and
+// The staff app (05 §5): its own document, outside the website's layout, in the back office's look (staff.css). Per user and
 // request-time, like the admin: every page checks the session with Payload before rendering (session.ts).
 export const instant = false;
 
@@ -16,13 +17,18 @@ export const metadata: Metadata = {
   icons: { apple: '/staff/icon-192.png' },
 };
 
-export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#f7f4ee' };
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#eaeef5',
+};
 
 export default async function StaffRootLayout({ children }: LayoutProps<'/staff'>) {
   await connection();
   return (
-    <html lang="fr" className={`${serif.variable} ${sans.variable}`}>
-      <body className="min-h-dvh bg-bone text-ink antialiased">
+    <html lang="fr" className={sans.variable}>
+      <body className="gg-staff bg-bone text-ink min-h-dvh antialiased">
         {children}
         <Toaster position="top-center" />
       </body>

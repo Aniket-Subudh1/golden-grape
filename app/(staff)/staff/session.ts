@@ -7,6 +7,8 @@ import { SCREENS, type Screen } from './screens';
 
 /** The order of the bottom tab bar: the first five a user may open (05 §5, at most 5 tabs). */
 const TABS: Screen[] = ['home', 'scan', 'sale', 'orders', 'receive', 'count', 'customers'];
+/** The order of the sidebar: everything a role opens, the reorder list included. */
+const NAV: Screen[] = ['home', 'scan', 'sale', 'orders', 'customers', 'receive', 'count', 'reorder'];
 
 type ScreenRule = { roles: readonly Role[]; module?: ModuleName };
 
@@ -28,9 +30,16 @@ export async function requireStaff(screen: Screen, path: string = SCREENS[screen
   return { user, locale, t: t.staff, dict: t };
 }
 
-/** The tabs this user sees, in order (at most five). */
+/** The phone's bottom tab bar: the first five of `TABS` this user may open (05 §5). */
 export async function tabsFor(user: { collection?: unknown; roles?: unknown }) {
   const allowed: Screen[] = [];
   for (const screen of TABS) if (await canOpen(user, screen)) allowed.push(screen);
   return allowed.slice(0, 5);
+}
+
+/** The sidebar and rail (tablets, laptops): every screen of `NAV` this user may open. */
+export async function navFor(user: { collection?: unknown; roles?: unknown }) {
+  const allowed: Screen[] = [];
+  for (const screen of NAV) if (await canOpen(user, screen)) allowed.push(screen);
+  return allowed;
 }

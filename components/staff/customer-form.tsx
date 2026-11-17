@@ -23,11 +23,37 @@ export type CustomerTexts = {
   saved: string;
 };
 
-export type PickedCustomer = { id: string; name: string; company: string | null; phone: string | null; email: string; type: 'private' | 'business' };
-type Initial = { id: string; name: string; phone: string; email: string; type: 'private' | 'business'; company: string; vatNumber: string; locale: string };
+export type PickedCustomer = {
+  id: string;
+  name: string;
+  company: string | null;
+  phone: string | null;
+  email: string;
+  type: 'private' | 'business';
+};
+type Initial = {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  type: 'private' | 'business';
+  company: string;
+  vatNumber: string;
+  locale: string;
+};
 
 /** Create a customer at the till, or edit one (M3.1 T5). Name and phone are enough; the e-mail is optional (A-16). */
-export function CustomerForm({ t, messages, initial, onDone }: { t: CustomerTexts; messages: { error: string; fields: Record<string, string> } & Record<string, unknown>; initial?: Initial; onDone: (customer: PickedCustomer | { id: string }) => void }) {
+export function CustomerForm({
+  t,
+  messages,
+  initial,
+  onDone,
+}: {
+  t: CustomerTexts;
+  messages: { error: string; fields: Record<string, string> } & Record<string, unknown>;
+  initial?: Initial;
+  onDone: (customer: PickedCustomer | { id: string }) => void;
+}) {
   const [type, setType] = useState<'private' | 'business'>(initial?.type ?? 'private');
   return (
     <ActionForm
@@ -38,15 +64,43 @@ export function CustomerForm({ t, messages, initial, onDone }: { t: CustomerText
       className="space-y-4"
     >
       {initial && <input type="hidden" name="id" value={initial.id} />}
-      <Field label={t.name} name="name" defaultValue={initial?.name} required autoComplete="off" />
-      <Field label={t.phone} name="phone" type="tel" inputMode="tel" defaultValue={initial?.phone} required autoComplete="off" />
-      <Field label={t.email} name="email" type="email" inputMode="email" hint={t.emailHint} defaultValue={initial?.email} autoComplete="off" />
+      <Field look="box" label={t.name} name="name" defaultValue={initial?.name} required autoComplete="off" />
+      <Field
+        look="box"
+        label={t.phone}
+        name="phone"
+        type="tel"
+        inputMode="tel"
+        defaultValue={initial?.phone}
+        required
+        autoComplete="off"
+      />
+      <Field
+        look="box"
+        label={t.email}
+        name="email"
+        type="email"
+        inputMode="email"
+        hint={t.emailHint}
+        defaultValue={initial?.email}
+        autoComplete="off"
+      />
       <fieldset>
-        <legend className="eyebrow mb-1.5 text-ink/60">{t.type}</legend>
+        <legend className="text-ink/80 mb-2 text-sm font-medium">{t.type}</legend>
         <div className="flex gap-2">
           {(['private', 'business'] as const).map((value) => (
-            <label key={value} className={`flex h-11 flex-1 cursor-pointer items-center justify-center rounded-full border text-[11px] tracking-[0.22em] uppercase ${type === value ? 'border-ink bg-ink text-bone' : 'border-border'}`}>
-              <input type="radio" name="type" value={value} checked={type === value} onChange={() => setType(value)} className="sr-only" />
+            <label
+              key={value}
+              className={`flex h-11 flex-1 cursor-pointer items-center justify-center rounded-lg border text-sm font-medium ${type === value ? 'border-ink bg-ink text-bone' : 'border-border bg-white'}`}
+            >
+              <input
+                type="radio"
+                name="type"
+                value={value}
+                checked={type === value}
+                onChange={() => setType(value)}
+                className="sr-only"
+              />
               {t[value]}
             </label>
           ))}
@@ -54,11 +108,17 @@ export function CustomerForm({ t, messages, initial, onDone }: { t: CustomerText
       </fieldset>
       {type === 'business' && (
         <>
-          <Field label={t.company} name="company" defaultValue={initial?.company} required />
-          <Field label={t.vatNumber} name="vatNumber" defaultValue={initial?.vatNumber} placeholder="LU12345678" />
+          <Field look="box" label={t.company} name="company" defaultValue={initial?.company} required />
+          <Field
+            look="box"
+            label={t.vatNumber}
+            name="vatNumber"
+            defaultValue={initial?.vatNumber}
+            placeholder="LU12345678"
+          />
         </>
       )}
-      <Field label={t.language} name="locale" as="select" defaultValue={initial?.locale ?? 'fr'}>
+      <Field look="box" label={t.language} name="locale" as="select" defaultValue={initial?.locale ?? 'fr'}>
         {LOCALES.map((l) => (
           <option key={l} value={l}>
             {LOCALE_NAMES[l]}

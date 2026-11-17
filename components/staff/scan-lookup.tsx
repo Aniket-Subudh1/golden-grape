@@ -8,7 +8,17 @@ import { lookupBarcode, type ScanCard, searchItems } from '@/modules/catalogue/a
 import { type CardTexts, ProductCard } from './product-card';
 import { ScanField, type ScanTexts } from './scan-field';
 
-type Texts = { scan: ScanTexts; card: CardTexts; notFound: string; createProduct: string; noResults: string; results: string; adjust: string; count: string; sell: string };
+type Texts = {
+  scan: ScanTexts;
+  card: CardTexts;
+  notFound: string;
+  createProduct: string;
+  noResults: string;
+  results: string;
+  adjust: string;
+  count: string;
+  sell: string;
+};
 type Can = { adjust: boolean; count: boolean; sell: boolean; create: boolean };
 
 /**
@@ -64,16 +74,20 @@ export function ScanLookup({ locale, t, can }: { locale: Locale; t: Texts; can: 
       )}
       {results && (
         <section>
-          <p className="eyebrow mb-2 text-ink/60">{t.results}</p>
+          <p className="eyebrow text-ink/60 mb-2">{t.results}</p>
           <ul className="space-y-2">
             {results.map((card) => (
               <li key={card.variant}>
-                <button type="button" onClick={() => (setFound({ card, unit: null }), setResults(null))} className="flex w-full items-center justify-between rounded-xl border border-border bg-white/70 px-4 py-3 text-left">
+                <button
+                  type="button"
+                  onClick={() => (setFound({ card, unit: null }), setResults(null))}
+                  className="gg-card flex w-full items-center justify-between px-4 py-3 text-left"
+                >
                   <span>
                     <span className="block">{card.name}</span>
-                    <span className="text-xs text-ink/55">{[card.label, card.sku].filter(Boolean).join(' · ')}</span>
+                    <span className="text-ink/55 text-xs">{[card.label, card.sku].filter(Boolean).join(' · ')}</span>
                   </span>
-                  {card.trackStock && <span className="tabular-nums text-ink/70">{card.onHand}</span>}
+                  {card.trackStock && <span className="text-ink/70 tabular-nums">{card.onHand}</span>}
                 </button>
               </li>
             ))}
@@ -84,7 +98,10 @@ export function ScanLookup({ locale, t, can }: { locale: Locale; t: Texts; can: 
         <div role="alert" className="rounded-xl border border-amber-300 bg-amber-50/70 p-4 text-sm">
           <p>{t.notFound.replace('{{code}}', missing)}</p>
           {can.create && (
-            <Link href="/admin/collections/products/create" className="eyebrow mt-3 inline-block text-gold-deep">
+            <Link
+              href="/admin/collections/products/create"
+              className="text-gold-deep mt-3 inline-block text-sm font-medium hover:underline"
+            >
               {t.createProduct}
             </Link>
           )}

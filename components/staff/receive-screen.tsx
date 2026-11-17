@@ -33,7 +33,18 @@ type Texts = {
   qty: string;
 };
 
-type Row = { key: string; variant: string; unit: string | null; name: string; unitLabel: string | null; ordered: number; received: number; now: number; reason: string; extra: boolean };
+type Row = {
+  key: string;
+  variant: string;
+  unit: string | null;
+  name: string;
+  unitLabel: string | null;
+  ordered: number;
+  received: number;
+  now: number;
+  reason: string;
+  extra: boolean;
+};
 
 const keyOf = (variant: string, unit: string | null) => `${variant}:${unit ?? ''}`;
 
@@ -43,11 +54,25 @@ const keyOf = (variant: string, unit: string | null) => `${variant}:${unit ?? ''
  * not on the order is added only for managers. Confirm sends everything in one receipt.
  */
 export function ReceiveScreen({ order, manager, t }: { order: OrderToReceive; manager: boolean; t: Texts }) {
-  const [rows, setRows] = useState<Row[]>(order.lines.map((l) => ({ key: keyOf(l.variant, l.unit), variant: l.variant, unit: l.unit, name: l.name, unitLabel: l.unitLabel, ordered: l.ordered, received: l.received, now: 0, reason: '', extra: false })));
+  const [rows, setRows] = useState<Row[]>(
+    order.lines.map((l) => ({
+      key: keyOf(l.variant, l.unit),
+      variant: l.variant,
+      unit: l.unit,
+      name: l.name,
+      unitLabel: l.unitLabel,
+      ordered: l.ordered,
+      received: l.received,
+      now: 0,
+      reason: '',
+      extra: false,
+    })),
+  );
   const [pending, start] = useTransition();
   const [done, setDone] = useState<{ status: string; number: string } | null>(null);
 
-  const bump = (key: string, by: number) => setRows((prev) => prev.map((r) => (r.key === key ? { ...r, now: Math.max(0, r.now + by) } : r)));
+  const bump = (key: string, by: number) =>
+    setRows((prev) => prev.map((r) => (r.key === key ? { ...r, now: Math.max(0, r.now + by) } : r)));
   const over = (r: Row) => !r.extra && r.received + r.now > r.ordered;
 
   const onScan = async (code: string) => {
@@ -58,7 +83,21 @@ export function ReceiveScreen({ order, manager, t }: { order: OrderToReceive; ma
     const unitLabel = hit.data.unit ? (hit.data.card.units.find((u) => u.id === hit.data.unit)?.label ?? null) : null;
     if (!rows.some((r) => r.key === key)) {
       if (!manager) return void toast.error(interpolate(t.notOnOrder, { name }));
-      setRows((prev) => [...prev, { key, variant: hit.data.card.variant, unit: hit.data.unit, name, unitLabel, ordered: 0, received: 0, now: 1, reason: '', extra: true }]);
+      setRows((prev) => [
+        ...prev,
+        {
+          key,
+          variant: hit.data.card.variant,
+          unit: hit.data.unit,
+          name,
+          unitLabel,
+          ordered: 0,
+          received: 0,
+          now: 1,
+          reason: '',
+          extra: true,
+        },
+      ]);
     } else bump(key, 1);
     navigator.vibrate?.(40);
     toast.success(interpolate(t.added, { name: unitLabel ? `${name} (${unitLabel})` : name }));
@@ -69,21 +108,29 @@ export function ReceiveScreen({ order, manager, t }: { order: OrderToReceive; ma
       const lines = rows.filter((r) => r.now > 0);
       if (lines.length === 0) return void toast.error(t.nothing);
       if (lines.some((r) => over(r) && r.reason.trim().length < 3)) return void toast.error(t.reasonNeeded);
-      const result = await receivePurchase(null, { order: order.id, lines: lines.map((r) => ({ variant: r.variant, unit: r.unit, unitQty: r.now, reason: over(r) ? r.reason.trim() : undefined })) });
+      const result = await receivePurchase(null, {
+        order: order.id,
+        lines: lines.map((r) => ({
+          variant: r.variant,
+          unit: r.unit,
+          unitQty: r.now,
+          reason: over(r) ? r.reason.trim() : undefined,
+        })),
+      });
       if (result.ok) setDone(result.data);
       else toast.error(result.message === 'overReceipt' ? t.reasonNeeded : t.error);
     });
 
   if (done) {
     return (
-      <div className="space-y-4 rounded-xl border border-border bg-white/70 p-5 text-center">
+      <div className="gg-card space-y-4 p-6 text-center">
         <h2 className="font-serif text-2xl">{t.doneTitle}</h2>
-        <p className="text-sm text-ink/70">{done.status === 'received' ? t.doneReceived : t.donePartly}</p>
+        <p className="text-ink/70 text-sm">{done.status === 'received' ? t.doneReceived : t.donePartly}</p>
         <ul className="text-left text-sm">
           {rows
             .filter((r) => r.now > 0)
             .map((r) => (
-              <li key={r.key} className="flex justify-between border-t border-border py-2">
+              <li key={r.key} className="border-border flex justify-between border-t py-2">
                 <span>{r.unitLabel ? `${r.name} (${r.unitLabel})` : r.name}</span>
                 <span className="tabular-nums">+{r.now}</span>
               </li>
@@ -99,17 +146,24 @@ export function ReceiveScreen({ order, manager, t }: { order: OrderToReceive; ma
   return (
     <div className="space-y-4">
       <ScanField onScan={onScan} t={t.scan} busy={pending} />
-      <ul className="divide-y divide-border rounded-xl border border-border bg-white/70">
+      <ul className="divide-border gg-card divide-y">
         {rows.map((r) => (
           <li key={r.key} className="space-y-2 px-3 py-3" data-line={r.key}>
             <div className="flex items-center gap-3">
               <div className="min-w-0 flex-1 text-sm">
                 <p>{r.unitLabel ? `${r.name} (${r.unitLabel})` : r.name}</p>
-                <p className="text-xs text-ink/55">
-                  {r.extra ? t.extra : `${interpolate(t.ordered, { n: r.ordered })} · ${interpolate(t.remaining, { n: Math.max(0, r.ordered - r.received) })}`}
+                <p className="text-ink/55 text-xs">
+                  {r.extra
+                    ? t.extra
+                    : `${interpolate(t.ordered, { n: r.ordered })} · ${interpolate(t.remaining, { n: Math.max(0, r.ordered - r.received) })}`}
                 </p>
               </div>
-              <button type="button" aria-label="−" onClick={() => bump(r.key, -1)} className="grid h-11 w-11 place-items-center rounded-full border border-border">
+              <button
+                type="button"
+                aria-label="−"
+                onClick={() => bump(r.key, -1)}
+                className="border-border grid h-11 w-11 place-items-center rounded-full border"
+              >
                 <Minus className="h-4 w-4" />
               </button>
               <input
@@ -120,9 +174,14 @@ export function ReceiveScreen({ order, manager, t }: { order: OrderToReceive; ma
                   const n = Number(e.target.value.replace(/\D/g, '')) || 0;
                   setRows((prev) => prev.map((x) => (x.key === r.key ? { ...x, now: n } : x)));
                 }}
-                className="h-11 w-14 rounded-lg border border-border bg-white text-center tabular-nums"
+                className="border-border h-11 w-14 rounded-lg border bg-white text-center tabular-nums"
               />
-              <button type="button" aria-label="+" onClick={() => bump(r.key, 1)} className="grid h-11 w-11 place-items-center rounded-full border border-border">
+              <button
+                type="button"
+                aria-label="+"
+                onClick={() => bump(r.key, 1)}
+                className="border-border grid h-11 w-11 place-items-center rounded-full border"
+              >
                 <Plus className="h-4 w-4" />
               </button>
             </div>
@@ -131,7 +190,9 @@ export function ReceiveScreen({ order, manager, t }: { order: OrderToReceive; ma
                 aria-label={`${t.reason} ${r.name}`}
                 placeholder={t.reason}
                 value={r.reason}
-                onChange={(e) => setRows((prev) => prev.map((x) => (x.key === r.key ? { ...x, reason: e.target.value } : x)))}
+                onChange={(e) =>
+                  setRows((prev) => prev.map((x) => (x.key === r.key ? { ...x, reason: e.target.value } : x)))
+                }
                 className="h-11 w-full rounded-lg border border-amber-300 bg-amber-50/70 px-3 text-sm"
               />
             )}

@@ -7,7 +7,15 @@ import { Button } from '@/components/ui/button';
 import { createDraftPurchase } from '@/modules/purchasing/actions';
 
 /** "Draft order" for one supplier's reorder rows at the suggested quantities; opens it in the admin to send. */
-export function DraftButton({ supplier, lines, t }: { supplier: string; lines: { variant: string; unit: string | null; unitQty: number }[]; t: { create: string; creating: string; error: string } }) {
+export function DraftButton({
+  supplier,
+  lines,
+  t,
+}: {
+  supplier: string;
+  lines: { variant: string; unit: string | null; unitQty: number }[];
+  t: { create: string; creating: string; error: string };
+}) {
   const router = useRouter();
   const [pending, start] = useTransition();
   return (

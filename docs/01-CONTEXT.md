@@ -109,6 +109,7 @@ If a dependency arrives late, the dependent date moves by the same number of day
 | D-07 | A card payment confirmed after stock ran out → order confirmed + staff alert, not failed (M4.1 T2) | — | Proposed |
 | D-08 | Document PDFs (quotations now, invoices later) are stored in MongoDB (`documentFiles.data`, base64, never returned by the API) and served only by `app/api/documents/[id]` to staff, the owning customer or a link token, until a private bucket exists (Q-09: the media bucket is shared and not private). | 11 Nov 2026 | Decided |
 | D-09 | Catering quotations (Q-12, change request approved by APPLUX on 11 Nov 2026 with a $50 bonus): built ahead of M3.2 as `modules/documents`, which M3.2's B2B quotations, invoices and PDFs extend. Simple electronic signature: typed full name + consent, with time, IP, browser and the SHA-256 of the sent PDF printed on the signed copy. No deposit. | 11 Nov 2026 | Decided |
+| D-12 | Staff app look and devices: the back office's design (not the website's) and responsive for phones, tablets and laptops (tab bar / rail / sidebar), instead of 05 §5's phone-only column in the website's palette | 17 Nov 2026 | Decided (owner) |
 
 ## 8. Traceability check
 

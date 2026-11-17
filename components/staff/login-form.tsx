@@ -11,7 +11,15 @@ import { staffSignInAction } from '@/modules/settings/actions';
 type Texts = { email: string; password: string; submit: string; pending: string; show: string; hide: string };
 
 /** Staff sign-in: on success, back to the screen that asked for it (`next`, always under /staff). */
-export function LoginForm({ next, t, messages }: { next: string; t: Texts; messages: { error: string; fields: Record<string, string> } & Record<string, unknown> }) {
+export function LoginForm({
+  next,
+  t,
+  messages,
+}: {
+  next: string;
+  t: Texts;
+  messages: { error: string; fields: Record<string, string> } & Record<string, unknown>;
+}) {
   const router = useRouter();
   const [shown, setShown] = useState(false);
   return (
@@ -24,7 +32,16 @@ export function LoginForm({ next, t, messages }: { next: string; t: Texts; messa
       }}
       className="space-y-5"
     >
-      <Field label={t.email} name="email" type="email" autoComplete="username" inputMode="email" required size="lg" look="box" />
+      <Field
+        label={t.email}
+        name="email"
+        type="email"
+        autoComplete="username"
+        inputMode="email"
+        required
+        size="lg"
+        look="box"
+      />
       <Field
         label={t.password}
         name="password"
@@ -34,12 +51,22 @@ export function LoginForm({ next, t, messages }: { next: string; t: Texts; messa
         size="lg"
         look="box"
         trailing={
-          <button type="button" onClick={() => setShown(!shown)} aria-label={shown ? t.hide : t.show} aria-pressed={shown} className="grid h-9 w-9 place-items-center rounded-md text-ink/55 hover:text-ink">
+          <button
+            type="button"
+            onClick={() => setShown(!shown)}
+            aria-label={shown ? t.hide : t.show}
+            aria-pressed={shown}
+            className="text-ink/55 hover:text-ink grid h-9 w-9 place-items-center rounded-md"
+          >
             {shown ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         }
       />
-      <SubmitButton label={t.submit} pendingLabel={t.pending} className="h-11 w-full rounded-md text-sm font-medium normal-case tracking-normal" />
+      <SubmitButton
+        label={t.submit}
+        pendingLabel={t.pending}
+        className="h-11 w-full rounded-md text-sm font-medium tracking-normal normal-case"
+      />
     </ActionForm>
   );
 }
@@ -84,15 +111,19 @@ export function LoginLanguage({ current, label }: { current: Locale; label: stri
         aria-expanded={open}
         title={label}
         onClick={() => setOpen(!open)}
-        className="inline-flex h-9 items-center gap-2 rounded-[10px] border border-ink/12 bg-white px-3 text-[13px] font-medium shadow-[0_1px_2px_rgb(26_28_32/0.04)] hover:bg-champagne/50"
+        className="border-ink/12 hover:bg-champagne/50 inline-flex h-9 items-center gap-2 rounded-[10px] border bg-white px-3 text-[13px] font-medium shadow-[0_1px_2px_rgb(26_28_32/0.04)]"
       >
-        <Globe className="h-[15px] w-[15px] text-ink/55" aria-hidden />
+        <Globe className="text-ink/55 h-[15px] w-[15px]" aria-hidden />
         {LOCALE_NAMES[current]}
-        <ChevronDown className="h-3 w-3 text-ink/55" aria-hidden />
+        <ChevronDown className="text-ink/55 h-3 w-3" aria-hidden />
       </button>
       {open && (
-        <div role="menu" aria-label={label} className="absolute right-0 top-[calc(100%+8px)] z-20 w-52 rounded-xl border border-ink/10 bg-white p-1.5 shadow-lg">
-          <p className="px-2.5 pb-1.5 pt-1 text-xs text-ink/55">{label}</p>
+        <div
+          role="menu"
+          aria-label={label}
+          className="border-ink/10 absolute top-[calc(100%+8px)] right-0 z-20 w-52 rounded-xl border bg-white p-1.5 shadow-lg"
+        >
+          <p className="text-ink/55 px-2.5 pt-1 pb-1.5 text-xs">{label}</p>
           {LOCALES.map((code) => (
             <button
               key={code}
@@ -101,10 +132,10 @@ export function LoginLanguage({ current, label }: { current: Locale; label: stri
               aria-checked={code === current}
               lang={code}
               onClick={() => pick(code)}
-              className="flex w-full items-center justify-between rounded-md px-2.5 py-2 text-left text-sm hover:bg-champagne/50"
+              className="hover:bg-champagne/50 flex w-full items-center justify-between rounded-md px-2.5 py-2 text-left text-sm"
             >
               {LOCALE_NAMES[code]}
-              {code === current && <Check className="h-4 w-4 text-gold-deep" aria-hidden />}
+              {code === current && <Check className="text-gold-deep h-4 w-4" aria-hidden />}
             </button>
           ))}
         </div>

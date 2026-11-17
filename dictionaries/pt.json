@@ -1136,7 +1136,8 @@
       "orders": "Encomendas",
       "receive": "Receção",
       "count": "Inventário",
-      "customers": "Clientes"
+      "customers": "Clientes",
+      "reorder": "Repor"
     },
     "home": {
       "hello": "Olá {{name}}",
@@ -1148,7 +1149,9 @@
       "lowStockHint": "A encomendar",
       "lowStockNone": "Nada a encomendar",
       "deliveries": "Entregas previstas",
-      "deliveriesHint": "Hoje ou em atraso"
+      "deliveriesHint": "Hoje ou em atraso",
+      "subtitle": "O que o espera hoje.",
+      "quick": "Ações rápidas"
     },
     "login": {
       "eyebrow": "Área da equipa",
@@ -1345,6 +1348,7 @@
       "noReservations": "Nenhuma mesa a seguir.",
       "details": "Detalhes",
       "guests": "pess."
-    }
+    },
+    "menu": "Menu"
   }
 }

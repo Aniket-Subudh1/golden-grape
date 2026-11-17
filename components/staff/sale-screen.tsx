@@ -53,7 +53,17 @@ type Texts = {
  * see the price `quote` gives that customer, then "Payé sur place" or "Facture plus tard". The order is placed by
  * the same service as the website's, on the mobile channel, and stock goes out at once.
  */
-export function SaleScreen({ locale, t, messages, initial }: { locale: Locale; t: Texts; messages: { error: string; fields: Record<string, string> } & Record<string, unknown>; initial: Line[] }) {
+export function SaleScreen({
+  locale,
+  t,
+  messages,
+  initial,
+}: {
+  locale: Locale;
+  t: Texts;
+  messages: { error: string; fields: Record<string, string> } & Record<string, unknown>;
+  initial: Line[];
+}) {
   const [customer, setCustomer] = useState<PickedCustomer | null>(null);
   const [creating, setCreating] = useState(false);
   const [lines, setLines] = useState<Line[]>(initial);
@@ -84,9 +94,12 @@ export function SaleScreen({ locale, t, messages, initial }: { locale: Locale; t
   const add = (variant: string, unit?: string) =>
     setLines((prev) => {
       const found = prev.find((l) => l.variant === variant && l.unit === unit);
-      return found ? prev.map((l) => (l === found ? { ...l, qty: l.qty + 1 } : l)) : [...prev, { variant, unit, qty: 1 }];
+      return found
+        ? prev.map((l) => (l === found ? { ...l, qty: l.qty + 1 } : l))
+        : [...prev, { variant, unit, qty: 1 }];
     });
-  const setQty = (i: number, qty: number) => setLines((prev) => (qty <= 0 ? prev.filter((_, j) => j !== i) : prev.map((l, j) => (j === i ? { ...l, qty } : l))));
+  const setQty = (i: number, qty: number) =>
+    setLines((prev) => (qty <= 0 ? prev.filter((_, j) => j !== i) : prev.map((l, j) => (j === i ? { ...l, qty } : l))));
 
   const onScan = async (code: string) => {
     setResults(null);
@@ -116,12 +129,12 @@ export function SaleScreen({ locale, t, messages, initial }: { locale: Locale; t
 
   if (done) {
     return (
-      <div className="space-y-4 rounded-xl border border-border bg-white/70 p-5 text-center" role="status">
+      <div className="gg-card mx-auto max-w-md space-y-4 p-6 text-center" role="status">
         <h2 className="font-serif text-2xl">{t.doneTitle}</h2>
         <p className="font-serif text-3xl" data-testid="order-number">
           {done.number}
         </p>
-        <p className="text-sm text-ink/70">{done.payment === 'onsite' ? t.donePaid : t.doneInvoice}</p>
+        <p className="text-ink/70 text-sm">{done.payment === 'onsite' ? t.donePaid : t.doneInvoice}</p>
         <Button
           type="button"
           className="w-full"
@@ -140,146 +153,198 @@ export function SaleScreen({ locale, t, messages, initial }: { locale: Locale; t
   }
 
   return (
-    <div className="space-y-6">
-      <section className="space-y-3">
-        <h2 className="eyebrow text-ink/60">{t.customer}</h2>
-        {customer ? (
-          <div className="flex items-center gap-3 rounded-xl border border-gold-deep/40 bg-white/70 px-4 py-3" data-testid="sale-customer">
-            <UserRound className="h-5 w-5 text-gold-deep" />
-            <span className="min-w-0 flex-1">
-              <span className="block">{customer.company || customer.name}</span>
-              <span className="text-xs text-ink/55">{[customer.company ? customer.name : null, customer.phone].filter(Boolean).join(' · ')}</span>
-            </span>
-            <button type="button" onClick={() => setCustomer(null)} className="eyebrow text-gold-deep">
-              {t.change}
-            </button>
-          </div>
-        ) : creating ? (
-          <div className="rounded-xl border border-border bg-white/70 p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="font-serif text-xl">{t.newCustomer}</h3>
-              <button type="button" aria-label={t.cancel} onClick={() => setCreating(false)} className="grid h-9 w-9 place-items-center rounded-full">
-                <X className="h-4 w-4" />
+    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-8">
+      <div className="space-y-6">
+        <section className="space-y-3">
+          <h2 className="eyebrow text-ink/60">{t.customer}</h2>
+          {customer ? (
+            <div
+              className="border-gold-deep/40 flex items-center gap-3 rounded-xl border bg-white px-4 py-3"
+              data-testid="sale-customer"
+            >
+              <UserRound className="text-gold-deep h-5 w-5" />
+              <span className="min-w-0 flex-1">
+                <span className="block">{customer.company || customer.name}</span>
+                <span className="text-ink/55 text-xs">
+                  {[customer.company ? customer.name : null, customer.phone].filter(Boolean).join(' · ')}
+                </span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setCustomer(null)}
+                className="text-gold-deep text-sm font-medium hover:underline"
+              >
+                {t.change}
               </button>
             </div>
-            <CustomerForm
-              t={t.form}
-              messages={messages}
-              onDone={(c) => {
-                setCustomer(c as PickedCustomer);
-                setCreating(false);
-              }}
-            />
-          </div>
-        ) : (
-          <>
-            <CustomerSearch
-              t={t.search}
-              render={(c) => (
-                <button type="button" onClick={() => setCustomer(c)} className="flex w-full items-center justify-between rounded-xl border border-border bg-white/70 px-4 py-3 text-left">
-                  <span>
-                    <span className="block">{c.company || c.name}</span>
-                    <span className="text-xs text-ink/55">{[c.company ? c.name : null, c.phone].filter(Boolean).join(' · ')}</span>
-                  </span>
+          ) : creating ? (
+            <div className="gg-card p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="font-serif text-xl">{t.newCustomer}</h3>
+                <button
+                  type="button"
+                  aria-label={t.cancel}
+                  onClick={() => setCreating(false)}
+                  className="grid h-9 w-9 place-items-center rounded-full"
+                >
+                  <X className="h-4 w-4" />
                 </button>
-              )}
-            />
-            <Button type="button" variant="outline" className="w-full" onClick={() => setCreating(true)}>
-              {t.newCustomer}
-            </Button>
-          </>
-        )}
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="eyebrow text-ink/60">{t.items}</h2>
-        <ScanField onScan={onScan} t={t.scan} busy={pending} />
-        {results && (
-          <ul className="space-y-2" aria-label={t.results}>
-            {results.map((card) => (
-              <li key={card.variant}>
-                <button type="button" onClick={() => (add(card.variant), setResults(null))} className="flex w-full items-center justify-between rounded-xl border border-border bg-white/70 px-4 py-3 text-left">
-                  <span>
-                    <span className="block">{card.name}</span>
-                    <span className="text-xs text-ink/55">{[card.label, card.sku].filter(Boolean).join(' · ')}</span>
-                  </span>
-                  <span className="tabular-nums text-ink/70">{formatMoney(card.priceCents, locale)}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-        {lines.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-ink/55">{t.noItems}</p>
-        ) : (
-          <ul className="divide-y divide-border rounded-xl border border-border bg-white/70">
-            {lines.map((line, i) => {
-              const q = quote?.lines.find((l) => l.variant === line.variant && (l.unit ?? undefined) === line.unit);
-              const name = q ? [q.name, q.detail].filter(Boolean).join(' · ') : '…';
-              return (
-                <li key={`${line.variant}:${line.unit ?? ''}`} className="flex items-center gap-2 px-3 py-2">
-                  <span className="min-w-0 flex-1 text-sm">
-                    <span className="block">{name}</span>
-                    {q && <span className="text-xs text-ink/55">{formatMoney(q.unitPriceCents, locale)}</span>}
-                  </span>
-                  <button type="button" aria-label={line.qty === 1 ? t.remove : '−'} onClick={() => setQty(i, line.qty - 1)} className="grid h-11 w-11 place-items-center rounded-full border border-border">
-                    {line.qty === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
-                  </button>
-                  <span className="w-7 text-center tabular-nums" aria-label={`${t.qty} ${name}`}>
-                    {line.qty}
-                  </span>
-                  <button type="button" aria-label="+" onClick={() => setQty(i, line.qty + 1)} className="grid h-11 w-11 place-items-center rounded-full border border-border">
-                    <Plus className="h-4 w-4" />
-                  </button>
-                  <span className="w-20 text-right text-sm tabular-nums">{q ? formatMoney(q.totalCents, locale) : ''}</span>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-        {quote && lines.length > 0 && (
-          <dl className="space-y-1 rounded-xl bg-champagne/60 px-4 py-3 text-sm">
-            {quote.vatBreakdown.map((v) => (
-              <div key={v.rateBp} className="flex justify-between text-ink/60">
-                <dt>{interpolate(t.vat, { rate: v.rateBp / 100 })}</dt>
-                <dd className="tabular-nums">{formatMoney(v.vatCents, locale)}</dd>
               </div>
-            ))}
-            <div className="flex justify-between font-serif text-2xl">
-              <dt>{t.total}</dt>
-              <dd className="tabular-nums" data-testid="sale-total">
-                {formatMoney(quote.totalCents, locale)}
-              </dd>
+              <CustomerForm
+                t={t.form}
+                messages={messages}
+                onDone={(c) => {
+                  setCustomer(c as PickedCustomer);
+                  setCreating(false);
+                }}
+              />
             </div>
-          </dl>
-        )}
-      </section>
+          ) : (
+            <>
+              <CustomerSearch
+                t={t.search}
+                render={(c) => (
+                  <button
+                    type="button"
+                    onClick={() => setCustomer(c)}
+                    className="gg-card flex w-full items-center justify-between px-4 py-3 text-left"
+                  >
+                    <span>
+                      <span className="block">{c.company || c.name}</span>
+                      <span className="text-ink/55 text-xs">
+                        {[c.company ? c.name : null, c.phone].filter(Boolean).join(' · ')}
+                      </span>
+                    </span>
+                  </button>
+                )}
+              />
+              <Button type="button" variant="outline" className="w-full" onClick={() => setCreating(true)}>
+                {t.newCustomer}
+              </Button>
+            </>
+          )}
+        </section>
 
-      <section className="space-y-3">
-        <h2 className="eyebrow text-ink/60">{t.pay}</h2>
-        <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={t.pay}>
-          {(['onsite', 'invoice'] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              role="radio"
-              aria-checked={payment === value}
-              onClick={() => setPayment(value)}
-              className={`rounded-xl border p-3 text-left transition ${payment === value ? 'border-ink bg-ink text-bone' : 'border-border bg-white/70'}`}
-            >
-              <span className="block text-sm">{t[value]}</span>
-              <span className={`text-xs ${payment === value ? 'text-bone/70' : 'text-ink/55'}`}>{t[`${value}Hint`]}</span>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] pt-2">
-        <Button type="button" onClick={place} disabled={pending || lines.length === 0 || !quote} className="w-full shadow-lg">
-          {pending ? t.placing : quote ? `${t.confirm} · ${formatMoney(quote.totalCents, locale)}` : t.confirm}
-        </Button>
-        {!customer && lines.length > 0 && <p className="mt-2 text-center text-xs text-ink/60">{t.needCustomer}</p>}
+        <section className="space-y-3">
+          <h2 className="eyebrow text-ink/60">{t.items}</h2>
+          <ScanField onScan={onScan} t={t.scan} busy={pending} />
+          {results && (
+            <ul className="space-y-2" aria-label={t.results}>
+              {results.map((card) => (
+                <li key={card.variant}>
+                  <button
+                    type="button"
+                    onClick={() => (add(card.variant), setResults(null))}
+                    className="gg-card flex w-full items-center justify-between px-4 py-3 text-left"
+                  >
+                    <span>
+                      <span className="block">{card.name}</span>
+                      <span className="text-ink/55 text-xs">{[card.label, card.sku].filter(Boolean).join(' · ')}</span>
+                    </span>
+                    <span className="text-ink/70 tabular-nums">{formatMoney(card.priceCents, locale)}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {lines.length === 0 ? (
+            <p className="border-border text-ink/55 rounded-xl border border-dashed p-6 text-center text-sm">
+              {t.noItems}
+            </p>
+          ) : (
+            <ul className="divide-border gg-card divide-y">
+              {lines.map((line, i) => {
+                const q = quote?.lines.find((l) => l.variant === line.variant && (l.unit ?? undefined) === line.unit);
+                const name = q ? [q.name, q.detail].filter(Boolean).join(' · ') : '…';
+                return (
+                  <li key={`${line.variant}:${line.unit ?? ''}`} className="flex items-center gap-2 px-3 py-2">
+                    <span className="min-w-0 flex-1 text-sm">
+                      <span className="block">{name}</span>
+                      {q && <span className="text-ink/55 text-xs">{formatMoney(q.unitPriceCents, locale)}</span>}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={line.qty === 1 ? t.remove : '−'}
+                      onClick={() => setQty(i, line.qty - 1)}
+                      className="border-border grid h-11 w-11 place-items-center rounded-full border"
+                    >
+                      {line.qty === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
+                    </button>
+                    <span className="w-7 text-center tabular-nums" aria-label={`${t.qty} ${name}`}>
+                      {line.qty}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label="+"
+                      onClick={() => setQty(i, line.qty + 1)}
+                      className="border-border grid h-11 w-11 place-items-center rounded-full border"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                    <span className="w-20 text-right text-sm tabular-nums">
+                      {q ? formatMoney(q.totalCents, locale) : ''}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
       </div>
+
+      <aside className="space-y-6 lg:sticky lg:top-6">
+        <section className="space-y-3">
+          {quote && lines.length > 0 && (
+            <dl className="gg-card space-y-1 px-4 py-3 text-sm">
+              {quote.vatBreakdown.map((v) => (
+                <div key={v.rateBp} className="text-ink/60 flex justify-between">
+                  <dt>{interpolate(t.vat, { rate: v.rateBp / 100 })}</dt>
+                  <dd className="tabular-nums">{formatMoney(v.vatCents, locale)}</dd>
+                </div>
+              ))}
+              <div className="flex justify-between font-serif text-2xl">
+                <dt>{t.total}</dt>
+                <dd className="tabular-nums" data-testid="sale-total">
+                  {formatMoney(quote.totalCents, locale)}
+                </dd>
+              </div>
+            </dl>
+          )}
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="eyebrow text-ink/60">{t.pay}</h2>
+          <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={t.pay}>
+            {(['onsite', 'invoice'] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                role="radio"
+                aria-checked={payment === value}
+                onClick={() => setPayment(value)}
+                className={`rounded-xl border p-3 text-left transition ${payment === value ? 'border-ink bg-ink text-bone' : 'border-border bg-white'}`}
+              >
+                <span className="block text-sm">{t[value]}</span>
+                <span className={`text-xs ${payment === value ? 'text-bone/70' : 'text-ink/55'}`}>
+                  {t[`${value}Hint`]}
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] pt-2 md:bottom-4 lg:static">
+          <Button
+            type="button"
+            onClick={place}
+            disabled={pending || lines.length === 0 || !quote}
+            className="w-full shadow-lg"
+          >
+            {pending ? t.placing : quote ? `${t.confirm} · ${formatMoney(quote.totalCents, locale)}` : t.confirm}
+          </Button>
+          {!customer && lines.length > 0 && <p className="text-ink/60 mt-2 text-center text-xs">{t.needCustomer}</p>}
+        </div>
+      </aside>
     </div>
   );
 }

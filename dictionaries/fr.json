@@ -1136,7 +1136,8 @@
       "orders": "Commandes",
       "receive": "Réception",
       "count": "Inventaire",
-      "customers": "Clients"
+      "customers": "Clients",
+      "reorder": "À recommander"
     },
     "home": {
       "hello": "Bonjour {{name}}",
@@ -1148,7 +1149,9 @@
       "lowStockHint": "À recommander",
       "lowStockNone": "Rien à recommander",
       "deliveries": "Livraisons attendues",
-      "deliveriesHint": "Aujourd’hui ou en retard"
+      "deliveriesHint": "Aujourd’hui ou en retard",
+      "subtitle": "Ce qui vous attend aujourd’hui.",
+      "quick": "Actions rapides"
     },
     "login": {
       "eyebrow": "Espace équipe",
@@ -1345,6 +1348,7 @@
       "noReservations": "Aucune table à venir.",
       "details": "Détails",
       "guests": "pers."
-    }
+    },
+    "menu": "Menu"
   }
 }

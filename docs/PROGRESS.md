@@ -75,6 +75,12 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-17 · Staff app redesign: the back office's look, phones, tablets and laptops (owner decision D-12)
+
+- **Why:** on a laptop or tablet the staff app was a phone column, and the website's serif and spaced capitals looked dated in a work tool. The owner chose the admin's design and a responsive app.
+- **Built:** `staff.css` re-points the shared tokens inside `.gg-staff` (canvas `#eaeef5`, white `gg-card`, ink/gold, Inter, sentence-case `Button` via `data-slot="button"`, 11 px labels). `StaffNav` (tablet rail, laptop sidebar with every allowed screen, the person, sign-out) and the phone `TabBar` in `components/staff/nav.tsx`; screen icons in `icons.ts`; `navFor` in `session.ts`. `StaffPage` frames every screen (replaces `TopBar`). Home: 4 metric tiles (admin anatomy, gold bar when something waits) + quick actions. Multi-column Stock, Sale (sticky summary), Orders (orders | tables, one solid move per card, status pills), Receive, Reorder, customer page. Boxed fields in the staff forms. Texts: `staff.tabs.reorder`, `staff.home.subtitle|quick`, `staff.menu` (4 dictionaries).
+- **Checked (production build, throwaway replica set):** the owner's 16-step plan as a walk-through on Pixel 7, iPad and 1440 px: 19/19 each (stock role menus and 404, scan, adjust −1, count 3, receive 2 × box12 = +24 then the rest, sale paid on site → Completed/Paid, invoice later → Confirmed, stock clamp, customer page, manager handover, draft order; no sideways scroll, no page error). Screens at 3 sizes: no sideways scroll. check 290, int 124, build, e2e 29 passed / 4 skipped, `rebuild-stock --check` 0 differences.
+
 ### 2026-11-17 · Staff sign-in in the back office's look (owner request)
 
 - `/staff/login` now matches `/admin/login`: "Golden Grape · Team app" lockup, "Sign in to the team app" with the account e-mail line, boxed e-mail and password fields with a show-password eye, an admin-style button, the address at the foot, and on screens ≥ 1024 px the rounded photo panel with two notes (scan, count, receive; sell at the counter). The language menu (top right) shares the admin's `payload-lng` cookie: English picked on one sign-in page shows on the other. `Field` gained `look="box"` and `trailing`. Texts in the 4 dictionaries (`staff.login.*`).

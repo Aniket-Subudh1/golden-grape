@@ -15,25 +15,35 @@ export function boxesHint(onHand: number, units: ScanCard['units'], template: st
 }
 
 /** A size as the staff screens show it (M3.1 T3): photo, name, stock in bottles with the box hint, prices, boxes. */
-export function ProductCard({ item, locale, t, children }: { item: ScanCard; locale: Locale; t: CardTexts; children?: ReactNode }) {
+export function ProductCard({
+  item,
+  locale,
+  t,
+  children,
+}: {
+  item: ScanCard;
+  locale: Locale;
+  t: CardTexts;
+  children?: ReactNode;
+}) {
   const hint = boxesHint(item.onHand, item.units, t.boxesHint);
   return (
-    <article className="overflow-hidden rounded-xl border border-border bg-white/70">
+    <article className="gg-card overflow-hidden">
       <div className="flex gap-4 p-4">
-        <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg bg-champagne">
+        <div className="bg-champagne relative h-20 w-16 shrink-0 overflow-hidden rounded-lg">
           {item.image && <Image src={item.image} alt={item.name} fill sizes="64px" className="object-cover" />}
         </div>
         <div className="min-w-0 flex-1">
           <h2 className="font-serif text-xl leading-tight">{item.name}</h2>
-          <p className="text-xs text-ink/55">{[item.label, item.sku].filter(Boolean).join(' · ')}</p>
+          <p className="text-ink/55 text-xs">{[item.label, item.sku].filter(Boolean).join(' · ')}</p>
           <p className="mt-2 text-sm">
             {item.trackStock ? (
               <>
-                <span className="eyebrow mr-2 text-ink/50">{t.onHand}</span>
+                <span className="eyebrow text-ink/50 mr-2">{t.onHand}</span>
                 <strong className={item.onHand <= 0 ? 'text-red-700' : undefined} data-testid="on-hand">
                   {item.onHand}
                 </strong>
-                {hint && <span className="ml-1 text-ink/55">{hint}</span>}
+                {hint && <span className="text-ink/55 ml-1">{hint}</span>}
               </>
             ) : (
               <span className="text-ink/55">{t.notTracked}</span>
@@ -41,7 +51,7 @@ export function ProductCard({ item, locale, t, children }: { item: ScanCard; loc
           </p>
         </div>
       </div>
-      <dl className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 border-t border-border px-4 py-3 text-sm">
+      <dl className="border-border grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 border-t px-4 py-3 text-sm">
         <dt className="text-ink/60">{item.label ?? t.price}</dt>
         <dd className="text-right tabular-nums">{formatMoney(item.priceCents, locale)}</dd>
         {item.units.map((u) => (
@@ -51,7 +61,7 @@ export function ProductCard({ item, locale, t, children }: { item: ScanCard; loc
           </div>
         ))}
       </dl>
-      {children && <div className="flex flex-wrap gap-2 border-t border-border p-3">{children}</div>}
+      {children && <div className="border-border flex flex-wrap gap-2 border-t p-3">{children}</div>}
     </article>
   );
 }

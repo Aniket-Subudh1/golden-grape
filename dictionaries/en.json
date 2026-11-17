@@ -1136,7 +1136,8 @@
       "orders": "Orders",
       "receive": "Receive",
       "count": "Count",
-      "customers": "Customers"
+      "customers": "Customers",
+      "reorder": "Reorder"
     },
     "home": {
       "hello": "Hello {{name}}",
@@ -1148,7 +1149,9 @@
       "lowStockHint": "To reorder",
       "lowStockNone": "Nothing to reorder",
       "deliveries": "Deliveries expected",
-      "deliveriesHint": "Today or late"
+      "deliveriesHint": "Today or late",
+      "subtitle": "Here is what needs you today.",
+      "quick": "Quick actions"
     },
     "login": {
       "eyebrow": "Team area",
@@ -1345,6 +1348,7 @@
       "noReservations": "No upcoming tables.",
       "details": "Details",
       "guests": "guests"
-    }
+    },
+    "menu": "Menu"
   }
 }
