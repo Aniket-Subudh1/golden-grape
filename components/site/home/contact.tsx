@@ -25,9 +25,9 @@ const link = 'transition hover:text-gold-deep';
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="grid gap-2 border-t border-ink/10 py-5 sm:grid-cols-[9rem_1fr] sm:gap-6">
-      <dt className="eyebrow pt-1 text-ink/45">{label}</dt>
-      <dd className="text-[17px] leading-relaxed font-light text-ink">{children}</dd>
+    <div className="border-ink/10 grid gap-2 border-t py-5 sm:grid-cols-[9rem_1fr] sm:gap-6">
+      <dt className="eyebrow text-ink/45 pt-1">{label}</dt>
+      <dd className="text-ink text-[17px] leading-relaxed font-light">{children}</dd>
     </div>
   );
 }
@@ -36,8 +36,9 @@ export function HomeContact({ t, labels, photo, city, address, phone, email, hou
   return (
     <section className="bg-bone text-ink">
       <div className="mx-auto grid max-w-[1400px] items-center gap-12 px-5 py-20 md:px-10 md:py-28 lg:grid-cols-12 lg:gap-16 lg:py-32">
-        <div className="group relative aspect-[4/3] overflow-hidden bg-champagne sm:aspect-[16/10] lg:col-span-6 lg:aspect-[4/5]">
-          {photo && (
+        {/* No photo chosen (Home page settings): no empty frame, the details stand alone. */}
+        {photo && (
+          <div className="group bg-champagne relative aspect-[4/3] overflow-hidden sm:aspect-[16/10] lg:col-span-6 lg:aspect-[4/5]">
             <Image
               src={photo.src}
               alt={photo.alt}
@@ -45,15 +46,15 @@ export function HomeContact({ t, labels, photo, city, address, phone, email, hou
               sizes="(min-width: 1024px) 45vw, 100vw"
               className="object-cover transition-transform duration-[1600ms] ease-out group-hover:scale-[1.03]"
             />
-          )}
-        </div>
-        <div className="lg:col-span-6 lg:pl-4">
+          </div>
+        )}
+        <div className={photo ? 'lg:col-span-6 lg:pl-4' : 'lg:col-span-8 lg:col-start-3'}>
           <span className="eyebrow">{t.eyebrow}</span>
           <h2 className="mt-5 font-serif text-[clamp(2.75rem,6vw,5rem)] leading-[0.95] font-light">
             {t.title}
-            <em className="block font-light text-gold-deep italic">{city}</em>
+            <em className="text-gold-deep block font-light italic">{city}</em>
           </h2>
-          <dl className="mt-10 border-b border-ink/10">
+          <dl className="border-ink/10 mt-10 border-b">
             <Row label={labels.address}>
               {address.map((line) => (
                 <span key={line} className="block">

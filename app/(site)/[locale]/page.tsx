@@ -43,7 +43,7 @@ async function ContactSection({ t, locale }: { t: Dictionary; locale: Locale }) 
       <HomeContact
         t={t.home.contact}
         labels={t.contactPage.info}
-        photo={mediaOf(photos?.contact)}
+        photo={mediaOf(photos?.contact) ?? mediaOf(photos?.interior)}
         city={b.city}
         address={[b.street, `L-${b.postalCode} ${b.city}${b.country ? `, ${b.country}` : ''}`]}
         phone={b.phone}
