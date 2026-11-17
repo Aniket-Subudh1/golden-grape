@@ -5,10 +5,15 @@ import { AppError } from './errors';
 // Spreadsheets in and out of the back office. Readers: the catalogue import, the stock count from a file, the POS
 // product import. Writers: the catalogue and stock-movement exports.
 
-/** A sheet as text. `rows[i]` is spreadsheet row `i + 2` (row 1 is the header), blank rows included. */
-export type Table = { headers: string[]; rows: Record<string, string>[] };
+/**
+ * A sheet as text. `rows[i]` is spreadsheet row `i + 2` (row 1 is the header), blank rows included. `overflow` lists the
+ * rows with more filled cells than headers: in a comma-separated file an unquoted "13,50" becomes two cells, and the
+ * reader would otherwise keep "13" without a word.
+ */
+export type Table = { headers: string[]; rows: Record<string, string>[]; overflow?: number[] };
 
-const cell = (v: unknown) => (v === null || v === undefined ? '' : v instanceof Date ? v.toISOString().slice(0, 10) : String(v)).trim();
+const cell = (v: unknown) =>
+  (v === null || v === undefined ? '' : v instanceof Date ? v.toISOString().slice(0, 10) : String(v)).trim();
 
 /** Excel's "CSV" in French or German Windows is often Windows-1252, not UTF-8. */
 function decode(data: Uint8Array) {
@@ -33,7 +38,10 @@ export async function readTable(data: Buffer, filename: string): Promise<Table> 
     const text = decode(data).replace(/^﻿/, '');
     // The delimiter is the header line's most frequent of ; , tab (Papa's guess fails on short files with blank lines).
     const head = text.split(/\r?\n/, 1)[0];
-    const delimiter = [';', '\t', ','].reduce((best, d) => (head.split(d).length > head.split(best).length ? d : best), ',');
+    const delimiter = [';', '\t', ','].reduce(
+      (best, d) => (head.split(d).length > head.split(best).length ? d : best),
+      ',',
+    );
     grid = Papa.parse<string[]>(text, { delimiter, skipEmptyLines: false }).data.map((row) => row.map(cell));
   } else {
     throw new AppError('VALIDATION', 'the file must be .xlsx or .csv');
@@ -41,11 +49,17 @@ export async function readTable(data: Buffer, filename: string): Promise<Table> 
   const [head = [], ...body] = grid;
   while (body.length && (body.at(-1) ?? []).every((v) => !v)) body.pop();
   const headers = head.map((h) => h.trim());
-  return { headers, rows: body.map((row) => Object.fromEntries(headers.map((h, i) => [h, row[i] ?? '']))) };
+  const overflow = body.flatMap((row, i) => (row.slice(headers.length).some((v) => v !== '') ? [i + 2] : []));
+  return { headers, rows: body.map((row) => Object.fromEntries(headers.map((h, i) => [h, row[i] ?? '']))), overflow };
 }
 
 /** A header compared loosely: no case, accents, spaces or punctuation ("Code-barre" = "code barre" = "codebarre"). */
-export const headerKey = (header: string) => header.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+export const headerKey = (header: string) =>
+  header
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
 
 /** CSV that Excel opens correctly in Luxembourg: UTF-8 BOM (accents), `;` between cells, CRLF line ends. */
 export const toCsv = (headers: string[], rows: (string | number | null | undefined)[][]) =>

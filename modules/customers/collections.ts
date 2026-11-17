@@ -16,15 +16,24 @@ export const customerGroups: CollectionConfig = {
     useAsTitle: 'name',
     hidden: hiddenUnless('sales'),
     description: l(
-      'Par exemple « Restaurants » ou « Entreprises ». Les prix par groupe arrivent avec les listes de prix.',
-      'For example “Restaurants” or “Companies”. Group prices come with price lists.',
-      'Zum Beispiel „Restaurants“ oder „Firmen“. Gruppenpreise kommen mit den Preislisten.',
-      'Por exemplo «Restaurantes» ou «Empresas». Os preços por grupo chegam com as listas de preços.',
+      'Par exemple « Restaurants » ou « Entreprises ». Un groupe peut avoir sa liste de prix.',
+      'For example “Restaurants” or “Companies”. A group can have its own price list.',
+      'Zum Beispiel „Restaurants“ oder „Firmen“. Eine Gruppe kann eine eigene Preisliste haben.',
+      'Por exemplo «Restaurantes» ou «Empresas». Um grupo pode ter a sua lista de preços.',
     ),
     components: addButton('customerGroups', l('Ajouter un groupe', 'Add a group', 'Gruppe hinzufügen', 'Adicionar um grupo')),
   },
   access: { read: isStaff(), create: isStaff('manager', 'sales'), update: isStaff('manager', 'sales'), delete: isStaff('manager') },
-  fields: [{ name: 'name', type: 'text', required: true, label: l('Nom', 'Name', 'Name', 'Nome') }],
+  fields: [
+    { name: 'name', type: 'text', required: true, label: l('Nom', 'Name', 'Name', 'Nome') },
+    {
+      name: 'priceList',
+      type: 'relationship',
+      relationTo: 'priceLists',
+      label: l('Liste de prix du groupe', 'Group price list', 'Preisliste der Gruppe', 'Lista de preços do grupo'),
+      admin: { description: l('Pour les membres sans liste à eux.', 'For members without a list of their own.', 'Für Mitglieder ohne eigene Liste.', 'Para membros sem lista própria.') },
+    },
+  ],
 };
 
 export const customers: CollectionConfig = {
@@ -157,9 +166,23 @@ export const customers: CollectionConfig = {
           fields: [
             { name: 'group', type: 'relationship', relationTo: 'customerGroups', label: l('Groupe', 'Group', 'Gruppe', 'Grupo'), access: { create: staffOnly, update: staffOnly }, admin: { width: '33%' } },
             {
+              name: 'priceList',
+              type: 'relationship',
+              relationTo: 'priceLists',
+              label: l('Liste de prix', 'Price list', 'Preisliste', 'Lista de preços'),
+              access: { create: staffOnly, update: staffOnly, read: staffOnly },
+              admin: { width: '33%' },
+            },
+            {
+              // Days from the invoice to its due date (M3.2 T5): an invoice's "due" date is its issue day plus these.
               name: 'paymentTerm',
-              type: 'text',
-              label: l('Conditions de paiement', 'Payment terms', 'Zahlungsbedingungen', 'Condições de pagamento'),
+              type: 'select',
+              defaultValue: '0',
+              options: [
+                { value: '0', label: l('À réception', 'On receipt', 'Bei Erhalt', 'À receção') },
+                ...['8', '15', '30', '45', '60'].map((d) => ({ value: d, label: l(`${d} jours`, `${d} days`, `${d} Tage`, `${d} dias`) })),
+              ],
+              label: l('Délai de paiement', 'Payment term', 'Zahlungsziel', 'Prazo de pagamento'),
               access: { create: staffOnly, update: staffOnly },
               admin: { width: '33%' },
             },

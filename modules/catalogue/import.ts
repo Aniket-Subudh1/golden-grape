@@ -122,6 +122,8 @@ export function parseCatalogue(table: Table): { rows: CatalogueRow[]; errors: Ro
   table.rows.forEach((raw, i) => {
     const row = i + 2;
     if (present.every((c) => !raw[c]?.trim())) return;
+    // An unquoted "24,50" in a comma-separated file shifts every cell after it: refuse the row, never import it shifted.
+    if (table.overflow?.includes(row)) return void errors.push({ row, column: '-', message: 'more cells than columns: quote any value with a comma ("24,50"), or separate the columns with ;' });
     const result = rowSchema.safeParse(Object.fromEntries(present.map((c) => [c, raw[c] ?? ''])));
     if (!result.success) {
       for (const issue of result.error.issues) errors.push({ row, column: String(issue.path[0] ?? '-'), message: issue.message });

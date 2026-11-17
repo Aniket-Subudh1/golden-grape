@@ -20,6 +20,7 @@ import { catalogueCollections } from '@/modules/catalogue/collections';
 import { customerGroups, customers } from '@/modules/customers/collections';
 import { cateringPackages, cateringRequests } from '@/modules/catering/collections';
 import { documentCollections } from '@/modules/documents/collections';
+import { promotionCollections } from '@/modules/promotions/collections';
 import { eventBookings, events } from '@/modules/events/collections';
 import { payments } from '@/modules/payments/collections';
 import { purchasingCollections } from '@/modules/purchasing/collections';
@@ -108,6 +109,7 @@ export default buildConfig({
     eventBookings,
     payments,
     ...documentCollections,
+    ...promotionCollections,
   ]
     .map(withAudit)
     .map(withListFields),

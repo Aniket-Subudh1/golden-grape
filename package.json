@@ -14,6 +14,8 @@
     "gate": "npm run check && npm run test:int && npm run build && npm run test:e2e",
     "seed": "node --import tsx --env-file-if-exists=.env scripts/seed.mts",
     "import:catalogue": "node --import tsx --env-file-if-exists=.env scripts/import-catalogue.mts",
+    "import:pricelist": "node --import tsx --env-file-if-exists=.env scripts/import-pricelist.mts",
+    "import:customers": "node --import tsx --env-file-if-exists=.env scripts/import-customers.mts",
     "import:pos": "node --import tsx --env-file-if-exists=.env scripts/import-pos-products.mts",
     "rebuild-stock": "node --import tsx --env-file-if-exists=.env scripts/rebuild-stock.mts",
     "migrate:2026-11": "node --import tsx --env-file-if-exists=.env scripts/migrate-2026-11.mts",

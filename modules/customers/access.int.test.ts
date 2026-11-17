@@ -42,19 +42,21 @@ describe('customer data is scoped to its owner (AC-M2.2-05)', () => {
     expect(stored.addresses).toHaveLength(1);
   });
 
-  it('a customer cannot set their own group, payment terms or loyalty points', async () => {
+  it('a customer cannot set their own group, price list, payment terms or loyalty points', async () => {
     const group = await payload.create({ collection: 'customerGroups', data: { name: 'Restaurants' }, overrideAccess: true });
+    const list = await payload.create({ collection: 'priceLists', data: { name: 'Pros', lines: [] }, overrideAccess: true });
     await payload.update({
       collection: 'customers',
       id: a.id,
-      data: { group: group.id, paymentTerm: 'net60', loyaltyBalance: 9999, name: 'Ana Silva' },
+      data: { group: group.id, priceList: list.id, paymentTerm: '60', loyaltyBalance: 9999, name: 'Ana Silva' },
       overrideAccess: false,
       user: a,
     });
     const stored = await payload.findByID({ collection: 'customers', id: a.id, depth: 0, overrideAccess: true });
     expect(stored).toMatchObject({ name: 'Ana Silva', loyaltyBalance: 0 });
     expect(stored.group ?? null).toBeNull();
-    expect(stored.paymentTerm ?? null).toBeNull();
+    expect(stored.priceList ?? null).toBeNull();
+    expect(stored.paymentTerm ?? '0').toBe('0');
   });
 
   it('nobody can create a customer through the API except staff (sign-up goes through the rate-limited action)', async () => {

@@ -16,7 +16,19 @@ type Key = keyof ReturnType<typeof adminText>['nav'];
 // icon items in everyday words, then account links. Only what the user's role may open is listed.
 // An item opens a collection or global (`slug`, listed when the role may see it) or one of our admin pages (`path`, listed
 // for `roles`).
-const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean; path?: string; roles?: Role[]; icon: string; query?: string; module?: ModuleName }[] }[] = [
+const GROUPS: {
+  label: Key;
+  items: {
+    label: Key;
+    slug: string;
+    global?: boolean;
+    path?: string;
+    roles?: Role[];
+    icon: string;
+    query?: string;
+    module?: ModuleName;
+  }[];
+}[] = [
   {
     label: 'website',
     items: [
@@ -41,13 +53,26 @@ const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean;
       { label: 'lowStock', slug: 'stockLevels', icon: 'lowStock', query: '?where[lowStock][equals]=true' },
       { label: 'stockCounts', slug: 'stockCounts', icon: 'counts' },
       { label: 'stockMovements', slug: 'stockMovements', icon: 'movements' },
-      { label: 'importExport', slug: 'importExport', path: '/admin/import-export', roles: ['manager', 'stock'], icon: 'importExport' },
+      {
+        label: 'importExport',
+        slug: 'importExport',
+        path: '/admin/import-export',
+        roles: ['manager', 'stock'],
+        icon: 'importExport',
+      },
     ],
   },
   {
     label: 'purchasing',
     items: [
-      { label: 'reorder', slug: 'reorder', path: '/admin/reorder', roles: ['manager', 'stock'], icon: 'lowStock', module: 'purchasing' },
+      {
+        label: 'reorder',
+        slug: 'reorder',
+        path: '/admin/reorder',
+        roles: ['manager', 'stock'],
+        icon: 'lowStock',
+        module: 'purchasing',
+      },
       { label: 'purchaseOrders', slug: 'purchaseOrders', icon: 'orders', module: 'purchasing' },
       { label: 'suppliers', slug: 'suppliers', icon: 'producers', module: 'purchasing' },
       { label: 'supplierProducts', slug: 'supplierProducts', icon: 'formats', module: 'purchasing' },
@@ -61,7 +86,21 @@ const GROUPS: { label: Key; items: { label: Key; slug: string; global?: boolean;
       { label: 'orders', slug: 'orders', icon: 'orders', query: '{orders}' },
       { label: 'reservations', slug: 'reservations', icon: 'reservations', query: '{reservations}' },
       // By event first (events-board.tsx); the list of one event's bookings opens from its card.
-      { label: 'eventBookings', slug: 'eventBookings', path: '/admin/event-bookings', roles: ['sales'], icon: 'bookings' },
+      {
+        label: 'eventBookings',
+        slug: 'eventBookings',
+        path: '/admin/event-bookings',
+        roles: ['sales'],
+        icon: 'bookings',
+      },
+    ],
+  },
+  {
+    label: 'pricing',
+    items: [
+      { label: 'priceLists', slug: 'priceLists', icon: 'formats', module: 'b2b' },
+      { label: 'promotions', slug: 'promotions', icon: 'lowStock', module: 'promotions' },
+      { label: 'discountCodes', slug: 'discountCodes', icon: 'quotations', module: 'promotions' },
     ],
   },
   {
@@ -100,8 +139,19 @@ export default async function AdminNav({ visibleEntities, i18n, payload, user }:
     items: g.items
       // A switched-off module's entries are not offered (R9).
       .filter((i) => !i.module || modules?.[i.module] === true)
-      .filter((i) => (i.path ? hasRole(user, i.roles ?? []) : ((i.global ? visibleEntities.globals : visibleEntities.collections) as string[]).includes(i.slug)))
-      .map((i) => ({ label: t.nav[i.label], icon: i.icon, slug: i.slug, href: i.path ?? `/admin/${i.global ? 'globals' : 'collections'}/${i.slug}${(i.query ?? '').replace('{reservations}', statusTabQuery(RESERVATION_TABS.find((tab) => tab.opens)!)).replace('{orders}', orderTabQuery(ORDER_TABS.find((tab) => tab.opens)!))}` })),
+      .filter((i) =>
+        i.path
+          ? hasRole(user, i.roles ?? [])
+          : ((i.global ? visibleEntities.globals : visibleEntities.collections) as string[]).includes(i.slug),
+      )
+      .map((i) => ({
+        label: t.nav[i.label],
+        icon: i.icon,
+        slug: i.slug,
+        href:
+          i.path ??
+          `/admin/${i.global ? 'globals' : 'collections'}/${i.slug}${(i.query ?? '').replace('{reservations}', statusTabQuery(RESERVATION_TABS.find((tab) => tab.opens)!)).replace('{orders}', orderTabQuery(ORDER_TABS.find((tab) => tab.opens)!))}`,
+      })),
   })).filter((g) => g.items.length > 0);
   return <NavClient groups={groups} alerts={alerts} text={{ ...t.nav, brandSub: t.brandSub }} />;
 }

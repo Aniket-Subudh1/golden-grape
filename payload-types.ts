@@ -99,6 +99,9 @@ export interface Config {
     payments: Payment;
     quotations: Quotation;
     documentFiles: DocumentFile;
+    priceLists: PriceList;
+    promotions: Promotion;
+    discountCodes: DiscountCode;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -150,6 +153,9 @@ export interface Config {
     payments: PaymentsSelect<false> | PaymentsSelect<true>;
     quotations: QuotationsSelect<false> | QuotationsSelect<true>;
     documentFiles: DocumentFilesSelect<false> | DocumentFilesSelect<true>;
+    priceLists: PriceListsSelect<false> | PriceListsSelect<true>;
+    promotions: PromotionsSelect<false> | PromotionsSelect<true>;
+    discountCodes: DiscountCodesSelect<false> | DiscountCodesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -1013,7 +1019,8 @@ export interface Customer {
       }[]
     | null;
   group?: (string | null) | CustomerGroup;
-  paymentTerm?: string | null;
+  priceList?: (string | null) | PriceList;
+  paymentTerm?: ('0' | '8' | '15' | '30' | '45' | '60') | null;
   loyaltyBalance?: number | null;
   quotations?: {
     docs?: (string | Quotation)[];
@@ -1041,7 +1048,7 @@ export interface Customer {
   collection: 'customers';
 }
 /**
- * For example “Restaurants” or “Companies”. Group prices come with price lists.
+ * For example “Restaurants” or “Companies”. A group can have its own price list.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "customerGroups".
@@ -1049,6 +1056,39 @@ export interface Customer {
 export interface CustomerGroup {
   id: string;
   name: string;
+  /**
+   * For members without a list of their own.
+   */
+  priceList?: (string | null) | PriceList;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * The negotiated prices of a business customer or a group, per bottle or per box. Link the list to the customer (or their group) on their page.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "priceLists".
+ */
+export interface PriceList {
+  id: string;
+  name: string;
+  /**
+   * Unticked: prices excl. VAT, VAT is added (usual for businesses).
+   */
+  pricesInclVat?: boolean | null;
+  validFrom?: string | null;
+  validTo?: string | null;
+  lines?:
+    | {
+        variant: string | Variant;
+        /**
+         * Empty: per bottle.
+         */
+        unit?: (string | null) | PackagingUnit;
+        priceCents: number;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1587,6 +1627,73 @@ export interface Payment {
   createdAt: string;
 }
 /**
+ * Automatic discounts on products, categories or brands. They do not add up: the best one applies. Business price-list prices are not discounted.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promotions".
+ */
+export interface Promotion {
+  id: string;
+  name: string;
+  active?: boolean | null;
+  type: 'percent' | 'fixed';
+  percentBp?: number | null;
+  amountCents?: number | null;
+  target: 'all' | 'products' | 'categories' | 'brands';
+  targets?:
+    | (
+        | {
+            relationTo: 'products';
+            value: string | Product;
+          }
+        | {
+            relationTo: 'categories';
+            value: string | Category;
+          }
+        | {
+            relationTo: 'brands';
+            value: string | Brand;
+          }
+      )[]
+    | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  channels: ('webshop' | 'mobile' | 'pos')[];
+  priority?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * A code the customer types in the cart or staff enter at the sale. It comes on top of a promotion.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "discountCodes".
+ */
+export interface DiscountCode {
+  id: string;
+  code: string;
+  active?: boolean | null;
+  type: 'percent' | 'fixed';
+  percentBp?: number | null;
+  amountCents?: number | null;
+  minOrderCents?: number | null;
+  /**
+   * Empty: no limit.
+   */
+  maxUses?: number | null;
+  maxUsesPerCustomer?: number | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  channels: ('webshop' | 'mobile' | 'pos')[];
+  uses?: number | null;
+  /**
+   * Empty: everyone.
+   */
+  customers?: (string | Customer)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -1733,6 +1840,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'documentFiles';
         value: string | DocumentFile;
+      } | null)
+    | ({
+        relationTo: 'priceLists';
+        value: string | PriceList;
+      } | null)
+    | ({
+        relationTo: 'promotions';
+        value: string | Promotion;
+      } | null)
+    | ({
+        relationTo: 'discountCodes';
+        value: string | DiscountCode;
       } | null);
   globalSlug?: string | null;
   user:
@@ -2308,6 +2427,7 @@ export interface CustomersSelect<T extends boolean = true> {
         id?: T;
       };
   group?: T;
+  priceList?: T;
   paymentTerm?: T;
   loyaltyBalance?: T;
   quotations?: T;
@@ -2335,6 +2455,7 @@ export interface CustomersSelect<T extends boolean = true> {
  */
 export interface CustomerGroupsSelect<T extends boolean = true> {
   name?: T;
+  priceList?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2676,6 +2797,66 @@ export interface DocumentFilesSelect<T extends boolean = true> {
   sizeBytes?: T;
   sha256?: T;
   data?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "priceLists_select".
+ */
+export interface PriceListsSelect<T extends boolean = true> {
+  name?: T;
+  pricesInclVat?: T;
+  validFrom?: T;
+  validTo?: T;
+  lines?:
+    | T
+    | {
+        variant?: T;
+        unit?: T;
+        priceCents?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promotions_select".
+ */
+export interface PromotionsSelect<T extends boolean = true> {
+  name?: T;
+  active?: T;
+  type?: T;
+  percentBp?: T;
+  amountCents?: T;
+  target?: T;
+  targets?: T;
+  startsAt?: T;
+  endsAt?: T;
+  channels?: T;
+  priority?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "discountCodes_select".
+ */
+export interface DiscountCodesSelect<T extends boolean = true> {
+  code?: T;
+  active?: T;
+  type?: T;
+  percentBp?: T;
+  amountCents?: T;
+  minOrderCents?: T;
+  maxUses?: T;
+  maxUsesPerCustomer?: T;
+  startsAt?: T;
+  endsAt?: T;
+  channels?: T;
+  uses?: T;
+  customers?: T;
   updatedAt?: T;
   createdAt?: T;
 }

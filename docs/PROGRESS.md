@@ -13,7 +13,7 @@ Update this file at the end of every task (`00-START-HERE.md` §2). The newest l
 | M2.2 | Shop, cart, accounts, SEO | P2 | Mon 9 Nov | Done (all 7 ACs pass; Rich Results Test and real e-mail delivery wait for staging/SMTP) | — |
 | M2.3 | Checkout, orders, reservations | P2 | Tue 10 Nov | Done (all 8 ACs pass; e-mails checked as logged sends, real delivery and the Mailpit step wait for SMTP; zones and slots are A-05 until DEP-06) | — |
 | M3.1 | Mobile back office + purchasing | P3 $250 | Thu 12 Nov | Done (17 Nov, local; 7 ACs pass in a browser on a production build; real phones, a Bluetooth scanner and real e-mail delivery are human checks) | — |
-| M3.2 | B2B, documents, pricing, loyalty, gift cards | P3 | Sat 14 Nov | Not started | — |
+| M3.2 | B2B, documents, pricing, loyalty, gift cards | P3 | Sat 14 Nov | In progress (17 Nov, local): T1 | — |
 | M3.3 | Reviews, attendance, dashboard, POS CSV | P3 | Sun 15 Nov | Not started (T4's sales totals built early, 9 Nov) | — |
 | M4.1 | wallee | P4 $300 | after authorisation | Not started | — |
 | M4.2 | CashMag + outbox | P4 | after DEP-11 | Not started | — |
@@ -74,6 +74,14 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 | A-15 | Until DEP-07: a catering menu line starts at the super-reduced rate (3 %, a meal served at the event), extra lines at the standard rate (17 %); staff choose the rate per line | Q-12 (11 Nov) | — |
 
 ## 4. Log
+
+### 2026-11-17 · M3.2 B2B, documents, pricing, loyalty, gift cards (in progress)
+
+Started at Aniket's go-ahead after M3.1 ("M3.1 OK"). Same rules as M3.1 (local commits, browser checks, one sub-milestone at a time). DEP-07 (accountant) and DEP-08 (the real B2B list) are not in: built on A-03, A-07 (DRAFT PDFs on staging), A-08 and sample data.
+
+- **T1 Price lists and B2B customers.** `priceLists` (`modules/promotions/collections.ts`): name, net or VAT-inclusive, valid from/to, lines `{ variant, unit?, priceCents }` (a box must belong to its size; a size or box once per list). `customers.priceList` and `customerGroups.priceList` (the group's list for members without their own); `customers.paymentTerm` is now days (`0` on receipt, 8, 15, 30, 45, 60) for invoice due dates. Imports: `npm run import:pricelist -- file "List name" [--incl-vat] [--dry-run]` (sku, unit_factor, price_eur; idempotent by name) and `npm run import:customers -- file` (company, vat, contact, email, phone, "street, postcode town", group, price_list, payment_term; idempotent by e-mail, groups created, lists must exist). Every row checked first, nothing written on one error. Admin: Prix et remises › Listes de prix (module B2B).
+- **Found while testing:** in a comma-separated file an unquoted "13,50" is two cells, and the reader kept "13": a price list would have charged 13,00 €. `readTable` now reports such rows (`overflow`), and the price-list, customer and catalogue imports refuse them with how to fix the file. Tests: `promotions/import.test.ts` (amounts, boxes, duplicates, the split comma); the customer access test covers the new fields.
+- **T2 collections** (logic in T4): `promotions` (percent or amount; all / products / categories / brands; dates; channels; priority; active) and `discountCodes` (upper-cased, unique; minimum; total and per-customer limits; `uses` written only by the server; dates; channels; optional customer list). Admin: Prix et remises (module Promotions).
 
 ### 2026-11-17 · Stock page reworked (owner request)
 
