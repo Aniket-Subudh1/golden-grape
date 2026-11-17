@@ -410,6 +410,29 @@ export const businessSettings: GlobalConfig = {
               fields: [{ name: 'validityMonths', type: 'number', defaultValue: 24, min: 1, label: l('Validité d’une carte (mois)', 'A card is valid for (months)', 'Gültigkeit einer Karte (Monate)', 'Validade de um cartão (meses)') }],
             },
             {
+              // Google reviews (M3.3 T1): which place, and where the review QR leads.
+              name: 'reviews',
+              type: 'group',
+              label: l('Avis Google', 'Google reviews', 'Google-Bewertungen', 'Avaliações Google'),
+              admin: { condition: (data) => data?.modules?.reviews === true },
+              fields: [
+                row(
+                  {
+                    name: 'placeId',
+                    type: 'text',
+                    label: l('Identifiant Google du lieu (Place ID)', 'Google Place ID', 'Google Place ID', 'Place ID do Google'),
+                    admin: { width: '50%', description: l('Trouvé avec l’outil « Place ID Finder » de Google.', 'Found with Google’s “Place ID Finder”.', 'Mit Googles „Place ID Finder“ zu finden.', 'Encontrado com o «Place ID Finder» do Google.') },
+                  },
+                  {
+                    name: 'reviewUrl',
+                    type: 'text',
+                    label: l('Lien « Laisser un avis » (facultatif)', '“Leave a review” link (optional)', 'Link „Bewertung schreiben“ (optional)', 'Ligação «Deixar uma avaliação» (opcional)'),
+                    admin: { width: '50%', description: l('Vide : le formulaire d’avis Google du lieu.', 'Empty: the place’s Google review form.', 'Leer: das Google-Bewertungsformular des Orts.', 'Vazio: o formulário de avaliação Google do local.') },
+                  },
+                ),
+              ],
+            },
+            {
               // The till's daily sales file (M3.3 T5): the column names of its export (A-10 until a real CashMag sample).
               name: 'pos',
               type: 'group',

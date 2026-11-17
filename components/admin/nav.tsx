@@ -37,6 +37,7 @@ const GROUPS: {
       { label: 'happyHour', slug: 'HappyHour', global: true, icon: 'happy' },
       { label: 'catering', slug: 'cateringPackages', icon: 'catering' },
       { label: 'photos', slug: 'media', icon: 'media' },
+      { label: 'googleReviews', slug: 'google-reviews', path: '/admin/reviews', roles: ['manager'], module: 'reviews', icon: 'star' },
       { label: 'house', slug: 'pages', icon: 'pages' },
       { label: 'legal', slug: 'legal', icon: 'legal' },
     ],

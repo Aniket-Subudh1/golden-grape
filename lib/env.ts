@@ -25,6 +25,9 @@ const schema = z.object({
   CRON_SECRET: z.string().min(24).optional(),
   // The venue's daily attendance QR (M3.3). Unset → a key derived from PAYLOAD_SECRET.
   ATTENDANCE_SECRET: z.string().min(24).optional(),
+  // Google reviews (M3.3 T1, DEP-09): the Places API (New) key, and the place when not set in Settings.
+  GOOGLE_PLACES_API_KEY: optional,
+  GOOGLE_PLACE_ID: optional,
 });
 
 type Env = z.infer<typeof schema>;

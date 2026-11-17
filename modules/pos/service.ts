@@ -205,7 +205,7 @@ function previewOf(doc: PosImport): ImportPreview {
     days: [...new Set(rows.map((r) => r.date))].sort(),
     ready: [...ready.values()],
     unmatched: [...unmatched.values()],
-    errors: (doc.errors ?? []) as RowError[],
+    errors: (doc.rowErrors ?? []) as RowError[],
     posted: posted.size,
   };
 }
@@ -226,7 +226,7 @@ export async function previewImport(payload: Payload, { data, filename, user }: 
   const stored = await matchRows(payload, rows, {});
   const doc = await payload.create({
     collection: 'posImports',
-    data: { filename, hash, status: 'preview', rows: stored as never, errors: errors as never, assignments: {}, postedLines: [], unmatched: stored.filter((r) => !r.match).length, user },
+    data: { filename, hash, status: 'preview', rows: stored as never, rowErrors: errors as never, assignments: {}, postedLines: [], unmatched: stored.filter((r) => !r.match).length, user },
     overrideAccess: true,
     depth: 0,
   });

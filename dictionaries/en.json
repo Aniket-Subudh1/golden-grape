@@ -141,25 +141,14 @@
     "eyebrow": "They talk about us",
     "titleA": "Hospitality,",
     "titleB": "above all.",
-    "reviewsSuffix": " · 214 reviews · ",
-    "readAll": "Read reviews",
-    "reviews": [
-      {
-        "name": "Camille D.",
-        "source": "Google",
-        "text": "A one-of-a-kind address. The wine, the charcuterie, Ivo's welcome — everything in its right place."
-      },
-      {
-        "name": "Marco L.",
-        "source": "Google",
-        "text": "Best Bifana in Luxembourg, hands down. And the Port is a lesson."
-      },
-      {
-        "name": "Ana P.",
-        "source": "Instagram",
-        "text": "Like coming home — but with better wine on the table."
-      }
-    ]
+    "readAll": "Read the reviews",
+    "count": "{{count}} reviews on Google Maps",
+    "leave": "Leave a review",
+    "visited": "Visited {{date}}",
+    "onMaps": "See on Google Maps",
+    "report": "Report",
+    "order": "The most relevant reviews, as Google Maps shows them. Source:",
+    "stars": "{{count}} stars out of 5"
   },
   "marquee": {
     "words": [

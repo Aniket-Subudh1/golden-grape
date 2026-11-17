@@ -8,4 +8,5 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 30 2 * * * root /usr/local/bin/gg-job quotations-expire >> /var/log/gg-jobs.log 2>&1
 0 7 * * * root /usr/local/bin/gg-job low-stock-digest >> /var/log/gg-jobs.log 2>&1
 45 2 * * * root /usr/local/bin/gg-job loyalty-expire >> /var/log/gg-jobs.log 2>&1
+15 6 * * * root /usr/local/bin/gg-job reviews-refresh >> /var/log/gg-jobs.log 2>&1
 * * * * * root /usr/local/bin/gg-job outbox-process >> /var/log/gg-outbox.log 2>&1

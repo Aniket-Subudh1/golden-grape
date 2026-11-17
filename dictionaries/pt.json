@@ -141,25 +141,14 @@
     "eyebrow": "Falam de nós",
     "titleA": "O acolhimento,",
     "titleB": "acima de tudo.",
-    "reviewsSuffix": " · 214 avaliações · ",
-    "readAll": "Ler avaliações",
-    "reviews": [
-      {
-        "name": "Camille D.",
-        "source": "Google",
-        "text": "Uma casa à parte. O vinho, a charcutaria, o acolhimento do Ivo — tudo no lugar certo."
-      },
-      {
-        "name": "Marco L.",
-        "source": "Google",
-        "text": "Melhor Bifana do Luxemburgo, sem discussão. E o Porto é uma lição."
-      },
-      {
-        "name": "Ana P.",
-        "source": "Instagram",
-        "text": "Como chegar a casa — mas com melhor vinho à mesa."
-      }
-    ]
+    "readAll": "Ler as avaliações",
+    "count": "{{count}} avaliações no Google Maps",
+    "leave": "Deixar uma avaliação",
+    "visited": "Visita: {{date}}",
+    "onMaps": "Ver no Google Maps",
+    "report": "Denunciar",
+    "order": "As avaliações mais relevantes, como o Google Maps as apresenta. Fonte:",
+    "stars": "{{count}} estrelas em 5"
   },
   "marquee": {
     "words": [

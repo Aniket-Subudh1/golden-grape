@@ -197,6 +197,7 @@ export interface Config {
     Header: Header;
     Footer: Footer;
     HappyHour: HappyHour;
+    ReviewsCache: ReviewsCache;
   };
   globalsSelect: {
     BusinessSettings: BusinessSettingsSelect<false> | BusinessSettingsSelect<true>;
@@ -204,6 +205,7 @@ export interface Config {
     Header: HeaderSelect<false> | HeaderSelect<true>;
     Footer: FooterSelect<false> | FooterSelect<true>;
     HappyHour: HappyHourSelect<false> | HappyHourSelect<true>;
+    ReviewsCache: ReviewsCacheSelect<false> | ReviewsCacheSelect<true>;
   };
   locale: 'fr' | 'en' | 'de' | 'pt';
   widgets: {
@@ -2038,7 +2040,7 @@ export interface PosImport {
     | number
     | boolean
     | null;
-  errors?:
+  rowErrors?:
     | {
         [k: string]: unknown;
       }
@@ -3619,7 +3621,7 @@ export interface PosImportsSelect<T extends boolean = true> {
   matched?: T;
   unmatched?: T;
   rows?: T;
-  errors?: T;
+  rowErrors?: T;
   assignments?: T;
   postedLines?: T;
   confirms?: T;
@@ -4004,6 +4006,16 @@ export interface BusinessSetting {
   giftCards?: {
     validityMonths?: number | null;
   };
+  reviews?: {
+    /**
+     * Found with Google’s “Place ID Finder”.
+     */
+    placeId?: string | null;
+    /**
+     * Empty: the place’s Google review form.
+     */
+    reviewUrl?: string | null;
+  };
   /**
    * The name of each column in the till’s daily export. Case, accents and spaces do not matter.
    */
@@ -4350,6 +4362,32 @@ export interface HappyHour {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ReviewsCache".
+ */
+export interface ReviewsCache {
+  id: string;
+  rating?: number | null;
+  total?: number | null;
+  reviews?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  mapsUri?: string | null;
+  writeReviewUri?: string | null;
+  attributionHtml?: string | null;
+  fetchedAt?: string | null;
+  lastError?: string | null;
+  lastErrorAt?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "BusinessSettings_select".
  */
 export interface BusinessSettingsSelect<T extends boolean = true> {
@@ -4432,6 +4470,12 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
     | T
     | {
         validityMonths?: T;
+      };
+  reviews?:
+    | T
+    | {
+        placeId?: T;
+        reviewUrl?: T;
       };
   pos?:
     | T
@@ -4563,6 +4607,24 @@ export interface HappyHourSelect<T extends boolean = true> {
   titleB?: T;
   text?: T;
   image?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ReviewsCache_select".
+ */
+export interface ReviewsCacheSelect<T extends boolean = true> {
+  rating?: T;
+  total?: T;
+  reviews?: T;
+  mapsUri?: T;
+  writeReviewUri?: T;
+  attributionHtml?: T;
+  fetchedAt?: T;
+  lastError?: T;
+  lastErrorAt?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

@@ -8,7 +8,9 @@ import { Hero } from '@/components/site/home/hero';
 import { Hospitality } from '@/components/site/home/hospitality';
 import { Marquee } from '@/components/site/home/marquee';
 import { Store } from '@/components/site/home/store';
+import { Reviews } from '@/components/site/home/reviews';
 import { SocialBand } from '@/components/site/home/social-band';
+import { siteReviews } from '@/modules/reviews/service';
 import { Story } from '@/components/site/home/story';
 import { Universes } from '@/components/site/home/universes';
 import { JsonLd } from '@/components/site/json-ld';
@@ -103,14 +105,17 @@ async function BusinessJsonLd({ locale }: { locale: Locale }) {
   return settings.business?.street ? <JsonLd data={localBusinessJsonLd(settings, localePath(locale))} /> : null;
 }
 
-async function SocialSection({ t }: { t: Dictionary['socialProof'] }) {
-  const { business: b } = await getSettings();
-  if (!b?.street) return null;
-  return <SocialBand t={t} instagram={b.instagram} facebook={b.facebook} googleHref={directionsUrl(b)} />;
+// "Ils parlent de nous": the Google Maps rating and reviews (M3.3 T1) when the module is on and fresh ones exist, then
+// the links. The prototype's hard-coded reviews were never shown.
+async function SocialSection({ t, locale }: { t: Dictionary['socialProof']; locale: Locale }) {
+  const [{ business: b }, reviews] = await Promise.all([getSettings(), siteReviews()]);
+  return (
+    <>
+      {reviews && <Reviews t={t} locale={locale} {...reviews} leaveHref={localePath(locale, '/r')} />}
+      {b?.street && <SocialBand t={t} instagram={b.instagram} facebook={b.facebook} googleHref={reviews?.mapsUri ?? directionsUrl(b)} />}
+    </>
+  );
 }
-
-// The social-proof section's reviews are not rendered: its reviews were hard-coded in the prototype and could not be
-// verified. Real Google reviews arrive with M3.3.
 export default async function HomePage({ params }: PageProps<'/[locale]'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
@@ -144,7 +149,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
       <Story t={t.story} />
       <Events t={t.eventsHome} calendarHref={localePath(locale, '/events')} reserveHref={localePath(locale, '/events')} />
       <Suspense fallback={null}>
-        <SocialSection t={t.socialProof} />
+        <SocialSection t={t.socialProof} locale={locale} />
       </Suspense>
     </>
   );

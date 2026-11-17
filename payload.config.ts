@@ -21,6 +21,7 @@ import { customerGroups, customers } from '@/modules/customers/collections';
 import { cateringPackages, cateringRequests } from '@/modules/catering/collections';
 import { attendanceCollections } from '@/modules/attendance/collections';
 import { posCollections } from '@/modules/pos/collections';
+import { reviewsCache } from '@/modules/reviews/globals';
 import { documentCollections } from '@/modules/documents/collections';
 import { promotionCollections } from '@/modules/promotions/collections';
 import { eventBookings, events } from '@/modules/events/collections';
@@ -97,6 +98,8 @@ export default buildConfig({
         attendanceReport: { Component: '@/modules/attendance/admin/report-view', path: '/attendance-report' },
         // Sales by day, channel, customer, product, producer or category, with CSV (M3.3 T4).
         sales: { Component: '@/modules/reporting/admin/sales-view', path: '/sales' },
+        // Rating, the latest reviews, refresh, the review QR (M3.3 T1).
+        reviews: { Component: '@/modules/reviews/admin/reviews-view', path: '/reviews' },
       },
     },
   },
@@ -121,7 +124,7 @@ export default buildConfig({
   ]
     .map(withAudit)
     .map(withListFields),
-  globals: [businessSettings, ...cmsGlobals].map(withGlobalAudit),
+  globals: [businessSettings, ...cmsGlobals, reviewsCache].map(withGlobalAudit),
   db: mongooseAdapter({
     url: isBuildPhase ? false : env.DATABASE_URL,
     transactionOptions: {},

@@ -45,7 +45,7 @@ export const posImports: CollectionConfig = {
     { name: 'matched', type: 'number', defaultValue: 0, label: l('Lignes importées', 'Lines imported', 'Importierte Zeilen', 'Linhas importadas') },
     { name: 'unmatched', type: 'number', defaultValue: 0, label: l('Lignes sans article', 'Lines without item', 'Zeilen ohne Artikel', 'Linhas sem artigo') },
     { name: 'rows', type: 'json', admin: { hidden: true } },
-    { name: 'errors', type: 'json', admin: { hidden: true } },
+    { name: 'rowErrors', type: 'json', admin: { hidden: true } },
     { name: 'assignments', type: 'json', admin: { hidden: true } },
     { name: 'postedLines', type: 'json', admin: { hidden: true } },
     { name: 'confirms', type: 'number', defaultValue: 0, admin: { hidden: true } },

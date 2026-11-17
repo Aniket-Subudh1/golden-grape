@@ -3,6 +3,7 @@
 import { useNav, usePreferences } from '@payloadcms/ui';
 import {
   ChartColumn,
+  Star,
   ArrowLeftRight,
   CalendarCheck,
   Clock,
@@ -87,6 +88,7 @@ const ICONS = {
   importExport: FileSpreadsheet,
   groups: Contact,
   chart: ChartColumn,
+  star: Star,
 };
 
 function Item({ item, active, external, count }: { item: NavItem; active: boolean; external?: boolean; count?: number }) {

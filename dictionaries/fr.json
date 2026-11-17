@@ -141,25 +141,14 @@
     "eyebrow": "Ils en parlent",
     "titleA": "L'accueil,",
     "titleB": "avant tout.",
-    "reviewsSuffix": " · 214 avis · ",
     "readAll": "Lire les avis",
-    "reviews": [
-      {
-        "name": "Camille D.",
-        "source": "Google",
-        "text": "Une adresse à part. Le vin, la charcuterie, l'accueil d'Ivo — tout est à sa juste place."
-      },
-      {
-        "name": "Marco L.",
-        "source": "Google",
-        "text": "Meilleure Bifana de Luxembourg, sans discussion. Et le Porto est une leçon."
-      },
-      {
-        "name": "Ana P.",
-        "source": "Instagram",
-        "text": "Comme rentrer chez soi — mais avec un meilleur vin à table."
-      }
-    ]
+    "count": "{{count}} avis sur Google Maps",
+    "leave": "Laisser un avis",
+    "visited": "Visite : {{date}}",
+    "onMaps": "Voir sur Google Maps",
+    "report": "Signaler",
+    "order": "Les avis les plus pertinents, tels que Google Maps les présente. Source :",
+    "stars": "{{count}} étoiles sur 5"
   },
   "marquee": {
     "words": [
