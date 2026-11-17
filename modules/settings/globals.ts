@@ -1,6 +1,6 @@
 import type { PayloadRequest, Field, GlobalConfig } from 'payload';
 import { hiddenUnless, isStaff } from '@/lib/access';
-import { type Label, l, say, timeOfDay, WEEKDAYS } from '@/lib/admin';
+import { type Label, l, say, scaledNumber, timeOfDay, WEEKDAYS } from '@/lib/admin';
 import { isBic, isIban, withOneDefault } from './iban';
 import { revalidateTagHook } from '@/lib/revalidate';
 
@@ -333,6 +333,45 @@ export const businessSettings: GlobalConfig = {
                 ),
                 { name: 'outboxAlertEmail', type: 'email', admin: later },
               ],
+            },
+            {
+              // Loyalty points (M3.2 T3): earned when an order is completed (A-08), spent like money, expired oldest first.
+              name: 'loyalty',
+              type: 'group',
+              label: l('Fidélité', 'Loyalty', 'Treueprogramm', 'Fidelização'),
+              admin: { condition: (data) => data?.modules?.loyalty === true },
+              fields: [
+                row(
+                  { name: 'pointsPerEuro', type: 'number', defaultValue: 1, min: 0, label: l('Points par euro dépensé', 'Points per euro spent', 'Punkte pro ausgegebenem Euro', 'Pontos por euro gasto'), admin: { width: '33%' } },
+                  {
+                    name: 'pointValueCents',
+                    type: 'number',
+                    defaultValue: 5,
+                    min: 1,
+                    label: l('Valeur d’un point', 'Value of a point', 'Wert eines Punktes', 'Valor de um ponto'),
+                    admin: { width: '33%', components: scaledNumber('€') },
+                  },
+                  { name: 'expiryMonths', type: 'number', defaultValue: 24, min: 1, label: l('Validité (mois)', 'Valid for (months)', 'Gültig (Monate)', 'Validade (meses)'), admin: { width: '33%' } },
+                ),
+                {
+                  name: 'eligibleChannels',
+                  type: 'select',
+                  hasMany: true,
+                  defaultValue: ['webshop', 'mobile'],
+                  options: [
+                    { value: 'webshop', label: l('Site', 'Website', 'Website', 'Site') },
+                    { value: 'mobile', label: l('Vente équipe', 'Staff sale', 'Teamverkauf', 'Venda equipa') },
+                  ],
+                  label: l('Où l’on gagne des points', 'Where points are earned', 'Wo Punkte gesammelt werden', 'Onde se ganham pontos'),
+                },
+              ],
+            },
+            {
+              name: 'giftCards',
+              type: 'group',
+              label: l('Cartes cadeaux', 'Gift cards', 'Geschenkkarten', 'Cartões-presente'),
+              admin: { condition: (data) => data?.modules?.giftCards === true },
+              fields: [{ name: 'validityMonths', type: 'number', defaultValue: 24, min: 1, label: l('Validité d’une carte (mois)', 'A card is valid for (months)', 'Gültigkeit einer Karte (Monate)', 'Validade de um cartão (meses)') }],
             },
           ],
         },

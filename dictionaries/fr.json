@@ -771,6 +771,13 @@
       "suggest": "suggéré : {{what}}",
       "open": "Ouvrir la liste à recommander",
       "units": "unité(s)"
+    },
+    "giftCard": {
+      "subject": "Votre carte cadeau Golden Grape de {{amount}}",
+      "intro": "Merci pour votre achat. Voici votre carte cadeau de {{amount}}, valable jusqu’au {{date}}.",
+      "code": "Code de la carte",
+      "how": "Utilisez-la sur goldengrape.lu (champ « Carte cadeau » du panier) ou en boutique : montrez ce QR code ou dictez le code. Elle peut servir en plusieurs fois.",
+      "balance": "Pour connaître le solde, entrez le code dans votre espace client."
     }
   },
   "cookies": {

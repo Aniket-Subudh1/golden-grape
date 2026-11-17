@@ -771,6 +771,13 @@
       "suggest": "Vorschlag: {{what}}",
       "open": "Nachbestellliste öffnen",
       "units": "Einheit(en)"
+    },
+    "giftCard": {
+      "subject": "Ihre Golden-Grape-Geschenkkarte über {{amount}}",
+      "intro": "Vielen Dank für Ihren Einkauf. Hier ist Ihre Geschenkkarte über {{amount}}, gültig bis {{date}}.",
+      "code": "Kartencode",
+      "how": "Lösen Sie sie auf goldengrape.lu ein (Feld „Geschenkkarte“ im Warenkorb) oder im Geschäft: zeigen Sie diesen QR-Code oder nennen Sie den Code. Sie kann in mehreren Teilen eingelöst werden.",
+      "balance": "Um das Guthaben zu sehen, geben Sie den Code in Ihrem Kundenkonto ein."
     }
   },
   "cookies": {

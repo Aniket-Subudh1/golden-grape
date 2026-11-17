@@ -512,9 +512,25 @@ export const products: CollectionConfig = {
         },
       ],
     },
-    // Used from M3.2 (loyalty, gift cards); kept in the data, not shown before then.
-    { name: 'loyaltyExcluded', type: 'checkbox', defaultValue: false, admin: { hidden: true, disableListColumn: true } },
-    { name: 'giftCard', type: 'checkbox', defaultValue: false, admin: { hidden: true, disableListColumn: true } },
+    // M3.2: a product that earns no loyalty points, and a gift card (its sizes are the amounts, 25 / 50 / 100 €; no stock).
+    {
+      name: 'loyaltyExcluded',
+      type: 'checkbox',
+      defaultValue: false,
+      label: l('Ne rapporte pas de points', 'Earns no loyalty points', 'Bringt keine Treuepunkte', 'Não dá pontos'),
+      admin: { position: 'sidebar', disableListColumn: true },
+    },
+    {
+      name: 'giftCard',
+      type: 'checkbox',
+      defaultValue: false,
+      label: l('Carte cadeau', 'Gift card', 'Geschenkkarte', 'Cartão-presente'),
+      admin: {
+        position: 'sidebar',
+        disableListColumn: true,
+        description: l('Ses formats sont les montants (25, 50, 100 €). Le code est envoyé quand la commande est confirmée.', 'Its sizes are the amounts (25, 50, 100 €). The code is sent when the order is confirmed.', 'Seine Formate sind die Beträge (25, 50, 100 €). Der Code wird bei Bestätigung der Bestellung gesendet.', 'Os formatos são os montantes (25, 50, 100 €). O código é enviado quando a encomenda é confirmada.'),
+      },
+    },
     // List column only: lowest price and stock across the sizes (modules/catalogue/admin/product-cells.tsx).
     {
       name: 'offer',

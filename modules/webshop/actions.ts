@@ -16,8 +16,11 @@ export const quoteCartAction = publicAction(
       .array(z.object({ variant: z.string().min(1).max(40), unit: z.string().min(1).max(40).optional(), qty: z.number().int().min(1).max(999) }))
       .max(60),
     code: z.string().trim().max(40).optional(),
+    useLoyalty: z.boolean().optional(),
+    giftCards: z.array(z.string().max(40)).max(5).optional(),
   }),
-  async (input, { payload }) => quoteCart(payload, input.lines, { customer: await currentCustomer(), channel: 'webshop', locale: input.locale, code: input.code }),
+  async (input, { payload }) =>
+    quoteCart(payload, input.lines, { customer: await currentCustomer(), channel: 'webshop', locale: input.locale, code: input.code, loyaltyPoints: input.useLoyalty ? 'all' : undefined, giftCards: input.giftCards }),
 );
 
 /** Address suggestions while the customer types the street (GG-007); 60 searches a minute per address is plenty. */

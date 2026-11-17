@@ -102,6 +102,9 @@ export interface Config {
     priceLists: PriceList;
     promotions: Promotion;
     discountCodes: DiscountCode;
+    loyaltyLedger: LoyaltyLedger;
+    giftCards: GiftCard;
+    giftCardLedger: GiftCardLedger;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -119,6 +122,9 @@ export interface Config {
     };
     customers: {
       quotations: 'quotations';
+    };
+    giftCards: {
+      history: 'giftCardLedger';
     };
   };
   collectionsSelect: {
@@ -156,6 +162,9 @@ export interface Config {
     priceLists: PriceListsSelect<false> | PriceListsSelect<true>;
     promotions: PromotionsSelect<false> | PromotionsSelect<true>;
     discountCodes: DiscountCodesSelect<false> | DiscountCodesSelect<true>;
+    loyaltyLedger: LoyaltyLedgerSelect<false> | LoyaltyLedgerSelect<true>;
+    giftCards: GiftCardsSelect<false> | GiftCardsSelect<true>;
+    giftCardLedger: GiftCardLedgerSelect<false> | GiftCardLedgerSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -740,6 +749,9 @@ export interface Product {
     description?: string | null;
   };
   loyaltyExcluded?: boolean | null;
+  /**
+   * Its sizes are the amounts (25, 50, 100 €). The code is sent when the order is confirmed.
+   */
   giftCard?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -1718,6 +1730,69 @@ export interface DiscountCode {
   createdAt: string;
 }
 /**
+ * Every point earned, used or expired. To correct a customer’s balance, add a line with a number (negative to remove) and the reason.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "loyaltyLedger".
+ */
+export interface LoyaltyLedger {
+  id: string;
+  customer: string | Customer;
+  points: number;
+  reason?: string | null;
+  type?: ('earn' | 'redeem' | 'expire' | 'adjust') | null;
+  order?: (string | null) | Order;
+  expiresAt?: string | null;
+  user?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Cards sold on the website and cards issued here. A card is used on the website or at a sale, in one go or several.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "giftCards".
+ */
+export interface GiftCard {
+  id: string;
+  initialCents: number;
+  /**
+   * Empty: the settings’ validity.
+   */
+  expiresAt?: string | null;
+  status?: ('active' | 'void') | null;
+  code?: string | null;
+  balanceCents?: number | null;
+  recipientName?: string | null;
+  recipientEmail?: string | null;
+  currency?: string | null;
+  purchaser?: (string | null) | Customer;
+  order?: (string | null) | Order;
+  locale?: string | null;
+  mailedAt?: string | null;
+  history?: {
+    docs?: (string | GiftCardLedger)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "giftCardLedger".
+ */
+export interface GiftCardLedger {
+  id: string;
+  card: string | GiftCard;
+  amountCents: number;
+  type: 'issue' | 'redeem' | 'refund' | 'void';
+  order?: (string | null) | Order;
+  user?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -1876,6 +1951,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'discountCodes';
         value: string | DiscountCode;
+      } | null)
+    | ({
+        relationTo: 'loyaltyLedger';
+        value: string | LoyaltyLedger;
+      } | null)
+    | ({
+        relationTo: 'giftCards';
+        value: string | GiftCard;
+      } | null)
+    | ({
+        relationTo: 'giftCardLedger';
+        value: string | GiftCardLedger;
       } | null);
   globalSlug?: string | null;
   user:
@@ -2904,6 +2991,55 @@ export interface DiscountCodesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "loyaltyLedger_select".
+ */
+export interface LoyaltyLedgerSelect<T extends boolean = true> {
+  customer?: T;
+  points?: T;
+  reason?: T;
+  type?: T;
+  order?: T;
+  expiresAt?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "giftCards_select".
+ */
+export interface GiftCardsSelect<T extends boolean = true> {
+  initialCents?: T;
+  expiresAt?: T;
+  status?: T;
+  code?: T;
+  balanceCents?: T;
+  recipientName?: T;
+  recipientEmail?: T;
+  currency?: T;
+  purchaser?: T;
+  order?: T;
+  locale?: T;
+  mailedAt?: T;
+  history?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "giftCardLedger_select".
+ */
+export interface GiftCardLedgerSelect<T extends boolean = true> {
+  card?: T;
+  amountCents?: T;
+  type?: T;
+  order?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -3224,6 +3360,15 @@ export interface BusinessSetting {
     defaultLowStock?: number | null;
     lowStockEmail?: string | null;
     outboxAlertEmail?: string | null;
+  };
+  loyalty?: {
+    pointsPerEuro?: number | null;
+    pointValueCents?: number | null;
+    expiryMonths?: number | null;
+    eligibleChannels?: ('webshop' | 'mobile')[] | null;
+  };
+  giftCards?: {
+    validityMonths?: number | null;
   };
   vat?:
     | {
@@ -3623,6 +3768,19 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
         defaultLowStock?: T;
         lowStockEmail?: T;
         outboxAlertEmail?: T;
+      };
+  loyalty?:
+    | T
+    | {
+        pointsPerEuro?: T;
+        pointValueCents?: T;
+        expiryMonths?: T;
+        eligibleChannels?: T;
+      };
+  giftCards?:
+    | T
+    | {
+        validityMonths?: T;
       };
   vat?:
     | T

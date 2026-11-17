@@ -1,8 +1,9 @@
 # Installed on the server as /etc/cron.d/golden-grape-jobs (mode 644): Golden Grape scheduled jobs
 # (docs/02-ARCHITECTURE.md §7). Daily: catering quotations past their validity become "Expiré"; at 07:00 the
-# low-stock e-mail (M3.1 T6). Times are the server's clock: it must run on Europe/Luxembourg time
+# low-stock e-mail (M3.1 T6); loyalty points past their validity expire (M3.2 T3). Times are the server's clock: it must run on Europe/Luxembourg time
 # (timedatectl set-timezone Europe/Luxembourg), or shift the hours.
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 30 2 * * * root /usr/local/bin/gg-job quotations-expire >> /var/log/gg-jobs.log 2>&1
 0 7 * * * root /usr/local/bin/gg-job low-stock-digest >> /var/log/gg-jobs.log 2>&1
+45 2 * * * root /usr/local/bin/gg-job loyalty-expire >> /var/log/gg-jobs.log 2>&1

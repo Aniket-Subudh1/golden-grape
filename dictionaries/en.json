@@ -771,6 +771,13 @@
       "suggest": "suggested: {{what}}",
       "open": "Open the reorder list",
       "units": "unit(s)"
+    },
+    "giftCard": {
+      "subject": "Your {{amount}} Golden Grape gift card",
+      "intro": "Thank you for your purchase. Here is your {{amount}} gift card, valid until {{date}}.",
+      "code": "Card code",
+      "how": "Use it on goldengrape.lu (the “Gift card” field in the cart) or in the shop: show this QR code or read out the code. It can be used in several goes.",
+      "balance": "To check the balance, enter the code in your account."
     }
   },
   "cookies": {

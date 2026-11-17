@@ -15,6 +15,8 @@ import { ORDER_ROLES, ORDER_STATUSES } from './order-states';
 import { transitionReservation } from './reservations';
 import { getOrder, getReservation, type MoneyResult, returnItems, orderToken, placeOrder, placeStaffOrder, recordPayment, recordRefund, requestRefund, setOrderBankAccount, slotCalendar, transition, zoneFor } from './service';
 import { deliveryFee } from './zones';
+import { getPayloadClient } from '@/lib/payload';
+import { mailGiftCards } from '@/modules/promotions/mail';
 
 // Checkout (public) and order / reservation decisions (staff). Error messages are dictionary keys (`form.fields.*`).
 
@@ -27,10 +29,10 @@ export const slotsFor = publicAction(z.object({ mode: z.enum(SLOT_MODES) }), asy
 
 /** Checkout totals with the delivery fee of the postcode typed (server prices and zones only). */
 export const checkoutQuote = publicAction(
-  z.object({ locale: z.enum(LOCALES), mode: z.enum(SLOT_MODES), lines, postalCode: z.string().max(12).optional(), code: optionalText(40) }),
+  z.object({ locale: z.enum(LOCALES), mode: z.enum(SLOT_MODES), lines, postalCode: z.string().max(12).optional(), code: optionalText(40), useLoyalty: z.boolean().optional(), giftCards: z.array(z.string().max(40)).max(5).optional() }),
   async (input, { payload }) => {
     const zone = input.mode === 'delivery' && input.postalCode?.trim() ? await zoneFor(payload, input.postalCode) : null;
-    const quote = input.lines.length > 0 ? await quoteCart(payload, input.lines, { customer: await currentCustomer(), channel: 'webshop', locale: input.locale, delivery: zone, code: input.code }) : null;
+    const quote = input.lines.length > 0 ? await quoteCart(payload, input.lines, { customer: await currentCustomer(), channel: 'webshop', locale: input.locale, delivery: zone, code: input.code, loyaltyPoints: input.useLoyalty ? 'all' : undefined, giftCards: input.giftCards }) : null;
     return {
       quote,
       zone: zone && {
@@ -75,6 +77,8 @@ const checkout = z
     notes: optionalText(2000),
     locale: z.enum(LOCALES),
     code: optionalText(40),
+    useLoyalty: z.literal('on').optional().transform((v) => v === 'on'),
+    giftCards: z.string().max(400).optional().transform((v) => (v ? v.split(/[\s,;]+/).filter(Boolean).slice(0, 5) : undefined)),
     website: z.string().optional(), // honeypot
   })
   .superRefine((d, ctx) => {
@@ -106,6 +110,7 @@ export const placeOrderAction = publicAction(checkout, async ({ website, line1, 
       if (placed.kind === 'order') {
         const order = await getOrder(payload, placed.id);
         if (order) await mailOrderPlaced(order).catch(logMail('order placed'));
+        await mailGiftCards(payload, placed.id).catch(logMail('gift cards'));
       } else {
         const reservation = await getReservation(payload, placed.id);
         if (reservation) await mailReservation(payload, reservation, 'pending').catch(logMail('reservation placed'));
@@ -132,6 +137,7 @@ export const transitionOrder = action(
     const result = await transition(payload, order, to, { user: user.id, reason, collect });
     await audit(payload, { user: user.id, action: 'order.status', collection: 'orders', id: order, ref: result.order.number, reason, before: { status: result.from }, after: { status: to, ...collectedAudit(collect) } });
     if (result.effects.includes('mailCustomer')) after(() => mailOrderStatus(result.order).catch(logMail('order status')));
+    if (to === 'confirmed') after(() => mailGiftCards(payload, order).catch(logMail('gift cards')));
     return { status: result.order.status };
   },
 );
@@ -142,6 +148,8 @@ const bankDay = bankDayField;
 const reasonText = z.string().trim().min(3, 'reasonRequired').max(300, 'tooLong');
 const mailMoved = (result: MoneyResult) => {
   if (result.effects.includes('mailCustomer')) after(() => mailOrderStatus(result.order).catch(logMail('order status')));
+  // A transfer paid in full confirms the order, which issues the gift cards it sold.
+  if (result.order.status === 'confirmed') after(async () => mailGiftCards(await getPayloadClient(), result.order.id).catch(logMail('gift cards')));
 };
 
 /** Money received for an order: a transfer, a deposit or the rest. Paid in full → a waiting order is confirmed. */
@@ -230,19 +238,20 @@ export const decideReservation = action(
 const saleRoles = { roles: ORDER_ROLES };
 
 /** Live totals of the sale being built, priced for the chosen customer on the mobile channel. */
-export const quoteStaffSale = action(z.object({ customer: z.string().max(40).optional(), lines, code: optionalText(40) }), saleRoles, async (input, { payload, user }) => {
+export const quoteStaffSale = action(z.object({ customer: z.string().max(40).optional(), lines, code: optionalText(40), useLoyalty: z.boolean().optional(), giftCards: z.array(z.string().max(40)).max(5).optional() }), saleRoles, async (input, { payload, user }) => {
   const customer = input.customer ? await getCustomer(payload, input.customer) : null;
   if (input.lines.length === 0) return null;
-  return quoteCart(payload, input.lines, { customer, channel: 'mobile', locale: (customer?.locale ?? user.locale ?? 'fr') as (typeof LOCALES)[number], code: input.code });
+  return quoteCart(payload, input.lines, { customer, channel: 'mobile', locale: (customer?.locale ?? user.locale ?? 'fr') as (typeof LOCALES)[number], code: input.code, loyaltyPoints: input.useLoyalty ? 'all' : undefined, giftCards: input.giftCards });
 });
 
 /** Places the sale: paid on site (confirmed and paid) or invoiced later (confirmed, unpaid). Stock out at once. */
 export const placeStaffSale = action(
-  z.object({ idempotencyKey: z.uuid(), customer: z.string().min(1).max(40), lines: lines.min(1), payment: z.enum(['onsite', 'invoice']), notes: optionalText(500), code: optionalText(40) }),
+  z.object({ idempotencyKey: z.uuid(), customer: z.string().min(1).max(40), lines: lines.min(1), payment: z.enum(['onsite', 'invoice']), notes: optionalText(500), code: optionalText(40), useLoyalty: z.boolean().optional(), giftCards: z.array(z.string().max(40)).max(5).optional() }),
   saleRoles,
   async (input, { payload, user }) => {
     const placed = await placeStaffOrder(payload, input, { staff: user.id });
     if (placed.created) await audit(payload, { user: user.id, action: 'doc.create', collection: 'orders', id: placed.id, ref: placed.number, after: { channel: 'mobile', payment: input.payment } });
+    if (placed.created) after(() => mailGiftCards(payload, placed.id).catch(logMail('gift cards')));
     return placed;
   },
 );

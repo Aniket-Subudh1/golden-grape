@@ -8,6 +8,7 @@ import { model, type Tx, withTx } from '@/lib/tx';
 import { postMovements } from '@/modules/inventory/service';
 import { type Movement, provider } from '@/modules/payments/provider';
 import { dueOf, type Figures, paymentState, refundableOf } from '@/modules/payments/service';
+import { earn, giveBack, issueForOrder, takeBack } from '@/modules/promotions/rewards';
 import { quoteCart, redeem } from '@/modules/promotions/service';
 import { NUMBERING } from '@/modules/settings/globals';
 import { activeAccounts, type BankAccount, getSettingsPrivate, transferAccount } from '@/modules/settings/service';
@@ -136,6 +137,10 @@ export type PlaceOrderInput = {
   locale: Locale;
   /** A discount code typed in the cart (M3.2). */
   code?: string;
+  /** Pay with the customer's loyalty points (all they have, up to the total). */
+  useLoyalty?: boolean;
+  /** Gift card codes, in the order typed. */
+  giftCards?: string[];
 };
 
 export type Placed = { kind: 'order' | 'reservation'; id: string; number: string; created: boolean };
@@ -159,9 +164,10 @@ const pricedLines = (q: Awaited<ReturnType<typeof quoteCart>>) => ({
   pricing: { code: q.code, promotions: q.promotions, loyaltyPoints: q.loyaltyPointsUsed, loyaltyCents: q.loyaltyCents, giftCards: q.giftCards, amountDueCents: q.amountDueCents },
 });
 
-/** A code typed but refused since the cart was shown (dates, uses, minimum): the order stops with the reason. */
-function assertCode(q: { codeRejected: string | null }) {
+/** A code or gift card typed but refused since the cart was shown (dates, uses, minimum, balance): the order stops. */
+function assertCode(q: { codeRejected: string | null; giftCardsRejected: { reason: string }[] }) {
   if (q.codeRejected) throw new AppError('VALIDATION', q.codeRejected, 'code');
+  if (q.giftCardsRejected.length > 0) throw new AppError('VALIDATION', q.giftCardsRejected[0].reason, 'giftCard');
 }
 
 /** The order or reservation already placed with this key (sequential reads: one transaction session runs one at a time). */
@@ -199,7 +205,7 @@ export async function placeOrder(payload: Payload, input: PlaceOrderInput, { cus
       const zone = input.mode === 'delivery' ? await zoneFor(payload, input.address!.postalCode, tx) : null;
       if (input.mode === 'delivery' && !zone) throw new AppError('VALIDATION', 'outsideZone', 'postalCode');
       const q = withLines
-        ? await quoteCart(payload, input.lines, { customer, channel: 'webshop', locale: input.locale, delivery: zone, code: input.code })
+        ? await quoteCart(payload, input.lines, { customer, channel: 'webshop', locale: input.locale, delivery: zone, code: input.code, loyaltyPoints: input.useLoyalty ? 'all' : undefined, giftCards: input.giftCards })
         : null;
       if (q) assertCode(q);
       // The cart changed since it was shown (stock, availability): the visitor sees it corrected before paying.
@@ -290,6 +296,8 @@ export type StaffSaleInput = {
   notes?: string;
   /** A discount code (M3.2). */
   code?: string;
+  useLoyalty?: boolean;
+  giftCards?: string[];
 };
 
 /**
@@ -309,7 +317,7 @@ export async function placeStaffOrder(payload: Payload, input: StaffSaleInput, {
     return await withTx(payload, async (tx) => {
       const again = await findPlaced(payload, input.idempotencyKey, tx);
       if (again) return again;
-      const q = await quoteCart(payload, input.lines, { customer, channel: 'mobile', locale, code: input.code });
+      const q = await quoteCart(payload, input.lines, { customer, channel: 'mobile', locale, code: input.code, loyaltyPoints: input.useLoyalty ? 'all' : undefined, giftCards: input.giftCards });
       if (q.notices.length > 0) throw new AppError('OUT_OF_STOCK', 'cartChanged', 'lines');
       assertCode(q);
       const { numbering } = await getSettingsPrivate();
@@ -379,6 +387,8 @@ function setOrder(tx: Tx, id: string, data: Partial<Order>) {
 async function postSale(tx: Tx, order: Order, user?: string) {
   const claim = await tx.model('orders').updateOne({ _id: order.id, stockPosted: { $ne: true } }, { $set: { stockPosted: true } }, { session: tx.session });
   if (claim.matchedCount === 0) return;
+  // Gift cards sold are issued with the sale (confirmed); their e-mail goes out after commit (mailGiftCards).
+  await issueForOrder(tx, order);
   await postMovements(
     tx,
     (order.lines ?? []).map((l) => ({
@@ -441,6 +451,11 @@ export async function applyTransition(tx: Tx, orderId: string, to: OrderStatus, 
   const list = effectsOf(from, to);
   if (list.includes('postSale')) await postSale(tx, order, user);
   if (list.includes('returnStock')) await returnStock(tx, order, user, reason);
+  // Loyalty and gift cards (M3.2 T3, A-08): points earned on completion; cards and points used given back on a cancel
+  // or a refund; the points a refunded order earned taken back.
+  if (to === 'completed') await earn(tx, order);
+  if (to === 'refunded') await takeBack(tx, order, user);
+  if (to === 'cancelled' || to === 'refunded') await giveBack(tx, order, user);
 
   // Money (GG-003/004, APPLUX 12 Nov GG-02). A move never records money by itself, whatever the payment method: a
   // handover records only the amount staff confirm in its dialog (never above what is still due), and an order can
@@ -496,8 +511,10 @@ export async function transition(payload: Payload, orderId: string, to: OrderSta
 // Money staff record (GG-003, GG-004). Each runs in one transaction that rewrites the order, so two clicks at once
 // conflict and the later one is retried against the new figures (and refused if the amount no longer fits).
 
+// The money side of an order is what is left after gift cards and loyalty points (M3.2): those are spent at once by
+// `redeem` and given back by `giveBack`, never refunded as money.
 const figuresOf = (order: Order): Figures => ({
-  totalCents: order.totals?.totalCents ?? 0,
+  totalCents: order.pricing?.amountDueCents ?? order.totals?.totalCents ?? 0,
   paidCents: order.payment?.paidCents ?? 0,
   refundedCents: order.payment?.refundedCents ?? 0,
   refundDueCents: order.payment?.refundDueCents ?? 0,

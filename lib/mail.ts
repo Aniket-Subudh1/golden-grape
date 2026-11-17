@@ -13,8 +13,8 @@ const getTransport = () =>
     auth: env.SMTP_USER ? { user: env.SMTP_USER, pass: env.SMTP_PASS } : undefined,
   }));
 
-/** `attachments`: documents sent with the e-mail (a quotation's PDF), passed to nodemailer as they are. */
-type Mail = { to: string; subject: string; html: string; text: string; replyTo?: string; attachments?: { filename: string; content: Buffer; contentType?: string }[] };
+/** `attachments`: documents sent with the e-mail (a quotation's PDF), or an inline image (`cid`, a gift card's QR). */
+type Mail = { to: string; subject: string; html: string; text: string; replyTo?: string; attachments?: { filename: string; content: Buffer; contentType?: string; cid?: string }[] };
 
 /** A customer created at the till without an e-mail gets an address on this reserved domain (RFC 2606): never sent. */
 export const NO_EMAIL_DOMAIN = 'no-email.invalid';

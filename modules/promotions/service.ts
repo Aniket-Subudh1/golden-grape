@@ -18,6 +18,7 @@ import {
   type QuoteRules,
   type VatClass,
 } from './pricing';
+import { giftCardsFor, loyaltyFor, spend } from './rewards';
 
 // I/O around the pricing engine: loads what `quote` needs (02 §5.2). The shop, the cart, checkout (M2.3), mobile
 // sales and documents (M3.x) all price through here; nothing else computes a price.
@@ -259,19 +260,27 @@ export async function quoteCart(
     locale,
     delivery,
     code,
+    loyaltyPoints,
+    giftCards: cardCodes,
   }: {
     customer?: { id: string } | null;
     channel: Channel;
     locale: Locale;
     delivery?: QuoteRules['delivery'];
     code?: string | null;
+    /** Points to use: a number, or 'all' the customer has (capped at the balance). */
+    loyaltyPoints?: number | 'all';
+    /** Gift card codes typed, in order. */
+    giftCards?: string[];
   },
 ) {
   const ids = [...new Set(input.map((l) => l.variant))];
-  const [sellable, stock, rules] = await Promise.all([
+  const [sellable, stock, rules, loyalty, cards] = await Promise.all([
     findSellable(payload, ids, channel, locale),
     availability(payload, ids),
     pricingRules(payload, { customer, code }),
+    loyaltyFor(payload, customer, loyaltyPoints),
+    giftCardsFor(payload, cardCodes),
   ]);
   const catalogue = catalogueOf(sellable);
   const notices: CartNotice[] = [];
@@ -298,7 +307,18 @@ export async function quoteCart(
     });
   }
 
-  const q = quote({ lines, customer, channel, code, now: new Date(), catalogue, rules: { ...rules, delivery } });
+  const q = quote({
+    lines,
+    customer,
+    channel,
+    code,
+    loyaltyPoints: loyalty.points,
+    giftCards: cards.cards,
+    now: new Date(),
+    catalogue,
+    rules: { ...rules, delivery, loyalty: loyalty.rule },
+  });
+  q.giftCardsRejected.push(...cards.unknown);
 
   const productImages = sellable
     .map((v) => (v.product as { images?: unknown[] }).images?.[0])
@@ -345,9 +365,10 @@ type Redeemable = Pick<CartQuote, 'code' | 'loyaltyPointsUsed' | 'giftCards'>;
  * What the order spends beyond money, inside the order's transaction (02 §5.2, M3.2 T4): the code's use, counted only
  * while uses < maxUses, and the customer's own limit checked again in the same transaction. A conditional update that
  * matches nothing (the last use taken by a parallel order) throws CONFLICT, which rolls the whole order back. Loyalty
- * points and gift cards join here with T3. `placeOrder` and `placeStaffOrder` call it; nothing else spends them.
+ * points and gift card amounts are spent the same way (rewards.ts). `placeOrder` and `placeStaffOrder` call it.
  */
 export async function redeem(tx: Tx, q: Redeemable, { order, customer }: { order: string; customer?: string | null }) {
+  await spend(tx, q, { order, customer });
   if (q.code) {
     const codes = tx.model('discountCodes');
     const claim = await codes.updateOne(

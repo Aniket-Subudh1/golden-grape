@@ -771,6 +771,13 @@
       "suggest": "sugerido: {{what}}",
       "open": "Abrir a lista a encomendar",
       "units": "unidade(s)"
+    },
+    "giftCard": {
+      "subject": "O seu cartão-presente Golden Grape de {{amount}}",
+      "intro": "Obrigado pela sua compra. Aqui está o seu cartão-presente de {{amount}}, válido até {{date}}.",
+      "code": "Código do cartão",
+      "how": "Use-o em goldengrape.lu (campo «Cartão-presente» do carrinho) ou na loja: mostre este código QR ou diga o código. Pode ser usado em várias vezes.",
+      "balance": "Para saber o saldo, introduza o código na sua conta."
     }
   },
   "cookies": {
