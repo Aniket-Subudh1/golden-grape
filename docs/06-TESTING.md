@@ -34,6 +34,7 @@ A test that cannot fail for a realistic bug is deleted.
 | M2.1 | `modules/catalogue/packaging.test.ts` | box6 × 2 → 12; box12 × 1 → 12; base × 5 → 5; factor < 2 is rejected |
 | M2.3 | `modules/sales/slots.test.ts`, `zones.test.ts`, `order-states.test.ts` | see M2.3 T1–T3 |
 | M2.3 | `modules/sales/admin/order-filters.test.ts` | every Orders tab URL lights that tab; every dashboard and bell shortcut (refunds, still to collect, sold over a range…) is named and lights no tab, also in the nested form Payload writes back; a hand-made filter lights nothing; "Toutes" carries the empty `where=` that makes its links load in full (QA 15 Nov). A lit tab over a different list hid a refund owed twice (QA 12 Nov GG-04, 14 Nov GG-22) |
+| M3.1 | `modules/purchasing/reorder.test.ts` | suggested units (threshold × 2 − onHand, rounded up to the box, at least 1), cheapest offer per bottle, cost per bottle half-up |
 | M3.2 | `modules/promotions/pricing.test.ts` | the vector table in M3.2 T4 (≥ 15 rows) |
 | M3.3 | `modules/attendance/qr-token.test.ts`, `modules/pos/csv.test.ts`, `modules/reporting/summary.test.ts` | see M3.3 |
 | M4.1 | `modules/payments/wallee-signature.test.ts` | valid, tampered, expired |
@@ -46,7 +47,7 @@ A test that cannot fail for a realistic bug is deleted.
 | M2.1 | 20 parallel sales of 1 against `onHand = 5` → exactly 5 succeed, `onHand = 0`, 5 movements; `rebuild-stock` matches the cache; an adjustment records user and reason; a count posts variance = counted − expected |
 | M2.2 | customer A's `find orders` / `find customers` return only A (REST and local API with `overrideAccess: false`) |
 | M2.3 | the same `idempotencyKey` twice → one order, one movement set, one e-mail; cancelling a confirmed order returns stock exactly once; the last event seat cannot be taken twice in parallel |
-| M3.1 | receiving a PO of 2 × box12 → +24 and status `received`; a partial receipt → `partly_received` |
+| M3.1 | receiving a PO of 2 × box12 → +24 and status `received`, cost 10.00 a bottle; a partial receipt → `partly_received`; more than remains needs a reason; a size not on the order only by a manager; two receipts of the last box at once count it once; numbers on leaving draft, gapless; "received" and frozen lines refused by hand (`purchasing/receive.int.test.ts`). A mobile sale: movements with channel `mobile` and user = staff, paid on site / invoice later, idempotent, counted on its day (`sales/staff-sale.int.test.ts`). The low-stock e-mail: none when nothing is low, one listing them otherwise (`inventory/jobs.int.test.ts`) |
 | M3.2 | 20 parallel `issueInvoice` → numbers 1..20, no gaps, no duplicates; a failed issue does not consume a number; a gift card of 50 € used 30 + 20 → balance 0, a third use fails; a code with `maxUses = 1` used in parallel → one success |
 | M3.3 | importing the same POS CSV twice → second rejected; a matched row posts a `pos_import` movement; only one open attendance record per user |
 | M4.1 | a replayed `paid` webhook → one payment row, order confirmed once; a rejected reservation voids the authorisation and posts no stock |
@@ -55,7 +56,7 @@ A test that cannot fail for a realistic bug is deleted.
 ### 3.3 E2E (only these journeys)
 1. `locale.spec.ts` (M1.3): `/` → `/fr`; switch to DE on `/de/contact` keeps the path; no FR string visible on the DE page (sampled keys).
 2. `checkout.spec.ts` (M2.3): add a snack and a wine → pickup → slot → order confirmation page and Mailpit e-mail in the chosen language; repeat for delivery (zone fee shown) and table + pre-order (pending).
-3. `staff-mobile.spec.ts` (M3.1, Pixel 7 viewport): staff login → receive PO by typed barcode → quick sale to a customer → stock reflects both.
+3. `staff-mobile.spec.ts` (M3.1, Pixel 7 viewport): staff login → receive PO by typed barcode → quick sale to a customer → stock reflects both. Runs on the `pixel-7` project only (skipped on the two others): it creates its own product, staff member, supplier and order through REST as the seeded admin (`E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`, CI defaults `ci-admin@example.test`), and simultaneous sign-ins of one account race on Payload's session list.
 4. `b2b.spec.ts` (M3.2): B2B customer sees list prices → staff creates a quotation → accept → order → invoice PDF downloads with the next number.
 5. `attendance.spec.ts` (M3.3): open today's QR URL → check in → check out → the hours appear in the manager's monthly report.
 

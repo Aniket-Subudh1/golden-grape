@@ -41,7 +41,7 @@ Access: read is Staff(any) for itself and admin/manager for everyone; create, up
 | `hours` | array `{ day 0–6, open "HH:mm", close "HH:mm" }` + `closedDates` array of dates |
 | `vat` | array `{ key: 'standard' \| 'intermediate' \| 'reduced' \| 'superReduced', rateBp }`; default LU 1700/1400/800/300, confirmed by the accountant (DEP-07) |
 | `numbering` | `{ invoice, creditNote, quotation, deliveryNote, order, cateringRequest, reservation }` format strings, French prefixes (APPLUX, 9 Nov): `FAC-{YYYY}-{00000}`, `AV-…`, `DEV-{YYYY}-{0000}`, `BL-…`, `CMD-{YYYY}-{00000}`, `DEM-{YYYY}-{0000}`, `RES-{YYYY}-{00000}` (`NUMBERING`). A saved format wins; changing one never renumbers (same counter series) |
-| `alerts` | `defaultLowStock` (int), `lowStockEmail` (email), `outboxAlertEmail` |
+| `alerts` | `defaultLowStock` (int), `lowStockEmail` (email; the 07:00 low-stock e-mail, else `MAIL_STAFF_TO`), `outboxAlertEmail`. Shown with `modules` in the tab "Modules et alertes" (M3.1) |
 | `modules` | checkbox per switchable module (02 §4) |
 | `paymentTerms` | array `{ key, days, label L }` |
 | `loyalty` | `pointsPerEuro`, `pointValueCents`, `expiryMonths`, `eligibleChannels` (M3.2) |
@@ -107,6 +107,8 @@ On the "Add" form only, a virtual group `firstVariant` { `priceCents` (required)
 ### `customers` (auth: shop accounts)
 `name`, `email` (auth), `phone`, `locale`, `addresses` array `{ label, line1, line2, postalCode, city, country default LU, isDefault }`, `type` (`private` \| `business`), `company`, `vatNumber`, `group` (rel customerGroups), `priceList` (rel priceLists, M3.2), `paymentTerm` (key, M3.2), `loyaltyBalance` (int, cache, M3.2), `marketingConsent` (checkbox). Access: read and update by `staffOrSelf('id')`; create through the sign-up action (rate-limited, only the sign-up fields) or by Staff(sales): **the API's create is staff-only**, so nobody bypasses the rate limit or the business-account checks; delete by admin only. The fields `group`, `priceList`, `paymentTerm` and `loyaltyBalance` can only be updated by staff (field-level access; `loyaltyBalance` by no one through the API). A customer can never set their own price list. `priceList` is added in M3.2 with the `priceLists` collection it points to.
 
+Created at the till (M3.1, A-16): staff may leave the e-mail empty; the account then gets `client-<random>@no-email.invalid` (reserved domain: `lib/mail.ts` never sends to it) and a random password, so it cannot sign in until a real e-mail is set. A known e-mail is refused.
+
 Session (M2.2): Payload's auth cookie name is shared by every auth collection, so the website keeps the customer's Payload token in its own httpOnly cookie `gg_customer` and verifies it with `payload.auth` (`Authorization: JWT …`). A staff session in the same browser is never replaced. Sign-out also ends the Payload session (`useSessions`), so a copied token stops working. Password reset uses Payload's `forgotPassword` with our e-mail template, in the customer's `locale`.
 
 ### `customerGroups`
@@ -171,6 +173,8 @@ Suppliers: `name`, `contact`, `email`, `phone`, `vatNumber`, `paymentTerm`, `not
 
 ### `purchaseOrders` (M3.1)
 `number` (`nextNumber('purchase')`), `supplier`, `status` (`draft`, `ordered`, `partly_received`, `received`, `cancelled`), `lines` array `{ variant, unit?, unitQty, costCents, receivedUnitQty }`, `expectedAt`, `notes`. `receive(poId, lines)` posts `receipt` movements (converted to base units), increments `receivedUnitQty`, updates the status, and updates `variants.costCents`, all in one transaction. Over-receipt is allowed with a reason.
+
+**As built (M3.1, 17 Nov):** `number` `BCF-{YYYY}-{00000}` (`NUMBERING.purchase`, A-17), given in the save's transaction (`txOf`) when the order leaves `draft`; unique among numbered orders (partial index, drafts have none); `title` ("BCF-2026-00001 · Supplier", "Brouillon · Supplier"). Statuses set by hand in the admin: draft → ordered | cancelled, ordered → cancelled (nothing received); `partly_received` and `received` only from `receive()` (`context.byReceive`). Lines are frozen once goods came in; `receivedUnitQty` cannot be typed. A line without a cost takes the supplier's price (`supplierProducts`, same unit). A box on a line or a supplier price must belong to its size. Indexes `{ status, expectedAt }`, `{ supplier }`. Delete: managers, drafts only. `stockMovements.ref` also points at `purchaseOrders`. Suppliers list their prices (join `products`). Admin: Achats › À recommander (`/admin/reorder`), Commandes fournisseurs, Fournisseurs, Prix d’achat, shown only while `modules.purchasing` is on.
 
 ### `priceLists` (M3.2)
 `name`, `currency` EUR, `pricesInclVat` (false for B2B), `lines` array `{ variant, unit?, priceCents }`, `validFrom`, `validTo`. Per-customer prices = a price list assigned directly to one customer.

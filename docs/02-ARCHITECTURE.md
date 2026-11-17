@@ -22,7 +22,7 @@
 
 Add a package only when a milestone lists it under **Packages added**. Install it with `npm install --save-exact` and record the version here.
 
-Pinned in M1.1 (D-02): `next` 16.4.3, `react`/`react-dom` 19.3.0, `payload`, `@payloadcms/next`, `@payloadcms/db-mongodb`, `@payloadcms/richtext-lexical` 3.92.1, `sharp` 0.35.5, `graphql` 16.14.2, `zod` 4.6.7. Added in M2.1: `papaparse` 5.7.0 (+ `@types/papaparse` 5.5.2, dev). Added for DEP-04 (7 Nov): `read-excel-file` 9.3.14 (reads .xlsx in `lib/table.ts`; MIT, no native code).
+Pinned in M1.1 (D-02): `next` 16.4.3, `react`/`react-dom` 19.3.0, `payload`, `@payloadcms/next`, `@payloadcms/db-mongodb`, `@payloadcms/richtext-lexical` 3.92.1, `sharp` 0.35.5, `graphql` 16.14.2, `zod` 4.6.7. Added in M2.1: `papaparse` 5.7.0 (+ `@types/papaparse` 5.5.2, dev). Added for DEP-04 (7 Nov): `read-excel-file` 9.3.14 (reads .xlsx in `lib/table.ts`; MIT, no native code). Added in M3.1: `@zxing/browser` 0.2.1 + `@zxing/library` 0.23.0 (camera scanning, loaded only when the camera sheet opens).
 
 The Payload CLI is run as `node --import tsx ./node_modules/payload/bin.js <cmd> --disable-transpile` (the npm scripts do this). Its default `tsImport` loader loads `undici` twice and crashes with `TypeError: Illegal constructor`.
 
@@ -35,7 +35,9 @@ app/
     page.tsx                    home
     shop/, shop/[slug]/, snack/, catering/, events/, events/[slug]/, maison/, contact/,
     legal/[slug]/, account/, auth/, checkout/, order/[id]/
-  (staff)/staff/                mobile back office (staff auth), see 05 §5
+  (staff)/staff/                mobile back office (staff auth), see 05 §5: its own root layout; `screens.ts` (who may
+                                open which screen, read by the pages and proxy.ts), `session.ts` (requireStaff, tabs),
+                                `login/`, `(app)/` (tab-bar screens)
   (payload)/admin/[[...segments]]/   Payload admin (generated)
   (payload)/api/[...slug]/      Payload REST used by the admin (generated)
   api/health/route.ts           health check
@@ -63,7 +65,7 @@ docs/                           this specification
 |---|---|
 | `lib/env.ts` | zod-parsed `process.env`; the only reader of env vars |
 | `lib/payload.ts` | `getPayloadClient()`, a cached `getPayload({ config })` |
-| `lib/tx.ts` | `withTx(payload, fn)` opens a transaction, passes `req` (and the Mongo session for raw atomic ops), and commits or rolls back. When MongoDB aborts it with a `TransientTransactionError` (two transactions writing the same stock row), it runs `fn` again on a fresh transaction, like the driver's `withTransaction`. **The only file that touches Payload transaction internals.** Inside a transaction, run Payload calls one after the other: parallel operations on one session can fail. |
+| `lib/tx.ts` | `withTx(payload, fn)` opens a transaction, passes `req` (and the Mongo session for raw atomic ops), and commits or rolls back. When MongoDB aborts it with a `TransientTransactionError` (two transactions writing the same stock row), it runs `fn` again on a fresh transaction, like the driver's `withTransaction`. `txOf(req)` gives a collection hook the transaction Payload opened for its operation (a number given on save, M3.1). **The only file that touches Payload transaction internals.** Inside a transaction, run Payload calls one after the other: parallel operations on one session can fail. A Payload `find` paginates with a count sent **in parallel** to the query: when it can be the transaction's first operation (a lookup in a `beforeChange` hook), pass `pagination: false` (M3.1: purchase orders failed intermittently with "transaction number … does not match"). |
 | `lib/errors.ts` | `AppError(code, message, field?)`, with codes `VALIDATION`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, `OUT_OF_STOCK`, `RATE_LIMITED` |
 | `lib/action.ts` | `action(schema, { roles }, fn)` and `publicAction(schema, fn)`: the only way to write a server action (03 §4) |
 | `lib/access.ts` | Payload access functions: `isStaff(...roles)`, `isSelfCustomer`, `staffOrSelf`, `publicRead`, `published` |
@@ -103,7 +105,7 @@ modules/<name>/
 | `events` | `events`, `eventBookings` | `upcomingEvents(locale)`, `bookEvent(input)`, `seatsLeft(ids)` | M1.3 (content), M2.3 (booking) |
 | `catering` | `cateringPackages`, `cateringRequests` | `requestCatering(input)` | M1.3 |
 | `notifications` | none (e-mail templates only) | template components rendered by `lib/mail.ts` | M1.3 |
-| `purchasing` | `suppliers`, `supplierProducts`, `purchaseOrders` | `receive(poId, lines)`, `reorderList()` | M3.1 |
+| `purchasing` | `suppliers`, `supplierProducts`, `purchaseOrders` | `receive(poId, lines)`, `reorderList()`, `openPurchaseOrders()`, `dueBy(day)`, `draftFromReorder()`, `importSupplierRefs()`; pure `reorder.ts` | M3.1 |
 | `promotions` | `priceLists`, `promotions`, `discountCodes`, `loyaltyLedger`, `giftCards`, `giftCardLedger` | **`quote(cart, customer, channel)`**, `redeem(tx, quote)` | M2.2 (v1), M3.2 (full) |
 | `documents` | `quotations`, `invoices`, `deliveryNotes`, `creditNotes` | `issueInvoice(orderId)`, `pdf(docId)` | M3.2 |
 | `reviews` | `ReviewsCache` global | `latestReviews()`, `refreshReviews()` | M3.3 |
@@ -149,7 +151,11 @@ After commit, the outbox (M3.3/M4.2) mirrors the order to the POS when the POS m
 
 **Reservation with pre-order:** created as `pending` with **no stock movement**. `accept` posts the sale movements (and, with wallee in M4.1, captures the payment). `reject` and `cancel` never post movements and, in M4.1, void the authorisation.
 
-**Mobile sale (M3.1):** the same `placeOrder` with `channel: 'mobile'`, a staff user and a customer, priced by `quote` with the customer's list. Payment is `manual` (on site or invoiced) in Phase 1, or a wallee link in M4.1.
+**Mobile sale (M3.1):** `placeStaffOrder` beside `placeOrder`, sharing its order building (`pricedLines`), numbering, provider and `postSale`: `channel: 'mobile'`, mode `instore` (`b2b` for a business customer), `staff` = the user, priced by `quote` for that customer, slot = the sale's own day and time. "Payé sur place" confirms and records the full payment (a `payments` row); "Facture plus tard" confirms unpaid (the invoice comes with M3.2). Payment is `manual` in Phase 1, or a wallee link in M4.1.
+
+**Staff screens and status codes (M3.1):** with Cache Components a page's `notFound()` runs after its first `await`, once the response has started, so production answers `200` with `noindex` (dev shows 404). A screen a role may not open therefore gets its 404 in `proxy.ts`, which verifies Payload's staff token (HS256, key = `sha256(PAYLOAD_SECRET)` hex, first 32 characters; no database) and reads its `roles`. Every page still checks the session with Payload (`requireStaff`). A switched-off module and an unknown document id still show the not-found page with status 200 (the proxy has no database).
+
+**Receiving goods (M3.1):** `purchasing.receive` in one transaction: `receipt` movements (box × factor) with channel `mobile` and `ref` = the purchase order, `receivedUnitQty`, status `partly_received`/`received`, and `variants.costCents` = line cost ÷ factor. More than remains needs a reason; a size not on the order is added by a manager only.
 
 **Catalogue import / export (back office, 7 Nov):** `/admin/import-export` (`components/admin/import-export.tsx`, managers and stock staff). Products: upload `.xlsx`/`.csv` → `inspectImportFile` suggests a mapping (template names) → staff map each field to a column or to one value for every row → `checkCatalogueImport` runs every check, nothing written → `runCatalogueImport` writes 100 rows per call (the page loops; each call re-checks the whole file and writes one `catalogue.import` audit line). All of it is `modules/catalogue/import.ts`, the same code as the CLI and the seed. Export: `exportCatalogue` in the import's format (+ `stock_on_hand`), so export → Excel → import changes only what was edited (an unchanged description is not rewritten, so its formatting survives). Stock: a count from a file (`sku`|`barcode`, `counted`) becomes an **open** `stockCounts` document that staff post as usual (`postCount` → `postMovements`); the movement history exports as CSV. History is never imported: the ledger is append-only.
 
