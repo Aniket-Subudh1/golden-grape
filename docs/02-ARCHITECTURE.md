@@ -22,7 +22,7 @@
 
 Add a package only when a milestone lists it under **Packages added**. Install it with `npm install --save-exact` and record the version here.
 
-Pinned in M1.1 (D-02): `next` 16.4.3, `react`/`react-dom` 19.3.0, `payload`, `@payloadcms/next`, `@payloadcms/db-mongodb`, `@payloadcms/richtext-lexical` 3.92.1, `sharp` 0.35.5, `graphql` 16.14.2, `zod` 4.6.7. Added in M2.1: `papaparse` 5.7.0 (+ `@types/papaparse` 5.5.2, dev). Added for DEP-04 (7 Nov): `read-excel-file` 9.3.14 (reads .xlsx in `lib/table.ts`; MIT, no native code). Added in M3.1: `@zxing/browser` 0.2.1 + `@zxing/library` 0.23.0 (camera scanning, loaded only when the camera sheet opens).
+Pinned in M1.1 (D-02): `next` 16.4.3 (16.4.6 since 17 Nov, security patch, Q-22; `eslint-config-next` alike), `react`/`react-dom` 19.3.0, `payload`, `@payloadcms/next`, `@payloadcms/db-mongodb`, `@payloadcms/richtext-lexical` 3.92.1, `sharp` 0.35.5, `graphql` 16.14.2, `zod` 4.6.7. Added in M2.1: `papaparse` 5.7.0 (+ `@types/papaparse` 5.5.2, dev). Added for DEP-04 (7 Nov): `read-excel-file` 9.3.14 (reads .xlsx in `lib/table.ts`; MIT, no native code). Added in M3.1: `@zxing/browser` 0.2.1 + `@zxing/library` 0.23.0 (camera scanning, loaded only when the camera sheet opens).
 
 The Payload CLI is run as `node --import tsx ./node_modules/payload/bin.js <cmd> --disable-transpile` (the npm scripts do this). Its default `tsImport` loader loads `undici` twice and crashes with `TypeError: Illegal constructor`.
 
