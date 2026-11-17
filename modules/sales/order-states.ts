@@ -1,6 +1,12 @@
 // Order and reservation state machines (03 §4.6, M2.3 T3). Transitions and their side effects are data, checked in
 // one place: `transition()` in service.ts refuses anything not listed and runs exactly the listed effects.
 
+/**
+ * Who moves orders and table reservations, takes and refunds their money (04 §orders: Staff(admin, manager, sales);
+ * Q-19, 17 Nov): one list for the actions, the admin panels and the phone.
+ */
+export const ORDER_ROLES = ['sales', 'manager'] as const;
+
 export const ORDER_STATUSES = ['pending', 'awaiting_payment', 'confirmed', 'ready', 'out_for_delivery', 'completed', 'cancelled', 'refunded'] as const;
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 

@@ -11,7 +11,7 @@ import { activeAccounts, formatIban } from '@/modules/settings/service';
 import { transitionOrder } from '../actions';
 import { orderBankAccount, returnableLines } from '../service';
 import { MODE_LABELS, ORDER_STATUS_LABELS, ORDER_STATUS_TONES, PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS, PAYMENT_STATUS_TONES, type PaymentStatus, RESERVATION_STATUS_LABELS, RESERVATION_STATUS_TONES } from '../collections';
-import type { OrderStatus } from '../order-states';
+import { ORDER_ROLES, type OrderStatus } from '../order-states';
 import { decisionsFor } from './decisions';
 import { langOf, salesText } from './text';
 
@@ -45,7 +45,7 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
   const when = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Luxembourg' });
   const returnable = order.status === 'completed' || order.status === 'refunded' ? await returnableLines(payload, order) : [];
   const account = order.payment?.method === 'transfer' ? orderBankAccount(order, settings.business?.bankAccounts) : null;
-  const decisions = reservation || !hasRole(user, ['sales']) ? [] : decisionsFor(order, t, returnable, activeAccounts(settings.business?.bankAccounts), money);
+  const decisions = reservation || !hasRole(user, ORDER_ROLES) ? [] : decisionsFor(order, t, returnable, activeAccounts(settings.business?.bankAccounts), money);
   // When the order was made ready, if it was (kept after handover too: the history shows the whole story).
   const readyAt = [...(order.history ?? [])].reverse().find((h) => h.to === 'ready')?.at ?? null;
   const totals = order.totals;

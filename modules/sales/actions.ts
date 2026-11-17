@@ -11,7 +11,7 @@ import { currentCustomer, getCustomer, saveAddress } from '@/modules/customers/s
 import { quoteCart } from '@/modules/promotions/service';
 import { SLOT_MODES } from './collections';
 import { mailOrderPlaced, mailOrderStatus, mailReservation } from './mail';
-import { ORDER_STATUSES } from './order-states';
+import { ORDER_ROLES, ORDER_STATUSES } from './order-states';
 import { transitionReservation } from './reservations';
 import { getOrder, getReservation, type MoneyResult, returnItems, orderToken, placeOrder, placeStaffOrder, recordPayment, recordRefund, requestRefund, setOrderBankAccount, slotCalendar, transition, zoneFor } from './service';
 import { deliveryFee } from './zones';
@@ -125,7 +125,7 @@ const collectedAudit = (collect: ReturnType<typeof collectOf>) =>
 /** Staff move an order along (admin buttons); the customer is told when the state machine says so. */
 export const transitionOrder = action(
   z.object({ order: z.string().min(1), to: z.enum(ORDER_STATUSES), reason: optionalText(300), ...collected }),
-  { roles: ['sales'] },
+  { roles: ORDER_ROLES },
   async ({ order, to, reason, ...money }, { payload, user }) => {
     const collect = collectOf(money);
     const result = await transition(payload, order, to, { user: user.id, reason, collect });
@@ -146,7 +146,7 @@ const mailMoved = (result: MoneyResult) => {
 /** Money received for an order: a transfer, a deposit or the rest. Paid in full → a waiting order is confirmed. */
 export const recordOrderPayment = action(
   z.object({ order: z.string().min(1), amount: euros, at: bankDay, method: z.enum(METHODS), reference: optionalText(80) }),
-  { roles: ['sales'] },
+  { roles: ORDER_ROLES },
   async ({ order, amount, at, method, reference }, { payload, user }) => {
     const result = await recordPayment(payload, order, { amountCents: amount, at, method, reference, user: user.id });
     await audit(payload, { user: user.id, action: 'order.payment', collection: 'orders', id: order, ref: result.order.number, after: { amountCents: amount, at: at.toISOString().slice(0, 10), method, reference, payment: result.order.payment?.status, status: result.order.status } });
@@ -156,7 +156,7 @@ export const recordOrderPayment = action(
 );
 
 /** Another of the shop's bank accounts for a transfer order: the customer gets the order e-mail again with its details. */
-export const changeOrderBankAccount = action(z.object({ order: z.string().min(1), account: z.string().min(1) }), { roles: ['sales'] }, async ({ order, account }, { payload, user }) => {
+export const changeOrderBankAccount = action(z.object({ order: z.string().min(1), account: z.string().min(1) }), { roles: ORDER_ROLES }, async ({ order, account }, { payload, user }) => {
   const updated = await setOrderBankAccount(payload, order, account, user.id);
   const chosen = updated.payment?.bankAccount;
   await audit(payload, { user: user.id, action: 'order.bankAccount', collection: 'orders', id: order, ref: updated.number, reason: [chosen?.holder, chosen?.bankName].filter(Boolean).join(' · ') });
@@ -167,7 +167,7 @@ export const changeOrderBankAccount = action(z.object({ order: z.string().min(1)
 /** A refund decided (amount and reason); nothing is sent yet. */
 export const requestOrderRefund = action(
   z.object({ order: z.string().min(1), amount: euros, reason: reasonText }),
-  { roles: ['sales'] },
+  { roles: ORDER_ROLES },
   async ({ order, amount, reason }, { payload, user }) => {
     const result = await requestRefund(payload, order, { amountCents: amount, reason, user: user.id });
     await audit(payload, { user: user.id, action: 'order.refundRequest', collection: 'orders', id: order, ref: result.order.number, reason, after: { amountCents: amount } });
@@ -178,7 +178,7 @@ export const requestOrderRefund = action(
 /** A refund actually sent; once everything is paid back, a handed-over order becomes "refunded" (customer e-mail). */
 export const recordOrderRefund = action(
   z.object({ order: z.string().min(1), amount: euros, at: bankDay, method: z.enum(METHODS), reference: optionalText(80), reason: reasonText }),
-  { roles: ['sales'] },
+  { roles: ORDER_ROLES },
   async ({ order, amount, at, method, reference, reason }, { payload, user }) => {
     const result = await recordRefund(payload, order, { amountCents: amount, at, method, reference, reason, user: user.id });
     await audit(payload, { user: user.id, action: 'order.refund', collection: 'orders', id: order, ref: result.order.number, reason, after: { amountCents: amount, at: at.toISOString().slice(0, 10), method, reference, payment: result.order.payment?.status } });
@@ -193,7 +193,7 @@ export const recordOrderRefund = action(
  */
 export const returnOrderItems = action(
   z.looseObject({ order: z.string().min(1), reason: reasonText }),
-  { roles: ['sales'] },
+  { roles: ORDER_ROLES },
   async (input, { payload, user }) => {
     const lines = Object.entries(input)
       .filter(([key]) => key.startsWith('line_'))
@@ -213,7 +213,7 @@ export const returnOrderItems = action(
  */
 export const decideReservation = action(
   z.object({ reservation: z.string().min(1), to: z.enum(['accepted', 'rejected', 'cancelled', 'completed', 'no_show']), reason: optionalText(300) }),
-  { roles: ['sales'] },
+  { roles: ORDER_ROLES },
   async ({ reservation, to, reason }, { payload, user }) => {
     const result = await transitionReservation(payload, reservation, to, { user: user.id, reason });
     await audit(payload, { user: user.id, action: 'reservation.status', collection: 'reservations', id: reservation, ref: result.reservation.number, reason, before: { status: result.from }, after: { status: to } });
@@ -226,7 +226,7 @@ export const decideReservation = action(
 // ---------------------------------------------------------------------------------------------------------------
 // Mobile sale (M3.1 T5): the phone's sale screen. Same pricing and the same order path as the website.
 
-const saleRoles = { roles: ['sales' as const, 'manager' as const] };
+const saleRoles = { roles: ORDER_ROLES };
 
 /** Live totals of the sale being built, priced for the chosen customer on the mobile channel. */
 export const quoteStaffSale = action(z.object({ customer: z.string().max(40).optional(), lines }), saleRoles, async (input, { payload, user }) => {

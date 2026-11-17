@@ -2,7 +2,7 @@ import type { CollectionConfig, Field, PayloadRequest } from 'payload';
 import { hiddenUnless, isStaff, none, staffOrSelf } from '@/lib/access';
 import { addButton, badgeCell, boolCell, emptyList, l, type Label, listOnly, say, scaledNumber, type StatusTab, statusTabs, timeOfDay, WEEKDAYS } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
-import { ORDER_STATUSES, RESERVATION_STATUSES } from './order-states';
+import { ORDER_ROLES, ORDER_STATUSES, RESERVATION_STATUSES } from './order-states';
 import { isLuxPostalCode, splitPostalCodes } from './zones';
 
 // Orders, table reservations, slot rules and delivery zones (04 §4). Orders and reservations are written only by
@@ -184,7 +184,7 @@ export const orders: CollectionConfig = {
     useAsTitle: 'number',
     // What staff act on (QA 12 Nov, GG-07): number, slot, pickup or delivery, customer, payment, total, stage.
     defaultColumns: ['number', 'slot', 'mode', 'contact', 'payment', 'totals', 'status'],
-    hidden: hiddenUnless('sales'),
+    hidden: hiddenUnless(...ORDER_ROLES),
     listSearchableFields: ['number', 'contact.name', 'contact.email', 'contact.phone'],
     description: l(
       'Les commandes du site, rangées par étape. Ouvrez-en une pour la confirmer, la préparer ou l’annuler.',
@@ -329,7 +329,7 @@ export const reservations: CollectionConfig = {
   admin: {
     useAsTitle: 'number',
     defaultColumns: ['number', 'slot', 'contact', 'guests', 'status', 'attendance', 'preorder'],
-    hidden: hiddenUnless('sales'),
+    hidden: hiddenUnless(...ORDER_ROLES),
     listSearchableFields: ['number', 'contact.name', 'contact.email', 'contact.phone'],
     description: l(
       'Les demandes de table du site. Acceptez ou refusez : le client reçoit un e-mail dans sa langue.',

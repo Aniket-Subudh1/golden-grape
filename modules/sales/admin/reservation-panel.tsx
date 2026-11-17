@@ -7,7 +7,7 @@ import { formatMoney } from '@/lib/money';
 import { slotLabel, today } from '@/lib/time';
 import { decideReservation } from '../actions';
 import { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS, type PaymentStatus, RESERVATION_STATUS_LABELS, RESERVATION_STATUS_TONES } from '../collections';
-import type { OrderStatus, ReservationStatus } from '../order-states';
+import { ORDER_ROLES, type OrderStatus, type ReservationStatus } from '../order-states';
 import { reservationDecisions } from './decisions';
 import { langOf, salesText } from './text';
 
@@ -30,7 +30,7 @@ export default async function ReservationPanel({ id, payload, i18n, user }: UIFi
   const staffName = new Map(staff.docs.map((u) => [u.id, u.name]));
   const when = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Luxembourg' });
   const money = (cents: number | null | undefined) => formatMoney(cents ?? 0, lang);
-  const decisions = hasRole(user, ['sales']) ? reservationDecisions(status, preorder, lang) : [];
+  const decisions = hasRole(user, ORDER_ROLES) ? reservationDecisions(status, preorder, lang) : [];
 
   return (
     <DocPanel>

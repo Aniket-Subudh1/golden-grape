@@ -10,7 +10,7 @@ import { decideReservation, transitionOrder } from '@/modules/sales/actions';
 import { decisionsFor, reservationDecisions } from '@/modules/sales/admin/decisions';
 import { langOf, salesText } from '@/modules/sales/admin/text';
 import { MODE_LABELS, ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS, type PaymentStatus, RESERVATION_STATUS_LABELS } from '@/modules/sales/collections';
-import type { ReservationStatus } from '@/modules/sales/order-states';
+import { ORDER_ROLES, type ReservationStatus } from '@/modules/sales/order-states';
 import { staffAgenda } from '@/modules/sales/service';
 import { requireStaff } from '../../session';
 
@@ -31,7 +31,7 @@ export default async function OrdersPage() {
   const lang = langOf(locale);
   const s = salesText(lang);
   // Moving orders is the sales role's, as in the admin (a manager sees them, sales staff act on them).
-  const acts = hasRole(user, ['sales']);
+  const acts = hasRole(user, ORDER_ROLES);
   const money = (cents: number) => formatMoney(cents, locale);
   return (
     <>

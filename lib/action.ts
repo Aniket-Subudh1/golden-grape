@@ -47,7 +47,7 @@ async function run<S extends z.ZodType, T>(
 export const action =
   <S extends z.ZodType, T>(
     schema: S,
-    { roles }: { roles: Role[] },
+    { roles }: { roles: readonly Role[] },
     fn: (input: z.output<S>, ctx: { payload: Payload; user: StaffUser }) => Promise<T>,
   ) =>
   async (_prev: unknown, input: Input<S>) =>

@@ -114,7 +114,7 @@ Route group `app/(staff)/staff/`, protected by staff auth in `proxy.ts` plus a s
 | `/staff/count` | stock, manager | open count → scan/enter counts → post |
 | `/staff/receive` | stock, manager | pick PO → scan lines → confirm receipt |
 | `/staff/sale` | sales, manager | pick customer → scan/search lines → quote → mark paid on site / invoiced (M4.1: wallee link + QR) |
-| `/staff/orders` | sales, manager | today/upcoming orders and reservations, status buttons |
+| `/staff/orders` | sales, manager | today/upcoming orders and reservations, status buttons (both roles move them, `ORDER_ROLES`, Q-19) |
 | `/staff/customers` | sales, manager | search, view history, create |
 | `/staff/attendance` | everyone with `attendance` | check-in/out (opened from the venue QR) |
 
