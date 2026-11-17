@@ -1,9 +1,10 @@
 'use client';
 
-import { Drawer, toast, useModal } from '@payloadcms/ui';
+import { toast } from '@payloadcms/ui';
 import { Check, KeyRound, Pencil, ShieldCheck, UserPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Sheet } from '@/components/ui/sheet';
 import type { Grantable, Grants, Role } from '@/lib/access';
 import { LOCALE_NAMES } from '@/lib/i18n';
 import { createTeamMember, saveAccessGrants, updateTeamMember } from '../actions';
@@ -17,15 +18,13 @@ type Person = { id: string; name: string; email: string; roles: Role[]; extra: s
 type RoleOption = { value: Role; label: string; detail: string };
 type Result = { ok: true } | { ok: false; error: string; message?: string; fieldErrors?: Record<string, string[]> };
 
-const ADD = 'gg-team-add';
-const EDIT = 'gg-team-edit';
 
 function failure(t: (typeof TEAM_TEXT)['fr'], r: Exclude<Result, { ok: true }>) {
   const key = r.message ?? Object.values(r.fieldErrors ?? {})[0]?.[0] ?? '';
   return (t.errors as Record<string, string>)[key] ?? t.errors.other;
 }
 
-function PersonForm({ lang, roles, person, me, onDone }: { lang: Lang; roles: RoleOption[]; person: Person | null; me: string; onDone: () => void }) {
+function PersonForm({ lang, roles, person, me, onDone, onCancel }: { lang: Lang; roles: RoleOption[]; person: Person | null; me: string; onDone: () => void; onCancel: () => void }) {
   const t = TEAM_TEXT[lang];
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -52,13 +51,15 @@ function PersonForm({ lang, roles, person, me, onDone }: { lang: Lang; roles: Ro
         void submit(e.currentTarget);
       }}
     >
+      <header className="gg-team__form-head">
+        <h2>{person ? `${t.edit} · ${person.name}` : t.add}</h2>
+        {person && <p>{person.email}</p>}
+      </header>
       <label>
         <span>{t.name}</span>
         <input name="name" required minLength={2} maxLength={80} defaultValue={person?.name} autoComplete="off" />
       </label>
-      {person ? (
-        <p className="gg-team__email">{person.email}</p>
-      ) : (
+      {!person && (
         <label>
           <span>{t.email}</span>
           <input name="email" type="email" required maxLength={200} autoComplete="off" />
@@ -67,7 +68,10 @@ function PersonForm({ lang, roles, person, me, onDone }: { lang: Lang; roles: Ro
       <div className="gg-team__field">
         <label>
           <span>{person ? t.newPassword : t.password}</span>
-          <input name="password" type="password" minLength={10} maxLength={200} required={!person} autoComplete="new-password" aria-describedby="gg-team-pw" />
+          {/* Its own box: the reveal eye (password-toggle.tsx) centres on the input's parent. */}
+          <span className="gg-team__pw">
+            <input name="password" type="password" minLength={10} maxLength={200} required={!person} autoComplete="new-password" aria-describedby="gg-team-pw" />
+          </span>
         </label>
         <small id="gg-team-pw">{t.passwordHint}</small>
       </div>
@@ -110,10 +114,15 @@ function PersonForm({ lang, roles, person, me, onDone }: { lang: Lang; roles: Ro
           {error}
         </p>
       )}
-      <button type="submit" className="gg-btn gg-btn--primary" disabled={busy || picked.length === 0}>
-        <Check />
-        <span>{person ? t.save : t.create}</span>
-      </button>
+      <footer className="gg-team__form-foot">
+        <button type="button" className="gg-btn" onClick={onCancel}>
+          <span>{t.cancel}</span>
+        </button>
+        <button type="submit" className="gg-btn gg-btn--primary" disabled={busy || picked.length === 0}>
+          <Check />
+          <span>{busy ? t.saving : person ? t.save : t.create}</span>
+        </button>
+      </footer>
     </form>
   );
 }
@@ -121,13 +130,16 @@ function PersonForm({ lang, roles, person, me, onDone }: { lang: Lang; roles: Ro
 export function TeamTable({ lang, owner, me, roles, people }: { lang: Lang; owner: boolean; me: string; roles: RoleOption[]; people: Person[] }) {
   const t = TEAM_TEXT[lang];
   const router = useRouter();
-  const { openModal, closeModal } = useModal();
-  const [editing, setEditing] = useState<Person | null>(null);
+  // `null` closed, `'new'` adding, a person: editing them.
+  const [open, setOpen] = useState<Person | 'new' | null>(null);
   const [key, setKey] = useState(0);
   const label = new Map(roles.map((r) => [r.value, r.label]));
+  const show = (target: Person | 'new') => {
+    setKey(key + 1);
+    setOpen(target);
+  };
   const done = () => {
-    closeModal(ADD);
-    closeModal(EDIT);
+    setOpen(null);
     // In place: the confirmation stays on screen while the list updates.
     router.refresh();
   };
@@ -142,10 +154,7 @@ export function TeamTable({ lang, owner, me, roles, people }: { lang: Lang; owne
           <button
             type="button"
             className="gg-btn gg-btn--primary"
-            onClick={() => {
-              setKey(key + 1);
-              openModal(ADD);
-            }}
+            onClick={() => show('new')}
           >
             <UserPlus />
             <span>{t.add}</span>
@@ -183,11 +192,7 @@ export function TeamTable({ lang, owner, me, roles, people }: { lang: Lang; owne
                 type="button"
                 className="gg-btn"
                 aria-label={`${t.edit} ${p.name}`}
-                onClick={() => {
-                  setEditing(p);
-                  setKey(key + 1);
-                  openModal(EDIT);
-                }}
+                onClick={() => show(p)}
               >
                 <Pencil />
                 <span>{t.edit}</span>
@@ -197,14 +202,19 @@ export function TeamTable({ lang, owner, me, roles, people }: { lang: Lang; owne
         ))}
       </ul>
       {owner && (
-        <>
-          <Drawer slug={ADD} title={t.add}>
-            <PersonForm key={`add-${key}`} lang={lang} roles={roles} person={null} me={me} onDone={done} />
-          </Drawer>
-          <Drawer slug={EDIT} title={editing ? `${t.edit} · ${editing.name}` : t.edit}>
-            {editing && <PersonForm key={`edit-${key}`} lang={lang} roles={roles} person={editing} me={me} onDone={done} />}
-          </Drawer>
-        </>
+        // The shared pop-up (animated in and out, Escape, scroll kept still), styled for the admin: a centred card on
+        // a laptop, a sheet from the bottom on a phone (custom.css, `.gg-admin-modal`).
+        <Sheet
+          open={open !== null}
+          onOpenChange={(v) => !v && setOpen(null)}
+          label={open === 'new' ? t.add : open ? `${t.edit} · ${open.name}` : t.add}
+          closeLabel={t.close}
+          variant="center"
+          className="gg-admin-modal__panel"
+          dialogClassName="gg-admin-modal"
+        >
+          {open && <PersonForm key={key} lang={lang} roles={roles} person={open === 'new' ? null : open} me={me} onDone={done} onCancel={() => setOpen(null)} />}
+        </Sheet>
       )}
     </section>
   );

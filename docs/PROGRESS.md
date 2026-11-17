@@ -88,6 +88,12 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 - Verified: `npm run check` (359), `npm run test:int` (165, incl. new: counter dish / pickup-only refused for delivery, 47 km refused). Browser on a production build with a throwaway seeded DB: home desktop + iPhone 14, nav "Services Catering", checkout (dish named + removed, 9,6 km fee, 9990 refused), admin range panel (10 → 12 km: 200 → 251 postcodes, 9011 checked). E2E specs updated, **not run** (need the seeded staging DB).
 - Open: Q — Ivo to confirm the starting ranges (≤10 km 5 €, min 30 €, free 80 €; ≤20 km 8 €, min 50 €, free 120 €) and to supply four landscape banner photos.
 
+### 2026-11-17 · Team & access: a real modal (owner report)
+
+- **Reported:** "Add a person" opened Payload's full-screen drawer: the form sat in a narrow column on the left of an empty screen, and the reveal eye was off-centre.
+- **Fixed:** the shared pop-up (`components/ui/sheet.tsx`, the one tested in the staff app: animations in and out, Escape, the page kept still) now serves the admin too (`dialogClassName`), styled in custom.css (`.gg-admin-modal`, the admin has no Tailwind): a 560 px white card centred over a dim on laptops and tablets, rising in and fading out; a bottom sheet with a grab bar on phones; a title, and Cancel / Save pinned at the foot while a long form scrolls; the eye centred (the password input has its own box); the × is "Close", Cancel "Cancel".
+- **Checked (production build):** modal at 1440, 1280×640, iPad and 390 px: animated in and out, centred card or bottom sheet, page still, eye centred, buttons in reach, Cancel / Escape close, Edit opens filled (17/17); Team & access 16/16; staff pop-ups 15/15; site and admin 7/7; check 349, e2e 31 passed / 8 skipped.
+
 ### 2026-11-17 · Team & access (owner request)
 
 - **Asked:** one place in the admin where the owner adds people (staff and other owners) and sets what each role may open. Chosen: a team page plus editable access ("Team page + editable access").

@@ -3548,8 +3548,36 @@ body:has(.gg-create) .no-results__actions {
 .gg-team__form {
   display: grid;
   gap: 18px;
-  max-width: 560px;
-  padding: 8px 0 40px;
+}
+.gg-team__form-head h2 {
+  margin: 0;
+  padding-right: 40px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.gg-team__form-head p {
+  margin: 4px 0 0;
+  color: var(--gg-text-2);
+  font-size: 13px;
+}
+/* Cancel and Save stay in reach at the foot of the card while a long form scrolls. */
+.gg-team__form-foot {
+  position: sticky;
+  bottom: -28px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 4px -28px -28px;
+  padding: 16px 28px;
+  border-top: 1px solid var(--gg-line);
+  background: #ffffff;
+}
+.gg-team__pw {
+  display: block;
+}
+.gg-team__pw > input {
+  width: 100%;
 }
 .gg-team__form label:not(.gg-team__check) {
   display: grid;
@@ -3602,10 +3630,6 @@ body:has(.gg-create) .no-results__actions {
   flex-wrap: wrap;
   align-items: flex-end;
   gap: 16px 24px;
-}
-.gg-team__email {
-  margin: 0;
-  color: var(--gg-text-2);
 }
 .gg-team__error {
   margin: 0;
@@ -3732,5 +3756,159 @@ body:has(.gg-create) .no-results__actions {
   }
   .gg-team__opens {
     padding: 4px 16px 16px;
+  }
+}
+
+/* The admin's modal (Team & access): components/ui/sheet.tsx's pop-up, styled here (the admin has no Tailwind).
+   Laptop: a centred white card rising in; phone: a sheet from the bottom. Exit: components/ui/sheet.tsx keeps it on
+   screen 220 ms, non-modal and click-through, while these animations run. */
+.gg-admin-modal.gg-sheet {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 24px;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+}
+.gg-admin-modal.gg-sheet[open] {
+  display: grid;
+  place-items: center;
+}
+.gg-admin-modal::backdrop {
+  background: rgb(16 24 40 / 0.45);
+  animation: gg-admin-fade-in 0.25s ease both;
+}
+.gg-admin-modal .gg-admin-modal__panel {
+  position: relative;
+  box-sizing: border-box;
+  width: min(560px, 100%);
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 26px 28px 28px;
+  border: 1px solid var(--gg-line);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 24px 48px -12px rgb(16 24 40 / 0.28);
+  animation: gg-admin-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.gg-admin-modal .gg-sheet__close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--gg-text-2);
+  cursor: pointer;
+}
+.gg-admin-modal .gg-sheet__close:hover {
+  background: var(--gg-accent);
+  color: var(--gg-ink);
+}
+.gg-admin-modal .gg-sheet__close svg {
+  width: 18px;
+  height: 18px;
+}
+.gg-admin-modal[data-closing] {
+  z-index: 1000;
+  pointer-events: none;
+  animation: gg-admin-dim-out 0.22s ease-in both;
+}
+.gg-admin-modal[data-closing] .gg-admin-modal__panel {
+  animation: gg-admin-out 0.2s ease-in both;
+}
+@keyframes gg-admin-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes gg-admin-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+}
+@keyframes gg-admin-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+@keyframes gg-admin-dim-out {
+  from {
+    background-color: rgb(16 24 40 / 0.45);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+@media (max-width: 640px) {
+  .gg-admin-modal.gg-sheet {
+    padding: 0;
+  }
+  .gg-admin-modal.gg-sheet[open] {
+    place-items: end stretch;
+  }
+  .gg-admin-modal .gg-admin-modal__panel {
+    width: 100%;
+    max-height: 92dvh;
+    padding: 30px 20px calc(24px + env(safe-area-inset-bottom));
+    border-width: 1px 0 0;
+    border-radius: 18px 18px 0 0;
+    animation: gg-admin-up 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+  /* A grab bar: the panel came up from the bottom edge. */
+  .gg-admin-modal .gg-admin-modal__panel::before {
+    content: '';
+    position: absolute;
+    top: 9px;
+    left: 50%;
+    width: 40px;
+    height: 4px;
+    margin-left: -20px;
+    border-radius: 999px;
+    background: var(--gg-line);
+  }
+  .gg-admin-modal[data-closing] .gg-admin-modal__panel {
+    animation: gg-admin-down 0.22s cubic-bezier(0.4, 0, 1, 1) both;
+  }
+  .gg-team__form-foot {
+    bottom: calc(-24px - env(safe-area-inset-bottom));
+    margin: 4px -20px calc(-24px - env(safe-area-inset-bottom));
+    padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
+  }
+  .gg-team__form-foot .gg-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+@keyframes gg-admin-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes gg-admin-down {
+  to {
+    transform: translateY(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gg-admin-modal::backdrop,
+  .gg-admin-modal .gg-admin-modal__panel,
+  .gg-admin-modal[data-closing],
+  .gg-admin-modal[data-closing] .gg-admin-modal__panel {
+    animation: none;
   }
 }

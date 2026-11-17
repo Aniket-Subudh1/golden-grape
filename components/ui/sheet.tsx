@@ -15,6 +15,8 @@ type Props = {
   /** `side`: slides in from the right (cart, filters). `center`: a centred card (event booking). `bottom`: rises from
    * the bottom edge (the staff screens' camera and forms; a centred dialog from tablets up in the staff app). */
   variant?: 'side' | 'center' | 'bottom';
+  /** Extra class on the <dialog> itself (the admin's modal styles it in custom.css, without Tailwind). */
+  dialogClassName?: string;
 };
 
 /** How long the closing animation runs (globals.css, `.gg-sheet[data-closing]`). */
@@ -43,7 +45,7 @@ function unlockScroll() {
  * the backdrop, Escape, or the parent) plays the exit animation first, with the panel's content kept as it was, so a
  * form mounted only while open does not vanish before the panel does.
  */
-export function Sheet({ open, onOpenChange, label, closeLabel, children, className, variant = 'side' }: Props) {
+export function Sheet({ open, onOpenChange, label, closeLabel, children, className, variant = 'side', dialogClassName }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   // Closes made here (the exit, a reopen) are not the user's: the `close` event they fire is ignored.
   const ours = useRef(0);
@@ -112,6 +114,7 @@ export function Sheet({ open, onOpenChange, label, closeLabel, children, classNa
         'gg-sheet fixed inset-0 h-dvh w-screen',
         variant === 'center' && 'gg-sheet--center place-items-center p-4 open:grid',
         variant === 'bottom' && 'gg-sheet--bottom',
+        dialogClassName,
       )}
       // Escape: the same exit as the × (the browser would otherwise close it at once).
       onCancel={(e) => {
@@ -142,7 +145,7 @@ export function Sheet({ open, onOpenChange, label, closeLabel, children, classNa
           type="button"
           onClick={() => onOpenChange(false)}
           aria-label={closeLabel}
-          className="hover:bg-ink hover:text-bone absolute top-5 right-5 z-10 grid h-9 w-9 place-items-center rounded-full transition"
+          className="gg-sheet__close hover:bg-ink hover:text-bone absolute top-5 right-5 z-10 grid h-9 w-9 place-items-center rounded-full transition"
         >
           <X className="h-4 w-4" />
         </button>
