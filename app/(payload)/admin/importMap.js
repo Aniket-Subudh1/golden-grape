@@ -65,6 +65,7 @@ import { default as default_e7547a6d616d19573a629279234f5127 } from '@/modules/d
 import { TotalCell as TotalCell_d6358e374739dc2aac8672e72d6cc454 } from '@/modules/documents/admin/cells'
 import { AccountingExport as AccountingExport_e0280cd7f0117a34dccb6bc7a9d49985 } from '@/modules/documents/admin/document-actions'
 import { InvoiceActions as InvoiceActions_e0280cd7f0117a34dccb6bc7a9d49985 } from '@/modules/documents/admin/document-actions'
+import { CorrectButton as CorrectButton_2d1e765cf2f5907dc8738db91b94eedc } from '@/modules/attendance/admin/correct-button'
 import { default as default_a2f0eccb7507197ce791108816851322 } from '@/components/admin/nav'
 import { default as default_0430f5fb3b8132a602107d7535a2a344 } from '@/components/admin/icon'
 import { default as default_334250e18ce0b45af3e0c04bb6fe8307 } from '@/components/admin/logo'
@@ -77,6 +78,7 @@ import { default as default_7215358aebef2f123662c81dc8a03dd2 } from '@/component
 import { default as default_47394fc398fbb6257bef21c65839433a } from '@/components/admin/import-export'
 import { default as default_3ee16c206b08a67611daf03ad27771c6 } from '@/modules/events/admin/events-board'
 import { default as default_8030b3f7edb9dc16d3547684ed039a06 } from '@/modules/purchasing/admin/reorder-view'
+import { default as default_3979806158f105f174bae8f4a6e6eeca } from '@/modules/attendance/admin/report-view'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 
@@ -149,6 +151,7 @@ export const importMap = {
   "@/modules/documents/admin/cells#TotalCell": TotalCell_d6358e374739dc2aac8672e72d6cc454,
   "@/modules/documents/admin/document-actions#AccountingExport": AccountingExport_e0280cd7f0117a34dccb6bc7a9d49985,
   "@/modules/documents/admin/document-actions#InvoiceActions": InvoiceActions_e0280cd7f0117a34dccb6bc7a9d49985,
+  "@/modules/attendance/admin/correct-button#CorrectButton": CorrectButton_2d1e765cf2f5907dc8738db91b94eedc,
   "@/components/admin/nav#default": default_a2f0eccb7507197ce791108816851322,
   "@/components/admin/icon#default": default_0430f5fb3b8132a602107d7535a2a344,
   "@/components/admin/logo#default": default_334250e18ce0b45af3e0c04bb6fe8307,
@@ -161,6 +164,7 @@ export const importMap = {
   "@/components/admin/import-export#default": default_47394fc398fbb6257bef21c65839433a,
   "@/modules/events/admin/events-board#default": default_3ee16c206b08a67611daf03ad27771c6,
   "@/modules/purchasing/admin/reorder-view#default": default_8030b3f7edb9dc16d3547684ed039a06,
+  "@/modules/attendance/admin/report-view#default": default_3979806158f105f174bae8f4a6e6eeca,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24
 }

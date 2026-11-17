@@ -6,9 +6,9 @@ import { currentStaff, isModuleOn } from '@/modules/settings/service';
 import { SCREENS, type Screen } from './screens';
 
 /** The order of the bottom tab bar: the first five a user may open (05 §5, at most 5 tabs). */
-const TABS: Screen[] = ['home', 'scan', 'sale', 'orders', 'receive', 'count', 'customers'];
+const TABS: Screen[] = ['home', 'scan', 'sale', 'orders', 'receive', 'count', 'customers', 'attendance'];
 /** The order of the sidebar: everything a role opens, the reorder list included. */
-const NAV: Screen[] = ['home', 'scan', 'sale', 'orders', 'customers', 'receive', 'count', 'reorder'];
+const NAV: Screen[] = ['home', 'scan', 'sale', 'orders', 'customers', 'receive', 'count', 'reorder', 'attendance', 'attendanceQr'];
 
 type ScreenRule = { roles: readonly Role[]; module?: ModuleName };
 

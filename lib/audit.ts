@@ -34,6 +34,7 @@ export const AUDIT_ACTIONS = [
   'invoice.paid',
   'creditNote.issued',
   'deliveryNote.issued',
+  'attendance.corrected',
   'doc.create',
   'doc.update',
   'doc.delete',

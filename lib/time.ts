@@ -45,6 +45,9 @@ export function dayStamp(date: Date) {
 /** True when `at` comes before the start of the slot (`slotAt`): an order made ready early (GG-027). */
 export const isBeforeSlot = (slotAt: string | null | undefined, at: Date = new Date()) => Boolean(slotAt) && localStamp(at) < slotAt!;
 
+/** A duration as "7 h 05" (attendance hours). */
+export const hoursAndMinutes = (minutes: number) => `${Math.floor(minutes / 60)} h ${String(Math.round(minutes) % 60).padStart(2, '0')}`;
+
 /** Today's date in Luxembourg as `YYYY-MM-DD`. */
 export function today(now: Date = new Date()) {
   const { year, month, day } = toLocal(now);

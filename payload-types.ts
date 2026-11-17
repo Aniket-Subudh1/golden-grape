@@ -108,6 +108,8 @@ export interface Config {
     loyaltyLedger: LoyaltyLedger;
     giftCards: GiftCard;
     giftCardLedger: GiftCardLedger;
+    attendance: Attendance;
+    attendanceCorrections: AttendanceCorrection;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -171,6 +173,8 @@ export interface Config {
     loyaltyLedger: LoyaltyLedgerSelect<false> | LoyaltyLedgerSelect<true>;
     giftCards: GiftCardsSelect<false> | GiftCardsSelect<true>;
     giftCardLedger: GiftCardLedgerSelect<false> | GiftCardLedgerSelect<true>;
+    attendance: AttendanceSelect<false> | AttendanceSelect<true>;
+    attendanceCorrections: AttendanceCorrectionsSelect<false> | AttendanceCorrectionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -308,6 +312,7 @@ export interface AuditLog {
     | 'invoice.paid'
     | 'creditNote.issued'
     | 'deliveryNote.issued'
+    | 'attendance.corrected'
     | 'doc.create'
     | 'doc.update'
     | 'doc.delete';
@@ -1971,6 +1976,39 @@ export interface GiftCardLedger {
   createdAt: string;
 }
 /**
+ * Check-ins and check-outs on the daily QR. To fix a time or a missing check-out: open the row, “Correct”.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attendance".
+ */
+export interface Attendance {
+  id: string;
+  user: string | User;
+  day: string;
+  checkIn?: string | null;
+  checkOut?: string | null;
+  minutes?: number | null;
+  open?: boolean | null;
+  source?: ('qr' | 'manager') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attendanceCorrections".
+ */
+export interface AttendanceCorrection {
+  id: string;
+  attendance: string | Attendance;
+  field: 'checkIn' | 'checkOut';
+  before?: string | null;
+  after?: string | null;
+  reason: string;
+  by: string | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -2153,6 +2191,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'giftCardLedger';
         value: string | GiftCardLedger;
+      } | null)
+    | ({
+        relationTo: 'attendance';
+        value: string | Attendance;
+      } | null)
+    | ({
+        relationTo: 'attendanceCorrections';
+        value: string | AttendanceCorrection;
       } | null);
   globalSlug?: string | null;
   user:
@@ -3393,6 +3439,35 @@ export interface GiftCardLedgerSelect<T extends boolean = true> {
   type?: T;
   order?: T;
   user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attendance_select".
+ */
+export interface AttendanceSelect<T extends boolean = true> {
+  user?: T;
+  day?: T;
+  checkIn?: T;
+  checkOut?: T;
+  minutes?: T;
+  open?: T;
+  source?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attendanceCorrections_select".
+ */
+export interface AttendanceCorrectionsSelect<T extends boolean = true> {
+  attendance?: T;
+  field?: T;
+  before?: T;
+  after?: T;
+  reason?: T;
+  by?: T;
   updatedAt?: T;
   createdAt?: T;
 }

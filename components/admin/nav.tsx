@@ -126,6 +126,8 @@ const GROUPS: {
       { label: 'topMenu', slug: 'Header', global: true, icon: 'header' },
       { label: 'footer', slug: 'Footer', global: true, icon: 'footer' },
       { label: 'team', slug: 'users', icon: 'users' },
+      { label: 'attendanceReport', slug: 'attendance-report', path: '/admin/attendance-report', roles: ['manager'], module: 'attendance', icon: 'slots' },
+      { label: 'attendance', slug: 'attendance', roles: ['manager'], module: 'attendance', icon: 'slots' },
       { label: 'activity', slug: 'auditLogs', icon: 'audit' },
     ],
   },

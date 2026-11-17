@@ -14,6 +14,8 @@ export const SCREENS = {
   customers: { href: '/staff/customers', roles: ['sales', 'manager'] },
   stock: { href: '/staff/stock', roles: ['stock', 'manager'] },
   reorder: { href: '/staff/reorder', roles: ['stock', 'manager'], module: 'purchasing' },
+  attendance: { href: '/staff/attendance', roles: ['attendance', 'manager'], module: 'attendance' },
+  attendanceQr: { href: '/staff/attendance/qr', roles: ['manager'], module: 'attendance' },
 } as const satisfies Record<string, { href: string; roles: Role[]; module?: ModuleName }>;
 export type Screen = keyof typeof SCREENS;
 

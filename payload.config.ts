@@ -19,6 +19,7 @@ import { cmsGlobals } from '@/modules/cms/globals';
 import { catalogueCollections } from '@/modules/catalogue/collections';
 import { customerGroups, customers } from '@/modules/customers/collections';
 import { cateringPackages, cateringRequests } from '@/modules/catering/collections';
+import { attendanceCollections } from '@/modules/attendance/collections';
 import { documentCollections } from '@/modules/documents/collections';
 import { promotionCollections } from '@/modules/promotions/collections';
 import { eventBookings, events } from '@/modules/events/collections';
@@ -91,6 +92,8 @@ export default buildConfig({
         eventBookings: { Component: '@/modules/events/admin/events-board', path: '/event-bookings' },
         // Low stock with the cheapest supplier and a suggested quantity; draft purchase orders from it (M3.1 T4).
         reorder: { Component: '@/modules/purchasing/admin/reorder-view', path: '/reorder' },
+        // Monthly hours per person, who is in now, the CSV (M3.3 T3).
+        attendanceReport: { Component: '@/modules/attendance/admin/report-view', path: '/attendance-report' },
       },
     },
   },
@@ -110,6 +113,7 @@ export default buildConfig({
     payments,
     ...documentCollections,
     ...promotionCollections,
+    ...attendanceCollections,
   ]
     .map(withAudit)
     .map(withListFields),

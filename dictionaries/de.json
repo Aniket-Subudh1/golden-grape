@@ -1230,7 +1230,9 @@
       "receive": "Wareneingang",
       "count": "Inventur",
       "customers": "Kunden",
-      "reorder": "Nachbestellen"
+      "reorder": "Nachbestellen",
+      "attendance": "Zeiterfassung",
+      "attendanceQr": "Tages-QR"
     },
     "home": {
       "hello": "Hallo {{name}}",
@@ -1507,6 +1509,53 @@
       "paid": "Bezahlt",
       "unpaid": "Offen"
     },
-    "menu": "Menü"
+    "menu": "Menü",
+    "attendance": {
+      "title": "Zeiterfassung",
+      "in": "Kommen",
+      "out": "Gehen",
+      "since": "Eingestempelt seit {{time}}",
+      "notIn": "Nicht eingestempelt",
+      "doneIn": "Eingestempelt um {{time}}",
+      "doneOut": "Ausgestempelt um {{time}} · {{hours}}",
+      "scanFirst": "Scannen Sie den heutigen QR-Code vor Ort mit der Handykamera, um zu stempeln.",
+      "expired": "Dieser QR-Code ist nicht mehr gültig. Scannen Sie den heute vor Ort gezeigten Code.",
+      "tooSoon": "Gerade eben schon erfasst. In 30 Sekunden erneut versuchen.",
+      "now": "Jetzt",
+      "month": "Monat",
+      "nobody": "Niemand ist eingestempelt.",
+      "venueQr": "Tages-QR",
+      "person": "Person",
+      "total": "Summe",
+      "missing": "Gehen fehlt",
+      "correct": "Korrigieren",
+      "setOut": "Gehen eintragen",
+      "field": "Zu korrigierende Zeit",
+      "checkIn": "Kommen",
+      "checkOut": "Gehen",
+      "at": "Richtige Zeit",
+      "reason": "Grund",
+      "reasonPh": "z. B. Ausstempeln vergessen",
+      "save": "Korrektur speichern",
+      "saved": "Korrektur gespeichert.",
+      "export": "CSV exportieren",
+      "noShifts": "Keine Schichten in diesem Monat.",
+      "shifts": "Schichten",
+      "prev": "Voriger Monat",
+      "next": "Nächster Monat",
+      "qrTitle": "Heutiger Zeiterfassungs-QR",
+      "qrText": "Mit der Handykamera scannen, um zu stempeln. Nach Mitternacht erscheint ein neuer Code; der von gestern gilt bis 03:00.",
+      "errors": {
+        "outBeforeIn": "Gehen muss nach Kommen liegen.",
+        "shiftTooLong": "Eine Schicht darf nicht länger als 24 Stunden sein.",
+        "timeInFuture": "Die Zeit darf nicht in der Zukunft liegen.",
+        "reasonRequired": "Bitte einen Grund angeben (mindestens 3 Zeichen).",
+        "qrExpired": "Dieser QR-Code ist nicht mehr gültig. Scannen Sie den heute vor Ort gezeigten Code.",
+        "RATE_LIMITED": "Gerade eben schon erfasst. In 30 Sekunden erneut versuchen."
+      },
+      "error": "Das ging nicht. Bitte erneut versuchen.",
+      "corrected": "Korrigiert",
+      "mine": "Mein Stempeln"
+    }
   }
 }

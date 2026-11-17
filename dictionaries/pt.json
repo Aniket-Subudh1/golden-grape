@@ -1230,7 +1230,9 @@
       "receive": "Receção",
       "count": "Inventário",
       "customers": "Clientes",
-      "reorder": "Repor"
+      "reorder": "Repor",
+      "attendance": "Ponto",
+      "attendanceQr": "QR do dia"
     },
     "home": {
       "hello": "Olá {{name}}",
@@ -1507,6 +1509,53 @@
       "paid": "Paga",
       "unpaid": "Por pagar"
     },
-    "menu": "Menu"
+    "menu": "Menu",
+    "attendance": {
+      "title": "Ponto",
+      "in": "Registar entrada",
+      "out": "Registar saída",
+      "since": "Entrada desde {{time}}",
+      "notIn": "Sem entrada registada",
+      "doneIn": "Entrada registada às {{time}}",
+      "doneOut": "Saída registada às {{time}} · {{hours}}",
+      "scanFirst": "Leia o QR do dia, afixado no local, com a câmara do telemóvel para registar o ponto.",
+      "expired": "Este QR já não é válido. Leia o código afixado hoje no local.",
+      "tooSoon": "Já registado há um instante. Tente de novo dentro de 30 segundos.",
+      "now": "Agora",
+      "month": "Mês",
+      "nobody": "Ninguém tem entrada registada.",
+      "venueQr": "QR do dia",
+      "person": "Pessoa",
+      "total": "Total",
+      "missing": "Saída em falta",
+      "correct": "Corrigir",
+      "setOut": "Indicar a saída",
+      "field": "Hora a corrigir",
+      "checkIn": "Entrada",
+      "checkOut": "Saída",
+      "at": "Hora correta",
+      "reason": "Motivo",
+      "reasonPh": "ex. esqueceu-se de registar a saída",
+      "save": "Guardar correção",
+      "saved": "Correção guardada.",
+      "export": "Exportar CSV",
+      "noShifts": "Sem turnos este mês.",
+      "shifts": "Turnos",
+      "prev": "Mês anterior",
+      "next": "Mês seguinte",
+      "qrTitle": "QR de ponto do dia",
+      "qrText": "Leia com a câmara do telemóvel para registar o ponto. Depois da meia-noite aparece um novo código; o de ontem vale até às 03:00.",
+      "errors": {
+        "outBeforeIn": "A saída tem de ser depois da entrada.",
+        "shiftTooLong": "Um turno não pode passar de 24 horas.",
+        "timeInFuture": "A hora não pode estar no futuro.",
+        "reasonRequired": "Indique um motivo (pelo menos 3 caracteres).",
+        "qrExpired": "Este QR já não é válido. Leia o código afixado hoje no local.",
+        "RATE_LIMITED": "Já registado há um instante. Tente de novo dentro de 30 segundos."
+      },
+      "error": "Não funcionou. Tente de novo.",
+      "corrected": "Corrigido",
+      "mine": "O meu ponto"
+    }
   }
 }

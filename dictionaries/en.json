@@ -1230,7 +1230,9 @@
       "receive": "Receive",
       "count": "Count",
       "customers": "Customers",
-      "reorder": "Reorder"
+      "reorder": "Reorder",
+      "attendance": "Time clock",
+      "attendanceQr": "Venue QR"
     },
     "home": {
       "hello": "Hello {{name}}",
@@ -1507,6 +1509,53 @@
       "paid": "Paid",
       "unpaid": "To pay"
     },
-    "menu": "Menu"
+    "menu": "Menu",
+    "attendance": {
+      "title": "Time clock",
+      "in": "Check in",
+      "out": "Check out",
+      "since": "Checked in since {{time}}",
+      "notIn": "Not checked in",
+      "doneIn": "Checked in at {{time}}",
+      "doneOut": "Checked out at {{time}} · {{hours}}",
+      "scanFirst": "Scan today’s QR code at the venue with your phone camera to check in or out.",
+      "expired": "This QR code is no longer valid. Scan the code shown at the venue today.",
+      "tooSoon": "Already recorded a moment ago. Try again in 30 seconds.",
+      "now": "Now",
+      "month": "Month",
+      "nobody": "Nobody is checked in.",
+      "venueQr": "Venue QR",
+      "person": "Person",
+      "total": "Total",
+      "missing": "Check-out missing",
+      "correct": "Correct",
+      "setOut": "Set check-out",
+      "field": "Time to correct",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "at": "Correct time",
+      "reason": "Reason",
+      "reasonPh": "e.g. forgot to scan out",
+      "save": "Save correction",
+      "saved": "Correction saved.",
+      "export": "Export CSV",
+      "noShifts": "No shifts this month.",
+      "shifts": "Shifts",
+      "prev": "Previous month",
+      "next": "Next month",
+      "qrTitle": "Today’s attendance QR",
+      "qrText": "Scan with your phone camera to check in or out. A new code appears after midnight; yesterday’s works until 03:00.",
+      "errors": {
+        "outBeforeIn": "The check-out must come after the check-in.",
+        "shiftTooLong": "A shift cannot last more than 24 hours.",
+        "timeInFuture": "The time cannot be in the future.",
+        "reasonRequired": "Give a reason (at least 3 characters).",
+        "qrExpired": "This QR code is no longer valid. Scan the code shown at the venue today.",
+        "RATE_LIMITED": "Already recorded a moment ago. Try again in 30 seconds."
+      },
+      "error": "That did not work. Try again.",
+      "corrected": "Corrected",
+      "mine": "My check-in"
+    }
   }
 }

@@ -1230,7 +1230,9 @@
       "receive": "Réception",
       "count": "Inventaire",
       "customers": "Clients",
-      "reorder": "À recommander"
+      "reorder": "À recommander",
+      "attendance": "Pointage",
+      "attendanceQr": "QR du jour"
     },
     "home": {
       "hello": "Bonjour {{name}}",
@@ -1507,6 +1509,53 @@
       "paid": "Payée",
       "unpaid": "À payer"
     },
-    "menu": "Menu"
+    "menu": "Menu",
+    "attendance": {
+      "title": "Pointage",
+      "in": "Pointer l’arrivée",
+      "out": "Pointer le départ",
+      "since": "Arrivé·e depuis {{time}}",
+      "notIn": "Pas pointé·e",
+      "doneIn": "Arrivée pointée à {{time}}",
+      "doneOut": "Départ pointé à {{time}} · {{hours}}",
+      "scanFirst": "Scannez le QR du jour, affiché sur place, avec l’appareil photo de votre téléphone pour pointer.",
+      "expired": "Ce QR n’est plus valable. Scannez celui affiché aujourd’hui sur place.",
+      "tooSoon": "Déjà enregistré il y a un instant. Réessayez dans 30 secondes.",
+      "now": "Maintenant",
+      "month": "Mois",
+      "nobody": "Personne n’est pointé.",
+      "venueQr": "QR du jour",
+      "person": "Personne",
+      "total": "Total",
+      "missing": "Départ manquant",
+      "correct": "Corriger",
+      "setOut": "Saisir le départ",
+      "field": "Heure à corriger",
+      "checkIn": "Arrivée",
+      "checkOut": "Départ",
+      "at": "Heure correcte",
+      "reason": "Raison",
+      "reasonPh": "ex. oubli de pointer le départ",
+      "save": "Enregistrer la correction",
+      "saved": "Correction enregistrée.",
+      "export": "Exporter en CSV",
+      "noShifts": "Aucun pointage ce mois-ci.",
+      "shifts": "Pointages",
+      "prev": "Mois précédent",
+      "next": "Mois suivant",
+      "qrTitle": "QR de pointage du jour",
+      "qrText": "Scannez avec l’appareil photo du téléphone pour pointer. Un nouveau code apparaît après minuit ; celui de la veille reste valable jusqu’à 03:00.",
+      "errors": {
+        "outBeforeIn": "Le départ doit venir après l’arrivée.",
+        "shiftTooLong": "Un service ne peut pas dépasser 24 heures.",
+        "timeInFuture": "L’heure ne peut pas être dans le futur.",
+        "reasonRequired": "Indiquez une raison (3 caractères au moins).",
+        "qrExpired": "Ce QR n’est plus valable. Scannez celui affiché aujourd’hui sur place.",
+        "RATE_LIMITED": "Déjà enregistré il y a un instant. Réessayez dans 30 secondes."
+      },
+      "error": "Cela n’a pas marché. Réessayez.",
+      "corrected": "Corrigé",
+      "mine": "Mon pointage"
+    }
   }
 }
