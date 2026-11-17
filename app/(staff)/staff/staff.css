@@ -91,7 +91,7 @@ html:has(body.gg-staff) {
   scrollbar-gutter: auto;
 }
 
-/* The success tick (components/staff/success-tick.tsx): pop, draw, ripple. */
+/* The success tick (components/staff/success-tick.tsx): pop, draw, one ripple, a small burst of flecks. */
 .gg-tick__disc {
   animation: gg-tick-pop 0.5s cubic-bezier(0.2, 1.5, 0.4, 1) both;
 }
@@ -102,10 +102,22 @@ html:has(body.gg-staff) {
 }
 .gg-tick__ripple {
   opacity: 0;
-  animation: gg-tick-ripple 1.1s ease-out 0.25s;
+  animation: gg-tick-ripple 1s ease-out 0.25s;
 }
-.gg-tick__ripple--late {
-  animation-delay: 0.5s;
+.gg-tick__fleck {
+  opacity: 0;
+  translate: -50% -50%;
+  animation: gg-fleck 0.8s cubic-bezier(0.15, 0.7, 0.3, 1) 0.3s;
+}
+/* The toast's small tick (ToastCheck). */
+.gg-toast-check__disc {
+  transform-origin: center;
+  animation: gg-tick-pop 0.35s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+.gg-toast-check__tick {
+  stroke-dasharray: 14;
+  stroke-dashoffset: 14;
+  animation: gg-tick-draw 0.25s ease-out 0.15s forwards;
 }
 @keyframes gg-tick-pop {
   from {
@@ -125,15 +137,31 @@ html:has(body.gg-staff) {
   }
   to {
     opacity: 0;
-    transform: scale(1.9);
+    transform: scale(1.8);
+  }
+}
+@keyframes gg-fleck {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) rotate(var(--r));
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .gg-tick__disc,
-  .gg-tick__ripple {
+  .gg-tick__ripple,
+  .gg-tick__fleck,
+  .gg-toast-check__disc {
     animation: none;
   }
-  .gg-tick__check {
+  .gg-tick__check,
+  .gg-toast-check__tick {
     animation: none;
     stroke-dashoffset: 0;
   }

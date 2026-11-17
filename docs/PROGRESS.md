@@ -75,6 +75,11 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-17 · "Done" feedback on every save, kept minimal (owner request)
+
+- **Built:** two levels. Big moments (sale, receipt, count posted): chime; sale and receipt also show the tick with one ripple and a small fixed burst of 10 gold/green flecks; a posted count lands on the Posted tab. Everyday saves (customer created or edited, stock corrected, order or table moved, draft order): a quiet two-note `done()` and a success toast whose tick draws itself. Per-scan toasts are plain; removing a line or changing a quantity makes no sound. Reduced motion: everything still, ticks shown drawn.
+- **Checked (production build, Pixel 7):** stock corrected → done + drawing tick toast; count scan → beep, plain toast; count posted → chime, Posted tab; receipt → chime + tick + 10 flecks; customer created → done; sale → chime; order moved → done; line removed → silent; no page error. Walk-through 25/25 at 360 px and 1440 px (test stock of the Alentejo topped up by a +60 correction in the app), check 290, build, e2e 29 passed / 4 skipped.
+
 ### 2026-11-17 · Scan sounds and the success tick (owner request)
 
 - **Built:** a scanner beep and a short vibration on every code found (Scan, Sale, Count, Receive), two low buzzes for a code not found, and on a sale or a receipt done an animated green tick (pop, draw, ripples) with a "cha-ching" chime (`components/staff/feedback.ts`, `success-tick.tsx`, keyframes in `staff.css`). Sound is generated in the browser (Web Audio), nothing downloaded; animation off under reduced motion. The camera no longer vibrates on its own (the screen's beep or buzz says found or not).

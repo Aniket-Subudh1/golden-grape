@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { ActionForm, SubmitButton } from '@/components/ui/action-form';
 import { Field } from '@/components/ui/field';
 import { adjustStock } from '@/modules/inventory/actions';
+import { done } from './feedback';
 
 type Texts = {
   title: string;
@@ -35,7 +36,10 @@ export function AdjustForm({
     <ActionForm
       action={adjustStock}
       messages={{ ...messages, success: t.done }}
-      onSuccess={() => router.refresh()}
+      onSuccess={() => {
+        done();
+        router.refresh();
+      }}
       className="gg-card space-y-5 p-4"
     >
       <h2 className="font-serif text-xl">{t.title}</h2>

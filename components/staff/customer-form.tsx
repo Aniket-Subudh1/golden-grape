@@ -5,6 +5,7 @@ import { ActionForm, SubmitButton } from '@/components/ui/action-form';
 import { Field } from '@/components/ui/field';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { createCustomerStaff, updateCustomerStaff } from '@/modules/customers/actions';
+import { done } from './feedback';
 
 export type CustomerTexts = {
   name: string;
@@ -58,8 +59,11 @@ export function CustomerForm({
   return (
     <ActionForm
       action={initial ? updateCustomerStaff : createCustomerStaff}
-      messages={{ ...messages, success: initial ? t.saved : undefined }}
-      onSuccess={onDone}
+      messages={{ ...messages, success: t.saved }}
+      onSuccess={(customer) => {
+        done();
+        onDone(customer);
+      }}
       keepValues={Boolean(initial)}
       className="space-y-4"
     >

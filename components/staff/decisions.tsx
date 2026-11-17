@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet } from '@/components/ui/sheet';
 import type { ActionResult } from '@/lib/action';
 import { cn } from '@/lib/cn';
+import { done } from './feedback';
 
 type Action = (prev: unknown, input: FormData) => Promise<ActionResult<unknown>>;
 
@@ -84,6 +85,7 @@ export function StaffDecisions({
         if (result.error === 'CONFLICT') router.refresh();
         return;
       }
+      done();
       toast.success(text.done);
       setOpen(null);
       router.refresh();

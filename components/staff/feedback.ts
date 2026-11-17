@@ -1,5 +1,5 @@
 // The staff app's sounds and buzzes (owner request, 17 Nov): a scanner beep when a code is found, a low buzz when it is
-// not, and a short chime when a sale or a receipt is done. Made with Web Audio (no files to load); quiet, and silent
+// not, a quiet "done" for everyday saves, and a short chime when a sale, a receipt or a count is done. Made with Web Audio (no files to load); quiet, and silent
 // where the browser has no audio. Phones only play sound after a first touch, so the context is opened on the first
 // tap or key press.
 
@@ -55,6 +55,13 @@ export function missed() {
   note(196, 0, 0.12, 'triangle', 0.14);
   note(165, 0.14, 0.16, 'triangle', 0.14);
   navigator.vibrate?.([60, 40, 60]);
+}
+
+/** An everyday action saved (customer, stock correction, an order moved): a quiet two-note "done". */
+export function done() {
+  note(1319, 0, 0.12, 'sine', 0.08);
+  note(1760, 0.07, 0.2, 'sine', 0.07);
+  navigator.vibrate?.(25);
 }
 
 /** A sale or a receipt is done: a rising "cha-ching" (C6, E6, G6, then a bright C7). */

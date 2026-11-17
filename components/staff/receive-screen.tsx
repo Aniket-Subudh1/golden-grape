@@ -110,7 +110,7 @@ export function ReceiveScreen({ order, manager, t }: { order: OrderToReceive; ma
       ]);
     } else bump(key, 1);
     scanned();
-    toast.success(interpolate(t.added, { name: unitLabel ? `${name} (${unitLabel})` : name }));
+    toast(interpolate(t.added, { name: unitLabel ? `${name} (${unitLabel})` : name }));
   };
 
   const confirm = () =>

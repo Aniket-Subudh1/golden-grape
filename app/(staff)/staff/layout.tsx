@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { sans } from '../../fonts';
 import '../../globals.css';
 import './staff.css';
+import { ToastCheck } from '@/components/staff/success-tick';
 
 // The staff app (05 §5): its own document, outside the website's layout, in the back office's look (staff.css). Per user and
 // request-time, like the admin: every page checks the session with Payload before rendering (session.ts).
@@ -30,7 +31,7 @@ export default async function StaffRootLayout({ children }: LayoutProps<'/staff'
     <html lang="fr" className={sans.variable}>
       <body className="gg-staff bg-bone text-ink min-h-dvh antialiased">
         {children}
-        <Toaster position="top-center" />
+        <Toaster position="top-center" icons={{ success: <ToastCheck /> }} />
       </body>
     </html>
   );

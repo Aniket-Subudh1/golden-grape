@@ -12,7 +12,7 @@ import { lookupBarcode } from '@/modules/catalogue/actions';
 import { postStockCount, saveStockCountLines } from '@/modules/inventory/actions';
 import { ScanField, type ScanTexts } from './scan-field';
 import { Empty } from './tabs';
-import { missed, scanned } from './feedback';
+import { celebrate, missed, scanned } from './feedback';
 
 type Line = { variant: string; name: string; counted: number };
 type Texts = {
@@ -84,7 +84,7 @@ export function CountScreen({ id, initial, t }: { id: string; initial: Line[]; t
     const { card, factor } = hit.data;
     if (!card.trackStock) return void (missed(), toast.error(t.untracked));
     scanned();
-    toast.success(interpolate(t.added, { qty: factor, name: card.name }));
+    toast(interpolate(t.added, { qty: factor, name: card.name }));
     change((prev) => {
       const found = prev.find((l) => l.variant === card.variant);
       if (found) return [{ ...found, counted: found.counted + factor }, ...prev.filter((l) => l !== found)];
@@ -107,8 +107,9 @@ export function CountScreen({ id, initial, t }: { id: string; initial: Line[]; t
       });
       const result = save.ok ? await postStockCount(null, { count: id }) : save;
       if (result.ok) {
+        celebrate();
         toast.success(t.posted);
-        router.replace('/staff/count');
+        router.replace('/staff/count?tab=posted');
         router.refresh();
       } else toast.error(result.message === 'emptyCount' ? t.emptyCount : t.postError);
     });

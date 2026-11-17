@@ -6,6 +6,7 @@ import { useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { createDraftPurchase } from '@/modules/purchasing/actions';
+import { done } from './feedback';
 
 /** "Draft order" for one supplier's reorder rows at the suggested quantities; opens it in the admin to send. */
 export function DraftButton({
@@ -27,8 +28,10 @@ export function DraftButton({
       onClick={() =>
         start(async () => {
           const result = await createDraftPurchase(null, { supplier, lines });
-          if (result.ok) router.push(`/admin/collections/purchaseOrders/${result.data.id}`);
-          else toast.error(t.error);
+          if (result.ok) {
+            done();
+            router.push(`/admin/collections/purchaseOrders/${result.data.id}`);
+          } else toast.error(t.error);
         })
       }
     >
