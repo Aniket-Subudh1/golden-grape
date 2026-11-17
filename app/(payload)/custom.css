@@ -3366,3 +3366,35 @@ body:has(.gg-create) .no-results__actions {
   font-size: 15px;
   color: var(--gg-ink);
 }
+
+/* "À recommander" (/admin/reorder, M3.1 T4): one card per supplier, its rows in a table, the draft button under it. */
+.gg-home > .gg-card + .gg-card {
+  margin-top: 16px;
+}
+.gg-reorder .table {
+  margin: 0;
+}
+.gg-reorder small {
+  color: var(--gg-text-2);
+}
+.gg-reorder__qty {
+  width: 64px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--gg-line);
+  border-radius: 6px;
+  text-align: right;
+}
+.gg-reorder__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 12px 16px;
+}
+.gg-reorder__actions .btn {
+  margin: 0;
+}
+.gg-reorder__error {
+  color: var(--theme-error-500);
+}

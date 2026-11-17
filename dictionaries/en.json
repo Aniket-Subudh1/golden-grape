@@ -1135,7 +1135,9 @@
       "reservationsHint": "To confirm or accepted",
       "lowStock": "Low stock",
       "lowStockHint": "To reorder",
-      "lowStockNone": "Nothing to reorder"
+      "lowStockNone": "Nothing to reorder",
+      "deliveries": "Deliveries expected",
+      "deliveriesHint": "Today or late"
     },
     "login": {
       "eyebrow": "Team area",
@@ -1219,6 +1221,43 @@
       "emptyCount": "Add at least one counted item before posting.",
       "closed": "This count has already been posted.",
       "qty": "Quantity"
+    },
+    "receivePage": {
+      "title": "Receive goods",
+      "none": "No purchase order waiting. Set an order to “Ordered” in the back office to receive it here.",
+      "partly": "partly received",
+      "remaining": "{{n}} remaining"
+    },
+    "receiveScreen": {
+      "ordered": "Ordered: {{n}}",
+      "remaining": "{{n}} left",
+      "now": "Received now",
+      "extra": "Not on the order (added by a manager)",
+      "reason": "Reason for the extra",
+      "reasonNeeded": "More than ordered: give a reason (at least 3 characters).",
+      "notFound": "No item for “{{code}}”.",
+      "notOnOrder": "{{name}} is not on this order. A manager can add it.",
+      "added": "+1 · {{name}}",
+      "confirm": "Confirm the receipt",
+      "confirming": "Confirming…",
+      "nothing": "Nothing to receive: scan or add quantities.",
+      "error": "The receipt could not be saved. Try again.",
+      "doneTitle": "Receipt saved",
+      "doneReceived": "The order is fully received. Stock is up to date.",
+      "donePartly": "Partly received: the rest can be received later. Stock is up to date.",
+      "back": "Back to the orders",
+      "qty": "Quantity received"
+    },
+    "reorder": {
+      "title": "To reorder",
+      "intro": "Suggestion: twice the level, minus the stock, from the cheapest supplier. Nothing is ordered automatically.",
+      "none": "Nothing to reorder.",
+      "noSupplier": "No known supplier",
+      "stock": "In stock {{onHand}} · level {{level}}",
+      "bottle": "bottle",
+      "create": "Draft order",
+      "creating": "Creating…",
+      "error": "The order could not be created."
     }
   }
 }

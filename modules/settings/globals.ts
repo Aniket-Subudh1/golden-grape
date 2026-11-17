@@ -7,6 +7,17 @@ import { revalidateTagHook } from '@/lib/revalidate';
 export const MODULES = ['b2b', 'purchasing', 'promotions', 'loyalty', 'giftCards', 'reviews', 'attendance', 'pos'] as const;
 export type ModuleName = (typeof MODULES)[number];
 
+const MODULE_LABELS: Record<ModuleName, Label> = {
+  b2b: l('Clients professionnels (B2B)', 'Business customers (B2B)', 'Geschäftskunden (B2B)', 'Clientes profissionais (B2B)'),
+  purchasing: l('Achats et réceptions', 'Purchasing and deliveries', 'Einkauf und Wareneingang', 'Compras e receções'),
+  promotions: l('Promotions et codes', 'Promotions and codes', 'Aktionen und Codes', 'Promoções e códigos'),
+  loyalty: l('Fidélité', 'Loyalty', 'Treueprogramm', 'Fidelização'),
+  giftCards: l('Cartes cadeaux', 'Gift cards', 'Geschenkkarten', 'Cartões-presente'),
+  reviews: l('Avis Google', 'Google reviews', 'Google-Bewertungen', 'Avaliações Google'),
+  attendance: l('Pointage', 'Time clock', 'Zeiterfassung', 'Ponto'),
+  pos: l('Caisse', 'Till', 'Kasse', 'Caixa'),
+};
+
 /**
  * Reference formats, French prefixes everywhere (APPLUX, 9 Nov): DEM request, DEV quotation, FAC invoice, CMD order,
  * RES reservation, AV credit note, BL delivery note. The defaults of BusinessSettings › numbering and the services'
@@ -18,6 +29,7 @@ export const NUMBERING = {
   quotation: 'DEV-{YYYY}-{0000}',
   deliveryNote: 'BL-{YYYY}-{00000}',
   order: 'CMD-{YYYY}-{00000}',
+  purchase: 'BCF-{YYYY}-{00000}',
   cateringRequest: 'DEM-{YYYY}-{0000}',
   reservation: 'RES-{YYYY}-{00000}',
 } as const;
@@ -280,6 +292,50 @@ export const businessSettings: GlobalConfig = {
             },
           ],
         },
+        {
+          // Module switches (R9) and who gets the automatic alerts (M3.1): shown once purchasing needed them.
+          label: l('Modules et alertes', 'Modules and alerts', 'Module und Warnungen', 'Módulos e alertas'),
+          fields: [
+            {
+              name: 'modules',
+              type: 'group',
+              label: l('Modules activés', 'Modules switched on', 'Aktive Module', 'Módulos ativos'),
+              admin: {
+                description: l(
+                  'Un module éteint disparaît du site, de l’espace équipe et du menu de gestion. Rien n’est effacé.',
+                  'A module switched off disappears from the website, the team screens and the back-office menu. Nothing is deleted.',
+                  'Ein ausgeschaltetes Modul verschwindet von der Website, den Teambildschirmen und dem Verwaltungsmenü. Nichts wird gelöscht.',
+                  'Um módulo desligado desaparece do site, dos ecrãs da equipa e do menu de gestão. Nada é apagado.',
+                ),
+              },
+              fields: MODULES.map((name): Field => ({ name, type: 'checkbox', defaultValue: false, label: MODULE_LABELS[name] })),
+            },
+            {
+              name: 'alerts',
+              type: 'group',
+              label: l('Alertes', 'Alerts', 'Warnungen', 'Alertas'),
+              fields: [
+                row(
+                  {
+                    name: 'defaultLowStock',
+                    type: 'number',
+                    defaultValue: 3,
+                    min: 0,
+                    label: l('Seuil de stock bas par défaut', 'Default low-stock level', 'Standard-Warnschwelle', 'Nível de stock baixo por defeito'),
+                    admin: { width: '50%', description: l('Pour les articles sans seuil propre.', 'For items without their own level.', 'Für Artikel ohne eigene Schwelle.', 'Para artigos sem nível próprio.') },
+                  },
+                  {
+                    name: 'lowStockEmail',
+                    type: 'email',
+                    label: l('E-mail du stock bas (chaque matin)', 'Low-stock e-mail (every morning)', 'E-Mail bei niedrigem Bestand (jeden Morgen)', 'E-mail de stock baixo (todas as manhãs)'),
+                    admin: { width: '50%' },
+                  },
+                ),
+                { name: 'outboxAlertEmail', type: 'email', admin: later },
+              ],
+            },
+          ],
+        },
       ],
     },
     {
@@ -297,17 +353,6 @@ export const businessSettings: GlobalConfig = {
       admin: later,
       fields: Object.entries(NUMBERING).map(([name, format]) => def(name, format)),
     },
-    {
-      name: 'alerts',
-      type: 'group',
-      admin: later,
-      fields: [
-        { name: 'defaultLowStock', type: 'number', defaultValue: 3, min: 0 },
-        { name: 'lowStockEmail', type: 'email' },
-        { name: 'outboxAlertEmail', type: 'email' },
-      ],
-    },
-    { name: 'modules', type: 'group', admin: later, fields: MODULES.map((name): Field => ({ name, type: 'checkbox', defaultValue: false })) },
     {
       name: 'paymentTerms',
       type: 'array',

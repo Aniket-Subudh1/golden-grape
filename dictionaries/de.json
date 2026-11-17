@@ -1135,7 +1135,9 @@
       "reservationsHint": "Zu bestätigen oder angenommen",
       "lowStock": "Niedriger Bestand",
       "lowStockHint": "Nachbestellen",
-      "lowStockNone": "Nichts nachzubestellen"
+      "lowStockNone": "Nichts nachzubestellen",
+      "deliveries": "Erwartete Lieferungen",
+      "deliveriesHint": "Heute oder überfällig"
     },
     "login": {
       "eyebrow": "Teambereich",
@@ -1219,6 +1221,43 @@
       "emptyCount": "Fügen Sie vor dem Buchen mindestens einen gezählten Artikel hinzu.",
       "closed": "Diese Inventur wurde bereits gebucht.",
       "qty": "Menge"
+    },
+    "receivePage": {
+      "title": "Wareneingang",
+      "none": "Keine offene Lieferantenbestellung. Setzen Sie eine Bestellung in der Verwaltung auf „Bestellt“, um sie hier zu erfassen.",
+      "partly": "teilweise erhalten",
+      "remaining": "{{n}} offen"
+    },
+    "receiveScreen": {
+      "ordered": "Bestellt: {{n}}",
+      "remaining": "noch {{n}}",
+      "now": "Jetzt erhalten",
+      "extra": "Nicht bestellt (von der Leitung hinzugefügt)",
+      "reason": "Grund für die Mehrmenge",
+      "reasonNeeded": "Mehr als bestellt: Grund angeben (mindestens 3 Zeichen).",
+      "notFound": "Kein Artikel für „{{code}}“.",
+      "notOnOrder": "{{name}} ist nicht in dieser Bestellung. Die Leitung kann es hinzufügen.",
+      "added": "+1 · {{name}}",
+      "confirm": "Wareneingang buchen",
+      "confirming": "Wird gebucht…",
+      "nothing": "Nichts zu buchen: scannen oder Mengen eingeben.",
+      "error": "Der Wareneingang konnte nicht gespeichert werden. Erneut versuchen.",
+      "doneTitle": "Wareneingang gebucht",
+      "doneReceived": "Die Bestellung ist vollständig erhalten. Der Bestand ist aktuell.",
+      "donePartly": "Teilweise erhalten: der Rest kann später gebucht werden. Der Bestand ist aktuell.",
+      "back": "Zurück zu den Bestellungen",
+      "qty": "Erhaltene Menge"
+    },
+    "reorder": {
+      "title": "Nachbestellen",
+      "intro": "Vorschlag: doppelte Schwelle minus Bestand, beim günstigsten Lieferanten. Nichts wird automatisch bestellt.",
+      "none": "Nichts nachzubestellen.",
+      "noSupplier": "Kein Lieferant bekannt",
+      "stock": "Auf Lager {{onHand}} · Schwelle {{level}}",
+      "bottle": "Flasche",
+      "create": "Bestellentwurf",
+      "creating": "Wird angelegt…",
+      "error": "Die Bestellung konnte nicht angelegt werden."
     }
   }
 }

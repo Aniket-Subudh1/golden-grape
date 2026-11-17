@@ -6,7 +6,8 @@
 import { getPayload } from 'payload';
 import { NUMBERING } from '@/modules/settings/globals';
 
-const OLD: Record<keyof typeof NUMBERING, string> = {
+// The formats this migration knew on 9 Nov (the purchase-order series came later, M3.1).
+const OLD: Record<Exclude<keyof typeof NUMBERING, 'purchase'>, string> = {
   invoice: 'INV-{YYYY}-{00000}',
   creditNote: 'CN-{YYYY}-{00000}',
   quotation: 'QUO-{YYYY}-{00000}',
@@ -24,7 +25,7 @@ const context = { skipRevalidate: true }; // no Next.js runtime here
 const settings = await payload.findGlobal({ slug: 'BusinessSettings', depth: 0, overrideAccess: true });
 const stored: Record<string, string | null | undefined> = { ...settings.numbering };
 const numbering = { ...stored };
-for (const key of Object.keys(NUMBERING) as (keyof typeof NUMBERING)[]) {
+for (const key of Object.keys(OLD) as (keyof typeof OLD)[]) {
   const now = stored[key];
   if (now === NUMBERING[key] || (now && now !== OLD[key])) continue;
   numbering[key] = NUMBERING[key];

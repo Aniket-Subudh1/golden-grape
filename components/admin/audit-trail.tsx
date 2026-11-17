@@ -94,7 +94,7 @@ export async function AuditChanges({ id, payload, i18n }: UIFieldServerProps) {
   if (!entry) return null;
   const lang = i18n.language;
   const title = say({ fr: 'Changements', en: 'Changes', de: 'Änderungen', pt: 'Alterações' }, lang);
-  const where = (payload.collections as unknown as Record<string, { config: { labels?: { plural?: unknown } } } | undefined>)[entry.targetCollection]?.config.labels?.plural;
+  const where = (payload.collections as unknown as Record<string, { config: { labels?: { plural?: unknown } } } | undefined>)[entry.targetCollection ?? '']?.config.labels?.plural;
   return (
     <DocCard title={title} wide>
       <p className="gg-doc__note">

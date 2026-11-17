@@ -18,7 +18,7 @@ export type MovementLine = {
   type: MovementType;
   reason?: string;
   channel: MovementChannel;
-  ref?: { relationTo: 'stockCounts' | 'orders'; value: string };
+  ref?: { relationTo: 'stockCounts' | 'orders' | 'purchaseOrders'; value: string };
   /** The order line a return belongs to (GG-042), so a line is never returned twice. */
   lineId?: string;
   user?: string;

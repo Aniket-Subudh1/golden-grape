@@ -74,6 +74,7 @@ import { default as default_6bcd1c2d18bda2e25f236d9cca5fccfd } from '@/component
 import { default as default_7215358aebef2f123662c81dc8a03dd2 } from '@/components/admin/dashboard'
 import { default as default_47394fc398fbb6257bef21c65839433a } from '@/components/admin/import-export'
 import { default as default_3ee16c206b08a67611daf03ad27771c6 } from '@/modules/events/admin/events-board'
+import { default as default_8030b3f7edb9dc16d3547684ed039a06 } from '@/modules/purchasing/admin/reorder-view'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 
@@ -155,6 +156,7 @@ export const importMap = {
   "@/components/admin/dashboard#default": default_7215358aebef2f123662c81dc8a03dd2,
   "@/components/admin/import-export#default": default_47394fc398fbb6257bef21c65839433a,
   "@/modules/events/admin/events-board#default": default_3ee16c206b08a67611daf03ad27771c6,
+  "@/modules/purchasing/admin/reorder-view#default": default_8030b3f7edb9dc16d3547684ed039a06,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24
 }

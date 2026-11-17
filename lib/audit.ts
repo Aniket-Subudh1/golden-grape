@@ -22,6 +22,7 @@ export const AUDIT_ACTIONS = [
   'stock.adjust',
   'stock.count',
   'catalogue.import',
+  'purchase.receive',
   'quotation.created',
   'quotation.sent',
   'quotation.viewed',

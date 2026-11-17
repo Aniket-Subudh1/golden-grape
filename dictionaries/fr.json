@@ -1135,7 +1135,9 @@
       "reservationsHint": "À confirmer ou acceptées",
       "lowStock": "Stock bas",
       "lowStockHint": "À recommander",
-      "lowStockNone": "Rien à recommander"
+      "lowStockNone": "Rien à recommander",
+      "deliveries": "Livraisons attendues",
+      "deliveriesHint": "Aujourd’hui ou en retard"
     },
     "login": {
       "eyebrow": "Espace équipe",
@@ -1219,6 +1221,43 @@
       "emptyCount": "Ajoutez au moins un article compté avant de valider.",
       "closed": "Cet inventaire a déjà été validé.",
       "qty": "Quantité"
+    },
+    "receivePage": {
+      "title": "Réception",
+      "none": "Aucune commande fournisseur en attente. Passez une commande en « Commandé » dans l’espace gestion pour la réceptionner ici.",
+      "partly": "reçue en partie",
+      "remaining": "{{n}} restant(s)"
+    },
+    "receiveScreen": {
+      "ordered": "Commandé : {{n}}",
+      "remaining": "reste {{n}}",
+      "now": "Reçu maintenant",
+      "extra": "Hors commande (ajouté par un gérant)",
+      "reason": "Raison du surplus",
+      "reasonNeeded": "Plus que commandé : indiquez une raison (au moins 3 caractères).",
+      "notFound": "Aucun article pour « {{code}} ».",
+      "notOnOrder": "{{name}} n’est pas sur cette commande. Un gérant peut l’ajouter.",
+      "added": "+1 · {{name}}",
+      "confirm": "Valider la réception",
+      "confirming": "Validation…",
+      "nothing": "Rien à réceptionner : scannez ou ajoutez des quantités.",
+      "error": "La réception n’a pas pu être enregistrée. Réessayez.",
+      "doneTitle": "Réception enregistrée",
+      "doneReceived": "La commande est entièrement reçue. Le stock est à jour.",
+      "donePartly": "Reçue en partie : le reste pourra être réceptionné plus tard. Le stock est à jour.",
+      "back": "Retour aux commandes",
+      "qty": "Quantité reçue"
+    },
+    "reorder": {
+      "title": "À recommander",
+      "intro": "Suggestion : deux fois le seuil, moins le stock, chez le fournisseur le moins cher. Rien n’est commandé automatiquement.",
+      "none": "Rien à recommander.",
+      "noSupplier": "Sans fournisseur connu",
+      "stock": "En stock {{onHand}} · seuil {{level}}",
+      "bottle": "bouteille",
+      "create": "Commande brouillon",
+      "creating": "Création…",
+      "error": "La commande n’a pas pu être créée."
     }
   }
 }

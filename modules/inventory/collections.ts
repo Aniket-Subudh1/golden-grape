@@ -121,8 +121,8 @@ export const stockMovements: CollectionConfig = {
         { value: 'backoffice', label: l('Espace gestion', 'Back office', 'Verwaltung', 'Gestão') },
       ],
     },
-    // Purchase orders and POS imports join this list when their milestones create them.
-    { name: 'ref', type: 'relationship', relationTo: ['stockCounts', 'orders'], label: l('Origine', 'Source', 'Ursprung', 'Origem') },
+    // POS imports join this list when M3.3 creates them.
+    { name: 'ref', type: 'relationship', relationTo: ['stockCounts', 'orders', 'purchaseOrders'], label: l('Origine', 'Source', 'Ursprung', 'Origem') },
     // The order line a return belongs to (GG-042): technical, never shown.
     { name: 'lineId', type: 'text', admin: { hidden: true, disableListColumn: true, disableListFilter: true } },
     { name: 'user', type: 'relationship', relationTo: 'users', label: l('Par', 'By', 'Von', 'Por') },

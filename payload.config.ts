@@ -22,6 +22,7 @@ import { cateringPackages, cateringRequests } from '@/modules/catering/collectio
 import { documentCollections } from '@/modules/documents/collections';
 import { eventBookings, events } from '@/modules/events/collections';
 import { payments } from '@/modules/payments/collections';
+import { purchasingCollections } from '@/modules/purchasing/collections';
 import { salesCollections } from '@/modules/sales/collections';
 import { inventoryCollections } from '@/modules/inventory/collections';
 import { settingsCollections } from '@/modules/settings/collections';
@@ -87,6 +88,8 @@ export default buildConfig({
         importExport: { Component: '@/components/admin/import-export', path: '/import-export' },
         // Event reservations by event: upcoming and archives (APPLUX report 4, §4).
         eventBookings: { Component: '@/modules/events/admin/events-board', path: '/event-bookings' },
+        // Low stock with the cheapest supplier and a suggested quantity; draft purchase orders from it (M3.1 T4).
+        reorder: { Component: '@/modules/purchasing/admin/reorder-view', path: '/reorder' },
       },
     },
   },
@@ -98,6 +101,7 @@ export default buildConfig({
     cateringRequests,
     ...catalogueCollections,
     ...inventoryCollections,
+    ...purchasingCollections,
     customers,
     customerGroups,
     ...salesCollections,

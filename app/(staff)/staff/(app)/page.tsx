@@ -6,6 +6,7 @@ import { interpolate } from '@/lib/i18n';
 import { getPayloadClient } from '@/lib/payload';
 import { today } from '@/lib/time';
 import { lowStockCount } from '@/modules/inventory/service';
+import { dueBy } from '@/modules/purchasing/service';
 import { staffDay } from '@/modules/sales/service';
 import { canOpen, requireStaff, SCREENS } from '../session';
 
@@ -20,7 +21,8 @@ export default async function StaffHome() {
   const [sales, stock] = await Promise.all([canOpen(user, 'orders'), canOpen(user, 'stock')]);
   const [figures, low] = await Promise.all([sales ? staffDay(payload, day) : null, stock ? lowStockCount(payload) : null]);
   const waiting = figures ? (figures.byStatus.pending ?? 0) + (figures.byStatus.awaiting_payment ?? 0) : 0;
-  const reorder = await canOpen(user, 'reorder');
+  const [reorder, receive] = await Promise.all([canOpen(user, 'reorder'), canOpen(user, 'receive')]);
+  const deliveries = receive ? await dueBy(payload, day) : null;
 
   return (
     <>
@@ -41,6 +43,7 @@ export default async function StaffHome() {
             tone={low > 0 ? 'warning' : 'neutral'}
           />
         )}
+        {deliveries !== null && <Tile href={SCREENS.receive.href} label={t.home.deliveries} value={deliveries} hint={t.home.deliveriesHint} tone={deliveries > 0 ? 'warning' : 'neutral'} />}
       </main>
     </>
   );

@@ -114,6 +114,7 @@ export const AUDIT_LABELS: Record<AuditAction, Label> = {
   'booking.refund': l('Réservation d’événement : remboursement', 'Event booking: refund', 'Veranstaltungsbuchung: Erstattung', 'Reserva de evento: reembolso'),
   'stock.adjust': l('Stock : correction', 'Stock: adjustment', 'Bestand: Korrektur', 'Stock: correção'),
   'stock.count': l('Stock : inventaire validé', 'Stock: count posted', 'Bestand: Inventur gebucht', 'Stock: inventário validado'),
+  'purchase.receive': l('Achats : marchandise reçue', 'Purchasing: goods received', 'Einkauf: Ware erhalten', 'Compras: mercadoria recebida'),
   'catalogue.import': l('Catalogue : import de fichier', 'Catalogue: file import', 'Katalog: Dateiimport', 'Catálogo: importação de ficheiro'),
   'quotation.created': l('Devis : préparé', 'Quotation: prepared', 'Angebot: erstellt', 'Orçamento: preparado'),
   'quotation.sent': l('Devis : envoyé au client', 'Quotation: sent to the customer', 'Angebot: an den Kunden gesendet', 'Orçamento: enviado ao cliente'),

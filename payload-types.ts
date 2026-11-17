@@ -86,6 +86,9 @@ export interface Config {
     stockLevels: StockLevel;
     stockMovements: StockMovement;
     stockCounts: StockCount;
+    suppliers: Supplier;
+    supplierProducts: SupplierProduct;
+    purchaseOrders: PurchaseOrder;
     customers: Customer;
     customerGroups: CustomerGroup;
     orders: Order;
@@ -107,6 +110,9 @@ export interface Config {
     };
     variants: {
       packaging: 'packagingUnits';
+    };
+    suppliers: {
+      products: 'supplierProducts';
     };
     customers: {
       quotations: 'quotations';
@@ -131,6 +137,9 @@ export interface Config {
     stockLevels: StockLevelsSelect<false> | StockLevelsSelect<true>;
     stockMovements: StockMovementsSelect<false> | StockMovementsSelect<true>;
     stockCounts: StockCountsSelect<false> | StockCountsSelect<true>;
+    suppliers: SuppliersSelect<false> | SuppliersSelect<true>;
+    supplierProducts: SupplierProductsSelect<false> | SupplierProductsSelect<true>;
+    purchaseOrders: PurchaseOrdersSelect<false> | PurchaseOrdersSelect<true>;
     customers: CustomersSelect<false> | CustomersSelect<true>;
     customerGroups: CustomerGroupsSelect<false> | CustomerGroupsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
@@ -266,6 +275,7 @@ export interface AuditLog {
     | 'stock.adjust'
     | 'stock.count'
     | 'catalogue.import'
+    | 'purchase.receive'
     | 'quotation.created'
     | 'quotation.sent'
     | 'quotation.viewed'
@@ -277,7 +287,7 @@ export interface AuditLog {
     | 'doc.delete';
   ref?: string | null;
   reason?: string | null;
-  targetCollection: string;
+  targetCollection?: string | null;
   docId: string;
   before?:
     | {
@@ -333,7 +343,6 @@ export interface Media {
    */
   alt: string;
   caption?: string | null;
-  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -530,7 +539,7 @@ export interface Event {
   startsAt: string;
   endsAt?: string | null;
   /**
-   * Two or three sentences, shown under the name.
+   * The beginning is the card’s preview. Formatting: ## Heading, **bold**, *italics*, - list.
    */
   description?: string | null;
   image?: (string | null) | Media;
@@ -822,6 +831,10 @@ export interface StockMovement {
     | ({
         relationTo: 'orders';
         value: string | Order;
+      } | null)
+    | ({
+        relationTo: 'purchaseOrders';
+        value: string | PurchaseOrder;
       } | null);
   lineId?: string | null;
   user?: (string | null) | User;
@@ -1132,6 +1145,79 @@ export interface DocumentFile {
   sizeBytes?: number | null;
   sha256?: string | null;
   data: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * What is ordered from suppliers. Set it to “Ordered” to give it a number; goods are received on the phone (Team › Receive).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "purchaseOrders".
+ */
+export interface PurchaseOrder {
+  id: string;
+  title?: string | null;
+  number?: string | null;
+  supplier: string | Supplier;
+  status: 'draft' | 'ordered' | 'partly_received' | 'received' | 'cancelled';
+  expectedAt?: string | null;
+  /**
+   * Quantity in boxes when a box is chosen, otherwise in bottles. Empty price: the supplier’s price.
+   */
+  lines?:
+    | {
+        variant: string | Variant;
+        unit?: (string | null) | PackagingUnit;
+        unitQty: number;
+        costCents?: number | null;
+        receivedUnitQty?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * The houses and wholesalers the shop buys from, with their price per item.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "suppliers".
+ */
+export interface Supplier {
+  id: string;
+  name: string;
+  contact?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  vatNumber?: string | null;
+  paymentTerm?: string | null;
+  notes?: string | null;
+  products?: {
+    docs?: (string | SupplierProduct)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * What an item costs at a supplier, per bottle or per box. The reorder list picks the cheapest.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "supplierProducts".
+ */
+export interface SupplierProduct {
+  id: string;
+  supplier: string | Supplier;
+  variant: string | Variant;
+  /**
+   * Empty: sold per bottle.
+   */
+  unit?: (string | null) | PackagingUnit;
+  supplierRef?: string | null;
+  costCents: number;
+  leadDays?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1597,6 +1683,18 @@ export interface PayloadLockedDocument {
         value: string | StockCount;
       } | null)
     | ({
+        relationTo: 'suppliers';
+        value: string | Supplier;
+      } | null)
+    | ({
+        relationTo: 'supplierProducts';
+        value: string | SupplierProduct;
+      } | null)
+    | ({
+        relationTo: 'purchaseOrders';
+        value: string | PurchaseOrder;
+      } | null)
+    | ({
         relationTo: 'customers';
         value: string | Customer;
       } | null)
@@ -1756,7 +1854,6 @@ export interface CountersSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
-  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -2129,6 +2226,60 @@ export interface StockCountsSelect<T extends boolean = true> {
         expected?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "suppliers_select".
+ */
+export interface SuppliersSelect<T extends boolean = true> {
+  name?: T;
+  contact?: T;
+  email?: T;
+  phone?: T;
+  vatNumber?: T;
+  paymentTerm?: T;
+  notes?: T;
+  products?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "supplierProducts_select".
+ */
+export interface SupplierProductsSelect<T extends boolean = true> {
+  supplier?: T;
+  variant?: T;
+  unit?: T;
+  supplierRef?: T;
+  costCents?: T;
+  leadDays?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "purchaseOrders_select".
+ */
+export interface PurchaseOrdersSelect<T extends boolean = true> {
+  title?: T;
+  number?: T;
+  supplier?: T;
+  status?: T;
+  expectedAt?: T;
+  lines?:
+    | T
+    | {
+        variant?: T;
+        unit?: T;
+        unitQty?: T;
+        costCents?: T;
+        receivedUnitQty?: T;
+        id?: T;
+      };
+  notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2586,7 +2737,7 @@ export interface BusinessSetting {
     city: string;
     country?: string | null;
     /**
-     * Empty: directions are found from the address.
+     * To open your exact listing: on Google Maps, your business › Share › Copy link. Empty: a search for the name and address.
      */
     mapsUrl?: string | null;
     instagram?: string | null;
@@ -2830,6 +2981,27 @@ export interface BusinessSetting {
    */
   quotationConditions?: string | null;
   quotationValidityDays?: number | null;
+  /**
+   * A module switched off disappears from the website, the team screens and the back-office menu. Nothing is deleted.
+   */
+  modules?: {
+    b2b?: boolean | null;
+    purchasing?: boolean | null;
+    promotions?: boolean | null;
+    loyalty?: boolean | null;
+    giftCards?: boolean | null;
+    reviews?: boolean | null;
+    attendance?: boolean | null;
+    pos?: boolean | null;
+  };
+  alerts?: {
+    /**
+     * For items without their own level.
+     */
+    defaultLowStock?: number | null;
+    lowStockEmail?: string | null;
+    outboxAlertEmail?: string | null;
+  };
   vat?:
     | {
         key: 'standard' | 'intermediate' | 'reduced' | 'superReduced';
@@ -2843,23 +3015,9 @@ export interface BusinessSetting {
     quotation?: string | null;
     deliveryNote?: string | null;
     order?: string | null;
+    purchase?: string | null;
     cateringRequest?: string | null;
     reservation?: string | null;
-  };
-  alerts?: {
-    defaultLowStock?: number | null;
-    lowStockEmail?: string | null;
-    outboxAlertEmail?: string | null;
-  };
-  modules?: {
-    b2b?: boolean | null;
-    purchasing?: boolean | null;
-    promotions?: boolean | null;
-    loyalty?: boolean | null;
-    giftCards?: boolean | null;
-    reviews?: boolean | null;
-    attendance?: boolean | null;
-    pos?: boolean | null;
   };
   paymentTerms?:
     | {
@@ -3224,6 +3382,25 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
       };
   quotationConditions?: T;
   quotationValidityDays?: T;
+  modules?:
+    | T
+    | {
+        b2b?: T;
+        purchasing?: T;
+        promotions?: T;
+        loyalty?: T;
+        giftCards?: T;
+        reviews?: T;
+        attendance?: T;
+        pos?: T;
+      };
+  alerts?:
+    | T
+    | {
+        defaultLowStock?: T;
+        lowStockEmail?: T;
+        outboxAlertEmail?: T;
+      };
   vat?:
     | T
     | {
@@ -3239,27 +3416,9 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
         quotation?: T;
         deliveryNote?: T;
         order?: T;
+        purchase?: T;
         cateringRequest?: T;
         reservation?: T;
-      };
-  alerts?:
-    | T
-    | {
-        defaultLowStock?: T;
-        lowStockEmail?: T;
-        outboxAlertEmail?: T;
-      };
-  modules?:
-    | T
-    | {
-        b2b?: T;
-        purchasing?: T;
-        promotions?: T;
-        loyalty?: T;
-        giftCards?: T;
-        reviews?: T;
-        attendance?: T;
-        pos?: T;
       };
   paymentTerms?:
     | T

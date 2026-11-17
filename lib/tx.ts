@@ -58,3 +58,13 @@ export async function withTx<T>(payload: Payload, fn: (tx: Tx) => Promise<T>): P
     }
   }
 }
+
+/**
+ * The transaction Payload opened for a collection operation (hooks: a document number given on save must roll back
+ * with the save). Payload runs every create and update in a transaction on a replica set; without one it throws.
+ */
+export function txOf(req: PayloadRequest): Tx {
+  const session = (req.payload.db as unknown as MongooseAdapter).sessions[String(req.transactionID)];
+  if (!req.transactionID || !session) throw new Error('No transaction session: MongoDB must run as a replica set');
+  return { req, session, model: (slug) => model(req.payload, slug) };
+}

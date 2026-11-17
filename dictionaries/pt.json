@@ -1135,7 +1135,9 @@
       "reservationsHint": "Por confirmar ou aceites",
       "lowStock": "Stock baixo",
       "lowStockHint": "A encomendar",
-      "lowStockNone": "Nada a encomendar"
+      "lowStockNone": "Nada a encomendar",
+      "deliveries": "Entregas previstas",
+      "deliveriesHint": "Hoje ou em atraso"
     },
     "login": {
       "eyebrow": "Área da equipa",
@@ -1219,6 +1221,43 @@
       "emptyCount": "Junte pelo menos um artigo contado antes de validar.",
       "closed": "Este inventário já foi validado.",
       "qty": "Quantidade"
+    },
+    "receivePage": {
+      "title": "Receção",
+      "none": "Nenhuma encomenda a fornecedor em espera. Passe uma encomenda a «Encomendado» na gestão para a receber aqui.",
+      "partly": "recebida em parte",
+      "remaining": "{{n}} em falta"
+    },
+    "receiveScreen": {
+      "ordered": "Encomendado: {{n}}",
+      "remaining": "faltam {{n}}",
+      "now": "Recebido agora",
+      "extra": "Fora da encomenda (adicionado por um gerente)",
+      "reason": "Motivo do excedente",
+      "reasonNeeded": "Mais do que o encomendado: indique um motivo (pelo menos 3 caracteres).",
+      "notFound": "Nenhum artigo para «{{code}}».",
+      "notOnOrder": "{{name}} não está nesta encomenda. Um gerente pode adicioná-lo.",
+      "added": "+1 · {{name}}",
+      "confirm": "Validar a receção",
+      "confirming": "A validar…",
+      "nothing": "Nada a receber: leia ou junte quantidades.",
+      "error": "Não foi possível guardar a receção. Tente novamente.",
+      "doneTitle": "Receção guardada",
+      "doneReceived": "A encomenda foi recebida por completo. O stock está atualizado.",
+      "donePartly": "Recebida em parte: o resto pode ser recebido mais tarde. O stock está atualizado.",
+      "back": "Voltar às encomendas",
+      "qty": "Quantidade recebida"
+    },
+    "reorder": {
+      "title": "A encomendar",
+      "intro": "Sugestão: o dobro do nível, menos o stock, no fornecedor mais barato. Nada é encomendado automaticamente.",
+      "none": "Nada a encomendar.",
+      "noSupplier": "Sem fornecedor conhecido",
+      "stock": "Em stock {{onHand}} · nível {{level}}",
+      "bottle": "garrafa",
+      "create": "Encomenda em rascunho",
+      "creating": "A criar…",
+      "error": "Não foi possível criar a encomenda."
     }
   }
 }
