@@ -11,6 +11,8 @@ import { lookupBarcode } from '@/modules/catalogue/actions';
 import { receivePurchase } from '@/modules/purchasing/actions';
 import type { OrderToReceive } from '@/modules/purchasing/service';
 import { ScanField, type ScanTexts } from './scan-field';
+import { missed, scanned } from './feedback';
+import { SuccessTick } from './success-tick';
 
 type Texts = {
   scan: ScanTexts;
@@ -85,12 +87,12 @@ export function ReceiveScreen({ order, manager, t }: { order: OrderToReceive; ma
 
   const onScan = async (code: string) => {
     const hit = await lookupBarcode(null, { code });
-    if (!hit.ok) return void toast.error(interpolate(t.notFound, { code }));
+    if (!hit.ok) return void (missed(), toast.error(interpolate(t.notFound, { code })));
     const key = keyOf(hit.data.card.variant, hit.data.unit);
     const name = [hit.data.card.name, hit.data.card.label].filter(Boolean).join(' · ');
     const unitLabel = hit.data.unit ? (hit.data.card.units.find((u) => u.id === hit.data.unit)?.label ?? null) : null;
     if (!rows.some((r) => r.key === key)) {
-      if (!manager) return void toast.error(interpolate(t.notOnOrder, { name }));
+      if (!manager) return void (missed(), toast.error(interpolate(t.notOnOrder, { name })));
       setRows((prev) => [
         ...prev,
         {
@@ -107,7 +109,7 @@ export function ReceiveScreen({ order, manager, t }: { order: OrderToReceive; ma
         },
       ]);
     } else bump(key, 1);
-    navigator.vibrate?.(40);
+    scanned();
     toast.success(interpolate(t.added, { name: unitLabel ? `${name} (${unitLabel})` : name }));
   };
 
@@ -132,9 +134,7 @@ export function ReceiveScreen({ order, manager, t }: { order: OrderToReceive; ma
   if (done) {
     return (
       <div className="gg-card space-y-4 p-6 text-center">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-emerald-50 text-emerald-700">
-          <Check className="h-7 w-7" />
-        </span>
+        <SuccessTick />
         <h2 className="text-xl">{t.doneTitle}</h2>
         <p className="text-ink/70 text-sm">{done.status === 'received' ? t.doneReceived : t.donePartly}</p>
         <ul className="text-left text-sm">

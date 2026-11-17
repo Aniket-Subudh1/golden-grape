@@ -7,6 +7,7 @@ import type { Locale } from '@/lib/i18n';
 import { lookupBarcode, type ScanCard, searchItems } from '@/modules/catalogue/actions';
 import { type CardTexts, ProductCard } from './product-card';
 import { ScanField, type ScanTexts } from './scan-field';
+import { missed, scanned } from './feedback';
 
 type Texts = {
   scan: ScanTexts;
@@ -37,10 +38,11 @@ export function ScanLookup({ locale, t, can }: { locale: Locale; t: Texts; can: 
       setResults(null);
       setMissing(null);
       const hit = await lookupBarcode(null, { code });
-      if (hit.ok) return setFound(hit.data);
+      if (hit.ok) return (scanned(), setFound(hit.data));
       const words = code.length >= 2 ? await searchItems(null, { q: code }) : null;
-      if (words?.ok && words.data.length === 1) return setFound({ card: words.data[0], unit: null });
+      if (words?.ok && words.data.length === 1) return (scanned(), setFound({ card: words.data[0], unit: null }));
       if (words?.ok && words.data.length > 1) return setResults(words.data);
+      missed();
       setMissing(code);
     });
 

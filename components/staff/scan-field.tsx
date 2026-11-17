@@ -24,7 +24,7 @@ type Props = {
 /**
  * The one scanner of the staff screens (M3.1 T2, 05 §5). A text input that keeps the focus: a Bluetooth or USB scanner
  * paired as a keyboard types the code and Enter sends it. The camera button opens the rear camera in a bottom sheet
- * (EAN-13, EAN-8, UPC-A, Code 128); a decode vibrates, closes the sheet and sends the code. Closing the sheet always
+ * (EAN-13, EAN-8, UPC-A, Code 128); a decode closes the sheet and sends the code. Closing the sheet always
  * stops the camera.
  */
 export function ScanField({ onScan, t, busy = false }: Props) {
@@ -121,7 +121,6 @@ function CameraScanner({ t, onCode }: { t: ScanTexts; onCode: (code: string) => 
             if (!result || stopped) return;
             stopped = true;
             ctl.stop();
-            navigator.vibrate?.(80);
             onCode(result.getText());
           },
         );

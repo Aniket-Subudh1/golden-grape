@@ -12,6 +12,8 @@ import type { CustomerTexts, PickedCustomer } from './customer-form';
 import { CustomerRow, CustomerSheet } from './customers-screen';
 import { CustomerSearch } from './customer-search';
 import { ScanField, type ScanTexts } from './scan-field';
+import { missed, scanned } from './feedback';
+import { SuccessTick } from './success-tick';
 
 type Line = { variant: string; unit?: string; qty: number };
 type Quote = NonNullable<Extract<Awaited<ReturnType<typeof quoteStaffSale>>, { ok: true }>['data']>;
@@ -107,12 +109,13 @@ export function SaleScreen({
     setResults(null);
     const hit = await lookupBarcode(null, { code });
     if (hit.ok) {
-      navigator.vibrate?.(40);
+      scanned();
       return add(hit.data.card.variant, hit.data.unit ?? undefined);
     }
     const words = await searchItems(null, { q: code });
-    if (words.ok && words.data.length === 1) return add(words.data[0].variant);
+    if (words.ok && words.data.length === 1) return (scanned(), add(words.data[0].variant));
     if (words.ok && words.data.length > 1) return setResults(words.data);
+    missed();
     toast.error(interpolate(t.notFound, { code }));
   };
 
@@ -132,6 +135,7 @@ export function SaleScreen({
   if (done) {
     return (
       <div className="gg-card mx-auto max-w-md space-y-4 p-6 text-center" role="status">
+        <SuccessTick />
         <h2 className="font-serif text-2xl">{t.doneTitle}</h2>
         <p className="font-serif text-3xl" data-testid="order-number">
           {done.number}

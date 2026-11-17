@@ -12,6 +12,7 @@ import { lookupBarcode } from '@/modules/catalogue/actions';
 import { postStockCount, saveStockCountLines } from '@/modules/inventory/actions';
 import { ScanField, type ScanTexts } from './scan-field';
 import { Empty } from './tabs';
+import { missed, scanned } from './feedback';
 
 type Line = { variant: string; name: string; counted: number };
 type Texts = {
@@ -79,10 +80,10 @@ export function CountScreen({ id, initial, t }: { id: string; initial: Line[]; t
 
   const onScan = async (code: string) => {
     const hit = await lookupBarcode(null, { code });
-    if (!hit.ok) return void toast.error(interpolate(t.notFound, { code }));
+    if (!hit.ok) return void (missed(), toast.error(interpolate(t.notFound, { code })));
     const { card, factor } = hit.data;
-    if (!card.trackStock) return void toast.error(t.untracked);
-    navigator.vibrate?.(40);
+    if (!card.trackStock) return void (missed(), toast.error(t.untracked));
+    scanned();
     toast.success(interpolate(t.added, { qty: factor, name: card.name }));
     change((prev) => {
       const found = prev.find((l) => l.variant === card.variant);

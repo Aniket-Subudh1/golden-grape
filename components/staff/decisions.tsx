@@ -118,7 +118,9 @@ export function StaffDecisions({
     <>
       <div className="space-y-2">
         {main && button(main, true)}
-        {rest.length > 0 && <div className="grid grid-cols-1 gap-2 min-[400px]:grid-cols-2">{rest.map((d) => button(d))}</div>}
+        {rest.length > 0 && (
+          <div className="grid grid-cols-1 gap-2 min-[400px]:grid-cols-2">{rest.map((d) => button(d))}</div>
+        )}
       </div>
       <Sheet
         open={open !== null}

@@ -75,6 +75,11 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-17 · Scan sounds and the success tick (owner request)
+
+- **Built:** a scanner beep and a short vibration on every code found (Scan, Sale, Count, Receive), two low buzzes for a code not found, and on a sale or a receipt done an animated green tick (pop, draw, ripples) with a "cha-ching" chime (`components/staff/feedback.ts`, `success-tick.tsx`, keyframes in `staff.css`). Sound is generated in the browser (Web Audio), nothing downloaded; animation off under reduced motion. The camera no longer vibrates on its own (the screen's beep or buzz says found or not).
+- **Checked (production build, Pixel 7):** found → one 1975 Hz beep; unknown code → 196 + 165 Hz buzzes; sale scan → beep; sale done → 1047, 1319, 1568, 2093 Hz chime, tick visible, animating and fully drawn; reduced motion → no animation, tick shown; no page error. Walk-through 25/25 at 360 px and 1440 px; check 290, build, e2e 29 passed / 4 skipped.
+
 ### 2026-11-17 · Staff app on small phones; branded phone app bar (owner report)
 
 - **Reported:** at 360 px (Galaxy A55 in Chrome's device mode) the order and receive cards ran past the right edge; phones needed some branding at the top.
