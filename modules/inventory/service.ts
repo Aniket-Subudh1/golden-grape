@@ -147,6 +147,49 @@ export async function lowStockCount(payload: Payload) {
   return totalDocs;
 }
 
+/** The latest movements of one size, newest first, with who made them (the staff stock screen, M3.1 T3). */
+export async function movementsOf(payload: Payload, variant: string, limit = 50) {
+  const { docs } = await payload.find({ collection: 'stockMovements', where: { variant: { equals: variant } }, sort: '-createdAt', limit, depth: 1, overrideAccess: true, select: { qty: true, unit: true, unitQty: true, type: true, reason: true, channel: true, user: true, createdAt: true, ref: true } });
+  return docs.map((m) => ({
+    id: m.id,
+    at: m.createdAt,
+    qty: m.qty,
+    type: m.type,
+    reason: m.reason ?? null,
+    channel: m.channel,
+    box: m.unit && typeof m.unit === 'object' ? `${m.unitQty ?? ''} × ${m.unit.label ?? ''}` : null,
+    user: m.user && typeof m.user === 'object' ? m.user.name : null,
+    ref: m.ref?.value && typeof m.ref.value === 'object' ? (('number' in m.ref.value && m.ref.value.number) || ('note' in m.ref.value && m.ref.value.note) || null) : null,
+  }));
+}
+
+/** Open stock counts, newest first (the staff count screen). */
+export async function openCounts(payload: Payload) {
+  const { docs } = await payload.find({ collection: 'stockCounts', where: { status: { equals: 'open' } }, sort: '-createdAt', limit: 20, depth: 1, overrideAccess: true, select: { note: true, lines: true, user: true, createdAt: true } });
+  return docs.map((c) => ({ id: c.id, note: c.note ?? null, lines: c.lines?.length ?? 0, user: c.user && typeof c.user === 'object' ? c.user.name : null, at: c.createdAt }));
+}
+
+export async function openCount(payload: Payload, { user, note }: { user: string; note?: string }) {
+  const count = await payload.create({ collection: 'stockCounts', data: { status: 'open', user, note, lines: [] }, overrideAccess: true, depth: 0 });
+  return count.id;
+}
+
+/**
+ * Saves the lines of an open count (the phone saves on every change, M3.1 T3). A count posted meanwhile is refused:
+ * its lines are final. One line per size.
+ */
+export async function saveCountLines(payload: Payload, id: string, lines: { variant: string; counted: number }[]) {
+  if (new Set(lines.map((l) => l.variant)).size !== lines.length) throw new AppError('VALIDATION', 'duplicateVariant', 'lines');
+  const { docs } = await payload.update({
+    collection: 'stockCounts',
+    where: { and: [{ id: { equals: id } }, { status: { equals: 'open' } }] },
+    data: { lines: lines.map((l) => ({ variant: l.variant, counted: l.counted })) },
+    overrideAccess: true,
+    depth: 0,
+  });
+  if (docs.length === 0) throw new AppError('CONFLICT', 'countClosed', 'lines');
+}
+
 /** Staff overview of several variants together (the product list): units on hand and whether any is low. */
 export async function stockSummary(payload: Payload, variantIds: string[]) {
   const { docs } = await payload.find({ collection: 'stockLevels', where: { variant: { in: variantIds } }, limit: 0, depth: 0, overrideAccess: true });

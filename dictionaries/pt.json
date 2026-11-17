@@ -1145,6 +1145,80 @@
       "submit": "Entrar",
       "pending": "A entrar…",
       "invalid": "E-mail ou palavra-passe incorretos, ou conta desativada."
+    },
+    "scan": {
+      "label": "Código de barras ou nome",
+      "placeholder": "Leia ou escreva…",
+      "camera": "Ler com a câmara",
+      "cameraTitle": "Câmara",
+      "cameraHint": "Coloque o código de barras dentro do quadro.",
+      "cameraError": "A câmara não está disponível. Autorize-a no navegador ou escreva o código.",
+      "close": "Fechar"
+    },
+    "card": {
+      "onHand": "Em stock",
+      "boxesHint": "= {{n}} × {{label}}",
+      "notTracked": "Sem controlo de stock",
+      "price": "Preço",
+      "units": "Caixas"
+    },
+    "scanPage": {
+      "title": "Ler",
+      "notFound": "Nenhum artigo para «{{code}}».",
+      "createProduct": "Criar o produto na gestão",
+      "noResults": "Sem resultados.",
+      "results": "Resultados",
+      "adjust": "Corrigir",
+      "count": "Contar",
+      "sell": "Vender"
+    },
+    "stockPage": {
+      "title": "Stock",
+      "movements": "Últimos movimentos",
+      "noMovements": "Ainda sem movimentos."
+    },
+    "adjust": {
+      "title": "Corrigir stock",
+      "qty": "Quantidade (garrafas)",
+      "qtyHint": "+3 para juntar, −2 para retirar.",
+      "reason": "Motivo",
+      "note": "Explique",
+      "submit": "Guardar a correção",
+      "pending": "A guardar…",
+      "done": "Stock corrigido.",
+      "belowZero": "O stock não pode ficar abaixo de zero.",
+      "zero": "Indique uma quantidade diferente de 0.",
+      "min3": "Pelo menos 3 caracteres."
+    },
+    "countPage": {
+      "title": "Inventário",
+      "name": "Nome (opcional)",
+      "placeholder": "Garrafeira, prateleira do Porto…",
+      "start": "Novo inventário",
+      "pending": "A criar…",
+      "open": "Em curso",
+      "none": "Nenhum inventário em curso.",
+      "untitled": "Inventário sem nome",
+      "lines": "{{n}} artigo(s)"
+    },
+    "countScreen": {
+      "empty": "Leia o primeiro artigo contado.",
+      "notFound": "Nenhum artigo para «{{code}}».",
+      "untracked": "Este artigo não tem controlo de stock.",
+      "added": "+{{qty}} · {{name}}",
+      "saving": "A guardar…",
+      "saved": "Guardado",
+      "saveError": "Não guardado: verifique a ligação.",
+      "post": "Validar o inventário",
+      "posting": "A validar…",
+      "confirmTitle": "Pronto a validar?",
+      "confirm": "O stock de cada artigo passa a ser a quantidade contada. O inventário deixa de poder ser alterado.",
+      "cancel": "Cancelar",
+      "posted": "Inventário validado.",
+      "postError": "Não foi possível validar. Tente novamente.",
+      "emptyCount": "Junte pelo menos um artigo contado antes de validar.",
+      "closed": "Este inventário já foi validado.",
+      "qty": "Quantidade"
     }
   }
 }

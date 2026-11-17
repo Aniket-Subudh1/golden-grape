@@ -53,7 +53,8 @@ export function ActionForm<T>({ action, messages, done, onSuccess, keepValues, c
       if (messages.success) toast.success(messages.success);
       if (!keepValues) form.current?.reset();
       onSuccess?.(state.data);
-    } else if (!state.fieldErrors) {
+    } else if (!state.fieldErrors || !Object.keys(state.fieldErrors).some((name) => form.current?.elements.namedItem(name))) {
+      // No error, or errors on no field of this form (a service naming a variant, a line…): said in a toast, never lost.
       const byCode = messages[state.error];
       toast.error(typeof byCode === 'string' ? byCode : messages.error);
     }

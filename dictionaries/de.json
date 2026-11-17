@@ -1145,6 +1145,80 @@
       "submit": "Anmelden",
       "pending": "Anmeldung…",
       "invalid": "E-Mail oder Passwort falsch, oder das Konto ist deaktiviert."
+    },
+    "scan": {
+      "label": "Barcode oder Name",
+      "placeholder": "Scannen oder tippen…",
+      "camera": "Mit der Kamera scannen",
+      "cameraTitle": "Kamera",
+      "cameraHint": "Halten Sie den Barcode in den Rahmen.",
+      "cameraError": "Die Kamera ist nicht verfügbar. Erlauben Sie sie im Browser oder tippen Sie den Code.",
+      "close": "Schließen"
+    },
+    "card": {
+      "onHand": "Auf Lager",
+      "boxesHint": "= {{n}} × {{label}}",
+      "notTracked": "Ohne Bestandsführung",
+      "price": "Preis",
+      "units": "Kartons"
+    },
+    "scanPage": {
+      "title": "Scannen",
+      "notFound": "Kein Artikel für „{{code}}“.",
+      "createProduct": "Produkt in der Verwaltung anlegen",
+      "noResults": "Keine Treffer.",
+      "results": "Treffer",
+      "adjust": "Korrigieren",
+      "count": "Zählen",
+      "sell": "Verkaufen"
+    },
+    "stockPage": {
+      "title": "Bestand",
+      "movements": "Letzte Bewegungen",
+      "noMovements": "Noch keine Bewegungen."
+    },
+    "adjust": {
+      "title": "Bestand korrigieren",
+      "qty": "Menge (Flaschen)",
+      "qtyHint": "+3 zum Hinzufügen, −2 zum Abziehen.",
+      "reason": "Grund",
+      "note": "Erläutern",
+      "submit": "Korrektur speichern",
+      "pending": "Speichern…",
+      "done": "Bestand korrigiert.",
+      "belowZero": "Der Bestand kann nicht unter null fallen.",
+      "zero": "Geben Sie eine Menge ungleich 0 ein.",
+      "min3": "Mindestens 3 Zeichen."
+    },
+    "countPage": {
+      "title": "Inventur",
+      "name": "Name (optional)",
+      "placeholder": "Keller, Portwein-Regal…",
+      "start": "Neue Inventur",
+      "pending": "Wird angelegt…",
+      "open": "Offen",
+      "none": "Keine offene Inventur.",
+      "untitled": "Inventur ohne Namen",
+      "lines": "{{n}} Artikel"
+    },
+    "countScreen": {
+      "empty": "Scannen Sie den ersten gezählten Artikel.",
+      "notFound": "Kein Artikel für „{{code}}“.",
+      "untracked": "Für diesen Artikel wird kein Bestand geführt.",
+      "added": "+{{qty}} · {{name}}",
+      "saving": "Speichern…",
+      "saved": "Gespeichert",
+      "saveError": "Nicht gespeichert: Verbindung prüfen.",
+      "post": "Inventur buchen",
+      "posting": "Wird gebucht…",
+      "confirmTitle": "Bereit zum Buchen?",
+      "confirm": "Der Bestand jedes Artikels wird zur gezählten Menge. Die Inventur kann danach nicht mehr geändert werden.",
+      "cancel": "Abbrechen",
+      "posted": "Inventur gebucht.",
+      "postError": "Buchen nicht möglich. Erneut versuchen.",
+      "emptyCount": "Fügen Sie vor dem Buchen mindestens einen gezählten Artikel hinzu.",
+      "closed": "Diese Inventur wurde bereits gebucht.",
+      "qty": "Menge"
     }
   }
 }

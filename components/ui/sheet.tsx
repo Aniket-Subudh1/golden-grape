@@ -12,8 +12,9 @@ type Props = {
   closeLabel: string;
   children: ReactNode;
   className?: string;
-  /** `side`: slides in from the right (cart, filters). `center`: a centred card (event booking). */
-  variant?: 'side' | 'center';
+  /** `side`: slides in from the right (cart, filters). `center`: a centred card (event booking). `bottom`: rises from
+   * the bottom edge (the staff screens' camera and forms). */
+  variant?: 'side' | 'center' | 'bottom';
 };
 
 /**
@@ -39,7 +40,7 @@ export function Sheet({ open, onOpenChange, label, closeLabel, children, classNa
     <dialog
       ref={ref}
       aria-label={label}
-      className={cn('gg-sheet fixed inset-0 h-dvh w-screen', variant === 'center' && 'gg-sheet--center place-items-center p-4 open:grid')}
+      className={cn('gg-sheet fixed inset-0 h-dvh w-screen', variant === 'center' && 'gg-sheet--center place-items-center p-4 open:grid', variant === 'bottom' && 'gg-sheet--bottom')}
       onClose={() => onOpenChange(false)}
       onClick={(e) => {
         if (e.target === e.currentTarget) onOpenChange(false);
@@ -48,7 +49,9 @@ export function Sheet({ open, onOpenChange, label, closeLabel, children, classNa
       <div
         className={cn(
           'gg-sheet__panel flex w-full flex-col overflow-hidden bg-bone text-ink shadow-2xl',
-          variant === 'side' ? 'absolute inset-y-0 right-0 sm:max-w-md' : 'relative max-h-[calc(100dvh-2rem)] max-w-lg overflow-y-auto rounded-2xl',
+          variant === 'side' && 'absolute inset-y-0 right-0 sm:max-w-md',
+          variant === 'center' && 'relative max-h-[calc(100dvh-2rem)] max-w-lg overflow-y-auto rounded-2xl',
+          variant === 'bottom' && 'absolute inset-x-0 bottom-0 mx-auto max-h-[92dvh] max-w-md overflow-y-auto rounded-t-2xl pb-[env(safe-area-inset-bottom)]',
           className,
         )}
       >

@@ -1145,6 +1145,80 @@
       "submit": "Se connecter",
       "pending": "Connexion…",
       "invalid": "E-mail ou mot de passe incorrect, ou compte désactivé."
+    },
+    "scan": {
+      "label": "Code-barres ou nom",
+      "placeholder": "Scannez ou tapez…",
+      "camera": "Scanner avec l’appareil photo",
+      "cameraTitle": "Appareil photo",
+      "cameraHint": "Placez le code-barres dans le cadre.",
+      "cameraError": "L’appareil photo n’est pas disponible. Autorisez-le dans le navigateur, ou tapez le code.",
+      "close": "Fermer"
+    },
+    "card": {
+      "onHand": "En stock",
+      "boxesHint": "= {{n}} × {{label}}",
+      "notTracked": "Sans suivi de stock",
+      "price": "Prix",
+      "units": "Cartons"
+    },
+    "scanPage": {
+      "title": "Scanner",
+      "notFound": "Aucun article pour « {{code}} ».",
+      "createProduct": "Créer le produit dans l’espace gestion",
+      "noResults": "Aucun résultat.",
+      "results": "Résultats",
+      "adjust": "Corriger",
+      "count": "Compter",
+      "sell": "Vendre"
+    },
+    "stockPage": {
+      "title": "Stock",
+      "movements": "Derniers mouvements",
+      "noMovements": "Aucun mouvement pour l’instant."
+    },
+    "adjust": {
+      "title": "Corriger le stock",
+      "qty": "Quantité (bouteilles)",
+      "qtyHint": "+3 pour en ajouter, −2 pour en retirer.",
+      "reason": "Raison",
+      "note": "Précisez",
+      "submit": "Enregistrer la correction",
+      "pending": "Enregistrement…",
+      "done": "Stock corrigé.",
+      "belowZero": "Le stock ne peut pas descendre sous zéro.",
+      "zero": "Indiquez une quantité autre que 0.",
+      "min3": "Au moins 3 caractères."
+    },
+    "countPage": {
+      "title": "Inventaire",
+      "name": "Nom (facultatif)",
+      "placeholder": "Cave, rayon Porto…",
+      "start": "Nouvel inventaire",
+      "pending": "Création…",
+      "open": "En cours",
+      "none": "Aucun inventaire en cours.",
+      "untitled": "Inventaire sans nom",
+      "lines": "{{n}} article(s)"
+    },
+    "countScreen": {
+      "empty": "Scannez le premier article compté.",
+      "notFound": "Aucun article pour « {{code}} ».",
+      "untracked": "Cet article n’a pas de suivi de stock.",
+      "added": "+{{qty}} · {{name}}",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré",
+      "saveError": "Non enregistré : vérifiez la connexion.",
+      "post": "Valider l’inventaire",
+      "posting": "Validation…",
+      "confirmTitle": "Prêt à valider ?",
+      "confirm": "Le stock de chaque article prend la quantité comptée. L’inventaire ne pourra plus être modifié.",
+      "cancel": "Annuler",
+      "posted": "Inventaire validé.",
+      "postError": "Impossible de valider. Réessayez.",
+      "emptyCount": "Ajoutez au moins un article compté avant de valider.",
+      "closed": "Cet inventaire a déjà été validé.",
+      "qty": "Quantité"
     }
   }
 }

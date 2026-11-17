@@ -5,8 +5,11 @@ import { action } from '@/lib/action';
 import { audit } from '@/lib/audit';
 import { AppError } from '@/lib/errors';
 import { readTable } from '@/lib/table';
+import type { Locale } from '@/lib/i18n';
 import { today } from '@/lib/time';
+import { onHand } from '@/modules/inventory/service';
 import { applyMapping, exportCatalogue, importCatalogue, type Mapping, parseCatalogue, previewCatalogue, suggestMapping, TEMPLATE_COLUMNS } from './import';
+import { findByBarcode, searchSizes, staffItems } from './service';
 
 // The back-office catalogue import/export (client request, 7 Nov). Stateless: the page sends the file with each step,
 // and every step checks the whole file again, so a batch never writes rows that were not checked.
@@ -68,3 +71,28 @@ export const runCatalogueImport = action(z.object({ file, mapping, from: z.coerc
 
 /** The whole catalogue in the import's format, to edit in Excel and import again. */
 export const exportCatalogueFile = action(z.object({}), roles, async (_, { payload }) => ({ name: `golden-grape-catalogue-${today()}.csv`, csv: await exportCatalogue(payload) }));
+
+// ---------------------------------------------------------------------------------------------------------------
+// Staff phone screens (M3.1 T2): one scanned code or a few typed words → product cards with the stock on hand.
+
+const scanRoles = { roles: ['stock' as const, 'sales' as const, 'manager' as const] };
+
+async function cards(payload: Parameters<typeof staffItems>[0], ids: string[], locale: Locale) {
+  const [items, stock] = await Promise.all([staffItems(payload, ids, locale), onHand(payload, ids)]);
+  return items.map((item) => ({ ...item, onHand: stock[item.variant] ?? 0 }));
+}
+
+export type ScanCard = Awaited<ReturnType<typeof cards>>[number];
+
+/** A scanned barcode (a box's first, then a bottle's: findByBarcode) → the card, and which unit the code was. */
+export const lookupBarcode = action(z.object({ code: z.string().trim().min(1).max(64) }), scanRoles, async ({ code }, { payload, user }) => {
+  const found = await findByBarcode(payload, code);
+  if (!found) throw new AppError('NOT_FOUND', 'barcode', 'code');
+  const [card] = await cards(payload, [found.variant.id], (user.locale ?? 'fr') as Locale);
+  return { card, unit: found.unit?.id ?? null, factor: found.factor };
+});
+
+/** Typed words (a name, a sku): up to 12 cards, for products without a barcode at hand. */
+export const searchItems = action(z.object({ q: z.string().trim().min(2).max(80) }), scanRoles, async ({ q }, { payload, user }) =>
+  cards(payload, await searchSizes(payload, q), (user.locale ?? 'fr') as Locale),
+);

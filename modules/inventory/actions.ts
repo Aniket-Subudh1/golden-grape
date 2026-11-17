@@ -6,7 +6,7 @@ import { audit } from '@/lib/audit';
 import { readTable, toCsv } from '@/lib/table';
 import { withTx } from '@/lib/tx';
 import { ADJUST_REASONS } from './labels';
-import { adjust, countFromTable, exportMovements, postCount, setLowStockThreshold } from './service';
+import { adjust, countFromTable, exportMovements, openCount, postCount, saveCountLines, setLowStockThreshold } from './service';
 
 const roles = { roles: ['manager' as const, 'stock' as const] };
 
@@ -63,5 +63,22 @@ export const exportStockMovements = action(
   async (input, { payload }) => {
     const { headers, rows } = await exportMovements(payload, input);
     return { name: `golden-grape-stock-movements-${input.from}-${input.to}.csv`, csv: toCsv(headers, rows), rows: rows.length };
+  },
+);
+
+/** A new count started from the phone (M3.1 T3). */
+export const startStockCount = action(z.object({ note: z.string().trim().max(80).optional() }), roles, async ({ note }, { payload, user }) => {
+  const id = await openCount(payload, { user: user.id, note: note || undefined });
+  await audit(payload, { user: user.id, action: 'doc.create', collection: 'stockCounts', id, ref: note || null });
+  return { id };
+});
+
+/** The lines of an open count, saved after each scan or edit on the phone. */
+export const saveStockCountLines = action(
+  z.object({ count: z.string().min(1), lines: z.array(z.object({ variant: z.string().min(1).max(40), counted: z.number().int().min(0).max(1_000_000) })).max(1000) }),
+  roles,
+  async ({ count, lines }, { payload }) => {
+    await saveCountLines(payload, count, lines);
+    return { saved: lines.length };
   },
 );

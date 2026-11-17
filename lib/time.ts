@@ -36,6 +36,12 @@ export function localStamp(date: Date = new Date()) {
   return `${year}-${pad(month)}-${pad(day)}T${pad(hour)}:${pad(minute)}`;
 }
 
+/** "17/11/2026 06:28" in Luxembourg time: day first, as everywhere in the back office. */
+export function dayStamp(date: Date) {
+  const [day, time] = localStamp(date).split('T');
+  return `${day.split('-').reverse().join('/')} ${time}`;
+}
+
 /** True when `at` comes before the start of the slot (`slotAt`): an order made ready early (GG-027). */
 export const isBeforeSlot = (slotAt: string | null | undefined, at: Date = new Date()) => Boolean(slotAt) && localStamp(at) < slotAt!;
 

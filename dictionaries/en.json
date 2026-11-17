@@ -1145,6 +1145,80 @@
       "submit": "Sign in",
       "pending": "Signing in…",
       "invalid": "Wrong e-mail or password, or the account is disabled."
+    },
+    "scan": {
+      "label": "Barcode or name",
+      "placeholder": "Scan or type…",
+      "camera": "Scan with the camera",
+      "cameraTitle": "Camera",
+      "cameraHint": "Hold the barcode inside the frame.",
+      "cameraError": "The camera is not available. Allow it in the browser, or type the code.",
+      "close": "Close"
+    },
+    "card": {
+      "onHand": "In stock",
+      "boxesHint": "= {{n}} × {{label}}",
+      "notTracked": "Stock not tracked",
+      "price": "Price",
+      "units": "Boxes"
+    },
+    "scanPage": {
+      "title": "Scan",
+      "notFound": "No item for “{{code}}”.",
+      "createProduct": "Create the product in the back office",
+      "noResults": "No results.",
+      "results": "Results",
+      "adjust": "Adjust",
+      "count": "Count",
+      "sell": "Sell"
+    },
+    "stockPage": {
+      "title": "Stock",
+      "movements": "Latest movements",
+      "noMovements": "No movements yet."
+    },
+    "adjust": {
+      "title": "Correct stock",
+      "qty": "Quantity (bottles)",
+      "qtyHint": "+3 to add, −2 to remove.",
+      "reason": "Reason",
+      "note": "Explain",
+      "submit": "Save the correction",
+      "pending": "Saving…",
+      "done": "Stock corrected.",
+      "belowZero": "Stock cannot go below zero.",
+      "zero": "Enter a quantity other than 0.",
+      "min3": "At least 3 characters."
+    },
+    "countPage": {
+      "title": "Stock count",
+      "name": "Name (optional)",
+      "placeholder": "Cellar, Port shelf…",
+      "start": "New count",
+      "pending": "Creating…",
+      "open": "In progress",
+      "none": "No count in progress.",
+      "untitled": "Untitled count",
+      "lines": "{{n}} item(s)"
+    },
+    "countScreen": {
+      "empty": "Scan the first item counted.",
+      "notFound": "No item for “{{code}}”.",
+      "untracked": "This item’s stock is not tracked.",
+      "added": "+{{qty}} · {{name}}",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "saveError": "Not saved: check the connection.",
+      "post": "Post this count",
+      "posting": "Posting…",
+      "confirmTitle": "Ready to post?",
+      "confirm": "Each item’s stock becomes the counted quantity. The count can no longer be changed afterwards.",
+      "cancel": "Cancel",
+      "posted": "Count posted.",
+      "postError": "Could not post. Try again.",
+      "emptyCount": "Add at least one counted item before posting.",
+      "closed": "This count has already been posted.",
+      "qty": "Quantity"
     }
   }
 }

@@ -203,3 +203,56 @@ export async function productSlugs(payload: Payload) {
   });
   return docs;
 }
+
+/**
+ * What the staff screens show of sizes (M3.1): the product's name and first photo, the size's label, its sku, the
+ * base price and every active box with its own price (or factor × price) and barcode. In the staff member's language.
+ */
+export async function staffItems(payload: Payload, variantIds: string[], locale: Locale) {
+  if (variantIds.length === 0) return [];
+  const opts = { limit: 0, depth: 0, locale, overrideAccess: true } as const;
+  const { docs: variants } = await payload.find({ collection: 'variants', where: { id: { in: [...new Set(variantIds)] } }, ...opts });
+  const [{ docs: products }, { docs: units }] = await Promise.all([
+    payload.find({ collection: 'products', where: { id: { in: variants.map((v) => idOf(v.product) as string) } }, ...opts, select: { name: true, images: true, kind: true } }),
+    payload.find({ collection: 'packagingUnits', where: { variant: { in: variants.map((v) => v.id) }, active: { equals: true } }, sort: 'factor', ...opts }),
+  ]);
+  const imageIds = products.map((p) => idOf(p.images?.[0] as string | { id: string } | undefined)).filter(Boolean) as string[];
+  const { docs: media } = imageIds.length ? await payload.find({ collection: 'media', where: { id: { in: imageIds } }, ...opts }) : { docs: [] };
+  const imageOf = new Map(media.map((m) => [m.id, m.sizes?.thumb?.url ?? m.url ?? null]));
+  const productOf = new Map(products.map((p) => [p.id, p]));
+  return variants.map((v) => {
+    const product = productOf.get(idOf(v.product) as string);
+    return {
+      variant: v.id,
+      sku: v.sku ?? '',
+      barcode: v.barcode ?? null,
+      name: product?.name ?? v.title ?? '',
+      label: v.label && v.label !== product?.name ? v.label : null,
+      image: imageOf.get(idOf(product?.images?.[0] as string | { id: string } | undefined) ?? '') ?? null,
+      priceCents: v.priceCents,
+      trackStock: v.trackStock !== false,
+      active: v.active !== false && product !== undefined,
+      units: units
+        .filter((u) => idOf(u.variant) === v.id)
+        .map((u) => ({ id: u.id, label: u.label ?? '', factor: u.factor, barcode: u.barcode ?? null, priceCents: u.priceCents ?? u.factor * v.priceCents })),
+    };
+  });
+}
+
+export type StaffItem = Awaited<ReturnType<typeof staffItems>>[number];
+
+/** Sizes whose product name (any language), sku or barcode matches `q`, for staff search (at most `limit`). */
+export async function searchSizes(payload: Payload, q: string, limit = 12) {
+  const text = q.trim();
+  if (text.length < 2) return [];
+  const hits = await model(payload, 'products').find({ $text: { $search: text } }, { _id: 1 }).limit(50).lean<{ _id: unknown }[]>();
+  const { docs } = await payload.find({
+    collection: 'variants',
+    where: { or: [{ product: { in: hits.map((h) => String(h._id)) } }, { sku: { like: text } }, { barcode: { equals: text } }, { title: { like: text } }] },
+    limit,
+    depth: 0,
+    overrideAccess: true,
+    select: { sku: true },
+  });
+  return docs.map((d) => d.id);
+}
