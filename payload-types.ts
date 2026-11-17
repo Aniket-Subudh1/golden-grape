@@ -369,6 +369,7 @@ export interface Media {
    */
   alt: string;
   caption?: string | null;
+  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1703,12 +1704,12 @@ export interface Invoice {
   lines?:
     | {
         name: string;
-        detail?: string | null;
         qty: number;
         unitPriceCents?: number | null;
-        discountCents?: number | null;
         vatBp?: number | null;
         totalCents?: number | null;
+        detail?: string | null;
+        discountCents?: number | null;
         variant?: (string | null) | Variant;
         unit?: (string | null) | PackagingUnit;
         id?: string | null;
@@ -1718,8 +1719,8 @@ export interface Invoice {
     subtotalCents?: number | null;
     discountCents?: number | null;
     deliveryCents?: number | null;
-    vatCents?: number | null;
     totalCents?: number | null;
+    vatCents?: number | null;
     vatBreakdown?:
       | {
           rateBp?: number | null;
@@ -1765,12 +1766,12 @@ export interface CreditNote {
   lines?:
     | {
         name: string;
-        detail?: string | null;
         qty: number;
         unitPriceCents?: number | null;
-        discountCents?: number | null;
         vatBp?: number | null;
         totalCents?: number | null;
+        detail?: string | null;
+        discountCents?: number | null;
         variant?: (string | null) | Variant;
         unit?: (string | null) | PackagingUnit;
         id?: string | null;
@@ -1780,8 +1781,8 @@ export interface CreditNote {
     subtotalCents?: number | null;
     discountCents?: number | null;
     deliveryCents?: number | null;
-    vatCents?: number | null;
     totalCents?: number | null;
+    vatCents?: number | null;
     vatBreakdown?:
       | {
           rateBp?: number | null;
@@ -1820,12 +1821,12 @@ export interface DeliveryNote {
   lines?:
     | {
         name: string;
-        detail?: string | null;
         qty: number;
         unitPriceCents?: number | null;
-        discountCents?: number | null;
         vatBp?: number | null;
         totalCents?: number | null;
+        detail?: string | null;
+        discountCents?: number | null;
         variant?: (string | null) | Variant;
         unit?: (string | null) | PackagingUnit;
         id?: string | null;
@@ -2273,6 +2274,7 @@ export interface CountersSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
+  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -3148,12 +3150,12 @@ export interface InvoicesSelect<T extends boolean = true> {
     | T
     | {
         name?: T;
-        detail?: T;
         qty?: T;
         unitPriceCents?: T;
-        discountCents?: T;
         vatBp?: T;
         totalCents?: T;
+        detail?: T;
+        discountCents?: T;
         variant?: T;
         unit?: T;
         id?: T;
@@ -3164,8 +3166,8 @@ export interface InvoicesSelect<T extends boolean = true> {
         subtotalCents?: T;
         discountCents?: T;
         deliveryCents?: T;
-        vatCents?: T;
         totalCents?: T;
+        vatCents?: T;
         vatBreakdown?:
           | T
           | {
@@ -3211,12 +3213,12 @@ export interface CreditNotesSelect<T extends boolean = true> {
     | T
     | {
         name?: T;
-        detail?: T;
         qty?: T;
         unitPriceCents?: T;
-        discountCents?: T;
         vatBp?: T;
         totalCents?: T;
+        detail?: T;
+        discountCents?: T;
         variant?: T;
         unit?: T;
         id?: T;
@@ -3227,8 +3229,8 @@ export interface CreditNotesSelect<T extends boolean = true> {
         subtotalCents?: T;
         discountCents?: T;
         deliveryCents?: T;
-        vatCents?: T;
         totalCents?: T;
+        vatCents?: T;
         vatBreakdown?:
           | T
           | {
@@ -3267,12 +3269,12 @@ export interface DeliveryNotesSelect<T extends boolean = true> {
     | T
     | {
         name?: T;
-        detail?: T;
         qty?: T;
         unitPriceCents?: T;
-        discountCents?: T;
         vatBp?: T;
         totalCents?: T;
+        detail?: T;
+        discountCents?: T;
         variant?: T;
         unit?: T;
         id?: T;

@@ -1492,7 +1492,7 @@
       "noQuotations": "Keine Angebote.",
       "createOrder": "Bestellung anlegen",
       "createOrderHint": "Die Bestellung wird zu den Angebotspreisen angelegt, „Rechnung später“. Ein gesendetes Angebot gilt als von Ihnen angenommen.",
-      "orderOf": "Bestellung {number}",
+      "orderOf": "Bestellung {{number}}",
       "invoices": "Rechnungen",
       "noInvoices": "Keine Rechnungen."
     },

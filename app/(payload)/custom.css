@@ -988,6 +988,10 @@ body:has(.gg-create) .list-create-new-doc__create-new-button {
   .template-default__wrap > main:is([class*='global-edit--'], [class*='collection-edit--']) .doc-controls__controls-wrapper {
     border: 0;
   }
+  /* A document with its own buttons in the bar (an invoice: PDF, mark paid, credit note) keeps room for them. */
+  .template-default__wrap:has(> main .doc-controls .gg-actions) > .doc-header {
+    padding-right: calc(var(--gg-pad) + 420px);
+  }
 }
 .template-default__wrap > main:is([class*='global-edit--'], [class*='collection-edit--']) .document-fields__fields {
   max-width: var(--gg-col);

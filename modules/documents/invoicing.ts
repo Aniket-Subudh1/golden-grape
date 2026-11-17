@@ -90,7 +90,8 @@ async function nextOf(tx: Tx, series: 'invoice' | 'creditNote' | 'deliveryNote',
 
 /** The customer's billing details at the moment of issue (they never change on the document afterwards). */
 function billingOf(order: Order, customer: Customer | null) {
-  const a = order.address ?? customer?.addresses?.find((x) => x.isDefault) ?? customer?.addresses?.[0] ?? null;
+  // A pickup or in-store order keeps an empty address group: the customer's own address is then the billing one.
+  const a = (order.address?.line1 ? order.address : null) ?? customer?.addresses?.find((x) => x.isDefault) ?? customer?.addresses?.[0] ?? null;
   return {
     name: order.contact?.name ?? customer?.name ?? '',
     company: customer?.type === 'business' ? (customer.company ?? null) : null,

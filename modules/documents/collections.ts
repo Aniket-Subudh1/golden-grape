@@ -332,8 +332,8 @@ export const documentFiles: CollectionConfig = {
     { name: 'kind', type: 'select', required: true, options: ['quotation', 'quotation_signed', 'invoice', 'credit_note', 'delivery_note'] },
     { name: 'filename', type: 'text', required: true },
     { name: 'quotation', type: 'relationship', relationTo: 'quotations', index: true },
-    { name: 'customer', type: 'relationship', relationTo: 'customers', index: true },
-    { name: 'order', type: 'relationship', relationTo: 'orders', index: true },
+    { name: 'customer', type: 'relationship', relationTo: 'customers', index: true, label: l('Client', 'Customer', 'Kunde', 'Cliente') },
+    { name: 'order', type: 'relationship', relationTo: 'orders', index: true, label: l('Commande', 'Order', 'Bestellung', 'Encomenda') },
     { name: 'sizeBytes', type: 'number' },
     { name: 'sha256', type: 'text' },
     // Base64 of the PDF (about 110 KB for a quotation with the logo); 12 MB keeps a document under MongoDB's 16 MB.
@@ -360,28 +360,29 @@ const billing = (): Field => ({
   type: 'group',
   label: l('Client', 'Customer', 'Kunde', 'Cliente'),
   fields: [
-    { name: 'name', type: 'text' },
-    { name: 'company', type: 'text' },
-    { name: 'vatNumber', type: 'text' },
-    { name: 'email', type: 'text' },
-    { name: 'phone', type: 'text' },
-    { name: 'address', type: 'textarea' },
+    { name: 'name', type: 'text', label: l('Nom', 'Name', 'Name', 'Nome'), admin: { width: '50%' } },
+    { name: 'company', type: 'text', label: l('Société', 'Company', 'Firma', 'Empresa'), admin: { width: '50%' } },
+    { name: 'vatNumber', type: 'text', label: l('N° TVA', 'VAT number', 'USt-IdNr.', 'N.º IVA'), admin: { width: '50%' } },
+    { name: 'email', type: 'text', label: l('E-mail', 'E-mail', 'E-Mail', 'E-mail'), admin: { width: '50%' } },
+    { name: 'phone', type: 'text', label: l('Téléphone', 'Phone', 'Telefon', 'Telefone'), admin: { width: '50%' } },
+    { name: 'address', type: 'textarea', label: l('Adresse', 'Address', 'Adresse', 'Morada') },
   ],
 });
+const eur = (width: string) => ({ width, components: scaledNumber('€') });
 const docLines = (): Field => ({
   name: 'lines',
   type: 'array',
   label: l('Lignes', 'Lines', 'Zeilen', 'Linhas'),
   fields: [
-    { name: 'name', type: 'text', required: true },
-    { name: 'detail', type: 'text' },
-    { name: 'qty', type: 'number', required: true },
-    { name: 'unitPriceCents', type: 'number' },
-    { name: 'discountCents', type: 'number', defaultValue: 0 },
-    { name: 'vatBp', type: 'number' },
-    { name: 'totalCents', type: 'number' },
-    { name: 'variant', type: 'relationship', relationTo: 'variants' },
-    { name: 'unit', type: 'relationship', relationTo: 'packagingUnits' },
+    { name: 'name', type: 'text', required: true, label: l('Désignation', 'Description', 'Bezeichnung', 'Designação'), admin: { width: '40%' } },
+    { name: 'qty', type: 'number', required: true, label: l('Quantité', 'Quantity', 'Menge', 'Quantidade'), admin: { width: '12%' } },
+    { name: 'unitPriceCents', type: 'number', label: l('Prix unitaire', 'Unit price', 'Stückpreis', 'Preço unitário'), admin: eur('16%') },
+    { name: 'vatBp', type: 'number', label: l('TVA', 'VAT', 'MwSt.', 'IVA'), admin: { width: '12%', components: scaledNumber('%') } },
+    { name: 'totalCents', type: 'number', label: l('Total', 'Total', 'Summe', 'Total'), admin: eur('20%') },
+    { name: 'detail', type: 'text', label: l('Détail', 'Details', 'Details', 'Detalhe') },
+    { name: 'discountCents', type: 'number', defaultValue: 0, admin: hidden },
+    { name: 'variant', type: 'relationship', relationTo: 'variants', admin: hidden },
+    { name: 'unit', type: 'relationship', relationTo: 'packagingUnits', admin: hidden },
   ],
 });
 const docTotals = (): Field => ({
@@ -390,12 +391,21 @@ const docTotals = (): Field => ({
   label: l('Total TTC', 'Total incl. VAT', 'Summe inkl. MwSt.', 'Total c/ IVA'),
   admin: { components: { Cell: '@/modules/documents/admin/cells#TotalCell' } },
   fields: [
-    { name: 'subtotalCents', type: 'number' },
-    { name: 'discountCents', type: 'number' },
-    { name: 'deliveryCents', type: 'number' },
-    { name: 'vatCents', type: 'number' },
-    { name: 'totalCents', type: 'number' },
-    { name: 'vatBreakdown', type: 'array', fields: [{ name: 'rateBp', type: 'number' }, { name: 'baseCents', type: 'number' }, { name: 'vatCents', type: 'number' }] },
+    { name: 'subtotalCents', type: 'number', label: l('Sous-total', 'Subtotal', 'Zwischensumme', 'Subtotal'), admin: eur('25%') },
+    { name: 'discountCents', type: 'number', label: l('Remises', 'Discounts', 'Rabatte', 'Descontos'), admin: eur('25%') },
+    { name: 'deliveryCents', type: 'number', label: l('Livraison', 'Delivery', 'Lieferung', 'Entrega'), admin: eur('25%') },
+    { name: 'totalCents', type: 'number', label: l('Total TTC', 'Total incl. VAT', 'Summe inkl. MwSt.', 'Total c/ IVA'), admin: eur('25%') },
+    { name: 'vatCents', type: 'number', label: l('Dont TVA', 'Of which VAT', 'Davon MwSt.', 'Dos quais IVA'), admin: eur('25%') },
+    {
+      name: 'vatBreakdown',
+      type: 'array',
+      label: l('TVA par taux', 'VAT per rate', 'MwSt. je Satz', 'IVA por taxa'),
+      fields: [
+        { name: 'rateBp', type: 'number', label: l('Taux', 'Rate', 'Satz', 'Taxa'), admin: { width: '33%', components: scaledNumber('%') } },
+        { name: 'baseCents', type: 'number', label: l('Base HT', 'Net', 'Netto', 'Base s/ IVA'), admin: eur('33%') },
+        { name: 'vatCents', type: 'number', label: l('TVA', 'VAT', 'MwSt.', 'IVA'), admin: eur('33%') },
+      ],
+    },
   ],
 });
 
@@ -420,7 +430,7 @@ const docAdmin = (description: Label) => ({
   description,
 });
 const number = (): Field => ({ name: 'number', type: 'text', required: true, unique: true, index: true, label: l('Numéro', 'Number', 'Nummer', 'Número') });
-const title = (): Field => ({ name: 'title', type: 'text', admin: hidden });
+const title = (): Field => ({ name: 'title', type: 'text', label: l('Titre', 'Title', 'Titel', 'Título'), admin: hidden });
 const locale = (): Field => ({ name: 'locale', type: 'text', defaultValue: 'fr', admin: hidden });
 const pdf = (): Field => ({ name: 'pdf', type: 'relationship', relationTo: 'documentFiles', admin: hidden });
 
@@ -430,7 +440,7 @@ export const invoices: CollectionConfig = {
   labels: { singular: l('Facture', 'Invoice', 'Rechnung', 'Fatura'), plural: l('Factures', 'Invoices', 'Rechnungen', 'Faturas') },
   admin: {
     ...docAdmin(l('Émises depuis une commande (bouton « Émettre la facture »). Une facture ne se modifie pas : pour corriger, faites un avoir.', 'Issued from an order (“Issue invoice”). An invoice is never edited: to correct one, issue a credit note.', 'Aus einer Bestellung ausgestellt („Rechnung ausstellen“). Eine Rechnung wird nie geändert: zur Korrektur eine Gutschrift.', 'Emitidas a partir de uma encomenda («Emitir fatura»). Uma fatura não se altera: para corrigir, emita uma nota de crédito.')),
-    defaultColumns: ['title', 'issuedAt', 'dueAt', 'totals', 'status'],
+    defaultColumns: ['number', 'customer', 'issuedAt', 'dueAt', 'totals', 'status'],
     components: { beforeList: ['@/modules/documents/admin/document-actions#AccountingExport'], edit: { beforeDocumentControls: ['@/modules/documents/admin/document-actions#InvoiceActions'] } },
   },
   access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
@@ -460,7 +470,7 @@ export const invoices: CollectionConfig = {
 export const creditNotes: CollectionConfig = {
   slug: 'creditNotes',
   labels: { singular: l('Avoir', 'Credit note', 'Gutschrift', 'Nota de crédito'), plural: l('Avoirs', 'Credit notes', 'Gutschriften', 'Notas de crédito') },
-  admin: { ...docAdmin(l('Un avoir annule tout ou partie d’une facture (remboursement, retour). Il se fait depuis la facture.', 'A credit note cancels all or part of an invoice (refund, return). It is made from the invoice.', 'Eine Gutschrift storniert eine Rechnung ganz oder teilweise. Sie wird aus der Rechnung erstellt.', 'Uma nota de crédito anula toda ou parte de uma fatura. Faz-se a partir da fatura.')), defaultColumns: ['title', 'issuedAt', 'totals', 'reason'] },
+  admin: { ...docAdmin(l('Un avoir annule tout ou partie d’une facture (remboursement, retour). Il se fait depuis la facture.', 'A credit note cancels all or part of an invoice (refund, return). It is made from the invoice.', 'Eine Gutschrift storniert eine Rechnung ganz oder teilweise. Sie wird aus der Rechnung erstellt.', 'Uma nota de crédito anula toda ou parte de uma fatura. Faz-se a partir da fatura.')), defaultColumns: ['number', 'customer', 'issuedAt', 'totals', 'reason'] },
   access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
   hooks: { beforeChange: [frozen([])] },
   defaultSort: '-issuedAt',
@@ -468,8 +478,8 @@ export const creditNotes: CollectionConfig = {
     number(),
     title(),
     { name: 'invoice', type: 'relationship', relationTo: 'invoices', required: true, index: true, label: l('Facture', 'Invoice', 'Rechnung', 'Fatura') },
-    { name: 'order', type: 'relationship', relationTo: 'orders', index: true },
-    { name: 'customer', type: 'relationship', relationTo: 'customers', index: true },
+    { name: 'order', type: 'relationship', relationTo: 'orders', index: true, label: l('Commande', 'Order', 'Bestellung', 'Encomenda') },
+    { name: 'customer', type: 'relationship', relationTo: 'customers', index: true, label: l('Client', 'Customer', 'Kunde', 'Cliente') },
     { name: 'reason', type: 'text', required: true, label: l('Raison', 'Reason', 'Grund', 'Motivo') },
     billing(),
     docLines(),
@@ -484,7 +494,7 @@ export const creditNotes: CollectionConfig = {
 export const deliveryNotes: CollectionConfig = {
   slug: 'deliveryNotes',
   labels: { singular: l('Bon de livraison', 'Delivery note', 'Lieferschein', 'Guia de remessa'), plural: l('Bons de livraison', 'Delivery notes', 'Lieferscheine', 'Guias de remessa') },
-  admin: { ...docAdmin(l('Émis depuis une commande (bouton « Bon de livraison »). Sans prix.', 'Issued from an order (“Delivery note”). No prices.', 'Aus einer Bestellung ausgestellt („Lieferschein“). Ohne Preise.', 'Emitida a partir de uma encomenda («Guia de remessa»). Sem preços.')), defaultColumns: ['title', 'issuedAt'] },
+  admin: { ...docAdmin(l('Émis depuis une commande (bouton « Bon de livraison »). Sans prix.', 'Issued from an order (“Delivery note”). No prices.', 'Aus einer Bestellung ausgestellt („Lieferschein“). Ohne Preise.', 'Emitida a partir de uma encomenda («Guia de remessa»). Sem preços.')), defaultColumns: ['number', 'customer', 'issuedAt'] },
   access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
   hooks: { beforeChange: [frozen(['deliveredAt', 'signature'])] },
   defaultSort: '-issuedAt',
@@ -492,12 +502,12 @@ export const deliveryNotes: CollectionConfig = {
     number(),
     title(),
     { name: 'order', type: 'relationship', relationTo: 'orders', required: true, index: true, label: l('Commande', 'Order', 'Bestellung', 'Encomenda') },
-    { name: 'customer', type: 'relationship', relationTo: 'customers', index: true },
+    { name: 'customer', type: 'relationship', relationTo: 'customers', index: true, label: l('Client', 'Customer', 'Kunde', 'Cliente') },
     billing(),
     docLines(),
     { name: 'issuedAt', type: 'date', required: true, label: l('Émis le', 'Issued on', 'Ausgestellt am', 'Emitida a') },
-    { name: 'deliveredAt', type: 'date' },
-    { name: 'signature', type: 'text' },
+    { name: 'deliveredAt', type: 'date', label: l('Livré le', 'Delivered on', 'Geliefert am', 'Entregue em') },
+    { name: 'signature', type: 'text', label: l('Reçu par', 'Received by', 'Empfangen von', 'Recebido por') },
     locale(),
     pdf(),
   ],

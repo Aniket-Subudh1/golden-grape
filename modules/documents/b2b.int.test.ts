@@ -29,7 +29,7 @@ beforeAll(async () => {
   staff = await makeStaff(payload, ['sales']);
   list = await payload.create({ collection: 'priceLists', data: { name: 'Lisboa', pricesInclVat: false, lines: [{ variant: wine.variant.id, unit: wine.units[6], priceCents: 5400 }] }, overrideAccess: true });
   rui = await createCustomerByStaff(payload, { name: 'Rui Costa', phone: '+352 621 500 001', email: 'rui-b2b-docs@example.test', type: 'business', company: 'Restaurante Lisboa', locale: 'pt' });
-  await payload.update({ collection: 'customers', id: rui.id, data: { priceList: list.id, paymentTerm: '30' }, overrideAccess: true });
+  await payload.update({ collection: 'customers', id: rui.id, data: { priceList: list.id, paymentTerm: '30', addresses: [{ line1: '12 rue de la Gare', postalCode: '7795', city: 'Bissen', isDefault: true }] }, overrideAccess: true });
 });
 
 describe('B2B quotation → order → invoice', () => {
@@ -50,7 +50,7 @@ describe('B2B quotation → order → invoice', () => {
     const q = await payload.findByID({ collection: 'quotations', id: quotation.id, overrideAccess: true, depth: 0 });
     expect(q).toMatchObject({ status: 'accepted', order });
     const invoice = await issueInvoice(payload, order, { now: NOW });
-    expect(invoice).toMatchObject({ locale: 'pt', totals: { totalCents: 12636 }, billing: { company: 'Restaurante Lisboa' } });
+    expect(invoice).toMatchObject({ locale: 'pt', totals: { totalCents: 12636 }, billing: { company: 'Restaurante Lisboa', address: '12 rue de la Gare, L-7795 Bissen' } });
   });
 
   it('an expired quotation cannot become an order', async () => {

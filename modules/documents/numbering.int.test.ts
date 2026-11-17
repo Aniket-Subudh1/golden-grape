@@ -93,7 +93,7 @@ describe('issueInvoice', () => {
     const invoice = await issueInvoice(payload, id, { now: NOW });
     expect(invoice).toMatchObject({
       status: 'issued',
-      billing: { company: 'Restaurante Lisboa', vatNumber: 'LU12345678' },
+      billing: { company: 'Restaurante Lisboa', vatNumber: 'LU12345678', address: null },
       totals: { totalCents: 3510 },
       amountDueCents: 3510,
       locale: 'pt',

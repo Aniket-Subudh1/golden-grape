@@ -1492,7 +1492,7 @@
       "noQuotations": "Nenhum orçamento.",
       "createOrder": "Criar encomenda",
       "createOrderHint": "A encomenda é feita aos preços do orçamento, «faturar depois». Um orçamento enviado fica aceite por si.",
-      "orderOf": "Encomenda {number}",
+      "orderOf": "Encomenda {{number}}",
       "invoices": "Faturas",
       "noInvoices": "Nenhuma fatura."
     },

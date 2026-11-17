@@ -93,6 +93,10 @@ const GROUPS: {
         roles: ['sales'],
         icon: 'bookings',
       },
+      // Documents of sold orders (M3.2 T5): issued from the order, read here; the accountant's export is on the invoices.
+      { label: 'invoices', slug: 'invoices', icon: 'quotations', roles: ['sales', 'manager'] },
+      { label: 'creditNotes', slug: 'creditNotes', icon: 'quotations', roles: ['sales', 'manager'] },
+      { label: 'deliveryNotes', slug: 'deliveryNotes', icon: 'quotations', roles: ['sales', 'manager'] },
     ],
   },
   {

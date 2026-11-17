@@ -1492,7 +1492,7 @@
       "noQuotations": "Aucun devis.",
       "createOrder": "Créer la commande",
       "createOrderHint": "La commande est passée aux prix du devis, « facture plus tard ». Un devis envoyé est noté accepté par vous.",
-      "orderOf": "Commande {number}",
+      "orderOf": "Commande {{number}}",
       "invoices": "Factures",
       "noInvoices": "Aucune facture."
     },

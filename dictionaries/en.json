@@ -1492,7 +1492,7 @@
       "noQuotations": "No quotations.",
       "createOrder": "Create order",
       "createOrderHint": "The order is placed at the quoted prices, “invoice later”. A sent quotation is marked accepted by you.",
-      "orderOf": "Order {number}",
+      "orderOf": "Order {{number}}",
       "invoices": "Invoices",
       "noInvoices": "No invoices."
     },

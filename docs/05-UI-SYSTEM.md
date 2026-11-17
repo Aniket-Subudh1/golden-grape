@@ -114,9 +114,9 @@ Route group `app/(staff)/staff/`, protected by staff auth in `proxy.ts` plus a s
 | `/staff/stock/[variant]` | stock, manager | movements list + adjust (qty ±, reason) |
 | `/staff/count` | stock, manager | open count → scan/enter counts → post |
 | `/staff/receive` | stock, manager | pick PO → scan lines → confirm receipt |
-| `/staff/sale` | sales, manager | pick customer → scan/search lines → quote → mark paid on site / invoiced (M4.1: wallee link + QR) |
-| `/staff/orders` | sales, manager | today/upcoming orders and reservations, status buttons (both roles move them, `ORDER_ROLES`, Q-19) |
-| `/staff/customers` | sales, manager | search, view history, create |
+| `/staff/sale` | sales, manager | pick customer → scan/search lines → quote → mark paid on site / invoiced (M4.1: wallee link + QR); business customer: "Send as quotation" (M3.2) |
+| `/staff/orders` | sales, manager | today/upcoming orders and reservations, status buttons (both roles move them, `ORDER_ROLES`, Q-19); Issue invoice, Delivery note and the documents' PDF links (M3.2) |
+| `/staff/customers` | sales, manager | search, view history, create; a business customer's quotations ("Create order") and invoices (M3.2) |
 | `/staff/attendance` | everyone with `attendance` | check-in/out (opened from the venue QR) |
 
 ## 6. Public route map
