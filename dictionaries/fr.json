@@ -1200,7 +1200,23 @@
     "stockPage": {
       "title": "Stock",
       "movements": "Derniers mouvements",
-      "noMovements": "Aucun mouvement pour l’instant."
+      "noMovements": "Aucun mouvement pour l’instant.",
+      "inStock": "En stock",
+      "low": "Stock bas",
+      "out": "Rupture",
+      "notTracked": "Non suivi",
+      "bottles": "bouteille(s)",
+      "level": "Seuil de stock bas",
+      "lastMove": "Dernier mouvement",
+      "never": "Jamais",
+      "price": "Prix bouteille",
+      "sell": "Vendre",
+      "all": "Tous",
+      "in": "Entrées",
+      "out_": "Sorties",
+      "today": "Aujourd’hui",
+      "yesterday": "Hier",
+      "more": "Voir plus"
     },
     "adjust": {
       "title": "Corriger le stock",
@@ -1213,7 +1229,12 @@
       "done": "Stock corrigé.",
       "belowZero": "Le stock ne peut pas descendre sous zéro.",
       "zero": "Indiquez une quantité autre que 0.",
-      "min3": "Au moins 3 caractères."
+      "min3": "Au moins 3 caractères.",
+      "add": "Ajouter",
+      "remove": "Retirer",
+      "after": "Stock après",
+      "tooMany": "Seulement {{n}} en stock : impossible d’en retirer plus.",
+      "howMany": "Combien de bouteilles ?"
     },
     "countPage": {
       "title": "Inventaire",

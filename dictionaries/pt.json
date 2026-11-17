@@ -1200,7 +1200,23 @@
     "stockPage": {
       "title": "Stock",
       "movements": "Últimos movimentos",
-      "noMovements": "Ainda sem movimentos."
+      "noMovements": "Ainda sem movimentos.",
+      "inStock": "Em stock",
+      "low": "Stock baixo",
+      "out": "Esgotado",
+      "notTracked": "Não seguido",
+      "bottles": "garrafa(s)",
+      "level": "Nível de stock baixo",
+      "lastMove": "Último movimento",
+      "never": "Nunca",
+      "price": "Preço da garrafa",
+      "sell": "Vender",
+      "all": "Todos",
+      "in": "Entradas",
+      "out_": "Saídas",
+      "today": "Hoje",
+      "yesterday": "Ontem",
+      "more": "Ver mais"
     },
     "adjust": {
       "title": "Corrigir stock",
@@ -1213,7 +1229,12 @@
       "done": "Stock corrigido.",
       "belowZero": "O stock não pode ficar abaixo de zero.",
       "zero": "Indique uma quantidade diferente de 0.",
-      "min3": "Pelo menos 3 caracteres."
+      "min3": "Pelo menos 3 caracteres.",
+      "add": "Adicionar",
+      "remove": "Retirar",
+      "after": "Stock depois",
+      "tooMany": "Só {{n}} em stock: não pode retirar mais.",
+      "howMany": "Quantas garrafas?"
     },
     "countPage": {
       "title": "Inventário",

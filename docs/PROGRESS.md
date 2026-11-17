@@ -75,6 +75,11 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-17 · Stock page reworked (owner request)
+
+- `/staff/stock/[variant]`: summary card with a stock status (against the low-stock level), the stock as a big figure, level / price / last movement, box prices and Sell; the correction as Add / Remove + stepper + 1 / box-size chips + reason chips + a "Stock after" preview (blocked below zero); the movements as a timeline by day with All / In / Out and "Show more". Texts in the 4 dictionaries (`staff.stockPage.*`, `staff.adjust.*`). Same `adjustStock` action: nothing changes in how stock is written.
+- **Checked (production build, 360 px and 1440 px):** removing more than the stock is blocked and the button disabled; Add + "6" previews and saves +6; In shows it, Out hides it; Remove "6" with Breakage brings it back; no sideways scroll, no page error (17/17). Walk-through 26/26 at 360 px and 1440 px; every staff screen fits at 320/360 px; check 290, build.
+
 ### 2026-11-17 · "Done" feedback on every save, kept minimal (owner request)
 
 - **Built:** two levels. Big moments (sale, receipt, count posted): chime; sale and receipt also show the tick with one ripple and a small fixed burst of 10 gold/green flecks; a posted count lands on the Posted tab. Everyday saves (customer created or edited, stock corrected, order or table moved, draft order): a quiet two-note `done()` and a success toast whose tick draws itself. Per-scan toasts are plain; removing a line or changing a quantity makes no sound. Reduced motion: everything still, ticks shown drawn.

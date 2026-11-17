@@ -1200,7 +1200,23 @@
     "stockPage": {
       "title": "Bestand",
       "movements": "Letzte Bewegungen",
-      "noMovements": "Noch keine Bewegungen."
+      "noMovements": "Noch keine Bewegungen.",
+      "inStock": "Auf Lager",
+      "low": "Niedriger Bestand",
+      "out": "Ausverkauft",
+      "notTracked": "Nicht erfasst",
+      "bottles": "Flasche(n)",
+      "level": "Mindestbestand",
+      "lastMove": "Letzte Bewegung",
+      "never": "Nie",
+      "price": "Flaschenpreis",
+      "sell": "Verkaufen",
+      "all": "Alle",
+      "in": "Zugänge",
+      "out_": "Abgänge",
+      "today": "Heute",
+      "yesterday": "Gestern",
+      "more": "Mehr anzeigen"
     },
     "adjust": {
       "title": "Bestand korrigieren",
@@ -1213,7 +1229,12 @@
       "done": "Bestand korrigiert.",
       "belowZero": "Der Bestand kann nicht unter null fallen.",
       "zero": "Geben Sie eine Menge ungleich 0 ein.",
-      "min3": "Mindestens 3 Zeichen."
+      "min3": "Mindestens 3 Zeichen.",
+      "add": "Hinzufügen",
+      "remove": "Entnehmen",
+      "after": "Bestand danach",
+      "tooMany": "Nur {{n}} auf Lager: mehr kann nicht entnommen werden.",
+      "howMany": "Wie viele Flaschen?"
     },
     "countPage": {
       "title": "Inventur",

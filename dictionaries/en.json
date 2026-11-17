@@ -1200,7 +1200,23 @@
     "stockPage": {
       "title": "Stock",
       "movements": "Latest movements",
-      "noMovements": "No movements yet."
+      "noMovements": "No movements yet.",
+      "inStock": "In stock",
+      "low": "Low stock",
+      "out": "Out of stock",
+      "notTracked": "Not tracked",
+      "bottles": "bottle(s)",
+      "level": "Low-stock level",
+      "lastMove": "Last movement",
+      "never": "Never",
+      "price": "Bottle price",
+      "sell": "Sell",
+      "all": "All",
+      "in": "In",
+      "out_": "Out",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "more": "Show more"
     },
     "adjust": {
       "title": "Correct stock",
@@ -1213,7 +1229,12 @@
       "done": "Stock corrected.",
       "belowZero": "Stock cannot go below zero.",
       "zero": "Enter a quantity other than 0.",
-      "min3": "At least 3 characters."
+      "min3": "At least 3 characters.",
+      "add": "Add",
+      "remove": "Remove",
+      "after": "Stock after",
+      "tooMany": "Only {{n}} in stock: you cannot remove more.",
+      "howMany": "How many bottles?"
     },
     "countPage": {
       "title": "Stock count",
