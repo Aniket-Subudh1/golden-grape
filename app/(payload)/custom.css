@@ -3490,275 +3490,6 @@ body:has(.gg-create) .no-results__actions {
   font: inherit;
 }
 
-/* Team & access (/admin/team): the team, the access table, what each role opens. */
-.gg-team__people {
-  margin: 0;
-  padding: 0 0 6px;
-  list-style: none;
-}
-.gg-team__people li {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 14px;
-  padding: 12px 20px;
-  border-top: 1px solid var(--gg-line);
-}
-.gg-team__people li[data-off] {
-  opacity: 0.6;
-}
-.gg-team__avatar {
-  display: grid;
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--gg-primary);
-  color: #ffffff;
-  font-weight: 600;
-}
-.gg-team__who {
-  display: grid;
-  flex: 1 1 200px;
-  min-width: 0;
-}
-.gg-team__who b,
-.gg-team__who small {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.gg-team__who small,
-.gg-team__extra {
-  color: var(--gg-text-2);
-  font-size: 12px;
-}
-.gg-team__roles {
-  display: flex;
-  flex: 2 1 260px;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-}
-.gg-team__extra {
-  margin-left: 6px;
-  font-weight: 500;
-}
-.gg-team__form {
-  display: grid;
-  gap: 18px;
-}
-.gg-team__form-head h2 {
-  margin: 0;
-  padding-right: 40px;
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1.3;
-}
-.gg-team__form-head p {
-  margin: 4px 0 0;
-  color: var(--gg-text-2);
-  font-size: 13px;
-}
-/* Cancel and Save stay in reach at the foot of the card while a long form scrolls. */
-.gg-team__form-foot {
-  position: sticky;
-  bottom: -28px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin: 4px -28px -28px;
-  padding: 16px 28px;
-  border-top: 1px solid var(--gg-line);
-  background: #ffffff;
-}
-.gg-team__pw {
-  display: block;
-}
-.gg-team__pw > input {
-  width: 100%;
-}
-.gg-team__form label:not(.gg-team__check) {
-  display: grid;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 500;
-}
-.gg-team__form input:not([type='checkbox']),
-.gg-team__form select {
-  height: 40px;
-  padding: 0 12px;
-  border: 1px solid var(--gg-line);
-  border-radius: 6px;
-  background: #ffffff;
-  font: inherit;
-}
-.gg-team__form small {
-  color: var(--gg-text-2);
-  font-size: 12px;
-  font-weight: 400;
-}
-.gg-team__form fieldset {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 14px 16px;
-  border: 1px solid var(--gg-line);
-  border-radius: 8px;
-}
-.gg-team__form legend {
-  padding: 0 6px;
-  font-size: 13px;
-  font-weight: 500;
-}
-.gg-team__check {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 14px;
-  cursor: pointer;
-}
-.gg-team__check input {
-  width: 16px;
-  height: 16px;
-  margin-top: 2px;
-  accent-color: var(--gg-primary);
-}
-.gg-team__row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 16px 24px;
-}
-.gg-team__error {
-  margin: 0;
-  padding: 10px 12px;
-  border-radius: 6px;
-  background: #fef3f2;
-  color: #b42318;
-  font-size: 13px;
-}
-.gg-team__matrix td small {
-  display: block;
-  margin-top: 2px;
-  color: var(--gg-text-2);
-  font-size: 12px;
-}
-.gg-team__matrix .gg-team__tabs {
-  color: var(--gg-text-3, var(--gg-text-2));
-}
-.gg-team__cell {
-  text-align: center;
-}
-.gg-team__cell input {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--gg-primary);
-  cursor: pointer;
-}
-.gg-team__own svg {
-  width: 16px;
-  height: 16px;
-  color: var(--gg-primary);
-}
-.gg-team__opens {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 14px;
-  padding: 4px 20px 20px;
-}
-.gg-team__role {
-  padding: 14px 16px;
-  border: 1px solid var(--gg-line);
-  border-radius: 8px;
-}
-.gg-team__role h3 {
-  margin: 0 0 8px;
-  font-size: 15px;
-}
-.gg-team__what {
-  margin: 10px 0 6px;
-  color: var(--gg-text-2);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.gg-team__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.gg-team__chips li {
-  padding: 3px 9px;
-  border: 1px solid var(--gg-line);
-  border-radius: 999px;
-  background: #ffffff;
-  font-size: 12px;
-}
-.gg-team__chips li[data-off] {
-  border-style: dashed;
-  color: var(--gg-text-2);
-}
-.gg-team__more {
-  margin: 0;
-  font-size: 13px;
-}
-.gg-team__field {
-  display: grid;
-  gap: 6px;
-}
-.gg-team__areas {
-  display: none;
-  margin: 0;
-  padding: 0 0 8px;
-  list-style: none;
-}
-.gg-team__areas li {
-  display: grid;
-  gap: 4px;
-  padding: 12px 16px;
-  border-top: 1px solid var(--gg-line);
-}
-.gg-team__areas small {
-  color: var(--gg-text-2);
-  font-size: 12px;
-}
-.gg-team__area-roles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-  margin-top: 6px;
-}
-.gg-team__own-chip {
-  align-items: center;
-  color: var(--gg-text-2);
-  cursor: default;
-}
-.gg-team__own-chip svg {
-  width: 14px;
-  height: 14px;
-  color: var(--gg-primary);
-}
-@media (max-width: 767px) {
-  .gg-team__areas {
-    display: block;
-  }
-  .gg-team__matrix-wrap {
-    display: none;
-  }
-  .gg-team__people li {
-    padding: 12px 16px;
-  }
-  .gg-team__opens {
-    padding: 4px 16px 16px;
-  }
-}
-
 /* The admin's modal (Team & access): components/ui/sheet.tsx's pop-up, styled here (the admin has no Tailwind).
    Laptop: a centred white card rising in; phone: a sheet from the bottom. Exit: components/ui/sheet.tsx keeps it on
    screen 220 ms, non-modal and click-through, while these animations run. */
@@ -3910,5 +3641,653 @@ body:has(.gg-create) .no-results__actions {
   .gg-admin-modal[data-closing],
   .gg-admin-modal[data-closing] .gg-admin-modal__panel {
     animation: none;
+  }
+}
+
+/* ---- Team & access (/admin/team), redesigned 17 Nov: figures, two tabs, a people table, a card per role. ---- */
+.gg-team__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.gg-team__stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--gg-line);
+  border-radius: 12px;
+  background: #ffffff;
+}
+.gg-team__stat-icon {
+  display: grid;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--gg-accent);
+  color: var(--gg-primary);
+}
+.gg-team__stat-icon svg {
+  width: 18px;
+  height: 18px;
+}
+.gg-team__stat b {
+  display: block;
+  font-size: 22px;
+  line-height: 1.1;
+}
+.gg-team__stat small {
+  color: var(--gg-text-2);
+  font-size: 12px;
+}
+.gg-team__tabs {
+  margin-bottom: 16px;
+}
+.gg-team__tabs .gg-tabs__tab {
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+.gg-team__note {
+  margin-bottom: 16px;
+}
+.gg-team__panel {
+  margin-bottom: 24px;
+}
+
+/* People */
+.gg-team__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gg-line);
+}
+.gg-team__search {
+  position: relative;
+  display: flex;
+  flex: 1 1 240px;
+  align-items: center;
+}
+.gg-team__search svg {
+  position: absolute;
+  left: 11px;
+  width: 16px;
+  height: 16px;
+  color: var(--gg-text-2);
+  pointer-events: none;
+}
+.gg-team__search input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px 0 34px;
+  border: 1px solid var(--gg-line);
+  border-radius: 8px;
+  background: #ffffff;
+  font: inherit;
+}
+.gg-team__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.gg-team__filter {
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--gg-line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--gg-text-2);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.gg-team__filter[aria-pressed='true'] {
+  border-color: var(--gg-ink);
+  background: var(--gg-ink);
+  color: #ffffff;
+}
+.gg-team__add {
+  margin-left: auto;
+}
+.gg-team__head,
+.gg-team__people li {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) minmax(200px, 2fr) 110px 100px;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+}
+.gg-team__head {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--gg-line);
+  background: #f8fafc;
+  color: var(--gg-text-2);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.gg-team__people {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.gg-team__people li + li {
+  border-top: 1px solid var(--gg-line);
+}
+.gg-team__people li:hover {
+  background: #fbfcfe;
+}
+.gg-team__people li[data-off] .gg-team__who {
+  opacity: 0.55;
+}
+.gg-team__who {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+}
+.gg-team__avatar {
+  display: grid;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--gg-primary);
+  color: #ffffff;
+  font-weight: 600;
+}
+.gg-team__id {
+  display: grid;
+  min-width: 0;
+}
+.gg-team__id b,
+.gg-team__id small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gg-team__id small {
+  color: var(--gg-text-2);
+  font-size: 12px;
+}
+.gg-team__you {
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--gg-accent);
+  color: var(--gg-primary);
+  font-size: 11px;
+  font-weight: 600;
+}
+.gg-team__roles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.gg-team__extra {
+  color: var(--gg-text-2);
+  font-size: 12px;
+  font-weight: 500;
+}
+.gg-team__act {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Roles & access */
+.gg-team__intro {
+  margin: 0 0 14px;
+  color: var(--gg-text-2);
+  font-size: 14px;
+}
+.gg-team__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+  align-items: start;
+  gap: 16px;
+}
+.gg-team__card {
+  display: flex;
+  flex-direction: column;
+  margin: 0 !important;
+}
+.gg-team__card header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 20px 14px;
+}
+.gg-team__card header div {
+  flex: 1;
+  min-width: 0;
+}
+.gg-team__card h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.gg-team__card h3 .gg-team__extra {
+  margin-left: 6px;
+}
+.gg-team__card header p {
+  margin: 2px 0 0;
+  color: var(--gg-text-2);
+  font-size: 13px;
+}
+.gg-team__card-icon {
+  display: grid;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--gg-accent);
+  color: var(--gg-primary);
+}
+.gg-team__card-icon svg {
+  width: 17px;
+  height: 17px;
+}
+.gg-team__card--owner {
+  grid-column: 1 / -1;
+  background: linear-gradient(90deg, #fffaf0, #ffffff);
+}
+.gg-team__members {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border: 1px solid var(--gg-line);
+  border-radius: 999px;
+  color: var(--gg-text-2);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.gg-team__also {
+  padding: 0 20px 6px;
+}
+.gg-team__also > p {
+  margin: 0 0 8px;
+  color: var(--gg-text-2);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.gg-team__switches {
+  display: grid;
+  gap: 2px;
+}
+.gg-switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  margin: 0 -10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.gg-switch:hover {
+  background: #f8fafc;
+}
+.gg-switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.gg-switch__track {
+  position: relative;
+  flex-shrink: 0;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: #d0d5dd;
+  transition: background 0.18s ease;
+}
+.gg-switch__track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(16 24 40 / 0.2);
+  transition: transform 0.18s ease;
+}
+.gg-switch input:checked + .gg-switch__track {
+  background: var(--gg-primary);
+}
+.gg-switch input:checked + .gg-switch__track::after {
+  transform: translateX(16px);
+}
+.gg-switch input:focus-visible + .gg-switch__track {
+  outline: 2px solid var(--gg-primary);
+  outline-offset: 2px;
+}
+.gg-switch input:disabled + .gg-switch__track {
+  opacity: 0.5;
+}
+.gg-switch:has(input:disabled) {
+  cursor: default;
+}
+.gg-switch__text {
+  display: grid;
+  min-width: 0;
+}
+.gg-switch__text b {
+  font-size: 14px;
+  font-weight: 500;
+}
+.gg-switch__text small {
+  color: var(--gg-text-2);
+  font-size: 12px;
+}
+.gg-team__opens {
+  margin-top: auto;
+  padding: 0 20px 16px;
+  border-top: 1px solid var(--gg-line);
+}
+.gg-team__opens summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  padding: 12px 0 2px;
+  list-style: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+.gg-team__opens summary::-webkit-details-marker {
+  display: none;
+}
+.gg-team__opens summary svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+.gg-team__opens[open] summary svg {
+  transform: rotate(180deg);
+}
+.gg-team__opens summary small {
+  margin-left: auto;
+  color: var(--gg-text-2);
+  font-weight: 400;
+}
+.gg-team__what {
+  margin: 12px 0 6px;
+  color: var(--gg-text-2);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.gg-team__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.gg-team__chips li {
+  padding: 3px 9px;
+  border: 1px solid var(--gg-line);
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 12px;
+}
+.gg-team__chips li[data-off] {
+  border-style: dashed;
+  color: var(--gg-text-2);
+}
+.gg-team__savebar {
+  position: sticky;
+  bottom: 16px;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--gg-ink);
+  color: #ffffff;
+  box-shadow: 0 12px 32px -8px rgb(16 24 40 / 0.35);
+  animation: gg-admin-in 0.25s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.gg-team__savebar > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.gg-team__savebar svg {
+  width: 16px;
+  height: 16px;
+}
+.gg-team__savebar-actions {
+  display: flex;
+  gap: 8px;
+}
+.gg-team__savebar .gg-btn:not(.gg-btn--primary) {
+  border-color: rgb(255 255 255 / 0.3);
+  background: transparent;
+  color: #ffffff;
+}
+.gg-team__savebar .gg-btn--primary {
+  background: var(--gg-primary);
+  border-color: var(--gg-primary);
+}
+.gg-team__more {
+  margin: 0;
+  font-size: 13px;
+}
+
+/* The person form (in the modal) */
+.gg-team__form {
+  display: grid;
+  gap: 18px;
+}
+.gg-team__form-head h2 {
+  margin: 0;
+  padding-right: 40px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.gg-team__form-head p {
+  margin: 4px 0 0;
+  color: var(--gg-text-2);
+  font-size: 13px;
+}
+.gg-team__form label:not(.gg-team__check) {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.gg-team__form input:not([type='checkbox']),
+.gg-team__form select {
+  box-sizing: border-box;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--gg-line);
+  border-radius: 8px;
+  background: #ffffff;
+  font: inherit;
+}
+.gg-team__form small {
+  color: var(--gg-text-2);
+  font-size: 12px;
+  font-weight: 400;
+}
+.gg-team__field {
+  display: grid;
+  gap: 6px;
+}
+.gg-team__pw {
+  display: block;
+}
+.gg-team__pw > input {
+  width: 100%;
+}
+.gg-team__form fieldset {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--gg-line);
+  border-radius: 10px;
+}
+.gg-team__form legend {
+  padding: 0 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.gg-team__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.gg-team__check input {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  accent-color: var(--gg-primary);
+}
+.gg-team__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 24px;
+}
+.gg-team__error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fef3f2;
+  color: #b42318;
+  font-size: 13px;
+}
+.gg-team__form-foot {
+  position: sticky;
+  bottom: -28px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 4px -28px -28px;
+  padding: 16px 28px;
+  border-top: 1px solid var(--gg-line);
+  background: #ffffff;
+}
+
+/* Tablets and phones: the people table becomes cards; the figures and the tabs stay in reach. */
+@media (max-width: 900px) {
+  .gg-team__head {
+    display: none;
+  }
+  .gg-team__people li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'who act' 'roles status';
+    gap: 10px;
+  }
+  .gg-team__who {
+    grid-area: who;
+  }
+  .gg-team__act {
+    grid-area: act;
+  }
+  .gg-team__roles {
+    grid-area: roles;
+    padding-left: 48px;
+  }
+  .gg-team__status {
+    grid-area: status;
+    align-self: start;
+  }
+}
+@media (max-width: 640px) {
+  .gg-team__stats {
+    gap: 8px;
+  }
+  .gg-team__stat {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 12px;
+  }
+  .gg-team__stat-icon {
+    width: 30px;
+    height: 30px;
+  }
+  .gg-team__toolbar {
+    padding: 14px 16px;
+  }
+  .gg-team__filters {
+    width: 100%;
+  }
+  .gg-team__add {
+    width: 100%;
+    margin-left: 0;
+    justify-content: center;
+  }
+  .gg-team__people li {
+    padding: 14px 16px;
+  }
+  .gg-team__act .gg-btn span {
+    display: none;
+  }
+  .gg-team__card header {
+    flex-wrap: wrap;
+    padding: 16px;
+  }
+  .gg-team__card header div {
+    flex-basis: calc(100% - 48px);
+  }
+  .gg-team__members {
+    order: 3;
+    margin-left: 48px;
+  }
+  .gg-team__also,
+  .gg-team__opens {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .gg-team__opens summary small {
+    margin-left: 22px;
+    flex-basis: 100%;
+  }
+  .gg-team__savebar {
+    bottom: 10px;
+  }
+  .gg-team__savebar-actions {
+    width: 100%;
+  }
+  .gg-team__savebar-actions .gg-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  /* The person form's buttons in the phone's bottom sheet (its padding is 20 px there, see .gg-admin-modal). */
+  .gg-team__form-foot {
+    bottom: calc(-24px - env(safe-area-inset-bottom));
+    margin: 4px -20px calc(-24px - env(safe-area-inset-bottom));
+    padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
+  }
+  .gg-team__form-foot .gg-btn {
+    flex: 1;
+    justify-content: center;
   }
 }

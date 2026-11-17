@@ -7,11 +7,11 @@ import { SCREENS, type Screen } from '@/app/(staff)/staff/screens';
 import { GROUPS } from '@/components/admin/nav';
 import { adminText } from '@/components/admin/text';
 import { getDictionary } from '@/lib/i18n';
-import { effectiveRoles, GRANTABLE, type Grants, hasRole, type Role, ROLES } from '@/lib/access';
+import { GRANTABLE, type Grants, hasRole, type Role, ROLES } from '@/lib/access';
 import { langOf } from '@/modules/sales/admin/text';
 import { getSettingsPrivate } from '../service';
 import { ROLE_LABELS } from '../collections';
-import { AccessMatrix, TeamTable } from './team-client';
+import { TeamPage } from './team-client';
 import { TEAM_TEXT } from './team-text';
 
 // Team & access (/admin/team): the team (add a person, change roles, switch off, a new password), the areas each
@@ -61,15 +61,14 @@ export default async function TeamView({ initPageResult, params, searchParams }:
   const modules = (settings.modules ?? {}) as Record<string, unknown>;
   const label = (r: Role) => ROLE_LABELS[r][lang].split(':')[0];
   const roles = ROLES.map((r) => ({ value: r, label: label(r), detail: ROLE_LABELS[r][lang] }));
-  const opens = GRANTABLE.map((r) => {
-    const eff = effectiveRoles([r], grants);
-    return { role: r, label: label(r), extra: eff.filter((x) => x !== r).map(label), staff: staffScreens(eff, lang, modules, dict.staff.tabs as Record<string, string>), admin: adminSections(req.payload, eff, lang, modules) };
-  });
+  const tabs = dict.staff.tabs as Record<string, string>;
   const areas = GRANTABLE.map((r) => ({
     role: r,
     label: label(r),
     detail: ROLE_LABELS[r][lang].split(':')[1]?.trim() ?? '',
-    staff: staffScreens([r], lang, modules, dict.staff.tabs as Record<string, string>).map((s) => s.label),
+    members: (people?.docs ?? []).filter((p) => p.roles?.includes(r)).length,
+    staff: staffScreens([r], lang, modules, tabs),
+    admin: adminSections(req.payload, [r], lang, modules),
   }));
 
   return (
@@ -84,12 +83,14 @@ export default async function TeamView({ initPageResult, params, searchParams }:
             <p className="gg-card__empty">{adminText(lang).importExport.forbidden}</p>
           ) : (
             <>
-              {!owner && <div className="gg-callout">{t.readOnly}</div>}
-              <TeamTable
+              <TeamPage
                 lang={lang}
                 owner={owner}
                 me={req.user.id}
                 roles={roles}
+                areas={areas}
+                grants={grants}
+                initialTab={searchParams?.tab === 'access' ? 'access' : 'people'}
                 people={people.docs.map((p) => ({
                   id: p.id,
                   name: p.name ?? '',
@@ -100,37 +101,6 @@ export default async function TeamView({ initPageResult, params, searchParams }:
                   locale: (p.locale ?? 'fr') as Lang,
                 }))}
               />
-              <AccessMatrix lang={lang} owner={owner} areas={areas} grants={grants} />
-              <section className="gg-card" data-testid="role-opens">
-                <header className="gg-card__head">
-                  <div>
-                    <h2>{t.opensTitle}</h2>
-                    <p>{t.opensHint}</p>
-                  </div>
-                </header>
-                <div className="gg-team__opens">
-                  {opens.map((o) => (
-                    <article key={o.role} className="gg-team__role" data-role={o.role}>
-                      <h3>
-                        {o.label}
-                        {o.extra.length > 0 && (
-                          <span className="gg-team__extra">
-                            + {t.extra} {o.extra.join(', ')}
-                          </span>
-                        )}
-                      </h3>
-                      <p className="gg-team__what">{t.staffApp}</p>
-                      <ul className="gg-team__chips" data-testid={`opens-staff-${o.role}`}>
-                        {o.staff.length ? o.staff.map((s) => <li key={s.label} data-off={s.off || undefined} title={s.off ? t.moduleOff : undefined}>{s.label}</li>) : <li data-off>{t.nothing}</li>}
-                      </ul>
-                      <p className="gg-team__what">{t.adminArea}</p>
-                      <ul className="gg-team__chips" data-testid={`opens-admin-${o.role}`}>
-                        {o.admin.length ? o.admin.map((s) => <li key={s.label} data-off={s.off || undefined} title={s.off ? t.moduleOff : undefined}>{s.label}</li>) : <li data-off>{t.nothing}</li>}
-                      </ul>
-                    </article>
-                  ))}
-                </div>
-              </section>
               <p className="gg-team__more">
                 <Link href="/admin/collections/users">{t.allAccounts}</Link>
               </p>

@@ -88,6 +88,13 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 - Verified: `npm run check` (359), `npm run test:int` (165, incl. new: counter dish / pickup-only refused for delivery, 47 km refused). Browser on a production build with a throwaway seeded DB: home desktop + iPhone 14, nav "Services Catering", checkout (dish named + removed, 9,6 km fee, 9990 refused), admin range panel (10 → 12 km: 200 → 251 postcodes, 9011 checked). E2E specs updated, **not run** (need the seeded staging DB).
 - Open: Q — Ivo to confirm the starting ranges (≤10 km 5 €, min 30 €, free 80 €; ≤20 km 8 €, min 50 €, free 120 €) and to supply four landscape banner photos.
 
+### 2026-11-17 · Team & access redesigned (owner report: "not great UX, not responsive, vague")
+
+- **Problems:** people and access on one long scroll; an access grid of key icons and ticks with a wall of tab names; "what each role opens" as ~40 chips per role; a list with no search, filter or columns; no sign of unsaved access changes.
+- **Now:** figures (people, can sign in, owners); two tabs. **People:** search, role filters, "Add a person" in one toolbar; a table on laptops (person, roles, status, edit), cards on tablets and phones. **Roles & access:** the Owner card (opens everything, cannot be limited), then a card per role with how many people have it, on/off switches "people with this role can also use…" with plain words, and "See what it opens" with a one-line count (7 team-app tabs · 23 back-office sections) that updates live as switches move (a role opens the union of its areas, as `hasRole` decides); a sticky bar "Access changed, not saved yet · Discard · Save changes" appears only when something changed. Same rules and actions as before; only the page changed.
+- **Fixed on the way:** the person form's buttons slipped off the phone's bottom sheet (a later rule overrode its phone padding); cards stretched to their neighbour's height; the hint still said "tick".
+- **Checked (production build):** layout at 1440, 1024, iPad and 360 px: nothing past the edge, search → 1 row, Stock filter, the save bar appears and Discard clears it (5/5); modal 17/17; Team & access walk-through 17/17 (the Sales card shows Count before saving; grant and take back apply to a signed-in session; manager read-only); staff pop-ups 15/15; check 349, e2e 31 passed / 8 skipped.
+
 ### 2026-11-17 · Team & access: a real modal (owner report)
 
 - **Reported:** "Add a person" opened Payload's full-screen drawer: the form sat in a narrow column on the left of an empty screen, and the reveal eye was off-centre.
