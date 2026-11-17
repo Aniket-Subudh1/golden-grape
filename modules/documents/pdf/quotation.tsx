@@ -106,12 +106,15 @@ function QuotationDocument({ q, t, locale, business, signature }: Props) {
             {q.contact?.email ? <Text>{q.contact.email}</Text> : null}
             {q.contact?.phone ? <Text>{q.contact.phone}</Text> : null}
           </View>
-          <View style={s.box}>
-            <Text style={s.eyebrow}>{t.event}</Text>
-            <Text>{[day(q.event?.date), q.event?.time].filter(Boolean).join(' · ')}</Text>
-            {q.event?.guests ? <Text>{interpolate(t.guests, { count: q.event.guests })}</Text> : null}
-            {q.event?.location ? <Text>{q.event.location}</Text> : null}
-          </View>
+          {/* A B2B quotation (M3.2) has no event: its column is left out. */}
+          {q.kind !== 'b2b' && (
+            <View style={s.box}>
+              <Text style={s.eyebrow}>{t.event}</Text>
+              <Text>{[day(q.event?.date), q.event?.time].filter(Boolean).join(' · ')}</Text>
+              {q.event?.guests ? <Text>{interpolate(t.guests, { count: q.event.guests })}</Text> : null}
+              {q.event?.location ? <Text>{q.event.location}</Text> : null}
+            </View>
+          )}
         </View>
 
         <View style={s.headRow}>

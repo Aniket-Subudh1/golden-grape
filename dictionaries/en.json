@@ -811,6 +811,18 @@
       "code": "Card code",
       "how": "Use it on goldengrape.lu (the “Gift card” field in the cart) or in the shop: show this QR code or read out the code. It can be used in several goes.",
       "balance": "To check the balance, enter the code in your account."
+    },
+    "invoice": {
+      "subject": "Your Golden Grape invoice {{number}}",
+      "body": "Thank you for your order. Your invoice is attached to this e-mail.",
+      "due": "Please pay by {{date}}.",
+      "paid": "It is already settled: thank you.",
+      "total": "Total",
+      "dueLabel": "Due"
+    },
+    "creditNote": {
+      "subject": "Your Golden Grape credit note {{number}}",
+      "body": "Here is the credit note issued on your invoice {{invoice}}. It is attached to this e-mail."
     }
   },
   "cookies": {
@@ -1187,7 +1199,25 @@
       "expired": "This quotation has expired",
       "expiredText": "It was valid until {{date}}. Contact us for a new proposal:",
       "replaced": "This quotation has been replaced by a new version, sent by e-mail."
-    }
+    },
+    "invoice": "Invoice",
+    "creditNote": "Credit note",
+    "deliveryNote": "Delivery note",
+    "quotation": "Quotation",
+    "dueOn": "Due on",
+    "order": "Order",
+    "forInvoice": "Credit note for invoice {{number}}",
+    "reason": "Reason",
+    "delivery": "Delivery",
+    "paidBefore": "Already settled (points, gift cards, payments)",
+    "amountDue": "Amount due",
+    "payTo": "Please pay by bank transfer to",
+    "paymentRef": "Reference: {{number}}",
+    "draftMark": "DRAFT – pending accountant",
+    "received": "Received in good condition",
+    "receivedBy": "Name and signature",
+    "page": "Page {{n}} / {{total}}",
+    "credited": "Amount credited"
   },
   "staff": {
     "signOut": "Sign out",
@@ -1421,7 +1451,11 @@
       "doneInvoice": "To invoice: the order awaits payment. Stock is up to date.",
       "again": "New sale",
       "remove": "Remove",
-      "qty": "Quantity"
+      "qty": "Quantity",
+      "sendQuote": "Send as quotation",
+      "sendQuoteHint": "Business customers: a numbered quotation at their prices, e-mailed with its PDF. Stock does not move.",
+      "quoteSentTitle": "Quotation sent",
+      "quoteSentBody": "The customer gets the quotation by e-mail. Once accepted, “Create order” on their page."
     },
     "customers": {
       "title": "Customers",
@@ -1453,7 +1487,14 @@
       "recent": "Recent customers",
       "noCustomers": "No customers yet.",
       "privateBadge": "Private",
-      "businessBadge": "Business"
+      "businessBadge": "Business",
+      "quotations": "Quotations",
+      "noQuotations": "No quotations.",
+      "createOrder": "Create order",
+      "createOrderHint": "The order is placed at the quoted prices, “invoice later”. A sent quotation is marked accepted by you.",
+      "orderOf": "Order {number}",
+      "invoices": "Invoices",
+      "noInvoices": "No invoices."
     },
     "orders": {
       "title": "Orders",

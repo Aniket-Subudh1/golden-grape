@@ -4,9 +4,9 @@ import { badgeCell, l, type Label, say, scaledNumber } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { type DocumentDiscount, priceDocument, type VatClass } from '@/modules/promotions/pricing';
 
-// Catering quotations (Q-12, built 11 Nov 2026) and the PDF files of documents. A quotation is prepared by staff from
-// a catering request, then sent, viewed, signed or declined by the customer through a link (service.ts). The B2B
-// product quotations of M3.2 will use the same collection, numbering and PDF.
+// Quotations (catering, Q-12; B2B product quotations, M3.2), invoices, delivery notes, credit notes and the PDF files
+// of documents (04 §5). A quotation is sent, viewed, signed or declined by the customer through a link (service.ts);
+// invoices and credit notes never change once issued, except their status and payment (immutable below).
 
 export const QUOTATION_STATUS: Record<string, Label> = {
   draft: l('Brouillon', 'Draft', 'Entwurf', 'Rascunho'),
@@ -35,7 +35,8 @@ const options = (labels: Record<string, Label>) => Object.entries(labels).map(([
  */
 const priceDraft: CollectionBeforeChangeHook = async ({ data, originalDoc, req }) => {
   const status = data.status ?? originalDoc?.status ?? 'draft';
-  if (status !== 'draft') return data;
+  // A B2B quotation is priced by `quote` when it is made (M3.2) and kept as priced: never re-priced here.
+  if (status !== 'draft' || (data.kind ?? originalDoc?.kind) === 'b2b') return data;
   // Loaded when needed: the services import the Payload config, which imports this file.
   const rates = await (await import('@/modules/promotions/service')).vatRates();
   const lines = (data.lines ?? []) as { qty?: number; unitPriceCents?: number; vat?: VatClass }[];
@@ -103,6 +104,10 @@ const lineFields: Field[] = [
   { name: 'detail', type: 'textarea', label: l('Détail (facultatif)', 'Details (optional)', 'Details (optional)', 'Detalhe (opcional)'), admin: { rows: 2 } },
   { name: 'vatBp', type: 'number', admin: hidden },
   { name: 'totalCents', type: 'number', admin: hidden },
+  // B2B quotations (M3.2): the size and box quoted, and the line's discount (promotion), for the order made from it.
+  { name: 'variant', type: 'relationship', relationTo: 'variants', admin: hidden },
+  { name: 'unit', type: 'relationship', relationTo: 'packagingUnits', admin: hidden },
+  { name: 'discountCents', type: 'number', admin: hidden },
 ];
 
 export const quotations: CollectionConfig = {
@@ -149,6 +154,18 @@ export const quotations: CollectionConfig = {
       options: options(QUOTATION_STATUS),
       admin: { ...hidden, components: badgeCell(QUOTATION_TONES) },
     },
+    {
+      // A catering quotation (typed lines) or a B2B one (catalogue lines priced by quote, M3.2).
+      name: 'kind',
+      type: 'select',
+      defaultValue: 'catering',
+      options: [
+        { value: 'catering', label: l('Traiteur', 'Catering', 'Catering', 'Catering') },
+        { value: 'b2b', label: l('Professionnel', 'Business', 'Geschäftskunde', 'Profissional') },
+      ],
+      admin: hidden,
+    },
+    { name: 'order', type: 'relationship', relationTo: 'orders', index: true, label: l('Commande', 'Order', 'Bestellung', 'Encomenda'), admin: readOnly },
     { name: 'cateringRequest', type: 'relationship', relationTo: 'cateringRequests', index: true, label: l('Demande traiteur', 'Catering request', 'Catering-Anfrage', 'Pedido de catering'), admin: readOnly },
     { name: 'customer', type: 'relationship', relationTo: 'customers', index: true, label: l('Compte client', 'Customer account', 'Kundenkonto', 'Conta de cliente'), admin: readOnly },
     {
@@ -312,10 +329,11 @@ export const documentFiles: CollectionConfig = {
   admin: { hidden: true, useAsTitle: 'filename' },
   access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
   fields: [
-    { name: 'kind', type: 'select', required: true, options: ['quotation', 'quotation_signed'] },
+    { name: 'kind', type: 'select', required: true, options: ['quotation', 'quotation_signed', 'invoice', 'credit_note', 'delivery_note'] },
     { name: 'filename', type: 'text', required: true },
     { name: 'quotation', type: 'relationship', relationTo: 'quotations', index: true },
     { name: 'customer', type: 'relationship', relationTo: 'customers', index: true },
+    { name: 'order', type: 'relationship', relationTo: 'orders', index: true },
     { name: 'sizeBytes', type: 'number' },
     { name: 'sha256', type: 'text' },
     // Base64 of the PDF (about 110 KB for a quotation with the logo); 12 MB keeps a document under MongoDB's 16 MB.
@@ -323,7 +341,166 @@ export const documentFiles: CollectionConfig = {
   ],
 };
 
-export const documentCollections = [quotations, documentFiles];
 
 /** Staff who may open a quotation's PDF before it is sent (preview). */
 export const canPreview = isStaff('sales');
+
+// ---- Invoices, credit notes, delivery notes (M3.2 T5) -----------------------------------------------------------
+
+export const INVOICE_STATUS: Record<string, Label> = {
+  issued: l('Émise', 'Issued', 'Ausgestellt', 'Emitida'),
+  paid: l('Payée', 'Paid', 'Bezahlt', 'Paga'),
+  partly_credited: l('Avoir partiel', 'Partly credited', 'Teilweise gutgeschrieben', 'Creditada em parte'),
+  credited: l('Annulée par avoir', 'Credited', 'Gutgeschrieben', 'Creditada'),
+};
+export const INVOICE_TONES = { issued: 'info', paid: 'success', partly_credited: 'warning', credited: 'neutral' } as const;
+
+const billing = (): Field => ({
+  name: 'billing',
+  type: 'group',
+  label: l('Client', 'Customer', 'Kunde', 'Cliente'),
+  fields: [
+    { name: 'name', type: 'text' },
+    { name: 'company', type: 'text' },
+    { name: 'vatNumber', type: 'text' },
+    { name: 'email', type: 'text' },
+    { name: 'phone', type: 'text' },
+    { name: 'address', type: 'textarea' },
+  ],
+});
+const docLines = (): Field => ({
+  name: 'lines',
+  type: 'array',
+  label: l('Lignes', 'Lines', 'Zeilen', 'Linhas'),
+  fields: [
+    { name: 'name', type: 'text', required: true },
+    { name: 'detail', type: 'text' },
+    { name: 'qty', type: 'number', required: true },
+    { name: 'unitPriceCents', type: 'number' },
+    { name: 'discountCents', type: 'number', defaultValue: 0 },
+    { name: 'vatBp', type: 'number' },
+    { name: 'totalCents', type: 'number' },
+    { name: 'variant', type: 'relationship', relationTo: 'variants' },
+    { name: 'unit', type: 'relationship', relationTo: 'packagingUnits' },
+  ],
+});
+const docTotals = (): Field => ({
+  name: 'totals',
+  type: 'group',
+  label: l('Total TTC', 'Total incl. VAT', 'Summe inkl. MwSt.', 'Total c/ IVA'),
+  admin: { components: { Cell: '@/modules/documents/admin/cells#TotalCell' } },
+  fields: [
+    { name: 'subtotalCents', type: 'number' },
+    { name: 'discountCents', type: 'number' },
+    { name: 'deliveryCents', type: 'number' },
+    { name: 'vatCents', type: 'number' },
+    { name: 'totalCents', type: 'number' },
+    { name: 'vatBreakdown', type: 'array', fields: [{ name: 'rateBp', type: 'number' }, { name: 'baseCents', type: 'number' }, { name: 'vatCents', type: 'number' }] },
+  ],
+});
+
+/** Once issued, only these move (the payment, a credit note): every other field stays as printed, for every role. */
+const frozen =
+  (allowed: string[]): CollectionBeforeChangeHook =>
+  ({ data, originalDoc, operation, req }) => {
+    if (operation !== 'update' || !originalDoc) return data;
+    for (const [key, value] of Object.entries(data)) {
+      if (allowed.includes(key) || ['updatedAt', 'createdAt', 'id', '_id'].includes(key)) continue;
+      if (JSON.stringify(value) !== JSON.stringify((originalDoc as Record<string, unknown>)[key])) {
+        throw new Error(say(req, l('Un document émis ne se modifie pas : faites un avoir.', 'An issued document cannot be changed: issue a credit note.', 'Ein ausgestelltes Dokument wird nicht geändert: erstellen Sie eine Gutschrift.', 'Um documento emitido não se altera: emita uma nota de crédito.')));
+      }
+    }
+    return data;
+  };
+
+const docAdmin = (description: Label) => ({
+  useAsTitle: 'title',
+  hidden: hiddenUnless('sales', 'manager'),
+  listSearchableFields: ['number', 'title', 'billing.name', 'billing.company'],
+  description,
+});
+const number = (): Field => ({ name: 'number', type: 'text', required: true, unique: true, index: true, label: l('Numéro', 'Number', 'Nummer', 'Número') });
+const title = (): Field => ({ name: 'title', type: 'text', admin: hidden });
+const locale = (): Field => ({ name: 'locale', type: 'text', defaultValue: 'fr', admin: hidden });
+const pdf = (): Field => ({ name: 'pdf', type: 'relationship', relationTo: 'documentFiles', admin: hidden });
+
+/** Invoices (R5): numbered without gaps at issue (service.ts), from the order as sold; immutable but for the payment. */
+export const invoices: CollectionConfig = {
+  slug: 'invoices',
+  labels: { singular: l('Facture', 'Invoice', 'Rechnung', 'Fatura'), plural: l('Factures', 'Invoices', 'Rechnungen', 'Faturas') },
+  admin: {
+    ...docAdmin(l('Émises depuis une commande (bouton « Émettre la facture »). Une facture ne se modifie pas : pour corriger, faites un avoir.', 'Issued from an order (“Issue invoice”). An invoice is never edited: to correct one, issue a credit note.', 'Aus einer Bestellung ausgestellt („Rechnung ausstellen“). Eine Rechnung wird nie geändert: zur Korrektur eine Gutschrift.', 'Emitidas a partir de uma encomenda («Emitir fatura»). Uma fatura não se altera: para corrigir, emita uma nota de crédito.')),
+    defaultColumns: ['title', 'issuedAt', 'dueAt', 'totals', 'status'],
+    components: { beforeList: ['@/modules/documents/admin/document-actions#AccountingExport'], edit: { beforeDocumentControls: ['@/modules/documents/admin/document-actions#InvoiceActions'] } },
+  },
+  access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
+  hooks: { beforeChange: [frozen(['status', 'paidAt', 'creditedCents'])] },
+  defaultSort: '-issuedAt',
+  fields: [
+    number(),
+    title(),
+    { name: 'status', type: 'select', required: true, defaultValue: 'issued', index: true, options: options(INVOICE_STATUS), label: l('Statut', 'Status', 'Status', 'Estado'), admin: { components: badgeCell(INVOICE_TONES) } },
+    { name: 'order', type: 'relationship', relationTo: 'orders', required: true, index: true, label: l('Commande', 'Order', 'Bestellung', 'Encomenda') },
+    { name: 'customer', type: 'relationship', relationTo: 'customers', index: true, label: l('Client', 'Customer', 'Kunde', 'Cliente') },
+    billing(),
+    docLines(),
+    docTotals(),
+    { name: 'paidBeforeCents', type: 'number', defaultValue: 0, admin: hidden },
+    { name: 'amountDueCents', type: 'number', admin: hidden },
+    { name: 'creditedCents', type: 'number', defaultValue: 0, admin: hidden },
+    { name: 'issuedAt', type: 'date', required: true, index: true, label: l('Émise le', 'Issued on', 'Ausgestellt am', 'Emitida a') },
+    { name: 'dueAt', type: 'date', label: l('Échéance', 'Due', 'Fällig', 'Vencimento') },
+    { name: 'paidAt', type: 'date', label: l('Payée le', 'Paid on', 'Bezahlt am', 'Paga a') },
+    locale(),
+    pdf(),
+  ],
+};
+
+/** Credit notes (R5): their own series (AV), against one invoice, never more than it still holds. */
+export const creditNotes: CollectionConfig = {
+  slug: 'creditNotes',
+  labels: { singular: l('Avoir', 'Credit note', 'Gutschrift', 'Nota de crédito'), plural: l('Avoirs', 'Credit notes', 'Gutschriften', 'Notas de crédito') },
+  admin: { ...docAdmin(l('Un avoir annule tout ou partie d’une facture (remboursement, retour). Il se fait depuis la facture.', 'A credit note cancels all or part of an invoice (refund, return). It is made from the invoice.', 'Eine Gutschrift storniert eine Rechnung ganz oder teilweise. Sie wird aus der Rechnung erstellt.', 'Uma nota de crédito anula toda ou parte de uma fatura. Faz-se a partir da fatura.')), defaultColumns: ['title', 'issuedAt', 'totals', 'reason'] },
+  access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
+  hooks: { beforeChange: [frozen([])] },
+  defaultSort: '-issuedAt',
+  fields: [
+    number(),
+    title(),
+    { name: 'invoice', type: 'relationship', relationTo: 'invoices', required: true, index: true, label: l('Facture', 'Invoice', 'Rechnung', 'Fatura') },
+    { name: 'order', type: 'relationship', relationTo: 'orders', index: true },
+    { name: 'customer', type: 'relationship', relationTo: 'customers', index: true },
+    { name: 'reason', type: 'text', required: true, label: l('Raison', 'Reason', 'Grund', 'Motivo') },
+    billing(),
+    docLines(),
+    docTotals(),
+    { name: 'issuedAt', type: 'date', required: true, label: l('Émis le', 'Issued on', 'Ausgestellt am', 'Emitida a') },
+    locale(),
+    pdf(),
+  ],
+};
+
+/** Delivery notes (R5): what leaves with the customer or the driver, without prices, numbered (BL). */
+export const deliveryNotes: CollectionConfig = {
+  slug: 'deliveryNotes',
+  labels: { singular: l('Bon de livraison', 'Delivery note', 'Lieferschein', 'Guia de remessa'), plural: l('Bons de livraison', 'Delivery notes', 'Lieferscheine', 'Guias de remessa') },
+  admin: { ...docAdmin(l('Émis depuis une commande (bouton « Bon de livraison »). Sans prix.', 'Issued from an order (“Delivery note”). No prices.', 'Aus einer Bestellung ausgestellt („Lieferschein“). Ohne Preise.', 'Emitida a partir de uma encomenda («Guia de remessa»). Sem preços.')), defaultColumns: ['title', 'issuedAt'] },
+  access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
+  hooks: { beforeChange: [frozen(['deliveredAt', 'signature'])] },
+  defaultSort: '-issuedAt',
+  fields: [
+    number(),
+    title(),
+    { name: 'order', type: 'relationship', relationTo: 'orders', required: true, index: true, label: l('Commande', 'Order', 'Bestellung', 'Encomenda') },
+    { name: 'customer', type: 'relationship', relationTo: 'customers', index: true },
+    billing(),
+    docLines(),
+    { name: 'issuedAt', type: 'date', required: true, label: l('Émis le', 'Issued on', 'Ausgestellt am', 'Emitida a') },
+    { name: 'deliveredAt', type: 'date' },
+    { name: 'signature', type: 'text' },
+    locale(),
+    pdf(),
+  ],
+};
+
+export const documentCollections = [quotations, documentFiles, invoices, creditNotes, deliveryNotes];

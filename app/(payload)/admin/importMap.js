@@ -63,6 +63,8 @@ import { default as default_5ae1914325a0ee108216435b317303b1 } from '@/modules/e
 import { default as default_d7d5ef2f5280292ebc8cb7d4f5d043cc } from '@/modules/events/admin/booking-tabs'
 import { default as default_e7547a6d616d19573a629279234f5127 } from '@/modules/documents/admin/quotation-panel'
 import { TotalCell as TotalCell_d6358e374739dc2aac8672e72d6cc454 } from '@/modules/documents/admin/cells'
+import { AccountingExport as AccountingExport_e0280cd7f0117a34dccb6bc7a9d49985 } from '@/modules/documents/admin/document-actions'
+import { InvoiceActions as InvoiceActions_e0280cd7f0117a34dccb6bc7a9d49985 } from '@/modules/documents/admin/document-actions'
 import { default as default_a2f0eccb7507197ce791108816851322 } from '@/components/admin/nav'
 import { default as default_0430f5fb3b8132a602107d7535a2a344 } from '@/components/admin/icon'
 import { default as default_334250e18ce0b45af3e0c04bb6fe8307 } from '@/components/admin/logo'
@@ -145,6 +147,8 @@ export const importMap = {
   "@/modules/events/admin/booking-tabs#default": default_d7d5ef2f5280292ebc8cb7d4f5d043cc,
   "@/modules/documents/admin/quotation-panel#default": default_e7547a6d616d19573a629279234f5127,
   "@/modules/documents/admin/cells#TotalCell": TotalCell_d6358e374739dc2aac8672e72d6cc454,
+  "@/modules/documents/admin/document-actions#AccountingExport": AccountingExport_e0280cd7f0117a34dccb6bc7a9d49985,
+  "@/modules/documents/admin/document-actions#InvoiceActions": InvoiceActions_e0280cd7f0117a34dccb6bc7a9d49985,
   "@/components/admin/nav#default": default_a2f0eccb7507197ce791108816851322,
   "@/components/admin/icon#default": default_0430f5fb3b8132a602107d7535a2a344,
   "@/components/admin/logo#default": default_334250e18ce0b45af3e0c04bb6fe8307,

@@ -9,6 +9,8 @@ import {
   Check,
   CircleCheck,
   CircleX,
+  ClipboardList,
+  FileText,
   Handshake,
   Landmark,
   PackageCheck,
@@ -43,6 +45,8 @@ const ICONS: Record<string, typeof Check> = {
   accepted: Check,
   rejected: X,
   no_show: UserX,
+  invoice: FileText,
+  deliveryNote: ClipboardList,
 };
 const RESERVATION_ICONS: Record<string, typeof Check> = { completed: UserCheck };
 

@@ -811,6 +811,18 @@
       "code": "Código do cartão",
       "how": "Use-o em goldengrape.lu (campo «Cartão-presente» do carrinho) ou na loja: mostre este código QR ou diga o código. Pode ser usado em várias vezes.",
       "balance": "Para saber o saldo, introduza o código na sua conta."
+    },
+    "invoice": {
+      "subject": "A sua fatura Golden Grape {{number}}",
+      "body": "Obrigado pela sua encomenda. A sua fatura segue em anexo.",
+      "due": "Pague até {{date}}.",
+      "paid": "Já está paga: obrigado.",
+      "total": "Total",
+      "dueLabel": "Vencimento"
+    },
+    "creditNote": {
+      "subject": "A sua nota de crédito Golden Grape {{number}}",
+      "body": "Segue a nota de crédito emitida sobre a sua fatura {{invoice}}, em anexo."
     }
   },
   "cookies": {
@@ -1187,7 +1199,25 @@
       "expired": "Este orçamento expirou",
       "expiredText": "Era válido até {{date}}. Contacte-nos para uma nova proposta:",
       "replaced": "Este orçamento foi substituído por uma nova versão, enviada por e-mail."
-    }
+    },
+    "invoice": "Fatura",
+    "creditNote": "Nota de crédito",
+    "deliveryNote": "Guia de remessa",
+    "quotation": "Orçamento",
+    "dueOn": "Vencimento",
+    "order": "Encomenda",
+    "forInvoice": "Nota de crédito da fatura {{number}}",
+    "reason": "Motivo",
+    "delivery": "Entrega",
+    "paidBefore": "Já pago (pontos, cartões-presente, pagamentos)",
+    "amountDue": "Em dívida",
+    "payTo": "Pague por transferência para",
+    "paymentRef": "Referência: {{number}}",
+    "draftMark": "RASCUNHO – a aguardar o contabilista",
+    "received": "Recebido em bom estado",
+    "receivedBy": "Nome e assinatura",
+    "page": "Página {{n}} / {{total}}",
+    "credited": "Montante creditado"
   },
   "staff": {
     "signOut": "Terminar sessão",
@@ -1421,7 +1451,11 @@
       "doneInvoice": "A faturar: a encomenda aguarda pagamento. O stock está atualizado.",
       "again": "Nova venda",
       "remove": "Retirar",
-      "qty": "Quantidade"
+      "qty": "Quantidade",
+      "sendQuote": "Enviar como orçamento",
+      "sendQuoteHint": "Clientes empresariais: um orçamento numerado aos seus preços, enviado por e-mail com o PDF. O stock não muda.",
+      "quoteSentTitle": "Orçamento enviado",
+      "quoteSentBody": "O cliente recebe o orçamento por e-mail. Depois de aceite, «Criar encomenda» na sua ficha."
     },
     "customers": {
       "title": "Clientes",
@@ -1453,7 +1487,14 @@
       "recent": "Clientes recentes",
       "noCustomers": "Ainda sem clientes.",
       "privateBadge": "Particular",
-      "businessBadge": "Empresa"
+      "businessBadge": "Empresa",
+      "quotations": "Orçamentos",
+      "noQuotations": "Nenhum orçamento.",
+      "createOrder": "Criar encomenda",
+      "createOrderHint": "A encomenda é feita aos preços do orçamento, «faturar depois». Um orçamento enviado fica aceite por si.",
+      "orderOf": "Encomenda {number}",
+      "invoices": "Faturas",
+      "noInvoices": "Nenhuma fatura."
     },
     "orders": {
       "title": "Encomendas",

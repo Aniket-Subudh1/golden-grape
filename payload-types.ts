@@ -99,6 +99,9 @@ export interface Config {
     payments: Payment;
     quotations: Quotation;
     documentFiles: DocumentFile;
+    invoices: Invoice;
+    creditNotes: CreditNote;
+    deliveryNotes: DeliveryNote;
     priceLists: PriceList;
     promotions: Promotion;
     discountCodes: DiscountCode;
@@ -159,6 +162,9 @@ export interface Config {
     payments: PaymentsSelect<false> | PaymentsSelect<true>;
     quotations: QuotationsSelect<false> | QuotationsSelect<true>;
     documentFiles: DocumentFilesSelect<false> | DocumentFilesSelect<true>;
+    invoices: InvoicesSelect<false> | InvoicesSelect<true>;
+    creditNotes: CreditNotesSelect<false> | CreditNotesSelect<true>;
+    deliveryNotes: DeliveryNotesSelect<false> | DeliveryNotesSelect<true>;
     priceLists: PriceListsSelect<false> | PriceListsSelect<true>;
     promotions: PromotionsSelect<false> | PromotionsSelect<true>;
     discountCodes: DiscountCodesSelect<false> | DiscountCodesSelect<true>;
@@ -297,6 +303,11 @@ export interface AuditLog {
     | 'quotation.accepted'
     | 'quotation.declined'
     | 'quotation.expired'
+    | 'quotation.order'
+    | 'invoice.issued'
+    | 'invoice.paid'
+    | 'creditNote.issued'
+    | 'deliveryNote.issued'
     | 'doc.create'
     | 'doc.update'
     | 'doc.delete';
@@ -1139,6 +1150,8 @@ export interface Quotation {
   title?: string | null;
   number?: string | null;
   status: 'draft' | 'sent' | 'viewed' | 'accepted' | 'declined' | 'expired';
+  kind?: ('catering' | 'b2b') | null;
+  order?: (string | null) | Order;
   cateringRequest?: (string | null) | CateringRequest;
   customer?: (string | null) | Customer;
   contact: {
@@ -1166,6 +1179,9 @@ export interface Quotation {
         detail?: string | null;
         vatBp?: number | null;
         totalCents?: number | null;
+        variant?: (string | null) | Variant;
+        unit?: (string | null) | PackagingUnit;
+        discountCents?: number | null;
         id?: string | null;
       }[]
     | null;
@@ -1214,10 +1230,11 @@ export interface Quotation {
  */
 export interface DocumentFile {
   id: string;
-  kind: 'quotation' | 'quotation_signed';
+  kind: 'quotation' | 'quotation_signed' | 'invoice' | 'credit_note' | 'delivery_note';
   filename: string;
   quotation?: (string | null) | Quotation;
   customer?: (string | null) | Customer;
+  order?: (string | null) | Order;
   sizeBytes?: number | null;
   sha256?: string | null;
   data: string;
@@ -1663,6 +1680,166 @@ export interface Payment {
   createdAt: string;
 }
 /**
+ * Issued from an order (“Issue invoice”). An invoice is never edited: to correct one, issue a credit note.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoices".
+ */
+export interface Invoice {
+  id: string;
+  number: string;
+  title?: string | null;
+  status: 'issued' | 'paid' | 'partly_credited' | 'credited';
+  order: string | Order;
+  customer?: (string | null) | Customer;
+  billing?: {
+    name?: string | null;
+    company?: string | null;
+    vatNumber?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    address?: string | null;
+  };
+  lines?:
+    | {
+        name: string;
+        detail?: string | null;
+        qty: number;
+        unitPriceCents?: number | null;
+        discountCents?: number | null;
+        vatBp?: number | null;
+        totalCents?: number | null;
+        variant?: (string | null) | Variant;
+        unit?: (string | null) | PackagingUnit;
+        id?: string | null;
+      }[]
+    | null;
+  totals?: {
+    subtotalCents?: number | null;
+    discountCents?: number | null;
+    deliveryCents?: number | null;
+    vatCents?: number | null;
+    totalCents?: number | null;
+    vatBreakdown?:
+      | {
+          rateBp?: number | null;
+          baseCents?: number | null;
+          vatCents?: number | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  paidBeforeCents?: number | null;
+  amountDueCents?: number | null;
+  creditedCents?: number | null;
+  issuedAt: string;
+  dueAt?: string | null;
+  paidAt?: string | null;
+  locale?: string | null;
+  pdf?: (string | null) | DocumentFile;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * A credit note cancels all or part of an invoice (refund, return). It is made from the invoice.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "creditNotes".
+ */
+export interface CreditNote {
+  id: string;
+  number: string;
+  title?: string | null;
+  invoice: string | Invoice;
+  order?: (string | null) | Order;
+  customer?: (string | null) | Customer;
+  reason: string;
+  billing?: {
+    name?: string | null;
+    company?: string | null;
+    vatNumber?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    address?: string | null;
+  };
+  lines?:
+    | {
+        name: string;
+        detail?: string | null;
+        qty: number;
+        unitPriceCents?: number | null;
+        discountCents?: number | null;
+        vatBp?: number | null;
+        totalCents?: number | null;
+        variant?: (string | null) | Variant;
+        unit?: (string | null) | PackagingUnit;
+        id?: string | null;
+      }[]
+    | null;
+  totals?: {
+    subtotalCents?: number | null;
+    discountCents?: number | null;
+    deliveryCents?: number | null;
+    vatCents?: number | null;
+    totalCents?: number | null;
+    vatBreakdown?:
+      | {
+          rateBp?: number | null;
+          baseCents?: number | null;
+          vatCents?: number | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  issuedAt: string;
+  locale?: string | null;
+  pdf?: (string | null) | DocumentFile;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Issued from an order (“Delivery note”). No prices.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "deliveryNotes".
+ */
+export interface DeliveryNote {
+  id: string;
+  number: string;
+  title?: string | null;
+  order: string | Order;
+  customer?: (string | null) | Customer;
+  billing?: {
+    name?: string | null;
+    company?: string | null;
+    vatNumber?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    address?: string | null;
+  };
+  lines?:
+    | {
+        name: string;
+        detail?: string | null;
+        qty: number;
+        unitPriceCents?: number | null;
+        discountCents?: number | null;
+        vatBp?: number | null;
+        totalCents?: number | null;
+        variant?: (string | null) | Variant;
+        unit?: (string | null) | PackagingUnit;
+        id?: string | null;
+      }[]
+    | null;
+  issuedAt: string;
+  deliveredAt?: string | null;
+  signature?: string | null;
+  locale?: string | null;
+  pdf?: (string | null) | DocumentFile;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Automatic discounts on products, categories or brands. They do not add up: the best one applies. Business price-list prices are not discounted.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1939,6 +2116,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'documentFiles';
         value: string | DocumentFile;
+      } | null)
+    | ({
+        relationTo: 'invoices';
+        value: string | Invoice;
+      } | null)
+    | ({
+        relationTo: 'creditNotes';
+        value: string | CreditNote;
+      } | null)
+    | ({
+        relationTo: 'deliveryNotes';
+        value: string | DeliveryNote;
       } | null)
     | ({
         relationTo: 'priceLists';
@@ -2838,6 +3027,8 @@ export interface QuotationsSelect<T extends boolean = true> {
   title?: T;
   number?: T;
   status?: T;
+  kind?: T;
+  order?: T;
   cateringRequest?: T;
   customer?: T;
   contact?:
@@ -2867,6 +3058,9 @@ export interface QuotationsSelect<T extends boolean = true> {
         detail?: T;
         vatBp?: T;
         totalCents?: T;
+        variant?: T;
+        unit?: T;
+        discountCents?: T;
         id?: T;
       };
   discount?:
@@ -2923,9 +3117,171 @@ export interface DocumentFilesSelect<T extends boolean = true> {
   filename?: T;
   quotation?: T;
   customer?: T;
+  order?: T;
   sizeBytes?: T;
   sha256?: T;
   data?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoices_select".
+ */
+export interface InvoicesSelect<T extends boolean = true> {
+  number?: T;
+  title?: T;
+  status?: T;
+  order?: T;
+  customer?: T;
+  billing?:
+    | T
+    | {
+        name?: T;
+        company?: T;
+        vatNumber?: T;
+        email?: T;
+        phone?: T;
+        address?: T;
+      };
+  lines?:
+    | T
+    | {
+        name?: T;
+        detail?: T;
+        qty?: T;
+        unitPriceCents?: T;
+        discountCents?: T;
+        vatBp?: T;
+        totalCents?: T;
+        variant?: T;
+        unit?: T;
+        id?: T;
+      };
+  totals?:
+    | T
+    | {
+        subtotalCents?: T;
+        discountCents?: T;
+        deliveryCents?: T;
+        vatCents?: T;
+        totalCents?: T;
+        vatBreakdown?:
+          | T
+          | {
+              rateBp?: T;
+              baseCents?: T;
+              vatCents?: T;
+              id?: T;
+            };
+      };
+  paidBeforeCents?: T;
+  amountDueCents?: T;
+  creditedCents?: T;
+  issuedAt?: T;
+  dueAt?: T;
+  paidAt?: T;
+  locale?: T;
+  pdf?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "creditNotes_select".
+ */
+export interface CreditNotesSelect<T extends boolean = true> {
+  number?: T;
+  title?: T;
+  invoice?: T;
+  order?: T;
+  customer?: T;
+  reason?: T;
+  billing?:
+    | T
+    | {
+        name?: T;
+        company?: T;
+        vatNumber?: T;
+        email?: T;
+        phone?: T;
+        address?: T;
+      };
+  lines?:
+    | T
+    | {
+        name?: T;
+        detail?: T;
+        qty?: T;
+        unitPriceCents?: T;
+        discountCents?: T;
+        vatBp?: T;
+        totalCents?: T;
+        variant?: T;
+        unit?: T;
+        id?: T;
+      };
+  totals?:
+    | T
+    | {
+        subtotalCents?: T;
+        discountCents?: T;
+        deliveryCents?: T;
+        vatCents?: T;
+        totalCents?: T;
+        vatBreakdown?:
+          | T
+          | {
+              rateBp?: T;
+              baseCents?: T;
+              vatCents?: T;
+              id?: T;
+            };
+      };
+  issuedAt?: T;
+  locale?: T;
+  pdf?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "deliveryNotes_select".
+ */
+export interface DeliveryNotesSelect<T extends boolean = true> {
+  number?: T;
+  title?: T;
+  order?: T;
+  customer?: T;
+  billing?:
+    | T
+    | {
+        name?: T;
+        company?: T;
+        vatNumber?: T;
+        email?: T;
+        phone?: T;
+        address?: T;
+      };
+  lines?:
+    | T
+    | {
+        name?: T;
+        detail?: T;
+        qty?: T;
+        unitPriceCents?: T;
+        discountCents?: T;
+        vatBp?: T;
+        totalCents?: T;
+        variant?: T;
+        unit?: T;
+        id?: T;
+      };
+  issuedAt?: T;
+  deliveredAt?: T;
+  signature?: T;
+  locale?: T;
+  pdf?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3341,6 +3697,14 @@ export interface BusinessSetting {
   quotationConditions?: string | null;
   quotationValidityDays?: number | null;
   /**
+   * Printed at the bottom of every invoice and credit note (given by the accountant). While it is empty, documents say “DRAFT”.
+   */
+  invoiceLegal?: string | null;
+  /**
+   * E.g. “Please quote the invoice number with your transfer.”
+   */
+  invoicePaymentNote?: string | null;
+  /**
    * A module switched off disappears from the website, the team screens and the back-office menu. Nothing is deleted.
    */
   modules?: {
@@ -3750,6 +4114,8 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
       };
   quotationConditions?: T;
   quotationValidityDays?: T;
+  invoiceLegal?: T;
+  invoicePaymentNote?: T;
   modules?:
     | T
     | {

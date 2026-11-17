@@ -7,12 +7,13 @@ import { LOCALE_NAMES, type Locale } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { isBeforeSlot, slotLabel } from '@/lib/time';
 import { dueOf, paymentsOf } from '@/modules/payments/service';
+import { issueInvoiceAction } from '@/modules/documents/actions';
 import { activeAccounts, formatIban } from '@/modules/settings/service';
 import { transitionOrder } from '../actions';
 import { orderBankAccount, returnableLines } from '../service';
 import { MODE_LABELS, ORDER_STATUS_LABELS, ORDER_STATUS_TONES, PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS, PAYMENT_STATUS_TONES, type PaymentStatus, RESERVATION_STATUS_LABELS, RESERVATION_STATUS_TONES } from '../collections';
 import { ORDER_ROLES, type OrderStatus } from '../order-states';
-import { decisionsFor } from './decisions';
+import { decisionsFor, documentDecisions } from './decisions';
 import { langOf, salesText } from './text';
 
 // The order's edit view (ui field `panel`): status and the moves ORDER_FLOW allows, customer, slot, payment, items
@@ -38,6 +39,12 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
     order.customer ? payload.findByID({ collection: 'customers', id: String(order.customer), depth: 0, overrideAccess: true, disableErrors: true, select: { name: true } }) : null,
     paymentsOf(payload, order.id),
   ]);
+  const byOrder = { where: { order: { equals: order.id } }, depth: 0, limit: 20, overrideAccess: true, select: { number: true, pdf: true, issuedAt: true } } as const;
+  const [invoices, notes, credits] = await Promise.all([
+    payload.find({ collection: 'invoices', ...byOrder }),
+    payload.find({ collection: 'deliveryNotes', ...byOrder }),
+    payload.find({ collection: 'creditNotes', ...byOrder }),
+  ]);
   const day = new Intl.DateTimeFormat(lang, { dateStyle: 'medium', timeZone: 'Europe/Luxembourg' });
   const pay = order.payment;
   const due = dueOf({ totalCents: order.totals?.totalCents ?? 0, paidCents: pay?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 });
@@ -49,6 +56,13 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
   // When the order was made ready, if it was (kept after handover too: the history shows the whole story).
   const readyAt = [...(order.history ?? [])].reverse().find((h) => h.to === 'ready')?.at ?? null;
   const totals = order.totals;
+  // Documents of a sold order (M3.2 T5): one invoice, one delivery note; credit notes come from refunds or the invoice.
+  const docMoves = hasRole(user, ORDER_ROLES) ? documentDecisions(order, t, { invoice: invoices.docs.length > 0, deliveryNote: notes.docs.length > 0 }) : [];
+  const documents = [
+    ...invoices.docs.map((d) => ({ ...d, kind: t.docs.invoice, href: `/admin/collections/invoices/${d.id}` })),
+    ...credits.docs.map((d) => ({ ...d, kind: t.docs.creditNote, href: `/admin/collections/creditNotes/${d.id}` })),
+    ...notes.docs.map((d) => ({ ...d, kind: t.docs.deliveryNote, href: `/admin/collections/deliveryNotes/${d.id}` })),
+  ];
   const address = order.address;
   const payStatus = (pay?.status ?? 'none') as PaymentStatus;
   const closed = status === 'cancelled' || status === 'refunded';
@@ -255,6 +269,29 @@ export default async function OrderPanel({ id, payload, i18n, user }: UIFieldSer
             </tfoot>
           </table>
         </DocCard>
+
+        {(documents.length > 0 || docMoves.length > 0) && (
+          <DocCard title={t.docs.title} wide>
+            {documents.length === 0 ? (
+              <p className="gg-doc__muted">{t.docs.none}</p>
+            ) : (
+              <table className="gg-doc__lines">
+                <tbody>
+                  {documents.map((d) => (
+                    <tr key={d.id}>
+                      <td>
+                        <a href={d.href}>{`${d.kind} ${d.number}`}</a>
+                      </td>
+                      <td>{d.issuedAt ? day.format(new Date(d.issuedAt)) : ''}</td>
+                      <td>{d.pdf ? <a href={`/api/documents/${String(d.pdf)}`} target="_blank" rel="noreferrer">PDF</a> : null}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {docMoves.length > 0 && <DecisionBar action={issueInvoiceAction} target={{ order: order.id }} decisions={docMoves} text={t.decide} />}
+          </DocCard>
+        )}
 
         {order.notes && (
           <DocCard title={t.message} wide>

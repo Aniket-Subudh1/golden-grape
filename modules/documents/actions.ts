@@ -9,7 +9,11 @@ import { audit } from '@/lib/audit';
 import { AppError } from '@/lib/errors';
 import { checkLinkToken } from '@/lib/link-token';
 import { rateLimit } from '@/lib/rate-limit';
-import { mailQuotationDeclined, mailQuotationSent, mailQuotationSigned } from './mail';
+import { ORDER_ROLES } from '@/modules/sales/order-states';
+import { createB2bQuotation, orderFromQuotation } from './b2b';
+import { toCsv } from '@/lib/table';
+import { exportDocuments, issueCreditNote, issueDeliveryNote, issueInvoice, markInvoicePaid } from './invoicing';
+import { mailBusinessDocument, mailQuotationDeclined, mailQuotationSent, mailQuotationSigned } from './mail';
 import { acceptQuotation, copyQuotation, createQuotationFromRequest, declineQuotation, readDocument, type RequestMove, sendQuotation } from './service';
 
 // Catering quotations (Q-12). Staff: create from a request, send, send again, a new version, a refusal by phone.
@@ -104,4 +108,63 @@ export const declineQuotationAction = publicAction(linked.extend({ reason: z.str
   await auditRequest(payload, request, null, q.number);
   after(() => mailQuotationDeclined(q).catch(logMail('declined')));
   return { status: q.status };
+});
+
+// ---- B2B and invoicing (M3.2 T5): the staff who move orders (sales, managers) issue their documents. -------------------
+
+const docRoles = { roles: ORDER_ROLES };
+const logDoc = (what: string) => (error: unknown) => console.error(`[mail] ${what}`, error);
+const lines = z.array(z.object({ variant: z.string().min(1).max(40), unit: z.string().min(1).max(40).optional(), qty: z.number().int().min(1).max(999) })).min(1).max(60);
+
+/** A sold order's invoice (once), e-mailed to the customer with its PDF. */
+export const issueInvoiceAction = action(z.object({ order: z.string().min(1) }), docRoles, async ({ order }, { payload, user }) => {
+  const invoice = await issueInvoice(payload, order);
+  if (invoice.createdAt === invoice.updatedAt) {
+    await audit(payload, { user: user.id, action: 'invoice.issued', collection: 'invoices', id: invoice.id, ref: invoice.number, after: { 'totals.totalCents': invoice.totals?.totalCents } });
+    after(() => mailBusinessDocument(payload, 'invoice', invoice.id).catch(logDoc('invoice')));
+  }
+  return { id: invoice.id, number: invoice.number, pdf: String(invoice.pdf) };
+});
+
+export const issueDeliveryNoteAction = action(z.object({ order: z.string().min(1) }), docRoles, async ({ order }, { payload, user }) => {
+  const note = await issueDeliveryNote(payload, order);
+  await audit(payload, { user: user.id, action: 'deliveryNote.issued', collection: 'deliveryNotes', id: note.id, ref: note.number });
+  return { id: note.id, number: note.number, pdf: String(note.pdf) };
+});
+
+export const markInvoicePaidAction = action(z.object({ invoice: z.string().min(1) }), docRoles, async ({ invoice }, { payload, user }) => {
+  const paid = await markInvoicePaid(payload, invoice, { user: user.id });
+  await audit(payload, { user: user.id, action: 'invoice.paid', collection: 'invoices', id: paid.id, ref: paid.number });
+  return { status: paid.status };
+});
+
+/** A credit note for what is left on an invoice (a correction, a refund handled outside an order), e-mailed. */
+export const creditNoteAction = action(z.object({ invoice: z.string().min(1), reason: z.string().trim().min(3, 'reasonRequired').max(200, 'tooLong') }), docRoles, async ({ invoice, reason }, { payload, user }) => {
+  const note = await issueCreditNote(payload, invoice, { reason });
+  await audit(payload, { user: user.id, action: 'creditNote.issued', collection: 'creditNotes', id: note.id, ref: note.number, reason });
+  after(() => mailBusinessDocument(payload, 'creditNote', note.id).catch(logDoc('credit note')));
+  return { id: note.id, number: note.number };
+});
+
+/** A B2B quotation from the phone sale's lines: priced for the customer, numbered, e-mailed with its PDF. */
+export const sendB2bQuotationAction = action(z.object({ customer: z.string().min(1).max(40), lines }), docRoles, async (input, { payload, user }) => {
+  const { quotation, pdf } = await createB2bQuotation(payload, input);
+  await audit(payload, { user: user.id, action: 'quotation.sent', collection: 'quotations', id: quotation.id, ref: quotation.number, after: { 'totals.totalCents': quotation.totals?.totalCents } });
+  after(() => mailQuotationSent(quotation, pdf).catch(logMail('sent')));
+  return { id: quotation.id, number: quotation.number ?? '' };
+});
+
+/** "Create order" on a B2B quotation: at the quoted prices, once (AC-M3.2-02). */
+export const orderFromQuotationAction = action(z.object({ quotation: z.string().min(1) }), docRoles, async ({ quotation }, { payload, user }) => {
+  const { order, quotation: q } = await orderFromQuotation(payload, quotation, { staff: user.id, staffName: user.name ?? user.email });
+  await audit(payload, { user: user.id, action: 'quotation.order', collection: 'quotations', id: q.id, ref: q.number, reason: order });
+  return { order };
+});
+
+const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
+/** The accountant's file: every invoice and credit note issued in the period, net and VAT per rate (CSV for Excel). */
+export const exportDocumentsAction = action(z.object({ from: day, to: day }).refine((r) => r.from <= r.to, { path: ['to'], message: 'range' }), { roles: ['manager'] }, async ({ from, to }, { payload }) => {
+  const { headers, rows } = await exportDocuments(payload, from, to);
+  return { name: `golden-grape-invoices-${from}-${to}.csv`, csv: toCsv(headers, rows), rows: rows.length };
 });

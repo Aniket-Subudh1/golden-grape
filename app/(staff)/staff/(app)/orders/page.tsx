@@ -4,6 +4,7 @@ import {
   ClipboardList,
   Clock,
   ExternalLink,
+  FileText,
   ShoppingBag,
   Store,
   Truck,
@@ -20,7 +21,7 @@ import { formatMoney } from '@/lib/money';
 import { getPayloadClient } from '@/lib/payload';
 import { slotLabel, today } from '@/lib/time';
 import { decideReservation, transitionOrder } from '@/modules/sales/actions';
-import { decisionsFor, reservationDecisions } from '@/modules/sales/admin/decisions';
+import { decisionsFor, documentDecisions, reservationDecisions } from '@/modules/sales/admin/decisions';
 import { langOf, salesText } from '@/modules/sales/admin/text';
 import {
   MODE_LABELS,
@@ -117,6 +118,12 @@ export default async function OrdersPage({ searchParams }: PageProps<'/staff/ord
   const { tab } = await searchParams;
   const payload = await getPayloadClient();
   const { orders, reservations } = await staffAgenda(payload, today());
+  // Each order's invoice and delivery note, if issued: a PDF link on the card, and no button to issue it again.
+  const ofOrders = { where: { order: { in: orders.map((o) => o.id) } }, depth: 0, limit: 100, overrideAccess: true, select: { order: true, number: true, pdf: true } } as const;
+  const [invoices, notes] = orders.length
+    ? await Promise.all([payload.find({ collection: 'invoices', ...ofOrders }), payload.find({ collection: 'deliveryNotes', ...ofOrders })])
+    : [{ docs: [] }, { docs: [] }];
+  const docsOf = (id: string) => [...invoices.docs, ...notes.docs].filter((d) => String(d.order) === id);
   const lang = langOf(locale);
   const s = salesText(lang);
   const acts = hasRole(user, ORDER_ROLES);
@@ -148,11 +155,24 @@ export default async function OrdersPage({ searchParams }: PageProps<'/staff/ord
               <Pill tone={status}>{ORDER_STATUS_LABELS[status][locale]}</Pill>
               {details(`/admin/collections/orders/${o.id}`)}
             </div>
+            {docsOf(o.id).length > 0 && (
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                {docsOf(o.id).map((d) => (
+                  <a key={d.id} href={`/api/documents/${String(d.pdf)}`} target="_blank" rel="noreferrer" className="text-gold-deep inline-flex items-center gap-1 text-sm font-medium hover:underline">
+                    <FileText className="h-3.5 w-3.5" aria-hidden />
+                    {d.number}
+                  </a>
+                ))}
+              </div>
+            )}
             {acts && (
               <StaffDecisions
                 action={transitionOrder}
                 target={{ order: o.id }}
-                decisions={decisionsFor(o, s, [], [], money)}
+                decisions={[
+                  ...decisionsFor(o, s, [], [], money),
+                  ...documentDecisions(o, s, { invoice: invoices.docs.some((d) => String(d.order) === o.id), deliveryNote: notes.docs.some((d) => String(d.order) === o.id) }),
+                ]}
                 text={s.decide}
               />
             )}

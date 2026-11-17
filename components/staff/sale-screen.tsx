@@ -1,12 +1,13 @@
 'use client';
 
-import { Minus, Plus, Trash2, UserPlus } from 'lucide-react';
+import { FileText, Minus, Plus, Trash2, UserPlus } from 'lucide-react';
 import { useEffect, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { type Dictionary, interpolate, type Locale } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { lookupBarcode, searchItems, type ScanCard } from '@/modules/catalogue/actions';
+import { sendB2bQuotationAction } from '@/modules/documents/actions';
 import { placeStaffSale, quoteStaffSale } from '@/modules/sales/actions';
 import type { CustomerTexts, PickedCustomer } from './customer-form';
 import { CustomerRow, CustomerSheet } from './customers-screen';
@@ -52,6 +53,10 @@ type Texts = {
   again: string;
   remove: string;
   qty: string;
+  sendQuote: string;
+  sendQuoteHint: string;
+  quoteSentTitle: string;
+  quoteSentBody: string;
 };
 
 /**
@@ -76,7 +81,7 @@ export function SaleScreen({
   const [quote, setQuote] = useState<Quote | null>(null);
   const [results, setResults] = useState<ScanCard[] | null>(null);
   const [payment, setPayment] = useState<'onsite' | 'invoice'>('onsite');
-  const [done, setDone] = useState<{ number: string; payment: 'onsite' | 'invoice' } | null>(null);
+  const [done, setDone] = useState<{ number: string; payment: 'onsite' | 'invoice' | 'quotation' } | null>(null);
   const [pending, start] = useTransition();
   // One key per sale: a double tap or a retry after a lost answer places it once (02 §6).
   const [key, setKey] = useState(() => crypto.randomUUID());
@@ -142,15 +147,24 @@ export function SaleScreen({
       setKey(crypto.randomUUID());
     });
 
+  // A business customer may get a quotation instead (M3.2 T5): their prices, numbered, e-mailed; nothing is sold yet.
+  const sendQuote = () =>
+    start(async () => {
+      if (!customer) return void toast.error(t.needCustomer);
+      const r = await sendB2bQuotationAction(null, { customer: customer.id, lines });
+      if (r.ok) return void setDone({ number: r.data.number, payment: 'quotation' });
+      toast.error(r.error === 'OUT_OF_STOCK' ? t.outOfStock : t.error);
+    });
+
   if (done) {
     return (
       <div className="gg-card mx-auto max-w-md space-y-4 p-6 text-center" role="status">
         <SuccessTick />
-        <h2 className="font-serif text-2xl">{t.doneTitle}</h2>
+        <h2 className="font-serif text-2xl">{done.payment === 'quotation' ? t.quoteSentTitle : t.doneTitle}</h2>
         <p className="font-serif text-3xl" data-testid="order-number">
           {done.number}
         </p>
-        <p className="text-ink/70 text-sm">{done.payment === 'onsite' ? t.donePaid : t.doneInvoice}</p>
+        <p className="text-ink/70 text-sm">{done.payment === 'quotation' ? t.quoteSentBody : done.payment === 'onsite' ? t.donePaid : t.doneInvoice}</p>
         <Button
           type="button"
           className="w-full"
@@ -367,6 +381,15 @@ export function SaleScreen({
             {pending ? t.placing : quote ? `${t.confirm} · ${formatMoney(quote.amountDueCents, locale)}` : t.confirm}
           </Button>
           {!customer && lines.length > 0 && <p className="text-ink/60 mt-2 text-center text-xs">{t.needCustomer}</p>}
+          {customer?.type === 'business' && (
+            <div className="mt-3">
+              <Button type="button" variant="outline" onClick={sendQuote} disabled={pending || lines.length === 0 || !quote} className="w-full" data-testid="send-quotation">
+                <FileText className="h-4 w-4" aria-hidden />
+                {t.sendQuote}
+              </Button>
+              <p className="text-ink/55 mt-1.5 text-center text-xs">{t.sendQuoteHint}</p>
+            </div>
+          )}
         </div>
       </aside>
     </div>

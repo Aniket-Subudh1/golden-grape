@@ -2,6 +2,7 @@ import type { Decision, DecisionField } from '@/components/admin/decision-bar';
 import { formatMoney } from '@/lib/money';
 import { isBeforeSlot, today } from '@/lib/time';
 import type { Order } from '@/payload-types';
+import { issueDeliveryNoteAction, issueInvoiceAction } from '@/modules/documents/actions';
 import { dueOf, refundableOf } from '@/modules/payments/service';
 import { type BankAccount, formatIban, transferAccount } from '@/modules/settings/service';
 import { changeOrderBankAccount, recordOrderPayment, recordOrderRefund, requestOrderRefund, returnOrderItems } from '../actions';
@@ -168,3 +169,14 @@ export function reservationDecisions(status: ReservationStatus, preorder: Preord
   return [...moves.filter((d) => d.tone !== 'danger'), encash, ...moves.filter((d) => d.tone === 'danger')];
 }
 
+
+const SOLD: string[] = ['confirmed', 'ready', 'out_for_delivery', 'completed'];
+
+/** A sold order's documents still to issue (M3.2 T5): its invoice, and a delivery note when it is delivered or B2B. */
+export function documentDecisions(order: Order, t: Text, has: { invoice: boolean; deliveryNote: boolean }): Decision[] {
+  if (!SOLD.includes(order.status ?? '')) return [];
+  return [
+    ...(has.invoice ? [] : [{ to: 'invoice', label: t.docs.issueInvoice, hint: t.docs.issueInvoiceHint, action: issueInvoiceAction }]),
+    ...(has.deliveryNote || (order.mode !== 'delivery' && order.mode !== 'b2b') ? [] : [{ to: 'deliveryNote', label: t.docs.issueNote, hint: t.docs.issueNoteHint, action: issueDeliveryNoteAction }]),
+  ];
+}

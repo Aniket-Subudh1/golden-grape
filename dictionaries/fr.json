@@ -811,6 +811,18 @@
       "code": "Code de la carte",
       "how": "Utilisez-la sur goldengrape.lu (champ « Carte cadeau » du panier) ou en boutique : montrez ce QR code ou dictez le code. Elle peut servir en plusieurs fois.",
       "balance": "Pour connaître le solde, entrez le code dans votre espace client."
+    },
+    "invoice": {
+      "subject": "Votre facture Golden Grape {{number}}",
+      "body": "Merci pour votre commande. Votre facture est jointe à cet e-mail.",
+      "due": "À régler avant le {{date}}.",
+      "paid": "Elle est déjà réglée : merci.",
+      "total": "Total",
+      "dueLabel": "Échéance"
+    },
+    "creditNote": {
+      "subject": "Votre avoir Golden Grape {{number}}",
+      "body": "Voici l’avoir établi sur votre facture {{invoice}}. Il est joint à cet e-mail."
     }
   },
   "cookies": {
@@ -1187,7 +1199,25 @@
       "expired": "Ce devis a expiré",
       "expiredText": "Il était valable jusqu’au {{date}}. Contactez-nous pour une nouvelle proposition :",
       "replaced": "Ce devis a été remplacé par une nouvelle version, envoyée par e-mail."
-    }
+    },
+    "invoice": "Facture",
+    "creditNote": "Avoir",
+    "deliveryNote": "Bon de livraison",
+    "quotation": "Devis",
+    "dueOn": "Échéance",
+    "order": "Commande",
+    "forInvoice": "Avoir sur la facture {{number}}",
+    "reason": "Motif",
+    "delivery": "Livraison",
+    "paidBefore": "Déjà réglé (points, cartes cadeaux, paiements)",
+    "amountDue": "Reste à payer",
+    "payTo": "À régler par virement sur",
+    "paymentRef": "Communication : {{number}}",
+    "draftMark": "BROUILLON – en attente du comptable",
+    "received": "Reçu en bon état",
+    "receivedBy": "Nom et signature",
+    "page": "Page {{n}} / {{total}}",
+    "credited": "Montant crédité"
   },
   "staff": {
     "signOut": "Se déconnecter",
@@ -1421,7 +1451,11 @@
       "doneInvoice": "À facturer : la commande attend son paiement. Le stock est à jour.",
       "again": "Nouvelle vente",
       "remove": "Retirer",
-      "qty": "Quantité"
+      "qty": "Quantité",
+      "sendQuote": "Envoyer en devis",
+      "sendQuoteHint": "Clients professionnels : un devis numéroté à leurs prix, envoyé par e-mail avec le PDF. Le stock ne bouge pas.",
+      "quoteSentTitle": "Devis envoyé",
+      "quoteSentBody": "Le client reçoit le devis par e-mail. Une fois accepté, « Créer la commande » sur sa fiche."
     },
     "customers": {
       "title": "Clients",
@@ -1453,7 +1487,14 @@
       "recent": "Clients récents",
       "noCustomers": "Aucun client pour l’instant.",
       "privateBadge": "Particulier",
-      "businessBadge": "Entreprise"
+      "businessBadge": "Entreprise",
+      "quotations": "Devis",
+      "noQuotations": "Aucun devis.",
+      "createOrder": "Créer la commande",
+      "createOrderHint": "La commande est passée aux prix du devis, « facture plus tard ». Un devis envoyé est noté accepté par vous.",
+      "orderOf": "Commande {number}",
+      "invoices": "Factures",
+      "noInvoices": "Aucune facture."
     },
     "orders": {
       "title": "Commandes",

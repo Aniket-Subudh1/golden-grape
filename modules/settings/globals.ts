@@ -293,6 +293,35 @@ export const businessSettings: GlobalConfig = {
           ],
         },
         {
+          // Invoices, delivery notes and credit notes (M3.2 T5). Until the accountant's mentions are entered (DEP-07),
+          // every PDF carries "BROUILLON – en attente du comptable" (A-07).
+          label: l('Factures', 'Invoices', 'Rechnungen', 'Faturas'),
+          fields: [
+            {
+              name: 'invoiceLegal',
+              type: 'textarea',
+              localized: true,
+              label: l('Mentions légales des factures', 'Legal mentions on invoices', 'Pflichtangaben auf Rechnungen', 'Menções legais das faturas'),
+              admin: {
+                rows: 4,
+                description: l(
+                  'Texte imprimé en bas de chaque facture et avoir (fourni par le comptable). Tant qu’il est vide, les documents portent « BROUILLON ».',
+                  'Printed at the bottom of every invoice and credit note (given by the accountant). While it is empty, documents say “DRAFT”.',
+                  'Wird unten auf jede Rechnung und Gutschrift gedruckt (vom Steuerberater). Solange leer, tragen die Dokumente „ENTWURF“.',
+                  'Impresso no fundo de cada fatura e nota de crédito (dado pelo contabilista). Enquanto vazio, os documentos dizem «RASCUNHO».',
+                ),
+              },
+            },
+            {
+              name: 'invoicePaymentNote',
+              type: 'textarea',
+              localized: true,
+              label: l('Note de paiement', 'Payment note', 'Zahlungshinweis', 'Nota de pagamento'),
+              admin: { rows: 2, description: l('Par ex. « Merci d’indiquer le numéro de facture avec votre virement. »', 'E.g. “Please quote the invoice number with your transfer.”', 'Z. B. „Bitte geben Sie die Rechnungsnummer bei der Überweisung an.“', 'Ex. «Indique o número da fatura na transferência.»') },
+            },
+          ],
+        },
+        {
           // Module switches (R9) and who gets the automatic alerts (M3.1): shown once purchasing needed them.
           label: l('Modules et alertes', 'Modules and alerts', 'Module und Warnungen', 'Módulos e alertas'),
           fields: [

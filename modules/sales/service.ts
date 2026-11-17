@@ -8,6 +8,7 @@ import { model, type Tx, withTx } from '@/lib/tx';
 import { postMovements } from '@/modules/inventory/service';
 import { type Movement, provider } from '@/modules/payments/provider';
 import { dueOf, type Figures, paymentState, refundableOf } from '@/modules/payments/service';
+import { creditRefundedOrder } from '@/modules/documents/invoicing';
 import { earn, giveBack, issueForOrder, takeBack } from '@/modules/promotions/rewards';
 import { quoteCart, redeem } from '@/modules/promotions/service';
 import { NUMBERING } from '@/modules/settings/globals';
@@ -146,7 +147,13 @@ export type PlaceOrderInput = {
 export type Placed = { kind: 'order' | 'reservation'; id: string; number: string; created: boolean };
 
 /** An order's lines and totals as `quote` priced them: every order path stores exactly this. */
-const pricedLines = (q: Awaited<ReturnType<typeof quoteCart>>) => ({
+/** Prices fixed beforehand (an accepted quotation, M3.2): the shape of a quote, without codes, points or cards. */
+export type Priced = Pick<
+  Awaited<ReturnType<typeof quoteCart>>,
+  'subtotalCents' | 'promotionCents' | 'discountCents' | 'deliveryCents' | 'vatCents' | 'totalCents' | 'vatBreakdown' | 'code' | 'codeRejected' | 'promotions' | 'loyaltyPointsUsed' | 'loyaltyCents' | 'giftCards' | 'giftCardsRejected' | 'amountDueCents' | 'notices'
+> & { lines: Pick<Awaited<ReturnType<typeof quoteCart>>['lines'][number], 'variant' | 'unit' | 'qty' | 'baseQty' | 'name' | 'detail' | 'unitPriceCents' | 'promoCents' | 'discountCents' | 'vatBp' | 'totalCents'>[] };
+
+const pricedLines = (q: Priced) => ({
   lines: q.lines.map((l) => ({
     variant: l.variant,
     unit: l.unit,
@@ -306,7 +313,7 @@ export type StaffSaleInput = {
  * one transaction. Its slot is the sale's own day and time, so it counts in the sales figures on that day. A business
  * customer's sale is a `b2b` order, anyone else's `instore`.
  */
-export async function placeStaffOrder(payload: Payload, input: StaffSaleInput, { staff, now = new Date() }: { staff: string; now?: Date }): Promise<Placed> {
+export async function placeStaffOrder(payload: Payload, input: StaffSaleInput, { staff, now = new Date(), priced }: { staff: string; now?: Date; priced?: Priced }): Promise<Placed> {
   const existing = await findPlaced(payload, input.idempotencyKey);
   if (existing) return existing;
   if (input.lines.length === 0) throw new AppError('VALIDATION', 'emptyCart', 'lines');
@@ -317,7 +324,9 @@ export async function placeStaffOrder(payload: Payload, input: StaffSaleInput, {
     return await withTx(payload, async (tx) => {
       const again = await findPlaced(payload, input.idempotencyKey, tx);
       if (again) return again;
-      const q = await quoteCart(payload, input.lines, { customer, channel: 'mobile', locale, code: input.code, loyaltyPoints: input.useLoyalty ? 'all' : undefined, giftCards: input.giftCards });
+      // A quotation accepted is a commitment: its prices as quoted (`priced`), not today's. The stock is still checked
+      // when it goes out (postSale → postMovements refuses more than is there).
+      const q = priced ?? (await quoteCart(payload, input.lines, { customer, channel: 'mobile', locale, code: input.code, loyaltyPoints: input.useLoyalty ? 'all' : undefined, giftCards: input.giftCards }));
       if (q.notices.length > 0) throw new AppError('OUT_OF_STOCK', 'cartChanged', 'lines');
       assertCode(q);
       const { numbering } = await getSettingsPrivate();
@@ -456,6 +465,8 @@ export async function applyTransition(tx: Tx, orderId: string, to: OrderStatus, 
   if (to === 'completed') await earn(tx, order);
   if (to === 'refunded') await takeBack(tx, order, user);
   if (to === 'cancelled' || to === 'refunded') await giveBack(tx, order, user);
+  // An invoiced order refunded gets its credit note in the same transaction (R5, AC-M3.2-04).
+  if (to === 'refunded') await creditRefundedOrder(tx, order, reason);
 
   // Money (GG-003/004, APPLUX 12 Nov GG-02). A move never records money by itself, whatever the payment method: a
   // handover records only the amount staff confirm in its dialog (never above what is still due), and an order can

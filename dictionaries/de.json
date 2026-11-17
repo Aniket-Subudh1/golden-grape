@@ -811,6 +811,18 @@
       "code": "Kartencode",
       "how": "Lösen Sie sie auf goldengrape.lu ein (Feld „Geschenkkarte“ im Warenkorb) oder im Geschäft: zeigen Sie diesen QR-Code oder nennen Sie den Code. Sie kann in mehreren Teilen eingelöst werden.",
       "balance": "Um das Guthaben zu sehen, geben Sie den Code in Ihrem Kundenkonto ein."
+    },
+    "invoice": {
+      "subject": "Ihre Golden-Grape-Rechnung {{number}}",
+      "body": "Vielen Dank für Ihre Bestellung. Ihre Rechnung finden Sie im Anhang.",
+      "due": "Bitte zahlen Sie bis zum {{date}}.",
+      "paid": "Sie ist bereits beglichen: vielen Dank.",
+      "total": "Summe",
+      "dueLabel": "Fällig"
+    },
+    "creditNote": {
+      "subject": "Ihre Golden-Grape-Gutschrift {{number}}",
+      "body": "Hier ist die Gutschrift zu Ihrer Rechnung {{invoice}}. Sie finden sie im Anhang."
     }
   },
   "cookies": {
@@ -1187,7 +1199,25 @@
       "expired": "Dieses Angebot ist abgelaufen",
       "expiredText": "Es war gültig bis {{date}}. Kontaktieren Sie uns für ein neues Angebot:",
       "replaced": "Dieses Angebot wurde durch eine neue Version ersetzt, die per E-Mail gesendet wurde."
-    }
+    },
+    "invoice": "Rechnung",
+    "creditNote": "Gutschrift",
+    "deliveryNote": "Lieferschein",
+    "quotation": "Angebot",
+    "dueOn": "Fällig am",
+    "order": "Bestellung",
+    "forInvoice": "Gutschrift zur Rechnung {{number}}",
+    "reason": "Grund",
+    "delivery": "Lieferung",
+    "paidBefore": "Bereits beglichen (Punkte, Geschenkkarten, Zahlungen)",
+    "amountDue": "Offener Betrag",
+    "payTo": "Bitte überweisen Sie auf",
+    "paymentRef": "Verwendungszweck: {{number}}",
+    "draftMark": "ENTWURF – Prüfung durch den Steuerberater ausstehend",
+    "received": "In gutem Zustand erhalten",
+    "receivedBy": "Name und Unterschrift",
+    "page": "Seite {{n}} / {{total}}",
+    "credited": "Gutgeschriebener Betrag"
   },
   "staff": {
     "signOut": "Abmelden",
@@ -1421,7 +1451,11 @@
       "doneInvoice": "Zu fakturieren: die Bestellung wartet auf Zahlung. Der Bestand ist aktuell.",
       "again": "Neuer Verkauf",
       "remove": "Entfernen",
-      "qty": "Menge"
+      "qty": "Menge",
+      "sendQuote": "Als Angebot senden",
+      "sendQuoteHint": "Geschäftskunden: ein nummeriertes Angebot zu ihren Preisen, per E-Mail mit PDF. Der Bestand bleibt unverändert.",
+      "quoteSentTitle": "Angebot gesendet",
+      "quoteSentBody": "Der Kunde erhält das Angebot per E-Mail. Nach der Annahme „Bestellung anlegen“ auf seiner Seite."
     },
     "customers": {
       "title": "Kunden",
@@ -1453,7 +1487,14 @@
       "recent": "Neueste Kunden",
       "noCustomers": "Noch keine Kunden.",
       "privateBadge": "Privat",
-      "businessBadge": "Firma"
+      "businessBadge": "Firma",
+      "quotations": "Angebote",
+      "noQuotations": "Keine Angebote.",
+      "createOrder": "Bestellung anlegen",
+      "createOrderHint": "Die Bestellung wird zu den Angebotspreisen angelegt, „Rechnung später“. Ein gesendetes Angebot gilt als von Ihnen angenommen.",
+      "orderOf": "Bestellung {number}",
+      "invoices": "Rechnungen",
+      "noInvoices": "Keine Rechnungen."
     },
     "orders": {
       "title": "Bestellungen",

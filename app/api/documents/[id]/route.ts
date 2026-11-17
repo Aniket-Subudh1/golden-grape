@@ -4,8 +4,9 @@ import { checkLinkToken } from '@/lib/link-token';
 import { getPayloadClient } from '@/lib/payload';
 import { currentCustomer } from '@/modules/customers/service';
 import { readDocument } from '@/modules/documents/service';
+import { ORDER_ROLES } from '@/modules/sales/order-states';
 
-// A stored document (a quotation as sent, as signed): for sales staff, for the customer it belongs to, or for whoever
+// A stored document (a quotation as sent, as signed): for the staff who move orders (sales, managers), for the customer it belongs to, or for whoever
 // holds the link of the e-mail (`?t=`, lib/link-token.ts). Anything else is "not found", never a hint that it exists.
 
 const notFound = () => new Response('Not found', { status: 404 });
@@ -21,7 +22,7 @@ export async function GET(request: Request, { params }: RouteContext<'/api/docum
   let allowed = checkLinkToken('document', id, new URL(request.url).searchParams.get('t'));
   if (!allowed) {
     const { user } = await payload.auth({ headers: request.headers });
-    allowed = hasRole(user, ['sales']);
+    allowed = hasRole(user, ORDER_ROLES);
   }
   if (!allowed) {
     const customer = await currentCustomer();

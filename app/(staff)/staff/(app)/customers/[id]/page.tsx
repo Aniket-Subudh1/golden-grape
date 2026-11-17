@@ -1,14 +1,20 @@
-import { Building2, Mail, MapPin, Phone, Receipt, ShoppingBag } from 'lucide-react';
+import { Building2, FileText, Mail, MapPin, Phone, Receipt, ShoppingBag } from 'lucide-react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { CustomerEdit, CustomerRow } from '@/components/staff/customers-screen';
+import { StaffDecisions } from '@/components/staff/decisions';
 import { StaffPage } from '@/components/staff/page';
 import { Empty } from '@/components/staff/tabs';
+import { interpolate } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { getPayloadClient } from '@/lib/payload';
 import { slotLabel } from '@/lib/time';
 import { getCustomer, hasNoEmail } from '@/modules/customers/service';
+import { orderFromQuotationAction } from '@/modules/documents/actions';
+import { INVOICE_STATUS, QUOTATION_STATUS } from '@/modules/documents/collections';
+import { isExpired } from '@/modules/documents/service';
+import { langOf, salesText } from '@/modules/sales/admin/text';
 import { ORDER_STATUS_LABELS } from '@/modules/sales/collections';
 import { ordersOf } from '@/modules/sales/service';
 import { requireStaff } from '../../../session';
@@ -30,8 +36,17 @@ export default async function CustomerPage({ params }: PageProps<'/staff/custome
   const { id } = await params;
   const { locale, t, dict } = await requireStaff('customers', `/staff/customers/${id}`);
   const payload = await getPayloadClient();
-  const [customer, orders] = await Promise.all([getCustomer(payload, id), ordersOf(payload, id, 10)]);
+  const mine = { where: { customer: { equals: id } }, sort: '-createdAt', limit: 10, depth: 0, overrideAccess: true } as const;
+  const [customer, orders, quotations, invoices] = await Promise.all([
+    getCustomer(payload, id),
+    ordersOf(payload, id, 10),
+    payload.find({ collection: 'quotations', ...mine, where: { customer: { equals: id }, kind: { equals: 'b2b' }, status: { not_equals: 'draft' } } }),
+    payload.find({ collection: 'invoices', ...mine }),
+  ]);
   if (!customer) notFound();
+  const decide = salesText(langOf(locale)).decide;
+  const orderNumber = new Map(orders.map((o) => [o.id, o.number]));
+  const isBusiness = customer.type === 'business';
   const noEmail = hasNoEmail(customer.email);
   const picked = {
     id: customer.id,
@@ -102,6 +117,64 @@ export default async function CustomerPage({ params }: PageProps<'/staff/custome
               </li>
             ))}
           </ul>
+        )}
+        {isBusiness && (
+          <>
+            <h2 className="eyebrow text-ink/55 mt-6 mb-2">{t.customers.quotations}</h2>
+            {quotations.docs.length === 0 ? (
+              <Empty icon={<FileText />} text={t.customers.noQuotations} />
+            ) : (
+              <ul className="divide-border gg-card divide-y">
+                {quotations.docs.map((q) => {
+                  const open = !q.order && ['sent', 'viewed', 'accepted'].includes(q.status ?? '') && !isExpired(q);
+                  return (
+                    <li key={q.id} className="space-y-3 px-4 py-3 text-sm" data-quotation={q.number}>
+                      <div className="flex items-center justify-between gap-3">
+                        <span>
+                          <span className="block font-medium">{q.number}</span>
+                          <span className="text-ink/55 text-xs">
+                            {q.order ? interpolate(t.customers.orderOf, { number: orderNumber.get(String(q.order)) ?? '' }) : (QUOTATION_STATUS[q.status ?? 'sent']?.[locale] ?? q.status)}
+                          </span>
+                        </span>
+                        <span className="font-medium tabular-nums">{formatMoney(q.totals?.totalCents ?? 0, locale)}</span>
+                      </div>
+                      {open && (
+                        <StaffDecisions
+                          action={orderFromQuotationAction}
+                          target={{ quotation: q.id }}
+                          decisions={[{ to: 'confirmed', label: t.customers.createOrder, hint: t.customers.createOrderHint, tone: 'primary' }]}
+                          text={decide}
+                        />
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </>
+        )}
+        {(isBusiness || invoices.docs.length > 0) && (
+          <>
+            <h2 className="eyebrow text-ink/55 mt-6 mb-2">{t.customers.invoices}</h2>
+            {invoices.docs.length === 0 ? (
+              <Empty icon={<Receipt />} text={t.customers.noInvoices} />
+            ) : (
+              <ul className="divide-border gg-card divide-y">
+                {invoices.docs.map((inv) => (
+                  <li key={inv.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+                    <a href={`/api/documents/${String(inv.pdf)}`} target="_blank" rel="noreferrer" className="text-gold-deep inline-flex items-center gap-1.5 font-medium hover:underline">
+                      <FileText className="h-4 w-4" aria-hidden />
+                      {inv.number}
+                    </a>
+                    <span className="text-right">
+                      <span className="block font-medium tabular-nums">{formatMoney(inv.totals?.totalCents ?? 0, locale)}</span>
+                      <span className="text-ink/55 text-xs">{INVOICE_STATUS[inv.status ?? 'issued']?.[locale]}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
         )}
       </section>
     </StaffPage>
