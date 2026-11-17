@@ -8,7 +8,8 @@ import { today } from '@/lib/time';
 import { lowStockCount } from '@/modules/inventory/service';
 import { dueBy } from '@/modules/purchasing/service';
 import { staffDay } from '@/modules/sales/service';
-import { canOpen, requireStaff, SCREENS } from '../session';
+import { SCREENS } from '../screens';
+import { canOpen, requireStaff } from '../session';
 
 export const instant = false;
 export const metadata: Metadata = { title: 'Accueil' };

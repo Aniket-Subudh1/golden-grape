@@ -2,7 +2,8 @@ import { connection } from 'next/server';
 import { TabBar } from '@/components/staff/tab-bar';
 import { getDictionary, type Locale } from '@/lib/i18n';
 import { currentStaff } from '@/modules/settings/service';
-import { SCREENS, tabsFor } from '../session';
+import { SCREENS } from '../screens';
+import { tabsFor } from '../session';
 
 export const instant = false;
 

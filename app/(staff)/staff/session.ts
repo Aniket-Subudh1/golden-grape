@@ -3,21 +3,7 @@ import { hasRole, type Role } from '@/lib/access';
 import { getDictionary, type Locale } from '@/lib/i18n';
 import type { ModuleName } from '@/modules/settings/globals';
 import { currentStaff, isModuleOn } from '@/modules/settings/service';
-
-// Who may open which phone screen (05 §5): the tab bar shows only these, and the pages themselves answer 404 to anyone
-// else, so a URL typed by hand opens nothing more than the tab bar offers (AC-M3.1-07).
-export const SCREENS = {
-  home: { href: '/staff', roles: [] },
-  scan: { href: '/staff/scan', roles: ['stock', 'sales', 'manager'] },
-  sale: { href: '/staff/sale', roles: ['sales', 'manager'] },
-  orders: { href: '/staff/orders', roles: ['sales', 'manager'] },
-  receive: { href: '/staff/receive', roles: ['stock', 'manager'], module: 'purchasing' },
-  count: { href: '/staff/count', roles: ['stock', 'manager'] },
-  customers: { href: '/staff/customers', roles: ['sales', 'manager'] },
-  stock: { href: '/staff/stock', roles: ['stock', 'manager'] },
-  reorder: { href: '/staff/reorder', roles: ['stock', 'manager'], module: 'purchasing' },
-} as const satisfies Record<string, { href: string; roles: Role[]; module?: ModuleName }>;
-export type Screen = keyof typeof SCREENS;
+import { SCREENS, type Screen } from './screens';
 
 /** The order of the bottom tab bar: the first five a user may open (05 §5, at most 5 tabs). */
 const TABS: Screen[] = ['home', 'scan', 'sale', 'orders', 'receive', 'count', 'customers'];
