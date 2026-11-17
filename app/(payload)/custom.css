@@ -4291,3 +4291,44 @@ body:has(.gg-create) .no-results__actions {
     justify-content: center;
   }
 }
+
+/* ---- One frame for every page built on the admin template (Milestone 3 and the earlier custom views: sales, reviews,
+   monthly hours, team, import/export, reorder, events): the dashboard's spacing and title, one rhythm between cards. */
+.gutter > .gg-home {
+  padding: 28px 0 48px;
+}
+.gg-home:not(.gg-page) > .gg-home__title {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.gg-home:not(.gg-page) > .gg-home__title p {
+  max-width: 760px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.gg-home > .gg-card + .gg-card {
+  margin-top: 0;
+}
+/* Tabs inside a card (sales filters and grouping) need no rule of their own: the card frames them. */
+.gg-card .gg-tabs {
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+@media (max-width: 640px) {
+  .gutter > .gg-home {
+    padding-top: 20px;
+  }
+}
+/* A tool card above a list's table (the invoices' accounting export): inside the page's margins, apart from the table. */
+.gg-list-tool {
+  margin: 0 0 20px;
+}
+/* Team & access sits in the page's grid: its own margins would add to the grid's 20 px gap. */
+.gg-home .gg-team__stats,
+.gg-home .gg-team__tabs,
+.gg-home .gg-team__note,
+.gg-home .gg-team__panel {
+  margin-bottom: 0;
+}

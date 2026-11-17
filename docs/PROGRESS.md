@@ -88,6 +88,12 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 - Verified: `npm run check` (359), `npm run test:int` (165, incl. new: counter dish / pickup-only refused for delivery, 47 km refused). Browser on a production build with a throwaway seeded DB: home desktop + iPhone 14, nav "Services Catering", checkout (dish named + removed, 9,6 km fee, 9990 refused), admin range panel (10 → 12 km: 200 → 251 postcodes, 9011 checked). E2E specs updated, **not run** (need the seeded staging DB).
 - Open: Q — Ivo to confirm the starting ranges (≤10 km 5 €, min 30 €, free 80 €; ≤20 km 8 €, min 50 €, free 120 €) and to supply four landscape banner photos.
 
+### 2026-11-17 · One frame for the admin pages built in M3 (owner request)
+
+- **Found (measured on every page):** the custom pages (Sales figures, Google reviews, Monthly hours, Team & access, Import / export, To reorder) had their title glued to the top bar (0 px; the dashboard and Payload's lists have 28), their description pushed to the far right where the dashboard shows the date, cards 20 px apart on some and 36 on others, tabs drawing a rule inside a card, and the invoices' accounting export stuck above the title, edge to edge.
+- **Fixed in the shared admin CSS, once:** the dashboard's top margin (28 px, 20 on phones) and title for every custom page, the description under the title, one 20 px rhythm between cards, no tab rule inside a card; the accounting export moved under the invoices' title and search (`beforeListTable`), inside the page margins.
+- **Checked (production build):** every page's title at the dashboard's height (84 px at 1440), cards 20 px apart; at 360 px every page fits with its title 20 px below the bar; Team & access 17/17, modal 17/17, layout 5/5; check 359, e2e 31 passed / 8 skipped.
+
 ### 2026-11-17 · Team & access redesigned (owner report: "not great UX, not responsive, vague")
 
 - **Problems:** people and access on one long scroll; an access grid of key icons and ticks with a wall of tab names; "what each role opens" as ~40 chips per role; a list with no search, filter or columns; no sign of unsaved access changes.

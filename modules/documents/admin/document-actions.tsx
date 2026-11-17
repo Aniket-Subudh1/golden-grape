@@ -192,7 +192,7 @@ export function AccountingExport() {
   }
 
   return (
-    <section className="gg-card gg-io" style={{ marginBottom: 24 }}>
+    <section className="gg-card gg-io gg-list-tool">
       <header className="gg-card__head">
         <div>
           <h2>{t.exportTitle}</h2>

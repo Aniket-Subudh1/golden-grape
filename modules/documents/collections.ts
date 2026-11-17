@@ -441,7 +441,7 @@ export const invoices: CollectionConfig = {
   admin: {
     ...docAdmin(l('Émises depuis une commande (bouton « Émettre la facture »). Une facture ne se modifie pas : pour corriger, faites un avoir.', 'Issued from an order (“Issue invoice”). An invoice is never edited: to correct one, issue a credit note.', 'Aus einer Bestellung ausgestellt („Rechnung ausstellen“). Eine Rechnung wird nie geändert: zur Korrektur eine Gutschrift.', 'Emitidas a partir de uma encomenda («Emitir fatura»). Uma fatura não se altera: para corrigir, emita uma nota de crédito.')),
     defaultColumns: ['number', 'customer', 'issuedAt', 'dueAt', 'totals', 'status'],
-    components: { beforeList: ['@/modules/documents/admin/document-actions#AccountingExport'], edit: { beforeDocumentControls: ['@/modules/documents/admin/document-actions#InvoiceActions'] } },
+    components: { beforeListTable: ['@/modules/documents/admin/document-actions#AccountingExport'], edit: { beforeDocumentControls: ['@/modules/documents/admin/document-actions#InvoiceActions'] } },
   },
   access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
   hooks: { beforeChange: [frozen(['status', 'paidAt', 'creditedCents'])] },
