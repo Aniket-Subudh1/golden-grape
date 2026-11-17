@@ -86,6 +86,13 @@ const HOME: Record<string, { file: string; was: string[]; alt: string }> = {
   events: { file: 'owners-team/Owners_2.jpg', was: ['Home_11.jpg'], alt: 'Une soirée musicale à la Maison, verre de vin à la main' },
   contact: { file: 'home-store/Home_9.jpg', was: [], alt: 'Le salon de la boutique au soleil, devant les étagères de vins' },
 };
+// The photo in the media library by its file name (also as a "-1" copy), uploaded from public/brand when it is not there.
+const mediaId = async (file: string, alt: string) => {
+  const [stem, ext] = file.split('/').pop()!.split('.');
+  const found = await payload.find({ collection: 'media', where: { filename: { like: stem } }, limit: 20, depth: 0, overrideAccess: true, sort: 'createdAt' });
+  const same = found.docs.find((d) => new RegExp(`^${stem}(-\\d+)?\\.${ext}$`).test(d.filename ?? ''));
+  return (same ?? (await payload.create({ collection: 'media', data: { alt }, filePath: `public/brand/${file}`, locale: 'fr', overrideAccess: true }))).id;
+};
 const home = await payload.findGlobal({ slug: 'HomePage', depth: 1, overrideAccess: true });
 const photos: Record<string, unknown> = { ...(home.photos ?? {}) };
 let moved = 0;
@@ -94,18 +101,30 @@ for (const [slot, { file, was, alt }] of Object.entries(HOME)) {
   const name = typeof current === 'object' && current ? current.filename : undefined;
   // Payload adds "-1" to a name already taken (Home_8-1.jpg).
   if (current && !(name && was.includes(name.replace(/-\d+(\.\w+)$/, '$1')))) continue;
-  const filename = file.split('/').pop()!;
-  console.info(`[home] ${slot}: ${name ?? 'empty'} → ${filename}`);
+  console.info(`[home] ${slot}: ${name ?? 'empty'} → ${file.split('/').pop()}`);
   moved++;
-  if (check) continue;
-  const found = await payload.find({ collection: 'media', where: { filename: { equals: filename } }, limit: 1, depth: 0, overrideAccess: true });
-  const doc = found.docs[0] ?? (await payload.create({ collection: 'media', data: { alt }, filePath: `public/brand/${file}`, locale: 'fr', overrideAccess: true }));
-  photos[slot] = doc.id;
+  if (!check) photos[slot] = await mediaId(file, alt);
 }
-if (moved > 0 && !check) {
+// The photo band under the banners: ten of the house's photos while staff have chosen none.
+const GALLERY: [string, string][] = [
+  ['home-store/Home_0.jpg', 'La salle et le mur de vins de la boutique'],
+  ['catering-events/Catering_1.jpg', 'Plateau de réception : fromages, charcuterie et fruits'],
+  ['owners-team/Owners_8.jpg', 'Les propriétaires partageant un verre de vin rouge'],
+  ['shop-wines-gourmet/Shop_8.jpg', 'Une bouteille de vin rouge et un verre devant une guitare portugaise'],
+  ['catering-events/Catering_11.jpg', 'Une grande table de réception dressée dans la boutique'],
+  ['snack-menu/Snack_7.jpg', 'Jambon, olives et vin rouge sur la table'],
+  ['owners-team/Owners_5.jpg', 'L’équipe Golden Grape réunie dans la boutique'],
+  ['shop-wines-gourmet/Shop_16.jpg', 'Plateau garni de vins, biscuits et confiture portugaise'],
+  ['home-store/Home_11.jpg', 'Le coin piano de la Maison, entre miroirs et oliviers'],
+  ['shop-wines-gourmet/Shop_37.jpg', 'Caisses en bois garnies de vins, fromage et produits fins'],
+];
+const galleryEmpty = !home.gallery?.length;
+if (galleryEmpty) console.info(`[home] gallery: empty → ${GALLERY.length} photos`);
+if ((moved > 0 || galleryEmpty) && !check) {
   const ids = Object.fromEntries(Object.entries(photos).map(([k, v]) => [k, typeof v === 'object' && v ? (v as { id: string }).id : v]));
+  const gallery = galleryEmpty ? await Promise.all(GALLERY.map(([file, alt]) => mediaId(file, alt))) : undefined;
   // Outside Next the cache tag cannot be cleared here: the deploy's fresh build shows the new photos.
-  await payload.updateGlobal({ slug: 'HomePage', data: { photos: ids } as never, depth: 0, overrideAccess: true, context: { skipRevalidate: true } });
+  await payload.updateGlobal({ slug: 'HomePage', data: { photos: ids, ...(gallery ? { gallery } : {}) } as never, depth: 0, overrideAccess: true, context: { skipRevalidate: true } });
 }
-console.info(`[home] ${check ? 'would set' : 'set'} ${moved} photo(s).`);
+console.info(`[home] ${check ? 'would set' : 'set'} ${moved} photo(s)${galleryEmpty ? ' and the gallery' : ''}.`);
 process.exit(0);

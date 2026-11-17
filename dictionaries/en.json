@@ -1456,6 +1456,12 @@
       "text": "Upcoming tastings and evenings.",
       "cta": "See the calendar"
     },
+    "gallery": {
+      "title": "The House in pictures",
+      "follow": "Follow on Instagram",
+      "pause": "Pause the scrolling photos",
+      "play": "Play the scrolling photos"
+    },
     "contact": {
       "eyebrow": "Contact",
       "title": "Golden Grape",

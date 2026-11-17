@@ -39,6 +39,9 @@ function withIds(data: unknown, saved: unknown): unknown {
   return data;
 }
 
+// The home page's photo band, in order: none of the banner photos, rooms, food and people taking turns.
+const GALLERY = ['interior', 'platter', 'together', 'bottleGuitar', 'ivoTable', 'charcuterie', 'team', 'tray', 'piano', 'crates'];
+
 // ---- data --------------------------------------------------------------------------------------------
 
 // The client's photos used by CMS content, with the prototype's slot for each (its lib/brand.ts).
@@ -261,6 +264,7 @@ await global('HomePage', () => ({
     contact: media.salon,
     interior: media.interior,
   },
+  gallery: GALLERY.map((key) => media[key]),
 }));
 log('HomePage photos saved');
 

@@ -62,7 +62,7 @@ Brand motifs added for personality (Aniket's request): the azulejo tile (`bg-azu
 | `JsonLd` | `components/site/json-ld.tsx` | — | one `<script type="application/ld+json">`, `<` escaped |
 | `ActionForm` | `components/ui/action-form.tsx` | every mocked `submit()` with `setTimeout` | wraps `useActionState`, shows pending state, success toast, field errors |
 | `Blocks` | `components/site/blocks.tsx` | renders `pages.layout` blocks | one switch over the block types in §4 |
-| Home sections | `components/site/home/banners.tsx`, `contact.tsx` | the prototype's home sections, replaced (client request 17 Nov) | `Banners`: four vertical photo panels side by side on computers (hover or focus widens one), 2×2 on tablets, stacked on phones, opening once on load (`gg-panel`); `HomeContact`: photo + name and town + ruled details. Photos from the `HomePage` global, words from the dictionary |
+| Home sections | `components/site/home/banners.tsx`, `photo-strip.tsx`, `contact.tsx` | the prototype's home sections, replaced (client request 17 Nov) | `Banners`: four vertical photo panels side by side on computers (hover or focus widens one), 2×2 on tablets, stacked on phones, opening once on load (`gg-panel`); `PhotoStrip`: the gallery drifting left (`gg-strip`, pause button, still under reduced motion); `HomeContact`: photo + name and town + ruled details. Photos from the `HomePage` global, words from the dictionary |
 
 Before adding a component, check this table. If an existing one is 80 % right, add a prop or variant to it.
 

@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
-import { Banners } from '@/components/site/home/banners';
+import { BannerPhoto, Banners } from '@/components/site/home/banners';
 import { HomeContact } from '@/components/site/home/contact';
+import { PhotoStrip, type StripPhoto } from '@/components/site/home/photo-strip';
 import { JsonLd } from '@/components/site/json-ld';
 import { alternates, type Dictionary, getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { groupedHours } from '@/lib/time';
@@ -19,18 +20,44 @@ export async function generateMetadata({ params }: PageProps<'/[locale]'>): Prom
     title: meta.home.title,
     description: meta.home.description,
     alternates: alternates('/', locale),
-    openGraph: { title: meta.home.ogTitle, description: meta.home.ogDescription, type: 'website', url: localePath(locale) },
+    openGraph: {
+      title: meta.home.ogTitle,
+      description: meta.home.ogDescription,
+      type: 'website',
+      url: localePath(locale),
+    },
     twitter: { card: 'summary_large_image', title: meta.home.ogTitle, description: meta.home.ogDescription },
   };
 }
 
-// The home page (client request 17 Nov): four banners (shop, table, catering, events), then the contact details.
-// The photos and the contact details are read at request time (behind Suspense); the rest is static.
+// The home page (client request 17 Nov): four banners (shop, table, catering, events), a band of the house's photos,
+// then the contact details.
+// The photos and the contact details are read at request time (behind Suspense); the words are static.
 
-async function BannersSection({ t, locale, hrefs }: { t: Dictionary['home']; locale: Locale; hrefs: Parameters<typeof Banners>[0]['hrefs'] }) {
-  const { photos } = await getHomePage(locale);
-  const photo = (key: 'shop' | 'table' | 'catering' | 'events') => mediaOf(photos?.[key])?.src ?? null;
-  return <Banners t={t} hrefs={hrefs} images={{ shop: photo('shop'), table: photo('table'), catering: photo('catering'), events: photo('events') }} />;
+/** One banner's photo, read at request time; the banner's words are already on screen. */
+async function BannerPhotoSection({
+  locale,
+  slot,
+  eager,
+}: {
+  locale: Locale;
+  slot: 'shop' | 'table' | 'catering' | 'events';
+  eager?: 'high' | 'auto';
+}) {
+  const photo = mediaOf((await getHomePage(locale)).photos?.[slot]);
+  return photo ? <BannerPhoto src={photo.src} eager={eager} /> : null;
+}
+
+async function GallerySection({ t, locale }: { t: Dictionary['home']['gallery']; locale: Locale }) {
+  const [{ gallery }, settings] = await Promise.all([getHomePage(locale), getSettings()]);
+  const photos: StripPhoto[] = (gallery ?? []).flatMap((m) =>
+    // Each photo keeps its own shape, kept between upright and wide so no frame is a sliver or a banner.
+    typeof m === 'object' && m.url
+      ? [{ src: m.url, alt: m.alt ?? '', ratio: Math.min(1.5, Math.max(0.75, (m.width ?? 4) / (m.height ?? 5))) }]
+      : [],
+  );
+  if (photos.length < 3) return null; // too few to drift
+  return <PhotoStrip t={t} photos={photos} instagram={settings.business?.instagram} />;
 }
 
 async function ContactSection({ t, locale }: { t: Dictionary; locale: Locale }) {
@@ -70,9 +97,21 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
   return (
     <>
       <h1 className="sr-only">{t.meta.home.title}</h1>
-      {/* Until the photos arrive, the dark ground the banners open on (they open once, when they are there). */}
-      <Suspense fallback={<div className="h-svh bg-ink" />}>
-        <BannersSection t={t.home} locale={locale} hrefs={hrefs} />
+      {/* The banners' words are in the first paint; each photo streams in on its own (the home page settings). */}
+      <Banners
+        t={t.home}
+        hrefs={hrefs}
+        photos={Object.fromEntries(
+          (['shop', 'table', 'catering', 'events'] as const).map((slot, i) => [
+            slot,
+            <Suspense key={slot} fallback={null}>
+              <BannerPhotoSection locale={locale} slot={slot} eager={i === 0 ? 'high' : i === 1 ? 'auto' : undefined} />
+            </Suspense>,
+          ]),
+        )}
+      />
+      <Suspense fallback={null}>
+        <GallerySection t={t.home.gallery} locale={locale} />
       </Suspense>
       <Suspense fallback={null}>
         <ContactSection t={t} locale={locale} />

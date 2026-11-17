@@ -167,16 +167,52 @@
 .gg-panel {
   animation: gg-panel-open 1.25s cubic-bezier(0.7, 0, 0.2, 1) var(--d, 0ms) both;
 }
+@keyframes gg-photo-in {
+  from {
+    opacity: 0;
+  }
+}
+/* A photo that arrives after its panel has opened fades up instead of appearing at once. */
 .gg-panel__photo {
-  animation: gg-panel-settle 2.2s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms) both;
+  animation:
+    gg-panel-settle 2.2s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms) both,
+    gg-photo-in 0.9s ease-out both;
 }
 
-/* 05 §7: honour reduced motion for the fade and the home page's banners. */
+/* The home page's photo band (components/site/home/photo-strip.tsx): the doubled list slides by half its width, so the
+ * second copy lands where the first began. It stops under the pointer, under keyboard focus and with its button. */
+@keyframes gg-strip {
+  to {
+    translate: -50% 0;
+  }
+}
+.gg-strip {
+  animation: gg-strip 70s linear infinite;
+}
+.gg-strip-frame:hover .gg-strip,
+.gg-strip-frame:focus-within .gg-strip,
+.gg-strip-frame[data-paused] .gg-strip {
+  animation-play-state: paused;
+}
+
+/* 05 §7: honour reduced motion for the fade and the home page's banners and photo band (which then scrolls by hand). */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up,
   .gg-panel,
-  .gg-panel__photo {
+  .gg-panel__photo,
+  .gg-strip {
     animation: none;
+  }
+  .gg-strip-frame {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-inline: 1.25rem;
+  }
+  .gg-strip > li {
+    scroll-snap-align: start;
+  }
+  .gg-strip > li[aria-hidden] {
+    display: none;
   }
 }
 

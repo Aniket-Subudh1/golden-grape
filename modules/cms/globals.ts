@@ -238,6 +238,22 @@ export const homePage: GlobalConfig = {
         },
       ],
     },
+    {
+      name: 'gallery',
+      type: 'upload',
+      relationTo: 'media',
+      hasMany: true,
+      maxRows: 14,
+      label: l('Galerie (bande de photos qui défile)', 'Gallery (scrolling photo band)', 'Galerie (laufendes Fotoband)', 'Galeria (faixa de fotos em movimento)'),
+      admin: {
+        description: l(
+          'Les photos qui défilent doucement sous les bannières, dans cet ordre. 8 à 12 photos, en hauteur ou en largeur. Vide : la bande n’apparaît pas.',
+          'The photos that drift slowly under the banners, in this order. 8 to 12 photos, upright or landscape. Empty: the band is not shown.',
+          'Die Fotos, die langsam unter den Bannern vorbeiziehen, in dieser Reihenfolge. 8 bis 12 Fotos, hoch oder quer. Leer: das Band erscheint nicht.',
+          'As fotos que passam devagar sob as faixas, por esta ordem. 8 a 12 fotos, na vertical ou na horizontal. Vazio: a faixa não aparece.',
+        ),
+      },
+    },
   ],
 };
 

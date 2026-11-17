@@ -1456,6 +1456,12 @@
       "text": "Dégustations et soirées à venir.",
       "cta": "Voir l’agenda"
     },
+    "gallery": {
+      "title": "La Maison en images",
+      "follow": "Suivre sur Instagram",
+      "pause": "Mettre le défilement en pause",
+      "play": "Reprendre le défilement"
+    },
     "contact": {
       "eyebrow": "Contact",
       "title": "Golden Grape",

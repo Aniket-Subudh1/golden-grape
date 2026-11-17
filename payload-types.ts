@@ -4090,6 +4090,10 @@ export interface HomePage {
     contact?: (string | null) | Media;
     interior?: (string | null) | Media;
   };
+  /**
+   * The photos that drift slowly under the banners, in this order. 8 to 12 photos, upright or landscape. Empty: the band is not shown.
+   */
+  gallery?: (string | Media)[] | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -4546,6 +4550,7 @@ export interface HomePageSelect<T extends boolean = true> {
         contact?: T;
         interior?: T;
       };
+  gallery?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
