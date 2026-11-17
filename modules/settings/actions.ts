@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 import { action, clientIp, publicAction } from '@/lib/action';
+import { LOCALES } from '@/lib/i18n';
 import { rateLimit } from '@/lib/rate-limit';
 import { staffSignIn, staffSignOut } from './service';
 
@@ -17,4 +18,10 @@ export const staffSignInAction = publicAction(z.object({ email: z.email('email')
 export const staffSignOutAction = action(z.object({}), { roles: [] }, async (_, { payload }) => {
   await staffSignOut(payload);
   return {};
+});
+
+/** The staff member's own language (staff sidebar, phone home): the staff screens and e-mails to them speak it. */
+export const setStaffLanguage = action(z.object({ locale: z.enum(LOCALES) }), { roles: [] }, async ({ locale }, { payload, user }) => {
+  await payload.update({ collection: 'users', id: user.id, data: { locale }, overrideAccess: true, depth: 0 });
+  return { locale };
 });

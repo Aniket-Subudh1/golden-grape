@@ -92,6 +92,11 @@ Started at Aniket's go-ahead after M3.1 ("M3.1 OK"). Same rules as M3.1 (local c
 - **T6** `tests/e2e/b2b.spec.ts` (06 §3.3 #4, desktop: one invoice series): the B2B customer sees 11,40 (10,00 net + 14 %) instead of 18,00 → staff send a quotation from the phone sale → Create order on the customer page → Issue invoice on the orders screen → the PDF downloads as the next `FAC-` number.
 - **Checked (production build, QA data):** phone at 360 px: quotation DEV-2026-0003 sent, Create order → CMD-2026-00076, invoice FAC-2026-00003 with its PDF link, no second button, nothing wider than the screen; laptop (manager): CSV export downloaded with the invoice, Mark paid, credit note with a reason → credited, the order's Documents card lists the invoice and the credit note; no page error (14/14). check 335, int 151, build, e2e 30 passed / 6 skipped (the test stock of the e2e database was topped up through an adjustment and its order rate limit cleared after many runs).
 
+### 2026-11-17 · Language switch in the staff app (owner request)
+
+- The staff sidebar has a language menu above the person (the icon rail shows the code, e.g. "EN"); on phones it is in the Home screen's app bar. A choice is saved on the staff member's account (`setStaffLanguage`, `users.locale`) and sets the back office's `payload-lng` cookie, so the admin follows. One menu for the sign-in page and the app (`components/staff/language.tsx`, replaces `LoginLanguage`).
+- **Checked (production build):** laptop: English → Français, the screen in French, still French after a reload, the admin in French, back to English; iPad rail: the button; phone 360 px: Deutsch then English from the app bar, nothing wider than the screen; no page error (10/10).
+
 ### 2026-11-17 · Stock page reworked (owner request)
 
 - `/staff/stock/[variant]`: summary card with a stock status (against the low-stock level), the stock as a big figure, level / price / last movement, box prices and Sell; the correction as Add / Remove + stepper + 1 / box-size chips + reason chips + a "Stock after" preview (blocked below zero); the movements as a timeline by day with All / In / Out and "Show more". Texts in the 4 dictionaries (`staff.stockPage.*`, `staff.adjust.*`). Same `adjustStock` action: nothing changes in how stock is written.

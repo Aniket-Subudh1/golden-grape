@@ -5,7 +5,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/cn';
+import type { Locale } from '@/lib/i18n';
 import { ICONS } from './icons';
+import { LanguageMenu } from './language';
 import { SignOut } from './sign-out';
 
 export type NavItem = { screen: string; href: string; label: string };
@@ -26,8 +28,8 @@ export function StaffNav({
   t,
 }: {
   items: NavItem[];
-  user: { name: string; email: string };
-  t: { app: string; menu: string; signOut: string };
+  user: { name: string; email: string; locale: Locale };
+  t: { app: string; menu: string; signOut: string; language: string };
 }) {
   const active = useActive();
   return (
@@ -68,6 +70,9 @@ export function StaffNav({
           })}
         </ul>
       </nav>
+      <div className="px-2.5 pb-3 lg:px-3">
+        <LanguageMenu current={user.locale} label={t.language} account place="up" />
+      </div>
       <div className="border-border flex flex-col items-center gap-2 border-t p-3 lg:flex-row lg:gap-3 lg:px-4">
         <span
           className="bg-gold-deep grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-semibold text-white"

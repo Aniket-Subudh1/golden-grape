@@ -24,8 +24,8 @@ export default async function StaffAppLayout({ children }: LayoutProps<'/staff'>
     <div className="min-h-dvh md:flex">
       <StaffNav
         items={nav.map(item)}
-        user={{ name: user.name, email: user.email }}
-        t={{ app: t.login.app, menu: t.menu, signOut: t.signOut }}
+        user={{ name: user.name, email: user.email, locale: (user.locale ?? 'fr') as Locale }}
+        t={{ app: t.login.app, menu: t.menu, signOut: t.signOut, language: t.login.language }}
       />
       <div className="flex min-w-0 flex-1 flex-col pb-[calc(4.25rem+env(safe-area-inset-bottom))] md:pb-0">
         {children}

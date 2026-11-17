@@ -4,7 +4,8 @@ import type { ReactNode } from 'react';
 import { cookies } from 'next/headers';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
-import { LoginForm, LoginLanguage } from '@/components/staff/login-form';
+import { LanguageMenu } from '@/components/staff/language';
+import { LoginForm } from '@/components/staff/login-form';
 import { getDictionary, isLocale } from '@/lib/i18n';
 import { currentStaff } from '@/modules/settings/service';
 
@@ -72,7 +73,7 @@ export default async function StaffLogin({ searchParams }: PageProps<'/staff/log
       {/* One menu for every width: beside the lockup on phones, on the photo's corner on wide screens (outside the
           photo panel, which is hidden from screen readers). */}
       <div className="fixed top-[max(2rem,calc(env(safe-area-inset-top)+0.25rem))] right-6 z-10 lg:top-10 lg:right-10">
-        <LoginLanguage current={locale} label={t.language} />
+        <LanguageMenu current={locale} label={t.language} />
       </div>
 
       <aside aria-hidden="true" className="relative m-3 hidden overflow-hidden rounded-[28px] lg:block">

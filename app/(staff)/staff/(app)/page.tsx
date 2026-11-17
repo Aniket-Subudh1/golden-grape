@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ICONS } from '@/components/staff/icons';
 import { SignOut } from '@/components/staff/sign-out';
 import { Tile } from '@/components/staff/tile';
+import { LanguageMenu } from '@/components/staff/language';
 import { StaffPage } from '@/components/staff/page';
 import { interpolate } from '@/lib/i18n';
 import { getPayloadClient } from '@/lib/payload';
@@ -19,7 +20,7 @@ export const metadata: Metadata = { title: 'Accueil' };
 
 /** Home (05 §5): today's orders and open reservations for sales, low stock and expected deliveries for stock. */
 export default async function StaffHome() {
-  const { user, t } = await requireStaff('home');
+  const { user, locale, t } = await requireStaff('home');
   const payload = await getPayloadClient();
   const day = today();
   const [sales, stock] = await Promise.all([canOpen(user, 'orders'), canOpen(user, 'stock')]);
@@ -42,7 +43,8 @@ export default async function StaffHome() {
       subtitle={t.home.subtitle}
       width="wide"
       action={
-        <span className="md:hidden">
+        <span className="flex items-center gap-1 md:hidden">
+          <LanguageMenu current={locale} label={t.login.language} account tone="dark" />
           <SignOut label={t.signOut} />
         </span>
       }
