@@ -75,3 +75,18 @@
     transform: scale(0.97);
   }
 }
+
+/* Buttons in the phone's dark app bar (New count, Edit): light on dark. */
+@media (max-width: 767px) {
+  .gg-staff .gg-appbar [data-slot="button"] {
+    border-color: rgb(255 255 255 / 0.25);
+    background: rgb(255 255 255 / 0.1);
+    color: #ffffff;
+  }
+}
+
+/* The website keeps room for a scrollbar (globals.css, scrollbar-gutter: stable); on narrow screens that shows as an
+   empty strip beside the staff app's full-width bars. */
+html:has(body.gg-staff) {
+  scrollbar-gutter: auto;
+}

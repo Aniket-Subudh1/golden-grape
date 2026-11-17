@@ -75,6 +75,13 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-17 · Staff app on small phones; branded phone app bar (owner report)
+
+- **Reported:** at 360 px (Galaxy A55 in Chrome's device mode) the order and receive cards ran past the right edge; phones needed some branding at the top.
+- **Cause:** list grids without a column count (`grid` alone) size their implicit column to the longest content (a long customer or supplier name), so cards grew to ~410 px; Chrome's device mode with desktop scrollbars shows it, the Pixel 7 emulation (overlay scrollbars, 412 px) did not. The website's `scrollbar-gutter: stable` added an empty strip.
+- **Fixed:** `grid-cols-1` on every staff layout grid; secondary order moves one per row below 400 px; the count list hides the bottles line below 640 px; `scrollbar-gutter` off for the staff app; the receive list no longer repeats the order number when the supplier is missing. **Branding:** the phone top bar is a dark app bar with the Golden Grape logo, the gold wordmark and the screen title (05 §5).
+- **Checked (production build):** every staff screen at 320 and 360 px, both as a phone and as a narrow desktop window: nothing wider than the screen. The owner's walk-through at 360 px, Pixel 7, iPad and 1440 px: 25/25 each. check 290, build, e2e 29 passed / 4 skipped.
+
 ### 2026-11-17 · Staff app UX pass: pop-ups, tabs, guided receiving (owner request)
 
 - **Asked:** new customer as a pop-up (Sale, Customers), Orders in two tabs with icon buttons and better cards, a friendlier Customers screen, a Receive screen that explains itself, tabs on Count and Reorder.

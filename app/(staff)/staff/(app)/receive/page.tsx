@@ -30,7 +30,7 @@ export default async function ReceiveList() {
       {orders.length === 0 ? (
         <Empty icon={<PackageCheck />} text={r.none} />
       ) : (
-        <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
           {orders.map((po) => {
             const due = po.expectedAt ? today(new Date(po.expectedAt)) : null;
             const late = due !== null && due < day;
@@ -48,7 +48,7 @@ export default async function ReceiveList() {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold">{po.supplier || po.number}</span>
-                      <span className="text-ink/55 block text-xs">{po.number}</span>
+                      {po.supplier && <span className="text-ink/55 block text-xs">{po.number}</span>}
                     </span>
                     <span
                       className={cn(
@@ -68,6 +68,7 @@ export default async function ReceiveList() {
                             ? interpolate(r.due, { date: date.format(new Date(po.expectedAt!)) })
                             : r.noDate}
                     </span>
+                    <ChevronRight className="text-ink/35 mt-0.5 h-4 w-4 shrink-0" />
                   </span>
                   <span className="block">
                     <span className="mb-1.5 flex justify-between text-xs">
@@ -77,10 +78,6 @@ export default async function ReceiveList() {
                     <span className="block h-2 overflow-hidden rounded-full bg-[#e7ecf3]">
                       <span className="bg-gold block h-full rounded-full" style={{ width: `${pct}%` }} />
                     </span>
-                  </span>
-                  <span className="text-gold-deep flex items-center justify-end gap-1 text-sm font-medium">
-                    {r.title}
-                    <ChevronRight className="h-4 w-4" />
                   </span>
                 </Link>
               </li>

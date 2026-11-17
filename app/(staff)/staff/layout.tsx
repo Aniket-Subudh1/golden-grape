@@ -21,7 +21,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#eaeef5',
+  themeColor: [{ media: '(max-width: 767px)', color: '#16181c' }, { color: '#eaeef5' }],
 };
 
 export default async function StaffRootLayout({ children }: LayoutProps<'/staff'>) {

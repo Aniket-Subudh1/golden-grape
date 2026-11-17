@@ -20,7 +20,7 @@ export function SignOut({ label }: { label: string }) {
           router.refresh();
         })
       }
-      className="text-ink/60 hover:bg-champagne grid h-11 w-11 place-items-center rounded-full transition"
+      className="grid h-10 w-10 place-items-center rounded-full opacity-70 transition hover:bg-current/10 hover:opacity-100"
     >
       <LogOut className="h-5 w-5" />
     </button>

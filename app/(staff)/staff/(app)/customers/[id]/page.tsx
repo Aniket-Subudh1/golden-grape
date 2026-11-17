@@ -62,7 +62,7 @@ export default async function CustomerPage({ params }: PageProps<'/staff/custome
           }}
         />
       }
-      className="grid items-start gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-8"
+      className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-8"
     >
       <section className="gg-card p-4 text-sm md:p-5">
         <CustomerRow c={picked} t={t.customers} />

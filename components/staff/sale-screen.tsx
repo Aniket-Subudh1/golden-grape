@@ -155,7 +155,7 @@ export function SaleScreen({
   }
 
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-8">
+    <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-8">
       <div className="space-y-6">
         <section className="space-y-3">
           <h2 className="eyebrow text-ink/60">{t.customer}</h2>

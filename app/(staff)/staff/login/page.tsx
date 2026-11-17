@@ -36,7 +36,7 @@ export default async function StaffLogin({ searchParams }: PageProps<'/staff/log
         <header className="flex items-center justify-between gap-4">
           <span className="inline-flex items-center gap-3.5">
             <Image src="/brand/mark.png" alt="" width={41} height={44} className="h-11 w-auto" priority />
-            <span className="grid gap-0.5 leading-tight">
+            <span className="grid grid-cols-1 gap-0.5 leading-tight">
               <span className="text-xl font-semibold tracking-[-0.015em]">
                 Golden <b className="text-gold-deep font-bold">Grape</b>
               </span>

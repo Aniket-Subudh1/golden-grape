@@ -61,7 +61,7 @@ export default async function ReorderPage({ searchParams }: PageProps<'/staff/re
     suppliers.length === 0 ? (
       <Empty icon={<PackageCheck />} text={r.none} />
     ) : (
-      <div className="grid items-start gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         {suppliers.map((g) => {
           const total = g.rows.reduce((sum, x) => sum + (x.offer ? x.offer.costCents * x.suggested : 0), 0);
           return (

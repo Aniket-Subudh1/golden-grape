@@ -122,7 +122,7 @@ export function CustomersScreen({
                 {recent.length === 0 ? (
                   <Empty icon={<Users />} text={t.noCustomers} />
                 ) : (
-                  <ul className="grid gap-2 lg:grid-cols-2">
+                  <ul className="grid grid-cols-1 gap-2 lg:grid-cols-2">
                     {recent.map((c) => (
                       <li key={c.id}>{row(c)}</li>
                     ))}

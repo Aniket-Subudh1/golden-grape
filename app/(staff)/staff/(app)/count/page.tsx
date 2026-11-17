@@ -26,7 +26,7 @@ export default async function CountsPage({ searchParams }: PageProps<'/staff/cou
     const body = (
       <>
         <span
-          className={`grid h-10 w-10 shrink-0 place-items-center rounded-[10px] ${live ? 'bg-champagne text-gold-deep' : 'bg-emerald-50 text-emerald-700'}`}
+          className={`grid h-10 w-10 shrink-0 place-items-center rounded-[10px] ${live ?'bg-champagne text-gold-deep' : 'bg-emerald-50 text-emerald-700'}`}
         >
           {live ? <Tally5 className="h-5 w-5" /> : <CheckCircle2 className="h-5 w-5" />}
         </span>
@@ -40,7 +40,7 @@ export default async function CountsPage({ searchParams }: PageProps<'/staff/cou
         </span>
         <span className="text-ink/70 shrink-0 text-right text-sm">
           <span className="block tabular-nums">{interpolate(c.lines, { n: count.lines })}</span>
-          <span className="text-ink/50 text-xs tabular-nums">
+          <span className="text-ink/50 hidden text-xs tabular-nums sm:block">
             {interpolate(t.countScreen.units, { n: count.units })}
           </span>
         </span>
@@ -62,7 +62,7 @@ export default async function CountsPage({ searchParams }: PageProps<'/staff/cou
     counts.length === 0 ? (
       <Empty icon={live ? <Tally5 /> : <ClipboardList />} text={empty} />
     ) : (
-      <ul className="grid gap-2 lg:grid-cols-2">
+      <ul className="grid grid-cols-1 gap-2 lg:grid-cols-2">
         {counts.map((count) => (
           <li key={count.id}>{row(count, live)}</li>
         ))}

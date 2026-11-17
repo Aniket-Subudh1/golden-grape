@@ -129,7 +129,7 @@ export default async function OrdersPage({ searchParams }: PageProps<'/staff/ord
   );
 
   const orderCards = (
-    <div className="grid items-start gap-3 lg:grid-cols-2">
+    <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-2">
       {orders.map((o: Order) => {
         const Icon = MODE_ICONS[o.mode ?? 'pickup'] ?? ShoppingBag;
         const status = (o.status ?? 'pending') as OrderStatus;
@@ -163,7 +163,7 @@ export default async function OrdersPage({ searchParams }: PageProps<'/staff/ord
   );
 
   const tableCards = (
-    <div className="grid items-start gap-3 lg:grid-cols-2">
+    <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-2">
       {reservations.map((r) => {
         const preorder = typeof r.preorder === 'object' && r.preorder ? r.preorder : null;
         const status = (r.status ?? 'pending') as ReservationStatus;

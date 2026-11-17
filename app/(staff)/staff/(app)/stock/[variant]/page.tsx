@@ -31,7 +31,7 @@ export default async function StockPage({ params }: PageProps<'/staff/stock/[var
       title={t.stockPage.title}
       back={{ href: '/staff/scan', label: t.back }}
       width="wide"
-      className="grid items-start gap-4 lg:grid-cols-2 lg:gap-8"
+      className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2 lg:gap-8"
     >
       <div className="space-y-4">
         <ProductCard item={{ ...item, onHand: stock[variant] ?? 0 }} locale={locale} t={t.card} />
