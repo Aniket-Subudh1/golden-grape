@@ -1152,12 +1152,21 @@
     },
     "login": {
       "eyebrow": "Espace équipe",
-      "title": "Connexion",
+      "title": "Connexion à l’espace équipe",
       "email": "E-mail",
       "password": "Mot de passe",
       "submit": "Se connecter",
       "pending": "Connexion…",
-      "invalid": "E-mail ou mot de passe incorrect, ou compte désactivé."
+      "invalid": "E-mail ou mot de passe incorrect, ou compte désactivé.",
+      "app": "Application équipe",
+      "text": "Utilisez l’adresse e-mail de votre compte Golden Grape.",
+      "language": "Langue",
+      "show": "Afficher le mot de passe",
+      "hide": "Masquer le mot de passe",
+      "note1": "Scanner, compter, réceptionner",
+      "note1Text": "Le stock depuis votre téléphone : chaque scan le met à jour aussitôt.",
+      "note2": "Vendre au comptoir",
+      "note2Text": "Commandes, tables et clients, toujours sous la main."
     },
     "scan": {
       "label": "Code-barres ou nom",

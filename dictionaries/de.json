@@ -1152,12 +1152,21 @@
     },
     "login": {
       "eyebrow": "Teambereich",
-      "title": "Anmelden",
+      "title": "Anmeldung zur Team-App",
       "email": "E-Mail",
       "password": "Passwort",
       "submit": "Anmelden",
       "pending": "Anmeldung…",
-      "invalid": "E-Mail oder Passwort falsch, oder das Konto ist deaktiviert."
+      "invalid": "E-Mail oder Passwort falsch, oder das Konto ist deaktiviert.",
+      "app": "Team-App",
+      "text": "Verwenden Sie die E-Mail-Adresse Ihres Golden-Grape-Kontos.",
+      "language": "Sprache",
+      "show": "Passwort anzeigen",
+      "hide": "Passwort verbergen",
+      "note1": "Scannen, zählen, annehmen",
+      "note1Text": "Der Bestand vom Handy aus: jeder Scan aktualisiert ihn sofort.",
+      "note2": "Verkaufen an der Theke",
+      "note2Text": "Bestellungen, Tische und Kunden, immer zur Hand."
     },
     "scan": {
       "label": "Barcode oder Name",

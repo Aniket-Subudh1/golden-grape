@@ -1152,12 +1152,21 @@
     },
     "login": {
       "eyebrow": "Área da equipa",
-      "title": "Entrar",
+      "title": "Entrar na app da equipa",
       "email": "E-mail",
       "password": "Palavra-passe",
       "submit": "Entrar",
       "pending": "A entrar…",
-      "invalid": "E-mail ou palavra-passe incorretos, ou conta desativada."
+      "invalid": "E-mail ou palavra-passe incorretos, ou conta desativada.",
+      "app": "App da equipa",
+      "text": "Use o endereço de e-mail da sua conta Golden Grape.",
+      "language": "Língua",
+      "show": "Mostrar a palavra-passe",
+      "hide": "Ocultar a palavra-passe",
+      "note1": "Ler, contar, receber",
+      "note1Text": "O stock a partir do telemóvel: cada leitura atualiza-o logo.",
+      "note2": "Vender ao balcão",
+      "note2Text": "Encomendas, mesas e clientes, sempre à mão."
     },
     "scan": {
       "label": "Código de barras ou nome",

@@ -1152,12 +1152,21 @@
     },
     "login": {
       "eyebrow": "Team area",
-      "title": "Sign in",
+      "title": "Sign in to the team app",
       "email": "E-mail",
       "password": "Password",
       "submit": "Sign in",
       "pending": "Signing in…",
-      "invalid": "Wrong e-mail or password, or the account is disabled."
+      "invalid": "Wrong e-mail or password, or the account is disabled.",
+      "app": "Team app",
+      "text": "Use the e-mail address of your Golden Grape account.",
+      "language": "Language",
+      "show": "Show password",
+      "hide": "Hide password",
+      "note1": "Scan, count, receive",
+      "note1Text": "The stock from your phone: every scan updates it at once.",
+      "note2": "Sell at the counter",
+      "note2Text": "Orders, tables and customers, always at hand."
     },
     "scan": {
       "label": "Barcode or name",

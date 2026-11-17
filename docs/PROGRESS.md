@@ -75,6 +75,11 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-17 · Staff sign-in in the back office's look (owner request)
+
+- `/staff/login` now matches `/admin/login`: "Golden Grape · Team app" lockup, "Sign in to the team app" with the account e-mail line, boxed e-mail and password fields with a show-password eye, an admin-style button, the address at the foot, and on screens ≥ 1024 px the rounded photo panel with two notes (scan, count, receive; sell at the counter). The language menu (top right) shares the admin's `payload-lng` cookie: English picked on one sign-in page shows on the other. `Field` gained `look="box"` and `trailing`. Texts in the 4 dictionaries (`staff.login.*`).
+- Checked on the production build: French by default, English via the menu, the admin follows and back, the eye, a wrong password message, sign-in to `/staff`, no sideways scroll on a Pixel 7, no console error; check 290, e2e 29 passed / 4 skipped.
+
 ### 2026-11-17 · Decisions Q-18 … Q-22 (after M3.1)
 
 - **Q-22:** Next 16.4.3 → **16.4.6** (security patch GHSA-mfr8-8qww-v76h), `eslint-config-next` alike; Payload stays 3.92.1 (peer `next >=16.3.3 <17`); D-02 and 02 §1 updated. `next build` no longer reports the advisory.
