@@ -66,13 +66,28 @@
     border-radius: 16px;
     translate: -50% -50%;
     animation-name: gg-staff-pop;
-    animation-duration: 0.2s;
+    animation-duration: 0.26s;
+    animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+  .gg-staff .gg-sheet--bottom[data-closing] > .gg-sheet__panel {
+    animation-name: gg-staff-pop-out;
+    animation-duration: 0.18s;
+  }
+  /* A centred dialog has no edge to come from: no grab bar. */
+  .gg-staff .gg-sheet__grip {
+    display: none;
   }
 }
 @keyframes gg-staff-pop {
   from {
     opacity: 0;
-    transform: scale(0.97);
+    transform: translateY(12px) scale(0.96);
+  }
+}
+@keyframes gg-staff-pop-out {
+  to {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
   }
 }
 

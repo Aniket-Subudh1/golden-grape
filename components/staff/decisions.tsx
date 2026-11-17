@@ -144,7 +144,8 @@ export function StaffDecisions({
             }}
           >
             <h2 className="pr-10 font-serif text-2xl">{open.label}</h2>
-            <p className="text-ink/70 text-sm">{open.hint}</p>
+            {/* Hints are written to follow "Label — " in the admin: on their own line here, they start with a capital. */}
+            <p className="text-ink/70 text-sm first-letter:uppercase">{open.hint}</p>
             {(open.fields ?? []).map((f) => (
               <label key={f.name} className="block text-sm">
                 <span className="eyebrow text-ink/60 mb-1 block">{f.label}</span>

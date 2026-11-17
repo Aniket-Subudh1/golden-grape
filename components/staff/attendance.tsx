@@ -67,7 +67,8 @@ export function TapCard({ token, since, t, locale }: { token: string; since: str
 }
 
 /** A manager's correction: which time, the right time (Luxembourg), a reason. */
-export function CorrectShift({ shift, open, checkIn, checkOut, t, back }: { shift: string; open: boolean; checkIn: string; checkOut: string | null; t: Texts; back: string }) {
+/** `compact`: icon only on phones (the month's shift rows), the words from tablets up. */
+export function CorrectShift({ shift, open, checkIn, checkOut, t, back, compact = false }: { shift: string; open: boolean; checkIn: string; checkOut: string | null; t: Texts; back: string; compact?: boolean }) {
   const router = useRouter();
   const [show, setShow] = useState(false);
   const [field, setField] = useState<'checkIn' | 'checkOut'>(open ? 'checkOut' : 'checkIn');
@@ -97,9 +98,10 @@ export function CorrectShift({ shift, open, checkIn, checkOut, t, back }: { shif
           setShow(true);
         }}
         className="border-border shrink-0"
+        aria-label={open ? t.setOut : t.correct}
       >
         <Pencil className="h-3.5 w-3.5" aria-hidden />
-        {open ? t.setOut : t.correct}
+        <span className={compact ? 'hidden sm:inline' : undefined}>{open ? t.setOut : t.correct}</span>
       </Button>
       <Sheet open={show} onOpenChange={setShow} label={t.correct} closeLabel={back} variant="bottom">
         <form

@@ -138,14 +138,14 @@ export default async function AttendancePage({ searchParams }: PageProps<'/staff
                     <li key={s.id} className="flex items-center gap-3 px-4 py-2.5 text-sm">
                       <span className="min-w-0 flex-1">
                         <span className="block font-medium capitalize">{dayFmt.format(new Date(`${s.day}T12:00:00Z`))}</span>
-                        <span className="text-ink/60 inline-flex items-center gap-1 text-xs tabular-nums">
+                        <span className="text-ink/60 inline-flex flex-wrap items-center gap-x-1 text-xs tabular-nums">
                           <Clock className="h-3 w-3" aria-hidden />
                           {clock.format(new Date(s.checkIn!))} – {s.checkOut ? clock.format(new Date(s.checkOut)) : <b className="text-amber-700">{a.missing}</b>}
                           {s.source === 'manager' && ` · ${a.corrected}`}
                         </span>
                       </span>
-                      <span className="w-14 text-right tabular-nums">{s.open ? '—' : hoursAndMinutes(s.minutes ?? 0)}</span>
-                      <CorrectShift shift={s.id} open={Boolean(s.open)} checkIn={s.checkIn!} checkOut={s.checkOut ?? null} t={a} back={t.back} />
+                      <span className="shrink-0 text-right tabular-nums">{s.open ? '—' : hoursAndMinutes(s.minutes ?? 0)}</span>
+                      <CorrectShift shift={s.id} open={Boolean(s.open)} checkIn={s.checkIn!} checkOut={s.checkOut ?? null} t={a} back={t.back} compact />
                     </li>
                   ))}
               </ul>

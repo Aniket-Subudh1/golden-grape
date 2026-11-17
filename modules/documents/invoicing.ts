@@ -177,7 +177,8 @@ export async function issueInvoice(
     const locale = (order.locale ?? customer?.locale ?? 'fr') as Locale;
     const number = await nextOf(tx, 'invoice', now);
     const day = today(now);
-    const dueDay = addDays(day, Number(customer?.paymentTerm ?? 0));
+    // Days as stored since M3.2; a term typed before ("30 jours") gives its number, anything else "on receipt".
+    const dueDay = addDays(day, Number.parseInt(String(customer?.paymentTerm ?? '0'), 10) || 0);
     const totals = order.totals!;
     const money =
       (order.pricing?.loyaltyCents ?? 0) +
