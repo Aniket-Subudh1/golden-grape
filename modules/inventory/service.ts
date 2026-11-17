@@ -164,9 +164,26 @@ export async function movementsOf(payload: Payload, variant: string, limit = 50)
 }
 
 /** Open stock counts, newest first (the staff count screen). */
-export async function openCounts(payload: Payload) {
-  const { docs } = await payload.find({ collection: 'stockCounts', where: { status: { equals: 'open' } }, sort: '-createdAt', limit: 20, depth: 1, overrideAccess: true, select: { note: true, lines: true, user: true, createdAt: true } });
-  return docs.map((c) => ({ id: c.id, note: c.note ?? null, lines: c.lines?.length ?? 0, user: c.user && typeof c.user === 'object' ? c.user.name : null, at: c.createdAt }));
+/** The counts in progress (newest first), or the last 20 posted (most recently posted first): the phone's two tabs. */
+export async function countsBy(payload: Payload, status: 'open' | 'posted') {
+  const { docs } = await payload.find({
+    collection: 'stockCounts',
+    where: { status: { equals: status } },
+    sort: status === 'open' ? '-createdAt' : '-postedAt',
+    limit: 20,
+    depth: 1,
+    overrideAccess: true,
+    pagination: false,
+    select: { note: true, lines: true, user: true, createdAt: true, postedAt: true },
+  });
+  return docs.map((c) => ({
+    id: c.id,
+    note: c.note ?? null,
+    lines: c.lines?.length ?? 0,
+    units: (c.lines ?? []).reduce((sum, l) => sum + (l.counted ?? 0), 0),
+    user: c.user && typeof c.user === 'object' ? c.user.name : null,
+    at: (status === 'posted' && c.postedAt) || c.createdAt,
+  }));
 }
 
 export async function openCount(payload: Payload, { user, note }: { user: string; note?: string }) {

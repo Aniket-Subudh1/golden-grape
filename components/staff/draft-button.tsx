@@ -1,5 +1,6 @@
 'use client';
 
+import { FilePlus2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
@@ -21,7 +22,6 @@ export function DraftButton({
   return (
     <Button
       type="button"
-      variant="outline"
       size="sm"
       disabled={pending}
       onClick={() =>
@@ -32,6 +32,7 @@ export function DraftButton({
         })
       }
     >
+      <FilePlus2 className="h-4 w-4" />
       {pending ? t.creating : t.create}
     </Button>
   );

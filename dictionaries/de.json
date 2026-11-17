@@ -1224,7 +1224,11 @@
       "open": "Offen",
       "none": "Keine offene Inventur.",
       "untitled": "Inventur ohne Namen",
-      "lines": "{{n}} Artikel"
+      "lines": "{{n}} Artikel",
+      "history": "Gebucht",
+      "noHistory": "Noch keine Inventur gebucht.",
+      "hint": "Starten Sie eine Inventur für ein Regal oder den ganzen Keller und scannen Sie jede Flasche.",
+      "by": "von {{name}}"
     },
     "countScreen": {
       "empty": "Scannen Sie den ersten gezählten Artikel.",
@@ -1243,13 +1247,21 @@
       "postError": "Buchen nicht möglich. Erneut versuchen.",
       "emptyCount": "Fügen Sie vor dem Buchen mindestens einen gezählten Artikel hinzu.",
       "closed": "Diese Inventur wurde bereits gebucht.",
-      "qty": "Menge"
+      "qty": "Menge",
+      "items": "{{n}} Artikel",
+      "units": "{{n}} Flasche(n) gezählt",
+      "hint": "Scannen Sie jede Flasche. Der Code eines Kartons zählt alle seine Flaschen. Wird laufend gespeichert."
     },
     "receivePage": {
       "title": "Wareneingang",
       "none": "Keine offene Lieferantenbestellung. Setzen Sie eine Bestellung in der Verwaltung auf „Bestellt“, um sie hier zu erfassen.",
       "partly": "teilweise erhalten",
-      "remaining": "{{n}} offen"
+      "remaining": "{{n}} offen",
+      "progress": "{{received}} / {{ordered}} erhalten",
+      "late": "Verspätet",
+      "today": "Heute",
+      "due": "Fällig am {{date}}",
+      "noDate": "Ohne Datum"
     },
     "receiveScreen": {
       "ordered": "Bestellt: {{n}}",
@@ -1269,7 +1281,14 @@
       "doneReceived": "Die Bestellung ist vollständig erhalten. Der Bestand ist aktuell.",
       "donePartly": "Teilweise erhalten: der Rest kann später gebucht werden. Der Bestand ist aktuell.",
       "back": "Zurück zu den Bestellungen",
-      "qty": "Erhaltene Menge"
+      "qty": "Erhaltene Menge",
+      "hint": "Scannen Sie jeden Karton oder jede Flasche beim Auspacken oder nutzen Sie − und +. Dann den Wareneingang bestätigen.",
+      "all": "Alle",
+      "already": "Bereits erhalten: {{n}}",
+      "complete": "Vollständig",
+      "toReceive": "{{n}} jetzt zu erhalten",
+      "bottle": "Flasche",
+      "progress": "{{done}} von {{total}} Zeilen vollständig"
     },
     "reorder": {
       "title": "Nachbestellen",
@@ -1280,7 +1299,15 @@
       "units": "Einheit(en)",
       "create": "Bestellentwurf",
       "creating": "Wird angelegt…",
-      "error": "Die Bestellung konnte nicht angelegt werden."
+      "error": "Die Bestellung konnte nicht angelegt werden.",
+      "withSupplier": "Nach Lieferant",
+      "withoutSupplier": "Ohne Lieferant",
+      "products": "{{n}} Produkt(e)",
+      "estimate": "Etwa {{amount}}",
+      "noSupplierHint": "Für diese Artikel gibt es noch keinen Lieferantenpreis. Legen Sie einen in der Verwaltung an, um sie zu bestellen.",
+      "addPrice": "Einkaufspreis anlegen",
+      "suggested": "Vorschlag",
+      "level": "Mindestbestand {{n}}"
     },
     "sale": {
       "title": "Verkauf",
@@ -1338,7 +1365,11 @@
       "edit": "Bearbeiten",
       "noEmail": "Keine E-Mail",
       "orders": "Letzte Bestellungen",
-      "noOrders": "Keine Bestellungen."
+      "noOrders": "Keine Bestellungen.",
+      "recent": "Neueste Kunden",
+      "noCustomers": "Noch keine Kunden.",
+      "privateBadge": "Privat",
+      "businessBadge": "Firma"
     },
     "orders": {
       "title": "Bestellungen",
@@ -1347,7 +1378,9 @@
       "reservations": "Tische",
       "noReservations": "Keine kommenden Tische.",
       "details": "Details",
-      "guests": "Pers."
+      "guests": "Pers.",
+      "paid": "Bezahlt",
+      "unpaid": "Offen"
     },
     "menu": "Menü"
   }

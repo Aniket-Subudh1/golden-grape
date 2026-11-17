@@ -108,6 +108,7 @@ export async function openPurchaseOrders(payload: Payload) {
       expectedAt: po.expectedAt ?? null,
       lines: po.lines?.length ?? 0,
       remaining: (po.lines ?? []).reduce((sum, l) => sum + Math.max(0, l.unitQty - (l.receivedUnitQty ?? 0)), 0),
+      ordered: (po.lines ?? []).reduce((sum, l) => sum + l.unitQty, 0),
     }))
     .sort((a, b) => (a.expectedAt ?? '9999').localeCompare(b.expectedAt ?? '9999'));
 }

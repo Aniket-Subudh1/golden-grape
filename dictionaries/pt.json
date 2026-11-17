@@ -1224,7 +1224,11 @@
       "open": "Em curso",
       "none": "Nenhum inventário em curso.",
       "untitled": "Inventário sem nome",
-      "lines": "{{n}} artigo(s)"
+      "lines": "{{n}} artigo(s)",
+      "history": "Lançados",
+      "noHistory": "Ainda sem inventários lançados.",
+      "hint": "Comece um inventário para uma prateleira ou a cave inteira e leia cada garrafa.",
+      "by": "por {{name}}"
     },
     "countScreen": {
       "empty": "Leia o primeiro artigo contado.",
@@ -1243,13 +1247,21 @@
       "postError": "Não foi possível validar. Tente novamente.",
       "emptyCount": "Junte pelo menos um artigo contado antes de validar.",
       "closed": "Este inventário já foi validado.",
-      "qty": "Quantidade"
+      "qty": "Quantidade",
+      "items": "{{n}} artigo(s)",
+      "units": "{{n}} garrafa(s) contada(s)",
+      "hint": "Leia cada garrafa. O código de uma caixa soma todas as garrafas. Guardado à medida."
     },
     "receivePage": {
       "title": "Receção",
       "none": "Nenhuma encomenda a fornecedor em espera. Passe uma encomenda a «Encomendado» na gestão para a receber aqui.",
       "partly": "recebida em parte",
-      "remaining": "{{n}} em falta"
+      "remaining": "{{n}} em falta",
+      "progress": "{{received}} / {{ordered}} recebidos",
+      "late": "Atrasada",
+      "today": "Hoje",
+      "due": "Prevista a {{date}}",
+      "noDate": "Sem data"
     },
     "receiveScreen": {
       "ordered": "Encomendado: {{n}}",
@@ -1269,7 +1281,14 @@
       "doneReceived": "A encomenda foi recebida por completo. O stock está atualizado.",
       "donePartly": "Recebida em parte: o resto pode ser recebido mais tarde. O stock está atualizado.",
       "back": "Voltar às encomendas",
-      "qty": "Quantidade recebida"
+      "qty": "Quantidade recebida",
+      "hint": "Leia cada caixa ou garrafa ao desembalar, ou use − e +. Depois confirme a receção.",
+      "all": "Tudo",
+      "already": "Já recebido: {{n}}",
+      "complete": "Completo",
+      "toReceive": "{{n}} a receber agora",
+      "bottle": "Garrafa",
+      "progress": "{{done}} de {{total}} linhas completas"
     },
     "reorder": {
       "title": "A encomendar",
@@ -1280,7 +1299,15 @@
       "units": "unidade(s)",
       "create": "Encomenda em rascunho",
       "creating": "A criar…",
-      "error": "Não foi possível criar a encomenda."
+      "error": "Não foi possível criar a encomenda.",
+      "withSupplier": "Por fornecedor",
+      "withoutSupplier": "Sem fornecedor",
+      "products": "{{n}} produto(s)",
+      "estimate": "Cerca de {{amount}}",
+      "noSupplierHint": "Estes artigos ainda não têm preço de fornecedor. Adicione um na gestão para os encomendar.",
+      "addPrice": "Adicionar preço de compra",
+      "suggested": "Sugerido",
+      "level": "Nível {{n}}"
     },
     "sale": {
       "title": "Venda",
@@ -1338,7 +1365,11 @@
       "edit": "Editar",
       "noEmail": "Sem e-mail",
       "orders": "Últimas encomendas",
-      "noOrders": "Sem encomendas."
+      "noOrders": "Sem encomendas.",
+      "recent": "Clientes recentes",
+      "noCustomers": "Ainda sem clientes.",
+      "privateBadge": "Particular",
+      "businessBadge": "Empresa"
     },
     "orders": {
       "title": "Encomendas",
@@ -1347,7 +1378,9 @@
       "reservations": "Mesas",
       "noReservations": "Nenhuma mesa a seguir.",
       "details": "Detalhes",
-      "guests": "pess."
+      "guests": "pess.",
+      "paid": "Paga",
+      "unpaid": "Por pagar"
     },
     "menu": "Menu"
   }

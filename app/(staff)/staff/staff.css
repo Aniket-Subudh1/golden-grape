@@ -48,3 +48,30 @@
   background: #ffffff;
   box-shadow: 0 1px 2px rgb(26 28 32 / 0.04);
 }
+
+/* Pop-ups (new customer, edit, new count, confirmations): a bottom sheet on phones, a centred dialog from tablets up.
+   The panel is white, like the admin's dialogs. */
+.gg-staff .gg-sheet__panel {
+  background: #ffffff;
+}
+@media (min-width: 768px) {
+  .gg-staff .gg-sheet--bottom > .gg-sheet__panel {
+    top: 50%;
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    width: min(32rem, calc(100vw - 2rem));
+    max-width: none;
+    max-height: calc(100dvh - 4rem);
+    border-radius: 16px;
+    translate: -50% -50%;
+    animation-name: gg-staff-pop;
+    animation-duration: 0.2s;
+  }
+}
+@keyframes gg-staff-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}

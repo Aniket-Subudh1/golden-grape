@@ -1,6 +1,6 @@
 'use client';
 
-import { Minus, Plus, Trash2, UserRound, X } from 'lucide-react';
+import { Minus, Plus, Trash2, UserPlus } from 'lucide-react';
 import { useEffect, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,8 @@ import { interpolate, type Locale } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { lookupBarcode, searchItems, type ScanCard } from '@/modules/catalogue/actions';
 import { placeStaffSale, quoteStaffSale } from '@/modules/sales/actions';
-import { CustomerForm, type CustomerTexts, type PickedCustomer } from './customer-form';
+import type { CustomerTexts, PickedCustomer } from './customer-form';
+import { CustomerRow, CustomerSheet } from './customers-screen';
 import { CustomerSearch } from './customer-search';
 import { ScanField, type ScanTexts } from './scan-field';
 
@@ -23,6 +24,7 @@ type Texts = {
   cancel: string;
   search: { search: string; placeholder: string; none: string };
   form: CustomerTexts;
+  badges: { privateBadge: string; businessBadge: string };
   items: string;
   noItems: string;
   results: string;
@@ -158,71 +160,55 @@ export function SaleScreen({
         <section className="space-y-3">
           <h2 className="eyebrow text-ink/60">{t.customer}</h2>
           {customer ? (
-            <div
-              className="border-gold-deep/40 flex items-center gap-3 rounded-xl border bg-white px-4 py-3"
-              data-testid="sale-customer"
-            >
-              <UserRound className="text-gold-deep h-5 w-5" />
-              <span className="min-w-0 flex-1">
-                <span className="block">{customer.company || customer.name}</span>
-                <span className="text-ink/55 text-xs">
-                  {[customer.company ? customer.name : null, customer.phone].filter(Boolean).join(' · ')}
-                </span>
-              </span>
-              <button
-                type="button"
-                onClick={() => setCustomer(null)}
-                className="text-gold-deep text-sm font-medium hover:underline"
-              >
-                {t.change}
-              </button>
-            </div>
-          ) : creating ? (
-            <div className="gg-card p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <h3 className="font-serif text-xl">{t.newCustomer}</h3>
-                <button
-                  type="button"
-                  aria-label={t.cancel}
-                  onClick={() => setCreating(false)}
-                  className="grid h-9 w-9 place-items-center rounded-full"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <CustomerForm
-                t={t.form}
-                messages={messages}
-                onDone={(c) => {
-                  setCustomer(c as PickedCustomer);
-                  setCreating(false);
-                }}
+            <div className="gg-card border-gold-deep/40 bg-champagne/40 px-4 py-3" data-testid="sale-customer">
+              <CustomerRow
+                c={customer}
+                t={t.badges}
+                trailing={
+                  <button
+                    type="button"
+                    onClick={() => setCustomer(null)}
+                    className="text-gold-deep shrink-0 text-sm font-medium hover:underline"
+                  >
+                    {t.change}
+                  </button>
+                }
               />
             </div>
           ) : (
-            <>
-              <CustomerSearch
-                t={t.search}
-                render={(c) => (
-                  <button
-                    type="button"
-                    onClick={() => setCustomer(c)}
-                    className="gg-card flex w-full items-center justify-between px-4 py-3 text-left"
-                  >
-                    <span>
-                      <span className="block">{c.company || c.name}</span>
-                      <span className="text-ink/55 text-xs">
-                        {[c.company ? c.name : null, c.phone].filter(Boolean).join(' · ')}
-                      </span>
-                    </span>
-                  </button>
-                )}
-              />
-              <Button type="button" variant="outline" className="w-full" onClick={() => setCreating(true)}>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+              <div className="min-w-0 flex-1">
+                <CustomerSearch
+                  t={t.search}
+                  render={(c) => (
+                    <button
+                      type="button"
+                      onClick={() => setCustomer(c)}
+                      className="gg-card w-full px-4 py-3 transition hover:shadow-md"
+                    >
+                      <CustomerRow c={c} t={t.badges} />
+                    </button>
+                  )}
+                />
+              </div>
+              <Button type="button" variant="outline" className="h-12 sm:mt-[1.6rem]" onClick={() => setCreating(true)}>
+                <UserPlus className="h-4 w-4" />
                 {t.newCustomer}
               </Button>
-            </>
+            </div>
           )}
+          <CustomerSheet
+            open={creating}
+            onOpenChange={setCreating}
+            title={t.newCustomer}
+            closeLabel={t.cancel}
+            t={t.form}
+            messages={messages}
+            onDone={(c) => {
+              setCustomer(c as PickedCustomer);
+              setCreating(false);
+            }}
+          />
         </section>
 
         <section className="space-y-3">

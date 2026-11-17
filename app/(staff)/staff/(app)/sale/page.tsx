@@ -19,7 +19,7 @@ export default async function SalePage({ searchParams }: PageProps<'/staff/sale'
       <SaleScreen
         locale={locale}
         initial={initial}
-        t={{ ...t.sale, scan: t.scan, search: t.customers.search, form: t.customers.form }}
+        t={{ ...t.sale, scan: t.scan, search: t.customers.search, form: t.customers.form, badges: t.customers }}
         messages={{ error: dict.form.error, fields: { ...dict.form.fields, ...dict.auth.errors } }}
       />
     </StaffPage>

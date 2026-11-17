@@ -1224,7 +1224,11 @@
       "open": "In progress",
       "none": "No count in progress.",
       "untitled": "Untitled count",
-      "lines": "{{n}} item(s)"
+      "lines": "{{n}} item(s)",
+      "history": "Posted",
+      "noHistory": "No count posted yet.",
+      "hint": "Start a count for a shelf or the whole cellar, then scan every bottle.",
+      "by": "by {{name}}"
     },
     "countScreen": {
       "empty": "Scan the first item counted.",
@@ -1243,13 +1247,21 @@
       "postError": "Could not post. Try again.",
       "emptyCount": "Add at least one counted item before posting.",
       "closed": "This count has already been posted.",
-      "qty": "Quantity"
+      "qty": "Quantity",
+      "items": "{{n}} item(s)",
+      "units": "{{n}} bottle(s) counted",
+      "hint": "Scan each bottle. A box’s barcode adds all its bottles. Saved as you go."
     },
     "receivePage": {
       "title": "Receive goods",
       "none": "No purchase order waiting. Set an order to “Ordered” in the back office to receive it here.",
       "partly": "partly received",
-      "remaining": "{{n}} remaining"
+      "remaining": "{{n}} remaining",
+      "progress": "{{received}} / {{ordered}} received",
+      "late": "Late",
+      "today": "Today",
+      "due": "Due {{date}}",
+      "noDate": "No date"
     },
     "receiveScreen": {
       "ordered": "Ordered: {{n}}",
@@ -1269,7 +1281,14 @@
       "doneReceived": "The order is fully received. Stock is up to date.",
       "donePartly": "Partly received: the rest can be received later. Stock is up to date.",
       "back": "Back to the orders",
-      "qty": "Quantity received"
+      "qty": "Quantity received",
+      "hint": "Scan each box or bottle as you unpack it, or use − and +. Then confirm the receipt.",
+      "all": "All",
+      "already": "Already received: {{n}}",
+      "complete": "Complete",
+      "toReceive": "{{n}} to receive now",
+      "bottle": "Bottle",
+      "progress": "{{done}} of {{total}} lines complete"
     },
     "reorder": {
       "title": "To reorder",
@@ -1280,7 +1299,15 @@
       "units": "unit(s)",
       "create": "Draft order",
       "creating": "Creating…",
-      "error": "The order could not be created."
+      "error": "The order could not be created.",
+      "withSupplier": "By supplier",
+      "withoutSupplier": "No supplier",
+      "products": "{{n}} product(s)",
+      "estimate": "About {{amount}}",
+      "noSupplierHint": "These items have no supplier price yet. Add one in the back office to order them.",
+      "addPrice": "Add a supplier price",
+      "suggested": "Suggested",
+      "level": "Level {{n}}"
     },
     "sale": {
       "title": "Sale",
@@ -1338,7 +1365,11 @@
       "edit": "Edit",
       "noEmail": "No e-mail",
       "orders": "Latest orders",
-      "noOrders": "No orders."
+      "noOrders": "No orders.",
+      "recent": "Recent customers",
+      "noCustomers": "No customers yet.",
+      "privateBadge": "Private",
+      "businessBadge": "Business"
     },
     "orders": {
       "title": "Orders",
@@ -1347,7 +1378,9 @@
       "reservations": "Tables",
       "noReservations": "No upcoming tables.",
       "details": "Details",
-      "guests": "guests"
+      "guests": "guests",
+      "paid": "Paid",
+      "unpaid": "To pay"
     },
     "menu": "Menu"
   }

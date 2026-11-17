@@ -1,10 +1,11 @@
 'use client';
 
-import { Minus, Plus } from 'lucide-react';
+import { Check, CheckCheck, Info, Minus, Package, PackageCheck, Plus, Wine } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/cn';
 import { interpolate } from '@/lib/i18n';
 import { lookupBarcode } from '@/modules/catalogue/actions';
 import { receivePurchase } from '@/modules/purchasing/actions';
@@ -31,6 +32,13 @@ type Texts = {
   donePartly: string;
   back: string;
   qty: string;
+  hint: string;
+  all: string;
+  already: string;
+  complete: string;
+  toReceive: string;
+  bottle: string;
+  progress: string;
 };
 
 type Row = {
@@ -124,7 +132,10 @@ export function ReceiveScreen({ order, manager, t }: { order: OrderToReceive; ma
   if (done) {
     return (
       <div className="gg-card space-y-4 p-6 text-center">
-        <h2 className="font-serif text-2xl">{t.doneTitle}</h2>
+        <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-emerald-50 text-emerald-700">
+          <Check className="h-7 w-7" />
+        </span>
+        <h2 className="text-xl">{t.doneTitle}</h2>
         <p className="text-ink/70 text-sm">{done.status === 'received' ? t.doneReceived : t.donePartly}</p>
         <ul className="text-left text-sm">
           {rows
@@ -143,65 +154,132 @@ export function ReceiveScreen({ order, manager, t }: { order: OrderToReceive; ma
     );
   }
 
+  const left = (r: Row) => Math.max(0, r.ordered - r.received);
+  const complete = (r: Row) => !r.extra && r.received + r.now >= r.ordered;
+  const doneLines = rows.filter(complete).length;
+  const units = rows.reduce((sum, r) => sum + r.now, 0);
+  const regular = rows.filter((r) => !r.extra).length;
+
   return (
     <div className="space-y-4">
+      <p className="flex items-start gap-3 rounded-xl bg-sky-50 px-4 py-3 text-sm text-sky-900 ring-1 ring-sky-200 ring-inset">
+        <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+        {t.hint}
+      </p>
       <ScanField onScan={onScan} t={t.scan} busy={pending} />
-      <ul className="divide-border gg-card divide-y">
-        {rows.map((r) => (
-          <li key={r.key} className="space-y-2 px-3 py-3" data-line={r.key}>
-            <div className="flex items-center gap-3">
-              <div className="min-w-0 flex-1 text-sm">
-                <p>{r.unitLabel ? `${r.name} (${r.unitLabel})` : r.name}</p>
-                <p className="text-ink/55 text-xs">
-                  {r.extra
-                    ? t.extra
-                    : `${interpolate(t.ordered, { n: r.ordered })} · ${interpolate(t.remaining, { n: Math.max(0, r.ordered - r.received) })}`}
-                </p>
+      <div className="gg-card space-y-2 px-4 py-3">
+        <div className="flex items-center justify-between gap-3 text-sm">
+          <span className="font-semibold">{interpolate(t.progress, { done: doneLines, total: regular })}</span>
+          <span className="text-ink/60 tabular-nums">{interpolate(t.toReceive, { n: units })}</span>
+        </div>
+        <div className="h-2 overflow-hidden rounded-full bg-[#e7ecf3]">
+          <div
+            className="h-full rounded-full bg-emerald-500 transition-all"
+            style={{ width: `${regular ? Math.round((doneLines / regular) * 100) : 0}%` }}
+          />
+        </div>
+      </div>
+      <ul className="space-y-2">
+        {rows.map((r) => {
+          const ok = complete(r);
+          const Icon = r.unit ? Package : Wine;
+          return (
+            <li
+              key={r.key}
+              data-line={r.key}
+              className={cn('gg-card space-y-3 p-3 transition sm:p-4', ok && 'border-emerald-300 bg-emerald-50/40')}
+            >
+              <div className="flex items-start gap-3">
+                <span
+                  className={cn(
+                    'grid h-10 w-10 shrink-0 place-items-center rounded-[10px]',
+                    ok ? 'bg-emerald-100 text-emerald-700' : 'bg-champagne text-gold-deep',
+                  )}
+                >
+                  {ok ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium">{r.name}</p>
+                  <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                    <span className="text-ink/70 rounded-full bg-[#e7ecf3] px-2 py-0.5 font-medium">
+                      {r.unitLabel ?? t.bottle}
+                    </span>
+                    <span className="text-ink/55">
+                      {r.extra
+                        ? t.extra
+                        : [
+                            interpolate(t.ordered, { n: r.ordered }),
+                            interpolate(t.already, { n: r.received }),
+                            interpolate(t.remaining, { n: left(r) }),
+                          ].join(' · ')}
+                    </span>
+                  </p>
+                </div>
+                {ok && (
+                  <span className="shrink-0 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
+                    {t.complete}
+                  </span>
+                )}
               </div>
-              <button
-                type="button"
-                aria-label="−"
-                onClick={() => bump(r.key, -1)}
-                className="border-border grid h-11 w-11 place-items-center rounded-full border"
-              >
-                <Minus className="h-4 w-4" />
-              </button>
-              <input
-                aria-label={`${t.qty} ${r.name}`}
-                inputMode="numeric"
-                value={r.now}
-                onChange={(e) => {
-                  const n = Number(e.target.value.replace(/\D/g, '')) || 0;
-                  setRows((prev) => prev.map((x) => (x.key === r.key ? { ...x, now: n } : x)));
-                }}
-                className="border-border h-11 w-14 rounded-lg border bg-white text-center tabular-nums"
-              />
-              <button
-                type="button"
-                aria-label="+"
-                onClick={() => bump(r.key, 1)}
-                className="border-border grid h-11 w-11 place-items-center rounded-full border"
-              >
-                <Plus className="h-4 w-4" />
-              </button>
-            </div>
-            {over(r) && (
-              <input
-                aria-label={`${t.reason} ${r.name}`}
-                placeholder={t.reason}
-                value={r.reason}
-                onChange={(e) =>
-                  setRows((prev) => prev.map((x) => (x.key === r.key ? { ...x, reason: e.target.value } : x)))
-                }
-                className="h-11 w-full rounded-lg border border-amber-300 bg-amber-50/70 px-3 text-sm"
-              />
-            )}
-          </li>
-        ))}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  aria-label="−"
+                  onClick={() => bump(r.key, -1)}
+                  className="border-border hover:border-ink grid h-11 w-11 shrink-0 place-items-center rounded-full border bg-white transition"
+                >
+                  <Minus className="h-4 w-4" />
+                </button>
+                <input
+                  aria-label={`${t.qty} ${r.name}`}
+                  inputMode="numeric"
+                  value={r.now}
+                  onChange={(e) => {
+                    const n = Number(e.target.value.replace(/\D/g, '')) || 0;
+                    setRows((prev) => prev.map((x) => (x.key === r.key ? { ...x, now: n } : x)));
+                  }}
+                  className="border-border focus:border-gold-deep h-11 w-16 shrink-0 rounded-lg border bg-white text-center text-base font-semibold tabular-nums outline-none"
+                />
+                <button
+                  type="button"
+                  aria-label="+"
+                  onClick={() => bump(r.key, 1)}
+                  className="border-border hover:border-ink grid h-11 w-11 shrink-0 place-items-center rounded-full border bg-white transition"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+                {!r.extra && left(r) > 0 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="border-border ml-auto"
+                    onClick={() => setRows((prev) => prev.map((x) => (x.key === r.key ? { ...x, now: left(x) } : x)))}
+                  >
+                    <CheckCheck className="h-4 w-4" />
+                    {t.all} ({left(r)})
+                  </Button>
+                )}
+              </div>
+              {over(r) && (
+                <input
+                  aria-label={`${t.reason} ${r.name}`}
+                  placeholder={t.reason}
+                  value={r.reason}
+                  onChange={(e) =>
+                    setRows((prev) => prev.map((x) => (x.key === r.key ? { ...x, reason: e.target.value } : x)))
+                  }
+                  className="h-11 w-full rounded-lg border border-amber-300 bg-amber-50/70 px-3 text-sm"
+                />
+              )}
+            </li>
+          );
+        })}
       </ul>
-      <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] pt-2">
-        <Button type="button" onClick={confirm} disabled={pending} className="w-full shadow-lg">
-          {pending ? t.confirming : t.confirm}
+      <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] pt-2 md:bottom-4">
+        <Button type="button" onClick={confirm} disabled={pending || units === 0} className="h-12 w-full shadow-lg">
+          <PackageCheck className="h-4 w-4" />
+          {pending ? t.confirming : units > 0 ? `${t.confirm} · ${interpolate(t.toReceive, { n: units })}` : t.confirm}
         </Button>
       </div>
     </div>

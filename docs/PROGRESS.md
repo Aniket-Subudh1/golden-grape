@@ -75,6 +75,13 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-17 · Staff app UX pass: pop-ups, tabs, guided receiving (owner request)
+
+- **Asked:** new customer as a pop-up (Sale, Customers), Orders in two tabs with icon buttons and better cards, a friendlier Customers screen, a Receive screen that explains itself, tabs on Count and Reorder.
+- **Built:** see 05 §5 "UX pass". Services: `countsBy(payload, 'open' | 'posted')` (replaces `openCounts`, adds bottles counted), `openPurchaseOrders` adds `ordered`. The receive page's title falls back to the order number when the supplier is missing. Texts in the 4 dictionaries (`staff.customers.*`, `countPage.*`, `countScreen.*`, `receivePage.*`, `receiveScreen.*`, `reorder.*`, `orders.paid|unpaid`).
+- **Bug found by the walk-through and fixed:** a pop-up that navigated (new count, new customer) stayed open on the page left behind (Next keeps it in the DOM), so the new page ignored scans. `Sheet` now closes its dialog when unmounted or hidden, and those pop-ups close before navigating.
+- **Checked (production build):** the owner's plan + pop-ups and tabs as a walk-through on Pixel 7, iPad and 1440 px: 25/25 each. Screens on phone and laptop: no sideways scroll, no page error. check 290, int 124, build, e2e 29 passed / 4 skipped (website sheets included), `rebuild-stock --check` 0 differences.
+
 ### 2026-11-17 · Staff app redesign: the back office's look, phones, tablets and laptops (owner decision D-12)
 
 - **Why:** on a laptop or tablet the staff app was a phone column, and the website's serif and spaced capitals looked dated in a work tool. The owner chose the admin's design and a responsive app.

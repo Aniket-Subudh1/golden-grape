@@ -1,15 +1,17 @@
 'use client';
 
-import { Minus, Plus } from 'lucide-react';
+import { Check, CloudOff, Loader2, Minus, Plus, ScanBarcode } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Sheet } from '@/components/ui/sheet';
+import { cn } from '@/lib/cn';
 import { interpolate } from '@/lib/i18n';
 import { lookupBarcode } from '@/modules/catalogue/actions';
 import { postStockCount, saveStockCountLines } from '@/modules/inventory/actions';
 import { ScanField, type ScanTexts } from './scan-field';
+import { Empty } from './tabs';
 
 type Line = { variant: string; name: string; counted: number };
 type Texts = {
@@ -31,6 +33,9 @@ type Texts = {
   emptyCount: string;
   closed: string;
   qty: string;
+  items: string;
+  units: string;
+  hint: string;
 };
 
 /**
@@ -110,21 +115,46 @@ export function CountScreen({ id, initial, t }: { id: string; initial: Line[]; t
   return (
     <div className="space-y-4">
       <ScanField onScan={onScan} t={t.scan} />
-      <p className="text-ink/55 text-right text-xs" aria-live="polite">
-        {state === 'saving' ? t.saving : state === 'error' ? t.saveError : t.saved}
-      </p>
+      <div className="gg-card flex items-center gap-4 px-4 py-3 text-sm">
+        <span className="min-w-0 flex-1">
+          <span className="block font-semibold tabular-nums">{interpolate(t.items, { n: lines.length })}</span>
+          <span className="text-ink/55 text-xs tabular-nums">
+            {interpolate(t.units, { n: lines.reduce((sum, l) => sum + l.counted, 0) })}
+          </span>
+        </span>
+        <span
+          aria-live="polite"
+          className={cn(
+            'inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium',
+            state === 'error'
+              ? 'bg-red-50 text-red-700'
+              : state === 'saving'
+                ? 'text-ink/60 bg-[#e7ecf3]'
+                : 'bg-emerald-50 text-emerald-700',
+          )}
+        >
+          {state === 'error' ? (
+            <CloudOff className="h-3.5 w-3.5" />
+          ) : state === 'saving' ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Check className="h-3.5 w-3.5" />
+          )}
+          {state === 'saving' ? t.saving : state === 'error' ? t.saveError : t.saved}
+        </span>
+      </div>
       {lines.length === 0 ? (
-        <p className="border-border text-ink/55 rounded-xl border border-dashed p-6 text-center text-sm">{t.empty}</p>
+        <Empty icon={<ScanBarcode />} text={t.hint} />
       ) : (
         <ul className="divide-border gg-card divide-y">
           {lines.map((line) => (
-            <li key={line.variant} className="flex items-center gap-3 px-3 py-2">
-              <span className="min-w-0 flex-1 text-sm">{line.name}</span>
+            <li key={line.variant} className="flex items-center gap-2 px-3 py-2.5 sm:gap-3">
+              <span className="min-w-0 flex-1 text-sm font-medium">{line.name}</span>
               <button
                 type="button"
                 aria-label="−"
                 onClick={() => setQty(line.variant, line.counted - 1)}
-                className="border-border grid h-11 w-11 place-items-center rounded-full border"
+                className="border-border hover:border-ink grid h-11 w-11 shrink-0 place-items-center rounded-full border bg-white transition"
               >
                 <Minus className="h-4 w-4" />
               </button>
@@ -133,13 +163,13 @@ export function CountScreen({ id, initial, t }: { id: string; initial: Line[]; t
                 inputMode="numeric"
                 value={line.counted}
                 onChange={(e) => setQty(line.variant, Number(e.target.value.replace(/\D/g, '')) || 0)}
-                className="border-border h-11 w-16 rounded-lg border bg-white text-center tabular-nums"
+                className="border-border focus:border-gold-deep h-11 w-16 shrink-0 rounded-lg border bg-white text-center text-base font-semibold tabular-nums outline-none"
               />
               <button
                 type="button"
                 aria-label="+"
                 onClick={() => setQty(line.variant, line.counted + 1)}
-                className="border-border grid h-11 w-11 place-items-center rounded-full border"
+                className="border-border hover:border-ink grid h-11 w-11 shrink-0 place-items-center rounded-full border bg-white transition"
               >
                 <Plus className="h-4 w-4" />
               </button>
@@ -147,7 +177,7 @@ export function CountScreen({ id, initial, t }: { id: string; initial: Line[]; t
           ))}
         </ul>
       )}
-      <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] pt-2">
+      <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] pt-2 md:bottom-4">
         <Button
           type="button"
           onClick={() => setAsking(true)}
@@ -159,7 +189,7 @@ export function CountScreen({ id, initial, t }: { id: string; initial: Line[]; t
       </div>
       <Sheet open={asking} onOpenChange={setAsking} label={t.confirmTitle} closeLabel={t.cancel} variant="bottom">
         <div className="space-y-4 p-5 pt-6">
-          <h2 className="font-serif text-2xl">{t.confirmTitle}</h2>
+          <h2 className="pr-10 text-xl">{t.confirmTitle}</h2>
           <p className="text-ink/70 text-sm">{t.confirm}</p>
           <div className="flex gap-2">
             <Button type="button" variant="outline" className="flex-1" onClick={() => setAsking(false)}>

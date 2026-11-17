@@ -1224,7 +1224,11 @@
       "open": "En cours",
       "none": "Aucun inventaire en cours.",
       "untitled": "Inventaire sans nom",
-      "lines": "{{n}} article(s)"
+      "lines": "{{n}} article(s)",
+      "history": "Validés",
+      "noHistory": "Aucun inventaire validé pour l’instant.",
+      "hint": "Lancez un inventaire pour une étagère ou toute la cave, puis scannez chaque bouteille.",
+      "by": "par {{name}}"
     },
     "countScreen": {
       "empty": "Scannez le premier article compté.",
@@ -1243,13 +1247,21 @@
       "postError": "Impossible de valider. Réessayez.",
       "emptyCount": "Ajoutez au moins un article compté avant de valider.",
       "closed": "Cet inventaire a déjà été validé.",
-      "qty": "Quantité"
+      "qty": "Quantité",
+      "items": "{{n}} article(s)",
+      "units": "{{n}} bouteille(s) comptée(s)",
+      "hint": "Scannez chaque bouteille. Le code d’un carton ajoute toutes ses bouteilles. Enregistré au fur et à mesure."
     },
     "receivePage": {
       "title": "Réception",
       "none": "Aucune commande fournisseur en attente. Passez une commande en « Commandé » dans l’espace gestion pour la réceptionner ici.",
       "partly": "reçue en partie",
-      "remaining": "{{n}} restant(s)"
+      "remaining": "{{n}} restant(s)",
+      "progress": "{{received}} / {{ordered}} reçus",
+      "late": "En retard",
+      "today": "Aujourd’hui",
+      "due": "Prévu le {{date}}",
+      "noDate": "Sans date"
     },
     "receiveScreen": {
       "ordered": "Commandé : {{n}}",
@@ -1269,7 +1281,14 @@
       "doneReceived": "La commande est entièrement reçue. Le stock est à jour.",
       "donePartly": "Reçue en partie : le reste pourra être réceptionné plus tard. Le stock est à jour.",
       "back": "Retour aux commandes",
-      "qty": "Quantité reçue"
+      "qty": "Quantité reçue",
+      "hint": "Scannez chaque carton ou bouteille au déballage, ou utilisez − et +. Puis validez la réception.",
+      "all": "Tout",
+      "already": "Déjà reçu : {{n}}",
+      "complete": "Complet",
+      "toReceive": "{{n}} à recevoir maintenant",
+      "bottle": "Bouteille",
+      "progress": "{{done}} ligne(s) complète(s) sur {{total}}"
     },
     "reorder": {
       "title": "À recommander",
@@ -1280,7 +1299,15 @@
       "units": "unité(s)",
       "create": "Commande brouillon",
       "creating": "Création…",
-      "error": "La commande n’a pas pu être créée."
+      "error": "La commande n’a pas pu être créée.",
+      "withSupplier": "Par fournisseur",
+      "withoutSupplier": "Sans fournisseur",
+      "products": "{{n}} produit(s)",
+      "estimate": "Environ {{amount}}",
+      "noSupplierHint": "Ces articles n’ont pas encore de prix fournisseur. Ajoutez-en un dans l’espace gestion pour les commander.",
+      "addPrice": "Ajouter un prix d’achat",
+      "suggested": "Suggéré",
+      "level": "Seuil {{n}}"
     },
     "sale": {
       "title": "Vente",
@@ -1338,7 +1365,11 @@
       "edit": "Modifier",
       "noEmail": "Pas d’e-mail",
       "orders": "Dernières commandes",
-      "noOrders": "Aucune commande."
+      "noOrders": "Aucune commande.",
+      "recent": "Clients récents",
+      "noCustomers": "Aucun client pour l’instant.",
+      "privateBadge": "Particulier",
+      "businessBadge": "Entreprise"
     },
     "orders": {
       "title": "Commandes",
@@ -1347,7 +1378,9 @@
       "reservations": "Tables",
       "noReservations": "Aucune table à venir.",
       "details": "Détails",
-      "guests": "pers."
+      "guests": "pers.",
+      "paid": "Payée",
+      "unpaid": "À payer"
     },
     "menu": "Menu"
   }

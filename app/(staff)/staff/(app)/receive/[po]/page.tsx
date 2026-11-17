@@ -17,7 +17,11 @@ export default async function ReceivePage({ params }: PageProps<'/staff/receive/
   if (!order) notFound();
   if (!OPEN.includes(order.status)) redirect('/staff/receive');
   return (
-    <StaffPage title={`${order.supplier} · ${order.number}`} back={{ href: '/staff/receive', label: t.back }}>
+    <StaffPage
+      title={order.supplier || order.number}
+      subtitle={order.supplier ? order.number : undefined}
+      back={{ href: '/staff/receive', label: t.back }}
+    >
       <ReceiveScreen order={order} manager={hasRole(user, ['manager'])} t={{ ...t.receiveScreen, scan: t.scan }} />
     </StaffPage>
   );
