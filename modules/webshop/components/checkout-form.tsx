@@ -20,6 +20,7 @@ import type { AddressSuggestion } from '../address';
 import { PAYMENT_CHOICES, type PaymentChoice } from '@/modules/sales/order-states';
 import type { SlotDay } from '@/modules/sales/service';
 import { type CartMode, useCart } from '../cart';
+import { DiscountRows, PaymentRows, PriceExtras } from './price-extras';
 import { CallUs, SlotPicker } from './slot-picker';
 
 // The checkout (M2.3 T5): one page for pickup, delivery and a table with an optional pre-order, on one slot engine.
@@ -43,7 +44,7 @@ type Props = {
   initialMode: CartMode | null;
   customer: CheckoutCustomer;
   t: Dictionary['checkout'];
-  cartT: Pick<Dictionary['cart'], 'modes' | 'hints' | 'minus' | 'plus' | 'toShop' | 'toCounter' | 'vatIncluded' | 'tableShopNote'>;
+  cartT: Pick<Dictionary['cart'], 'modes' | 'hints' | 'minus' | 'plus' | 'toShop' | 'toCounter' | 'vatIncluded' | 'tableShopNote' | 'extras'>;
   formT: Dictionary['form'];
   signInHref: string;
   /** The shop's phone (Shop details), offered when nothing can be booked online. */
@@ -285,7 +286,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
     const id = ++asked.current;
     const timer = window.setTimeout(async () => {
       setPricing(true);
-      const result = await checkoutQuote(null, { locale, mode, lines, postalCode: mode === 'delivery' ? postalCode : undefined });
+      const result = await checkoutQuote(null, { locale, mode, lines, postalCode: mode === 'delivery' ? postalCode : undefined, code: cart.extras.code || undefined, useLoyalty: cart.extras.useLoyalty, giftCards: cart.extras.giftCards });
       if (id !== asked.current) return;
       setPricing(false);
       if (result.ok) setSummary(result.data);
@@ -293,7 +294,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
     return () => window.clearTimeout(timer);
     // `lines` is derived from these.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, items, mode, preorder, postalCode, locale, cart.quote]);
+  }, [ready, items, mode, preorder, postalCode, locale, cart.quote, cart.extras]);
 
   const payments = PAYMENT_CHOICES[mode];
   const payment = payments.includes(choice) ? choice : payments[0];
@@ -380,6 +381,9 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
     withLines && lines.length === 0 ? t.preorder.empty : null,
     outside ? t.zone.outside : null,
     zone?.belowMinimum ? interpolate(t.zone.belowMin, { missing: money(zone.minOrderCents - (quote?.subtotalCents ?? 0)), min: money(zone.minOrderCents) }) : null,
+    // A code or gift card refused (M3.2): remove it or fix it before ordering; the reason is the cart's.
+    quote?.codeRejected ? cartT.extras.reasons[quote.codeRejected as keyof typeof cartT.extras.reasons] : null,
+    quote?.giftCardsRejected[0] ? cartT.extras.reasons[quote.giftCardsRejected[0].reason as keyof typeof cartT.extras.reasons] : null,
   ].filter((b): b is string => Boolean(b));
   const notes = [...blockers, ...(missing.length > 0 ? [interpolate(t.missing, { fields: missing.map((m) => m.label).join(', ') })] : [])];
   const goToFirstMissing = () => {
@@ -414,6 +418,9 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
         <input type="hidden" name="lines" value={JSON.stringify(lines.map(({ variant, unit, qty }) => ({ variant, unit, qty })))} />
         <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="payment" value={payment} />
+        {cart.extras.code && <input type="hidden" name="code" value={cart.extras.code} />}
+        {cart.extras.useLoyalty && <input type="hidden" name="useLoyalty" value="on" />}
+        {cart.extras.giftCards.length > 0 && <input type="hidden" name="giftCards" value={cart.extras.giftCards.join(',')} />}
         {mode === 'table' && <input type="hidden" name="guests" value={guests} />}
         {mode === 'table' && withPreorder && <input type="hidden" name="preorder" value="on" />}
         <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
@@ -668,12 +675,16 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                       <span className="block truncate text-sm">{l.name}</span>
                       {l.detail && <span className="block truncate text-xs text-ink/50">{l.detail}</span>}
                     </span>
-                    <span className="text-sm tabular-nums">{money(l.totalCents)}</span>
+                    <span className="text-right text-sm tabular-nums">
+                      {l.promoCents > 0 && <s className="block text-xs text-ink/40">{money(l.unitPriceCents * l.qty)}</s>}
+                      <span className={l.promoCents > 0 ? 'text-gold-deep' : undefined}>{money(l.totalCents)}</span>
+                    </span>
                   </li>
                 ))}
               </ul>
             )}
 
+            {quote && quote.lines.length > 0 && <PriceExtras quote={quote} extras={cart.extras} setExtras={cart.setExtras} t={cartT.extras} locale={locale} />}
             <dl className="space-y-2 border-t border-border/70 pt-5 text-sm">
               <div className="flex justify-between gap-4">
                 <dt className="text-ink/60">{t.when}</dt>
@@ -690,6 +701,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                     <dt className="text-ink/60">{t.subtotal}</dt>
                     <dd className="tabular-nums">{money(quote.subtotalCents)}</dd>
                   </div>
+                  <DiscountRows quote={quote} t={cartT.extras} locale={locale} />
                   {mode === 'delivery' && (
                     <div className="flex justify-between gap-4">
                       <dt className="text-ink/60">{t.delivery}</dt>
@@ -714,6 +726,9 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                     </div>
                   ))}
                 </dl>
+                <div className="mt-3">
+                  <PaymentRows quote={quote} t={cartT.extras} locale={locale} />
+                </div>
               </div>
             )}
 

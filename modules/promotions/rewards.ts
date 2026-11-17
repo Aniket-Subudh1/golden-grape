@@ -64,27 +64,15 @@ const cardLedger = (tx: Tx, data: Record<string, unknown>) =>
 // ---- Pricing inputs (step 6–7 of quote) ---------------------------------------------------------------------------
 
 /** The point value and the most points this customer may use (their balance), when loyalty is on. */
-export async function loyaltyFor(
-  payload: Payload,
-  customer: { id: string } | null | undefined,
-  wanted: number | 'all' | undefined,
-) {
-  if (!customer || !wanted) return { rule: null, points: 0 };
+export async function loyaltyFor(payload: Payload, customer: { id: string } | null | undefined, wanted: number | 'all' | undefined) {
+  const none = { rule: null, points: 0, balance: 0, valueCents: 0 };
+  if (!customer) return none;
   const s = await settingsOf(payload);
-  if (!s.loyaltyOn) return { rule: null, points: 0 };
-  const doc = await payload.findByID({
-    collection: 'customers',
-    id: customer.id,
-    depth: 0,
-    overrideAccess: true,
-    disableErrors: true,
-    select: { loyaltyBalance: true },
-  });
+  if (!s.loyaltyOn) return none;
+  const doc = await payload.findByID({ collection: 'customers', id: customer.id, depth: 0, overrideAccess: true, disableErrors: true, select: { loyaltyBalance: true } });
   const balance = doc?.loyaltyBalance ?? 0;
-  return {
-    rule: { pointValueCents: s.pointValueCents },
-    points: wanted === 'all' ? balance : Math.min(balance, Math.max(0, Math.floor(wanted))),
-  };
+  const points = !wanted ? 0 : wanted === 'all' ? balance : Math.min(balance, Math.max(0, Math.floor(wanted)));
+  return { rule: { pointValueCents: s.pointValueCents }, points, balance, valueCents: s.pointValueCents };
 }
 
 /** Typed gift card codes as `quote` reads them, in the order typed; unknown codes come back apart. */

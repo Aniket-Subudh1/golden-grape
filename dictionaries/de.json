@@ -256,7 +256,40 @@
     },
     "checkout": "Zur Kasse",
     "bookTable": "Tisch reservieren",
-    "tableShopNote": "Artikel aus dem Shop werden nicht mit dem Tisch vorbestellt: Sie bleiben im Warenkorb für eine Abholung oder Lieferung."
+    "tableShopNote": "Artikel aus dem Shop werden nicht mit dem Tisch vorbestellt: Sie bleiben im Warenkorb für eine Abholung oder Lieferung.",
+    "extras": {
+      "code": "Rabattcode",
+      "codePh": "Ihr Code",
+      "apply": "Einlösen",
+      "remove": "Entfernen",
+      "codeApplied": "Code {{code}}",
+      "points": "Meine {{points}} Punkte nutzen ({{value}})",
+      "pointsUsed": "{{points}} Punkte",
+      "giftCard": "Geschenkkarte",
+      "giftCardPh": "XXXX-XXXX-XXXX-XXXX",
+      "add": "Hinzufügen",
+      "card": "Geschenkkarte ····{{last}}",
+      "toPay": "Zu zahlen",
+      "more": "Code, Geschenkkarte oder Punkte",
+      "reasons": {
+        "CODE_UNKNOWN": "Diesen Code gibt es nicht.",
+        "CODE_INACTIVE": "Dieser Code gilt im Moment nicht.",
+        "CODE_NOT_STARTED": "Dieser Code gilt noch nicht.",
+        "CODE_EXPIRED": "Dieser Code ist abgelaufen.",
+        "CODE_CHANNEL": "Dieser Code gilt hier nicht.",
+        "CODE_MIN_NOT_MET": "Ihre Bestellung erreicht den Mindestwert dieses Codes nicht.",
+        "CODE_USED_UP": "Dieser Code ist aufgebraucht.",
+        "CODE_NOT_FOR_YOU": "Dieser Code ist anderen Kunden vorbehalten.",
+        "CODE_ALREADY_USED": "Sie haben diesen Code bereits genutzt.",
+        "GIFT_CARD_UNKNOWN": "Keine Geschenkkarte mit diesem Code.",
+        "GIFT_CARD_EXPIRED": "Diese Geschenkkarte ist abgelaufen.",
+        "GIFT_CARD_EMPTY": "Diese Geschenkkarte hat kein Guthaben mehr.",
+        "GIFT_CARD_VOID": "Diese Geschenkkarte ist nicht mehr gültig.",
+        "CODE_SPENT": "Dieser Code wurde gerade aufgebraucht. Entfernen Sie ihn und versuchen Sie es erneut.",
+        "LOYALTY_SPENT": "Ihre Punkte haben sich inzwischen geändert. Bitte erneut versuchen.",
+        "GIFT_CARD_SPENT": "Diese Geschenkkarte wurde inzwischen genutzt. Bitte prüfen und erneut versuchen."
+      }
+    }
   },
   "shop": {
     "eyebrow": "Shop · Weine & Feinkost",
@@ -795,7 +828,8 @@
       "profile": "Profil",
       "addresses": "Adressen",
       "orders": "Bestellungen",
-      "quotations": "Angebote"
+      "quotations": "Angebote",
+      "rewards": "Punkte & Karten"
     },
     "edit": "Bearbeiten",
     "defaultAddress": "Standardadresse",
@@ -879,6 +913,28 @@
         "declined": "Abgelehnt",
         "expired": "Abgelaufen"
       }
+    },
+    "rewards": {
+      "title": "Meine Punkte",
+      "balance": "{{points}} Punkte",
+      "worth": "Das sind {{value}} bei Ihrer nächsten Bestellung. Gesammelt bei jeder abgeschlossenen Bestellung, {{months}} Monate gültig.",
+      "none": "Noch keine Punkte. Sie sammeln sie bei jeder abgeschlossenen Bestellung.",
+      "history": "Verlauf",
+      "types": {
+        "earn": "Gesammelt",
+        "redeem": "Eingelöst",
+        "expire": "Verfallen",
+        "adjust": "Korrektur"
+      },
+      "order": "Bestellung {{number}}",
+      "cardTitle": "Geschenkkarte prüfen",
+      "cardText": "Geben Sie den Code von der Karte oder aus ihrer E-Mail ein.",
+      "check": "Prüfen",
+      "cardBalance": "Guthaben {{balance}} · gültig bis {{date}}",
+      "cardUnknown": "Keine Geschenkkarte mit diesem Code.",
+      "cardExpired": "Diese Geschenkkarte ist abgelaufen.",
+      "cardVoid": "Diese Geschenkkarte ist nicht mehr gültig.",
+      "tooMany": "Zu viele Versuche. Bitte warten Sie ein paar Minuten."
     }
   },
   "checkout": {

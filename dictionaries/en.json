@@ -256,7 +256,40 @@
     },
     "checkout": "Checkout",
     "bookTable": "Book a table",
-    "tableShopNote": "Shop items are not pre-ordered with a table: they stay in your bag for a pickup or delivery order."
+    "tableShopNote": "Shop items are not pre-ordered with a table: they stay in your bag for a pickup or delivery order.",
+    "extras": {
+      "code": "Discount code",
+      "codePh": "Your code",
+      "apply": "Apply",
+      "remove": "Remove",
+      "codeApplied": "Code {{code}}",
+      "points": "Use my {{points}} points ({{value}})",
+      "pointsUsed": "{{points}} points",
+      "giftCard": "Gift card",
+      "giftCardPh": "XXXX-XXXX-XXXX-XXXX",
+      "add": "Add",
+      "card": "Gift card ····{{last}}",
+      "toPay": "To pay",
+      "more": "Code, gift card or points",
+      "reasons": {
+        "CODE_UNKNOWN": "This code does not exist.",
+        "CODE_INACTIVE": "This code is not valid at the moment.",
+        "CODE_NOT_STARTED": "This code is not valid yet.",
+        "CODE_EXPIRED": "This code has expired.",
+        "CODE_CHANNEL": "This code cannot be used here.",
+        "CODE_MIN_NOT_MET": "Your order does not reach this code’s minimum.",
+        "CODE_USED_UP": "This code has been used up.",
+        "CODE_NOT_FOR_YOU": "This code is reserved for other customers.",
+        "CODE_ALREADY_USED": "You have already used this code.",
+        "GIFT_CARD_UNKNOWN": "No gift card with this code.",
+        "GIFT_CARD_EXPIRED": "This gift card has expired.",
+        "GIFT_CARD_EMPTY": "This gift card has no balance left.",
+        "GIFT_CARD_VOID": "This gift card is no longer valid.",
+        "CODE_SPENT": "This code was just used up. Remove it and try again.",
+        "LOYALTY_SPENT": "Your points changed meanwhile. Please try again.",
+        "GIFT_CARD_SPENT": "This gift card was used meanwhile. Please check it and try again."
+      }
+    }
   },
   "shop": {
     "eyebrow": "Shop · Wines & Grocery",
@@ -795,7 +828,8 @@
       "profile": "Profile",
       "addresses": "Addresses",
       "orders": "Orders",
-      "quotations": "Quotations"
+      "quotations": "Quotations",
+      "rewards": "Points & cards"
     },
     "edit": "Edit",
     "defaultAddress": "Default address",
@@ -879,6 +913,28 @@
         "declined": "Declined",
         "expired": "Expired"
       }
+    },
+    "rewards": {
+      "title": "My points",
+      "balance": "{{points}} points",
+      "worth": "Worth {{value}} on your next order. Earned on every completed order, valid {{months}} months.",
+      "none": "No points yet. You earn them on every completed order.",
+      "history": "History",
+      "types": {
+        "earn": "Earned",
+        "redeem": "Used",
+        "expire": "Expired",
+        "adjust": "Correction"
+      },
+      "order": "Order {{number}}",
+      "cardTitle": "Check a gift card",
+      "cardText": "Enter the code printed on the card or in its e-mail.",
+      "check": "Check",
+      "cardBalance": "Balance {{balance}} · valid until {{date}}",
+      "cardUnknown": "No gift card with this code.",
+      "cardExpired": "This gift card has expired.",
+      "cardVoid": "This gift card is no longer valid.",
+      "tooMany": "Too many tries. Please wait a few minutes."
     }
   },
   "checkout": {

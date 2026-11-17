@@ -319,6 +319,8 @@ export async function quoteCart(
     rules: { ...rules, delivery, loyalty: loyalty.rule },
   });
   q.giftCardsRejected.push(...cards.unknown);
+  // What the customer could use: shown as "Use my 240 points (12,00 €)" when there are any.
+  const loyaltyAvailable = { points: loyalty.balance, valueCents: loyalty.valueCents };
 
   const productImages = sellable
     .map((v) => (v.product as { images?: unknown[] }).images?.[0])
@@ -353,6 +355,7 @@ export async function quoteCart(
       };
     }),
     notices,
+    loyaltyAvailable,
   };
 }
 

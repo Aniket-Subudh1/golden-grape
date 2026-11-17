@@ -9,6 +9,7 @@ import { Sheet } from '@/components/ui/sheet';
 import { cn } from '@/lib/cn';
 import { type Dictionary, interpolate, type Locale, localePath } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
+import { DiscountRows, PaymentRows, PriceExtras } from '@/modules/webshop/components/price-extras';
 import { TABLE_BOOKING } from '@/modules/sales/order-states';
 import { type CartMode, useCart } from '@/modules/webshop/cart';
 import { QtyStepper } from './qty-stepper';
@@ -27,7 +28,7 @@ const percent = (bp: number, locale: Locale) => new Intl.NumberFormat(locale, { 
  * it is forgotten on close, and the button carries it in the link (APPLUX audit 10 Nov, §1/§3).
  */
 export function CartSheet({ locale, t }: { locale: Locale; t: Dictionary['cart'] }) {
-  const { open, setOpen, mode, openMode, setMode, items, quote, pending, setQty } = useCart();
+  const { open, setOpen, mode, openMode, setMode, items, quote, pending, setQty, extras, setExtras } = useCart();
   const [picked, setPicked] = useState<CartMode | null>(null);
   const view = picked ?? openMode ?? mode;
   const lines = quote?.lines ?? [];
@@ -134,7 +135,8 @@ export function CartSheet({ locale, t }: { locale: Locale; t: Dictionary['cart']
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium tabular-nums">{formatMoney(line.totalCents, locale)}</p>
+                  {line.promoCents > 0 && <p className="text-xs text-ink/40 tabular-nums line-through">{formatMoney(line.unitPriceCents * line.qty, locale)}</p>}
+                  <p className={cn('text-sm font-medium tabular-nums', line.promoCents > 0 && 'text-gold-deep')}>{formatMoney(line.totalCents, locale)}</p>
                   <button
                     type="button"
                     onClick={() => setQty(line, 0)}
@@ -149,8 +151,10 @@ export function CartSheet({ locale, t }: { locale: Locale; t: Dictionary['cart']
 
           <footer className="space-y-3 border-t border-border/60 bg-champagne/40 px-6 py-5">
             {!quote && <div className="h-[52px] animate-pulse rounded bg-champagne/70" aria-hidden />}
+            <PriceExtras quote={quote} extras={extras} setExtras={setExtras} t={t.extras} locale={locale} />
             {quote && (
               <>
+                <DiscountRows quote={quote} t={t.extras} locale={locale} />
                 <div className="flex items-baseline justify-between">
                   <span className="eyebrow text-ink/60">{t.total}</span>
                   <span className="font-serif text-2xl tabular-nums">{formatMoney(quote.totalCents, locale)}</span>
@@ -163,6 +167,7 @@ export function CartSheet({ locale, t }: { locale: Locale; t: Dictionary['cart']
                     </div>
                   ))}
                 </dl>
+                <PaymentRows quote={quote} t={t.extras} locale={locale} />
               </>
             )}
             <Button asChild className="w-full">

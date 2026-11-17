@@ -256,7 +256,40 @@
     },
     "checkout": "Finalizar",
     "bookTable": "Reservar mesa",
-    "tableShopNote": "Os artigos da loja não são pré-encomendados com a mesa: ficam no seu saco para uma encomenda para levar ou com entrega."
+    "tableShopNote": "Os artigos da loja não são pré-encomendados com a mesa: ficam no seu saco para uma encomenda para levar ou com entrega.",
+    "extras": {
+      "code": "Código de desconto",
+      "codePh": "O seu código",
+      "apply": "Aplicar",
+      "remove": "Retirar",
+      "codeApplied": "Código {{code}}",
+      "points": "Usar os meus {{points}} pontos ({{value}})",
+      "pointsUsed": "{{points}} pontos",
+      "giftCard": "Cartão-presente",
+      "giftCardPh": "XXXX-XXXX-XXXX-XXXX",
+      "add": "Adicionar",
+      "card": "Cartão-presente ····{{last}}",
+      "toPay": "A pagar",
+      "more": "Código, cartão-presente ou pontos",
+      "reasons": {
+        "CODE_UNKNOWN": "Este código não existe.",
+        "CODE_INACTIVE": "Este código não é válido de momento.",
+        "CODE_NOT_STARTED": "Este código ainda não é válido.",
+        "CODE_EXPIRED": "Este código expirou.",
+        "CODE_CHANNEL": "Este código não se usa aqui.",
+        "CODE_MIN_NOT_MET": "A sua encomenda não atinge o mínimo deste código.",
+        "CODE_USED_UP": "Este código já foi esgotado.",
+        "CODE_NOT_FOR_YOU": "Este código está reservado a outros clientes.",
+        "CODE_ALREADY_USED": "Já usou este código.",
+        "GIFT_CARD_UNKNOWN": "Nenhum cartão-presente com este código.",
+        "GIFT_CARD_EXPIRED": "Este cartão-presente expirou.",
+        "GIFT_CARD_EMPTY": "Este cartão-presente já não tem saldo.",
+        "GIFT_CARD_VOID": "Este cartão-presente já não é válido.",
+        "CODE_SPENT": "Este código acabou de esgotar. Retire-o e tente de novo.",
+        "LOYALTY_SPENT": "Os seus pontos mudaram entretanto. Tente de novo.",
+        "GIFT_CARD_SPENT": "Este cartão-presente foi usado entretanto. Verifique-o e tente de novo."
+      }
+    }
   },
   "shop": {
     "eyebrow": "Loja · Vinhos & Mercearia",
@@ -795,7 +828,8 @@
       "profile": "Perfil",
       "addresses": "Moradas",
       "orders": "Encomendas",
-      "quotations": "Orçamentos"
+      "quotations": "Orçamentos",
+      "rewards": "Pontos e cartões"
     },
     "edit": "Editar",
     "defaultAddress": "Morada predefinida",
@@ -879,6 +913,28 @@
         "declined": "Recusado",
         "expired": "Expirado"
       }
+    },
+    "rewards": {
+      "title": "Os meus pontos",
+      "balance": "{{points}} pontos",
+      "worth": "Ou seja {{value}} na sua próxima encomenda. Ganhos em cada encomenda concluída, válidos {{months}} meses.",
+      "none": "Ainda sem pontos. Ganha-os em cada encomenda concluída.",
+      "history": "Histórico",
+      "types": {
+        "earn": "Ganhos",
+        "redeem": "Usados",
+        "expire": "Expirados",
+        "adjust": "Correção"
+      },
+      "order": "Encomenda {{number}}",
+      "cardTitle": "Verificar um cartão-presente",
+      "cardText": "Introduza o código impresso no cartão ou no seu e-mail.",
+      "check": "Verificar",
+      "cardBalance": "Saldo {{balance}} · válido até {{date}}",
+      "cardUnknown": "Nenhum cartão-presente com este código.",
+      "cardExpired": "Este cartão-presente expirou.",
+      "cardVoid": "Este cartão-presente já não é válido.",
+      "tooMany": "Demasiadas tentativas. Aguarde alguns minutos."
     }
   },
   "checkout": {

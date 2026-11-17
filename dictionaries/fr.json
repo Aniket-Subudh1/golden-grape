@@ -256,7 +256,40 @@
     },
     "checkout": "Commander",
     "bookTable": "Réserver une table",
-    "tableShopNote": "Les articles de la boutique ne sont pas pré-commandés avec une table : ils restent dans votre panier pour une commande à emporter ou en livraison."
+    "tableShopNote": "Les articles de la boutique ne sont pas pré-commandés avec une table : ils restent dans votre panier pour une commande à emporter ou en livraison.",
+    "extras": {
+      "code": "Code de réduction",
+      "codePh": "Votre code",
+      "apply": "Appliquer",
+      "remove": "Retirer",
+      "codeApplied": "Code {{code}}",
+      "points": "Utiliser mes {{points}} points ({{value}})",
+      "pointsUsed": "{{points}} points",
+      "giftCard": "Carte cadeau",
+      "giftCardPh": "XXXX-XXXX-XXXX-XXXX",
+      "add": "Ajouter",
+      "card": "Carte cadeau ····{{last}}",
+      "toPay": "À payer",
+      "more": "Code, carte cadeau ou points",
+      "reasons": {
+        "CODE_UNKNOWN": "Ce code n’existe pas.",
+        "CODE_INACTIVE": "Ce code n’est pas valable en ce moment.",
+        "CODE_NOT_STARTED": "Ce code n’est pas encore valable.",
+        "CODE_EXPIRED": "Ce code a expiré.",
+        "CODE_CHANNEL": "Ce code ne s’utilise pas ici.",
+        "CODE_MIN_NOT_MET": "Votre commande n’atteint pas le minimum de ce code.",
+        "CODE_USED_UP": "Ce code a déjà été entièrement utilisé.",
+        "CODE_NOT_FOR_YOU": "Ce code est réservé à d’autres clients.",
+        "CODE_ALREADY_USED": "Vous avez déjà utilisé ce code.",
+        "GIFT_CARD_UNKNOWN": "Aucune carte cadeau avec ce code.",
+        "GIFT_CARD_EXPIRED": "Cette carte cadeau a expiré.",
+        "GIFT_CARD_EMPTY": "Cette carte cadeau n’a plus de solde.",
+        "GIFT_CARD_VOID": "Cette carte cadeau n’est plus valable.",
+        "CODE_SPENT": "Ce code vient d’être épuisé. Retirez-le et réessayez.",
+        "LOYALTY_SPENT": "Vos points ont changé entre-temps. Réessayez.",
+        "GIFT_CARD_SPENT": "Cette carte cadeau vient d’être utilisée. Vérifiez-la et réessayez."
+      }
+    }
   },
   "shop": {
     "eyebrow": "Boutique · Vins & Épicerie",
@@ -795,7 +828,8 @@
       "profile": "Profil",
       "addresses": "Adresses",
       "orders": "Commandes",
-      "quotations": "Devis"
+      "quotations": "Devis",
+      "rewards": "Points et cartes"
     },
     "edit": "Modifier",
     "defaultAddress": "Adresse par défaut",
@@ -879,6 +913,28 @@
         "declined": "Refusé",
         "expired": "Expiré"
       }
+    },
+    "rewards": {
+      "title": "Mes points",
+      "balance": "{{points}} points",
+      "worth": "Soit {{value}} sur votre prochaine commande. Gagnés à chaque commande terminée, valables {{months}} mois.",
+      "none": "Pas encore de points. Vous en gagnez à chaque commande terminée.",
+      "history": "Historique",
+      "types": {
+        "earn": "Gagnés",
+        "redeem": "Utilisés",
+        "expire": "Expirés",
+        "adjust": "Correction"
+      },
+      "order": "Commande {{number}}",
+      "cardTitle": "Vérifier une carte cadeau",
+      "cardText": "Entrez le code imprimé sur la carte ou dans son e-mail.",
+      "check": "Vérifier",
+      "cardBalance": "Solde {{balance}} · valable jusqu’au {{date}}",
+      "cardUnknown": "Aucune carte cadeau avec ce code.",
+      "cardExpired": "Cette carte cadeau a expiré.",
+      "cardVoid": "Cette carte cadeau n’est plus valable.",
+      "tooMany": "Trop d’essais. Réessayez dans quelques minutes."
     }
   },
   "checkout": {

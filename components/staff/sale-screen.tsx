@@ -4,7 +4,7 @@ import { Minus, Plus, Trash2, UserPlus } from 'lucide-react';
 import { useEffect, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { interpolate, type Locale } from '@/lib/i18n';
+import { type Dictionary, interpolate, type Locale } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { lookupBarcode, searchItems, type ScanCard } from '@/modules/catalogue/actions';
 import { placeStaffSale, quoteStaffSale } from '@/modules/sales/actions';
@@ -13,6 +13,7 @@ import { CustomerRow, CustomerSheet } from './customers-screen';
 import { CustomerSearch } from './customer-search';
 import { ScanField, type ScanTexts } from './scan-field';
 import { missed, scanned } from './feedback';
+import { NO_SALE_EXTRAS, type SaleExtras, SaleExtrasCard } from './sale-extras';
 import { SuccessTick } from './success-tick';
 
 type Line = { variant: string; unit?: string; qty: number };
@@ -26,6 +27,7 @@ type Texts = {
   cancel: string;
   search: { search: string; placeholder: string; none: string };
   form: CustomerTexts;
+  extras: Dictionary['cart']['extras'];
   badges: { privateBadge: string; businessBadge: string };
   items: string;
   noItems: string;
@@ -78,13 +80,14 @@ export function SaleScreen({
   const [pending, start] = useTransition();
   // One key per sale: a double tap or a retry after a lost answer places it once (02 §6).
   const [key, setKey] = useState(() => crypto.randomUUID());
+  const [extras, setExtras] = useState<SaleExtras>(NO_SALE_EXTRAS);
 
   // Live totals: priced on the server for this customer, 250 ms after the last change. Lines the stock cannot cover
   // come back clamped; the sale takes the corrected quantities.
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (lines.length === 0) return setQuote(null);
-      const r = await quoteStaffSale(null, { customer: customer?.id, lines });
+      const r = await quoteStaffSale(null, { customer: customer?.id, lines, code: extras.code || undefined, useLoyalty: extras.useLoyalty, giftCards: extras.giftCards });
       if (!r.ok || !r.data) return;
       setQuote(r.data);
       if (r.data.notices.length > 0) {
@@ -93,7 +96,7 @@ export function SaleScreen({
       }
     }, 250);
     return () => clearTimeout(timer);
-  }, [lines, customer, t.clamped]);
+  }, [lines, customer, extras, t.clamped]);
 
   const add = (variant: string, unit?: string) =>
     setLines((prev) => {
@@ -115,6 +118,12 @@ export function SaleScreen({
     const words = await searchItems(null, { q: code });
     if (words.ok && words.data.length === 1) return (scanned(), add(words.data[0].variant));
     if (words.ok && words.data.length > 1) return setResults(words.data);
+    // A gift card's QR (16 characters, no look-alikes): it pays, it is not an item.
+    const card = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (/^[ABCDEFGHJKLMNPQRSTUVWXYZ2-9]{16}$/.test(card)) {
+      scanned();
+      return setExtras((c) => (c.giftCards.includes(card) ? c : { ...c, giftCards: [...c.giftCards, card].slice(0, 5) }));
+    }
     missed();
     toast.error(interpolate(t.notFound, { code }));
   };
@@ -122,12 +131,13 @@ export function SaleScreen({
   const place = () =>
     start(async () => {
       if (!customer) return void toast.error(t.needCustomer);
-      const r = await placeStaffSale(null, { idempotencyKey: key, customer: customer.id, lines, payment });
+      const r = await placeStaffSale(null, { idempotencyKey: key, customer: customer.id, lines, payment, code: extras.code || undefined, useLoyalty: extras.useLoyalty, giftCards: extras.giftCards });
       if (r.ok) {
         setDone({ number: r.data.number, payment });
         return;
       }
-      toast.error(r.error === 'OUT_OF_STOCK' ? t.outOfStock : t.error);
+      const why = (t.extras.reasons as Record<string, string>)[r.message ?? ''];
+      toast.error(r.error === 'OUT_OF_STOCK' ? t.outOfStock : (why ?? t.error));
       // A new key: the next try is a new sale (this one was refused, nothing was written).
       setKey(crypto.randomUUID());
     });
@@ -150,6 +160,7 @@ export function SaleScreen({
             setLines([]);
             setQuote(null);
             setCustomer(null);
+            setExtras(NO_SALE_EXTRAS);
           }}
         >
           {t.again}
@@ -283,6 +294,7 @@ export function SaleScreen({
       </div>
 
       <aside className="space-y-6 lg:sticky lg:top-6">
+        {lines.length > 0 && <SaleExtrasCard quote={quote} extras={extras} setExtras={setExtras} t={t.extras} locale={locale} />}
         <section className="space-y-3">
           {quote && lines.length > 0 && (
             <dl className="gg-card space-y-1 px-4 py-3 text-sm">
@@ -298,6 +310,28 @@ export function SaleScreen({
                   {formatMoney(quote.totalCents, locale)}
                 </dd>
               </div>
+              {(quote.loyaltyCents > 0 || quote.giftCards.length > 0) && (
+                <>
+                  {quote.loyaltyCents > 0 && (
+                    <div className="text-ink/60 flex justify-between">
+                      <dt>{interpolate(t.extras.pointsUsed, { points: quote.loyaltyPointsUsed })}</dt>
+                      <dd className="tabular-nums">−{formatMoney(quote.loyaltyCents, locale)}</dd>
+                    </div>
+                  )}
+                  {quote.giftCards.map((g) => (
+                    <div key={g.code} className="text-ink/60 flex justify-between">
+                      <dt>{interpolate(t.extras.card, { last: g.code.slice(-4) })}</dt>
+                      <dd className="tabular-nums">−{formatMoney(g.amountCents, locale)}</dd>
+                    </div>
+                  ))}
+                  <div className="border-border flex justify-between border-t pt-2 text-lg font-semibold">
+                    <dt>{t.extras.toPay}</dt>
+                    <dd className="tabular-nums" data-testid="sale-due">
+                      {formatMoney(quote.amountDueCents, locale)}
+                    </dd>
+                  </div>
+                </>
+              )}
             </dl>
           )}
         </section>
@@ -330,7 +364,7 @@ export function SaleScreen({
             disabled={pending || lines.length === 0 || !quote}
             className="w-full shadow-lg"
           >
-            {pending ? t.placing : quote ? `${t.confirm} · ${formatMoney(quote.totalCents, locale)}` : t.confirm}
+            {pending ? t.placing : quote ? `${t.confirm} · ${formatMoney(quote.amountDueCents, locale)}` : t.confirm}
           </Button>
           {!customer && lines.length > 0 && <p className="text-ink/60 mt-2 text-center text-xs">{t.needCustomer}</p>}
         </div>

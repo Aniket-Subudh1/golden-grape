@@ -13,6 +13,9 @@ export type CartMode = 'pickup' | 'delivery' | 'table';
 /** How the basket itself is collected: the only mode the cart remembers. */
 export type BasketMode = Exclude<CartMode, 'table'>;
 export type CartItem = { variant: string; unit?: string; qty: number };
+/** What pays or discounts beyond the lines (M3.2): a code, the customer's points, gift card codes. */
+export type CartExtras = { code: string; useLoyalty: boolean; giftCards: string[] };
+const NO_EXTRAS: CartExtras = { code: '', useLoyalty: false, giftCards: [] };
 
 const STORAGE = 'gg_cart_v2';
 const OLD_STORAGE = ['gg_cart_v1', 'gg-cart', 'cart']; // earlier versions held client prices: dropped
@@ -30,6 +33,8 @@ type CartContext = {
   count: number;
   quote: CartQuote | null;
   pending: boolean;
+  extras: CartExtras;
+  setExtras: (update: (current: CartExtras) => CartExtras) => void;
   setOpen: (open: boolean) => void;
   openAs: (mode: CartMode) => void;
   setMode: (mode: BasketMode) => void;
@@ -62,10 +67,10 @@ export function useCart(): CartContext {
 
 const same = (a: { variant: string; unit?: string }, b: { variant: string; unit?: string }) => a.variant === b.variant && (a.unit ?? '') === (b.unit ?? '');
 
-function read(): { items: CartItem[]; mode: BasketMode } {
+function read(): { items: CartItem[]; mode: BasketMode; extras: CartExtras } {
   try {
     for (const key of OLD_STORAGE) localStorage.removeItem(key);
-    const saved = JSON.parse(localStorage.getItem(STORAGE) ?? 'null') as { items?: unknown; mode?: unknown } | null;
+    const saved = JSON.parse(localStorage.getItem(STORAGE) ?? 'null') as { items?: unknown; mode?: unknown; extras?: Partial<CartExtras> } | null;
     const items = Array.isArray(saved?.items)
       ? saved.items.filter(
           (i): i is CartItem => typeof i?.variant === 'string' && Number.isInteger(i?.qty) && i.qty > 0 && (i.unit === undefined || typeof i.unit === 'string'),
@@ -73,10 +78,16 @@ function read(): { items: CartItem[]; mode: BasketMode } {
       : [];
     // A table saved by an earlier version is not restored: the next visit starts as an ordinary basket.
     const mode = saved?.mode === 'delivery' ? 'delivery' : 'pickup';
-    return { items: items.map(({ variant, unit, qty }) => ({ variant, unit, qty })), mode };
+    const e = saved?.extras;
+    const extras: CartExtras = {
+      code: typeof e?.code === 'string' ? e.code.slice(0, 40) : '',
+      useLoyalty: e?.useLoyalty === true,
+      giftCards: Array.isArray(e?.giftCards) ? e.giftCards.filter((c): c is string => typeof c === 'string').slice(0, 5) : [],
+    };
+    return { items: items.map(({ variant, unit, qty }) => ({ variant, unit, qty })), mode, extras };
   } catch {
     // Private mode or a corrupt value: start with an empty cart (the one allowed empty catch, 03 law 13).
-    return { items: [], mode: 'pickup' };
+    return { items: [], mode: 'pickup', extras: NO_EXTRAS };
   }
 }
 
@@ -88,6 +99,7 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
   const [loaded, setLoaded] = useState(false);
   const [quote, setQuote] = useState<CartQuote | null>(null);
   const [pending, setPending] = useState(false);
+  const [extras, setExtrasState] = useState<CartExtras>(NO_EXTRAS);
   const [asked, setAsked] = useState(0);
   const request = useRef(0);
   // The first quote after loading is asked at once (the drawer has no lines to show until it arrives); later
@@ -100,17 +112,18 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setItems(saved.items);
     setMode(saved.mode);
+    setExtrasState(saved.extras);
     setLoaded(true);
   }, []);
 
   useEffect(() => {
     if (!loaded) return;
     try {
-      localStorage.setItem(STORAGE, JSON.stringify({ items, mode }));
+      localStorage.setItem(STORAGE, JSON.stringify({ items, mode, extras }));
     } catch {
       // Storage full or disabled: the cart still works for this visit (03 law 13).
     }
-  }, [items, mode, loaded]);
+  }, [items, mode, extras, loaded]);
 
   // Server quote, 300 ms after the last change (at once the first time). Only the latest answer is applied.
   useEffect(() => {
@@ -124,7 +137,7 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
     quotedOnce.current = true;
     const timer = window.setTimeout(async () => {
       setPending(true);
-      const result = await quoteCartAction(null, { locale, lines: items });
+      const result = await quoteCartAction(null, { locale, lines: items, code: extras.code || undefined, useLoyalty: extras.useLoyalty, giftCards: extras.giftCards });
       if (id !== request.current) return;
       setPending(false);
       if (!result.ok) return;
@@ -142,7 +155,7 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
       }
     }, delay);
     return () => window.clearTimeout(timer);
-  }, [items, loaded, locale, notices, asked]);
+  }, [items, loaded, locale, notices, asked, extras]);
 
   const setQty = useCallback((target: { variant: string; unit?: string }, qty: number) => {
     setItems((current) => {
@@ -167,6 +180,8 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
       open,
       quote,
       pending,
+      extras,
+      setExtras: (update) => setExtrasState(update),
       count: items.reduce((sum, i) => sum + i.qty, 0),
       setOpen,
       setMode,
@@ -182,10 +197,13 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
       add: (target, qty = 1) => setQty(target, (items.find((i) => same(i, target))?.qty ?? 0) + qty),
       setQty,
       remove: (targets) => setItems((current) => current.filter((i) => !targets.some((t) => same(t, i)))),
-      clear: () => setItems([]),
+      clear: () => {
+        setItems([]);
+        setExtrasState(NO_EXTRAS);
+      },
       refresh: () => setAsked((n) => n + 1),
     }),
-    [loaded, items, mode, openMode, open, quote, pending, setQty, setOpen],
+    [loaded, items, mode, openMode, open, quote, pending, extras, setQty, setOpen],
   );
 
   return <Context value={value}>{children}</Context>;

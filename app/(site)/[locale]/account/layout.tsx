@@ -7,10 +7,13 @@ import { getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { AccountNav } from '@/modules/customers/components/account-nav';
 import { SignOutButton } from '@/modules/customers/components/account-forms';
 import { currentCustomer } from '@/modules/customers/service';
+import { getSettings } from '@/modules/settings/service';
 
 /** Every account page needs a signed-in customer. Guests are sent to sign-in by proxy.ts; an expired session lands here. */
 async function Shell({ locale, children }: { locale: Locale; children: React.ReactNode }) {
-  const [customer, { account: t }] = await Promise.all([currentCustomer(), getDictionary(locale)]);
+  const [customer, { account: t }, { modules }] = await Promise.all([currentCustomer(), getDictionary(locale), getSettings()]);
+  // "Points et cartes" only while loyalty or gift cards are switched on.
+  const rewards = modules?.loyalty === true || modules?.giftCards === true;
   if (!customer) {
     return (
       <div className="mx-auto max-w-md py-16 text-center">
@@ -44,6 +47,7 @@ async function Shell({ locale, children }: { locale: Locale; children: React.Rea
             { href: `${base}/addresses`, label: t.nav.addresses },
             { href: `${base}/orders`, label: t.nav.orders },
             { href: `${base}/quotations`, label: t.nav.quotations },
+            ...(rewards ? [{ href: `${base}/rewards`, label: t.nav.rewards }] : []),
           ]}
         />
       </div>
