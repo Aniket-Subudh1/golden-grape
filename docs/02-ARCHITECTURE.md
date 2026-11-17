@@ -161,7 +161,7 @@ After commit, the outbox (M3.3/M4.2) mirrors the order to the POS when the POS m
 
 **POS sale import (M3.3):** CSV upload, parse, match by barcode or reference, show a preview with unmatched rows, then confirm. A transaction creates one `pos` order per receipt plus movements. The import's file hash is unique, so the same file cannot be imported twice.
 
-**Outbox (M3.3/M4.2):** domain code calls `pos.enqueue(tx, event)` inside its transaction. A scheduled job (`scripts/outbox.ts`, run by cron or the Payload jobs queue) sends pending rows through `connector()`, using backoff of 1 min, 5 min, 30 min, 2 h, then 12 h. It records the result in `integrationLogs` and alerts by e-mail after the last retry. The admin has a "Retry now" button.
+**Outbox (M3.3/M4.2):** domain code calls `enqueue(tx, topic, order)` (`modules/pos/service.ts`) inside its transaction (`placeOrder`, `placeStaffOrder`, `applyTransition` to confirmed/cancelled/refunded; POS module on; never a till sale). The `outbox-process` job (`/api/cron/outbox-process`, every minute) sends pending rows through `connector()`, using backoff of 1 min, 5 min, 30 min, 2 h, then 12 h. It records the result in `integrationLogs` and alerts by e-mail after the last retry. The admin has a "Retry now" button.
 
 ## 7. Environment variables
 
@@ -175,8 +175,8 @@ Every variable lives in `.env.example` and is parsed by `lib/env.ts`. The build 
 | `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_REGION` | M1.3 | Any S3-compatible bucket, kept **private**: media are served through the app at `/api/media/file/…` (no public URL). Unset → uploads stored in `./media` |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_SECURE`, `MAIL_FROM`, `MAIL_STAFF_TO` | M1.3 | Any SMTP (Mailpit `localhost:1025` locally). Unset `SMTP_HOST` → e-mails are logged, not sent |
 | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET` | M4.3 | Cloudflare test keys |
-| `ATTENDANCE_SECRET` | M3.3 | 32+ random chars |
-| `GOOGLE_PLACES_API_KEY`, `GOOGLE_PLACE_ID`, `GBP_ACCOUNT_ID`, `GBP_LOCATION_ID`, `GBP_OAUTH_*` | M3.3 | optional; the feature degrades without them |
+| `ATTENDANCE_SECRET` | M3.3 | 32+ random chars; unset → derived from `PAYLOAD_SECRET` (A-19). Changing it invalidates the QR on display |
+| `GOOGLE_PLACES_API_KEY`, `GOOGLE_PLACE_ID` | M3.3 | optional: without a key the review job calls nothing, the home section stays hidden and the admin shows the setup steps; the place ID can also be set in Réglages. `GBP_*` not used: Business Profile API access was not granted (DEP-09) |
 | `WALLEE_SPACE_ID`, `WALLEE_USER_ID`, `WALLEE_API_SECRET`, `WALLEE_WEBHOOK_*` | M4.1 | test space |
 | `CASHMAG_*` | M4.2 | from the CashMag docs |
 | `CRON_SECRET` | Q-12 (11 Nov 2026) | protects scheduled-job routes (`Authorization: Bearer …`, at least 24 characters); unset → every job call is refused. Production: daily `quotations-expire` from `/etc/cron.d/golden-grape-jobs` |

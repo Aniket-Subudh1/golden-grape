@@ -58,7 +58,7 @@ A test that cannot fail for a realistic bug is deleted.
 2. `checkout.spec.ts` (M2.3): add a snack and a wine → pickup → slot → order confirmation page and Mailpit e-mail in the chosen language; repeat for delivery (zone fee shown) and table + pre-order (pending).
 3. `staff-mobile.spec.ts` (M3.1, Pixel 7 viewport): staff login → receive PO by typed barcode → quick sale to a customer → stock reflects both. Runs on the `pixel-7` project only (skipped on the two others): it creates its own product, staff member, supplier and order through REST as the seeded admin (`E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`, CI defaults `ci-admin@example.test`), and simultaneous sign-ins of one account race on Payload's session list.
 4. `b2b.spec.ts` (M3.2): B2B customer sees list prices → staff creates a quotation → accept → order → invoice PDF downloads with the next number.
-5. `attendance.spec.ts` (M3.3): open today's QR URL → check in → check out → the hours appear in the manager's monthly report.
+5. `attendance.spec.ts` (M3.3, Pixel 7 only): a manager opens the venue QR (its link is on the page as `data-url`), the employee opens it, signs in, checks in, waits out the 30 s tap limit, checks out → the person appears in the manager's month with a total.
 
 ## 4. Commands
 
