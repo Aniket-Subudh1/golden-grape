@@ -3,7 +3,7 @@ import { checkLinkToken, linkToken } from '@/lib/link-token';
 import { AppError } from '@/lib/errors';
 import type { Locale } from '@/lib/i18n';
 import { formatNumber, nextNumber } from '@/lib/numbering';
-import { addDays, today } from '@/lib/time';
+import { addDays, localStamp, today } from '@/lib/time';
 import { model, type Tx, withTx } from '@/lib/tx';
 import { postMovements } from '@/modules/inventory/service';
 import { type Movement, provider } from '@/modules/payments/provider';
@@ -138,6 +138,23 @@ export type PlaceOrderInput = {
 
 export type Placed = { kind: 'order' | 'reservation'; id: string; number: string; created: boolean };
 
+/** An order's lines and totals as `quote` priced them: every order path stores exactly this. */
+const pricedLines = (q: Awaited<ReturnType<typeof quoteCart>>) => ({
+  lines: q.lines.map((l) => ({
+    variant: l.variant,
+    unit: l.unit,
+    unitQty: l.qty,
+    baseQty: l.baseQty,
+    name: l.name,
+    detail: l.detail,
+    unitPriceCents: l.unitPriceCents,
+    discountCents: l.discountCents,
+    vatBp: l.vatBp,
+    totalCents: l.totalCents,
+  })),
+  totals: { subtotalCents: q.subtotalCents, discountCents: q.discountCents, deliveryCents: q.deliveryCents, vatCents: q.vatCents, totalCents: q.totalCents, vatBreakdown: q.vatBreakdown },
+});
+
 /** The order or reservation already placed with this key (sequential reads: one transaction session runs one at a time). */
 async function findPlaced(payload: Payload, key: string, tx?: Tx): Promise<Placed | null> {
   const where = { idempotencyKey: { equals: key } };
@@ -206,19 +223,7 @@ export async function placeOrder(payload: Payload, input: PlaceOrderInput, { cus
             address: input.mode === 'delivery' ? { ...input.address, country: 'LU' } : undefined,
             slot: slotData,
             slotAt: `${input.date}T${slot.from}`,
-            lines: q.lines.map((l) => ({
-              variant: l.variant,
-              unit: l.unit,
-              unitQty: l.qty,
-              baseQty: l.baseQty,
-              name: l.name,
-              detail: l.detail,
-              unitPriceCents: l.unitPriceCents,
-              discountCents: l.discountCents,
-              vatBp: l.vatBp,
-              totalCents: l.totalCents,
-            })),
-            totals: { subtotalCents: q.subtotalCents, discountCents: q.discountCents, deliveryCents: q.deliveryCents, vatCents: q.vatCents, totalCents: q.totalCents, vatBreakdown: q.vatBreakdown },
+            ...pricedLines(q),
             // A transfer order keeps the account its customer is told to pay into: the default one today.
             payment: { provider: 'manual', method: input.payment, status: 'none', ...(input.payment === 'transfer' ? { bankAccount: accountCopy(transferAccount(business.bankAccounts)) } : {}) },
             locale: input.locale,
@@ -259,6 +264,85 @@ export async function placeOrder(payload: Payload, input: PlaceOrderInput, { cus
     });
   } catch (error) {
     // Two submits with one key raced past the first check: the loser hits the unique index. Same answer as a reload.
+    const placed = await findPlaced(payload, input.idempotencyKey);
+    if (placed) return placed;
+    throw error;
+  }
+}
+
+export type StaffSaleInput = {
+  idempotencyKey: string;
+  customer: string;
+  lines: { variant: string; unit?: string; qty: number }[];
+  /** "Paid on site": confirmed and paid in full. "Invoice later": confirmed, unpaid (the invoice comes with M3.2). */
+  payment: 'onsite' | 'invoice';
+  notes?: string;
+};
+
+/**
+ * A sale made by staff on the phone (M3.1 T5): the same order as the website's (02 §6), on the `mobile` channel, for a
+ * customer, priced by `quote` with that customer, numbered, confirmed by the manual provider and taken out of stock in
+ * one transaction. Its slot is the sale's own day and time, so it counts in the sales figures on that day. A business
+ * customer's sale is a `b2b` order, anyone else's `instore`.
+ */
+export async function placeStaffOrder(payload: Payload, input: StaffSaleInput, { staff, now = new Date() }: { staff: string; now?: Date }): Promise<Placed> {
+  const existing = await findPlaced(payload, input.idempotencyKey);
+  if (existing) return existing;
+  if (input.lines.length === 0) throw new AppError('VALIDATION', 'emptyCart', 'lines');
+  const customer = await payload.findByID({ collection: 'customers', id: input.customer, depth: 0, overrideAccess: true, disableErrors: true });
+  if (!customer) throw new AppError('NOT_FOUND', 'customer', 'customer');
+  const locale = (customer.locale ?? 'fr') as Locale;
+  try {
+    return await withTx(payload, async (tx) => {
+      const again = await findPlaced(payload, input.idempotencyKey, tx);
+      if (again) return again;
+      const q = await quoteCart(payload, input.lines, { customer, channel: 'mobile', locale });
+      if (q.notices.length > 0) throw new AppError('OUT_OF_STOCK', 'cartChanged', 'lines');
+      const { numbering } = await getSettingsPrivate();
+      const day = today(now);
+      const time = localStamp(now).slice(11, 16);
+      const year = Number(day.slice(0, 4));
+      const n = await nextNumber(tx, 'order', year);
+      const order = await payload.create({
+        collection: 'orders',
+        req: tx.req,
+        overrideAccess: true,
+        depth: 0,
+        data: {
+          number: formatNumber(numbering?.order ?? NUMBERING.order, year, n),
+          idempotencyKey: input.idempotencyKey,
+          status: 'pending',
+          channel: 'mobile',
+          mode: customer.type === 'business' ? 'b2b' : 'instore',
+          customer: customer.id,
+          contact: { name: customer.company || customer.name, email: customer.email, phone: customer.phone ?? '' },
+          slot: { date: day, from: time, to: time },
+          slotAt: `${day}T${time}`,
+          ...pricedLines(q),
+          payment: { provider: 'manual', method: input.payment, status: 'none' },
+          locale,
+          notes: input.notes,
+          staff,
+          stockPosted: false,
+        },
+      });
+      const started = await provider(order.payment?.provider).start(tx, order);
+      const money = figuresOf(order);
+      const history: NonNullable<Order['history']> = [];
+      if (input.payment === 'onsite' && started.status === 'confirmed' && money.totalCents > 0) {
+        await provider(order.payment?.provider).capture(tx, order, { amountCents: money.totalCents, at: now, method: 'onsite', user: staff });
+        money.paidCents = money.totalCents;
+        history.push(historyRow('payment', staff));
+      }
+      const placed = await setOrder(tx, order.id, {
+        status: started.status,
+        payment: { ...order.payment, status: money.paidCents > 0 ? paymentState(money) : started.paymentStatus, paidCents: money.paidCents },
+        history,
+      });
+      if (started.status === 'confirmed') await postSale(tx, placed, staff);
+      return { kind: 'order' as const, id: order.id, number: order.number ?? '', created: true };
+    });
+  } catch (error) {
     const placed = await findPlaced(payload, input.idempotencyKey);
     if (placed) return placed;
     throw error;
@@ -604,6 +688,27 @@ export async function attachToCustomer(payload: Payload, id: string, customer: {
     for (const docId of ids[collection]) await payload.update({ collection, id: docId, data: { customer: customer.id }, overrideAccess: true, depth: 0 });
   }
   return { address: order?.mode === 'delivery' ? order.address : null };
+}
+
+/** A customer's latest orders, for staff (the phone's customer page, M3.1 T5). */
+export async function ordersOf(payload: Payload, customer: string, limit = 10) {
+  const { docs } = await payload.find({ collection: 'orders', where: { customer: { equals: customer } }, sort: '-createdAt', limit, depth: 0, overrideAccess: true });
+  return docs;
+}
+
+/** States in which an order still needs staff: the phone's orders screen. */
+const OPEN_ORDERS: OrderStatus[] = ['pending', 'awaiting_payment', 'confirmed', 'ready', 'out_for_delivery'];
+
+/**
+ * Today's and upcoming work for the phone (M3.1 T5): orders still open whose slot is today or later (a table's
+ * pre-order follows its reservation and is shown with it), and table reservations to decide or to welcome. Soonest first.
+ */
+export async function staffAgenda(payload: Payload, day: string) {
+  const [orders, reservations] = await Promise.all([
+    payload.find({ collection: 'orders', where: { 'slot.date': { greater_than_equal: day }, mode: { not_equals: 'table' }, status: { in: OPEN_ORDERS } }, sort: 'slotAt', limit: 50, depth: 0, overrideAccess: true }),
+    payload.find({ collection: 'reservations', where: { 'slot.date': { greater_than_equal: day }, status: { in: HOLDING } }, sort: 'slotAt', limit: 50, depth: 1, overrideAccess: true }),
+  ]);
+  return { orders: orders.docs, reservations: reservations.docs };
 }
 
 /** A customer's own orders and reservations, read with their access (never anyone else's). */

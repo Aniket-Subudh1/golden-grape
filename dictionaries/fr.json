@@ -1258,6 +1258,73 @@
       "create": "Commande brouillon",
       "creating": "Création…",
       "error": "La commande n’a pas pu être créée."
+    },
+    "sale": {
+      "title": "Vente",
+      "customer": "Client",
+      "change": "Changer",
+      "newCustomer": "Nouveau client",
+      "cancel": "Annuler",
+      "items": "Articles",
+      "noItems": "Scannez ou cherchez un article.",
+      "results": "Résultats",
+      "notFound": "Aucun article pour « {{code}} ».",
+      "clamped": "Stock insuffisant : les quantités ont été ajustées.",
+      "vat": "dont TVA {{rate}} %",
+      "total": "Total TTC",
+      "pay": "Paiement",
+      "onsite": "Payé sur place",
+      "onsiteHint": "Encaissé maintenant",
+      "invoice": "Facture plus tard",
+      "invoiceHint": "À payer sur facture",
+      "confirm": "Valider la vente",
+      "placing": "Enregistrement…",
+      "needCustomer": "Choisissez ou créez d’abord le client.",
+      "error": "La vente n’a pas pu être enregistrée. Réessayez.",
+      "outOfStock": "Le stock a changé : vérifiez les quantités et réessayez.",
+      "doneTitle": "Vente enregistrée",
+      "donePaid": "Payée sur place. Le stock est à jour.",
+      "doneInvoice": "À facturer : la commande attend son paiement. Le stock est à jour.",
+      "again": "Nouvelle vente",
+      "remove": "Retirer",
+      "qty": "Quantité"
+    },
+    "customers": {
+      "title": "Clients",
+      "search": {
+        "search": "Rechercher un client",
+        "placeholder": "Nom, société, e-mail ou téléphone",
+        "none": "Aucun client trouvé."
+      },
+      "form": {
+        "name": "Nom",
+        "phone": "Téléphone",
+        "email": "E-mail (facultatif)",
+        "emailHint": "Sans e-mail, le client ne reçoit aucun message et ne peut pas se connecter.",
+        "type": "Type",
+        "private": "Particulier",
+        "business": "Entreprise",
+        "company": "Société",
+        "vatNumber": "N° de TVA (facultatif)",
+        "language": "Langue",
+        "create": "Créer le client",
+        "save": "Enregistrer",
+        "pending": "Enregistrement…",
+        "saved": "Client enregistré."
+      },
+      "edit": "Modifier",
+      "noEmail": "Pas d’e-mail",
+      "orders": "Dernières commandes",
+      "noOrders": "Aucune commande."
+    },
+    "orders": {
+      "title": "Commandes",
+      "orders": "Commandes en cours",
+      "noOrders": "Aucune commande en cours.",
+      "reservations": "Tables",
+      "noReservations": "Aucune table à venir.",
+      "details": "Détails",
+      "guests": "pers."
     }
   }
 }

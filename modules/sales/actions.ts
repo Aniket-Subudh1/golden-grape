@@ -7,13 +7,13 @@ import { audit } from '@/lib/audit';
 import { AppError } from '@/lib/errors';
 import { LOCALES } from '@/lib/i18n';
 import { rateLimit } from '@/lib/rate-limit';
-import { currentCustomer, saveAddress } from '@/modules/customers/service';
+import { currentCustomer, getCustomer, saveAddress } from '@/modules/customers/service';
 import { quoteCart } from '@/modules/promotions/service';
 import { SLOT_MODES } from './collections';
 import { mailOrderPlaced, mailOrderStatus, mailReservation } from './mail';
 import { ORDER_STATUSES } from './order-states';
 import { transitionReservation } from './reservations';
-import { getOrder, getReservation, type MoneyResult, returnItems, orderToken, placeOrder, recordPayment, recordRefund, requestRefund, setOrderBankAccount, slotCalendar, transition, zoneFor } from './service';
+import { getOrder, getReservation, type MoneyResult, returnItems, orderToken, placeOrder, placeStaffOrder, recordPayment, recordRefund, requestRefund, setOrderBankAccount, slotCalendar, transition, zoneFor } from './service';
 import { deliveryFee } from './zones';
 
 // Checkout (public) and order / reservation decisions (staff). Error messages are dictionary keys (`form.fields.*`).
@@ -220,5 +220,28 @@ export const decideReservation = action(
     // No e-mail for a visit (completed) or a no-show: the customer is not told they did not come.
     if (to !== 'completed' && to !== 'no_show') after(() => mailReservation(payload, result.reservation, to).catch(logMail('reservation status')));
     return { status: result.reservation.status };
+  },
+);
+
+// ---------------------------------------------------------------------------------------------------------------
+// Mobile sale (M3.1 T5): the phone's sale screen. Same pricing and the same order path as the website.
+
+const saleRoles = { roles: ['sales' as const, 'manager' as const] };
+
+/** Live totals of the sale being built, priced for the chosen customer on the mobile channel. */
+export const quoteStaffSale = action(z.object({ customer: z.string().max(40).optional(), lines }), saleRoles, async (input, { payload, user }) => {
+  const customer = input.customer ? await getCustomer(payload, input.customer) : null;
+  if (input.lines.length === 0) return null;
+  return quoteCart(payload, input.lines, { customer, channel: 'mobile', locale: (customer?.locale ?? user.locale ?? 'fr') as (typeof LOCALES)[number] });
+});
+
+/** Places the sale: paid on site (confirmed and paid) or invoiced later (confirmed, unpaid). Stock out at once. */
+export const placeStaffSale = action(
+  z.object({ idempotencyKey: z.uuid(), customer: z.string().min(1).max(40), lines: lines.min(1), payment: z.enum(['onsite', 'invoice']), notes: optionalText(500) }),
+  saleRoles,
+  async (input, { payload, user }) => {
+    const placed = await placeStaffOrder(payload, input, { staff: user.id });
+    if (placed.created) await audit(payload, { user: user.id, action: 'doc.create', collection: 'orders', id: placed.id, ref: placed.number, after: { channel: 'mobile', payment: input.payment } });
+    return placed;
   },
 );

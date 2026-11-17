@@ -1258,6 +1258,73 @@
       "create": "Encomenda em rascunho",
       "creating": "A criar…",
       "error": "Não foi possível criar a encomenda."
+    },
+    "sale": {
+      "title": "Venda",
+      "customer": "Cliente",
+      "change": "Mudar",
+      "newCustomer": "Novo cliente",
+      "cancel": "Cancelar",
+      "items": "Artigos",
+      "noItems": "Leia ou procure um artigo.",
+      "results": "Resultados",
+      "notFound": "Nenhum artigo para «{{code}}».",
+      "clamped": "Stock insuficiente: as quantidades foram ajustadas.",
+      "vat": "inclui IVA {{rate}} %",
+      "total": "Total c/ IVA",
+      "pay": "Pagamento",
+      "onsite": "Pago na loja",
+      "onsiteHint": "Recebido agora",
+      "invoice": "Fatura mais tarde",
+      "invoiceHint": "A pagar por fatura",
+      "confirm": "Validar a venda",
+      "placing": "A guardar…",
+      "needCustomer": "Escolha ou crie primeiro o cliente.",
+      "error": "Não foi possível guardar a venda. Tente novamente.",
+      "outOfStock": "O stock mudou: verifique as quantidades e tente novamente.",
+      "doneTitle": "Venda guardada",
+      "donePaid": "Paga na loja. O stock está atualizado.",
+      "doneInvoice": "A faturar: a encomenda aguarda pagamento. O stock está atualizado.",
+      "again": "Nova venda",
+      "remove": "Retirar",
+      "qty": "Quantidade"
+    },
+    "customers": {
+      "title": "Clientes",
+      "search": {
+        "search": "Procurar um cliente",
+        "placeholder": "Nome, empresa, e-mail ou telefone",
+        "none": "Nenhum cliente encontrado."
+      },
+      "form": {
+        "name": "Nome",
+        "phone": "Telefone",
+        "email": "E-mail (opcional)",
+        "emailHint": "Sem e-mail, o cliente não recebe mensagens e não pode entrar.",
+        "type": "Tipo",
+        "private": "Particular",
+        "business": "Empresa",
+        "company": "Empresa",
+        "vatNumber": "N.º de IVA (opcional)",
+        "language": "Língua",
+        "create": "Criar o cliente",
+        "save": "Guardar",
+        "pending": "A guardar…",
+        "saved": "Cliente guardado."
+      },
+      "edit": "Editar",
+      "noEmail": "Sem e-mail",
+      "orders": "Últimas encomendas",
+      "noOrders": "Sem encomendas."
+    },
+    "orders": {
+      "title": "Encomendas",
+      "orders": "Encomendas em curso",
+      "noOrders": "Nenhuma encomenda em curso.",
+      "reservations": "Mesas",
+      "noReservations": "Nenhuma mesa a seguir.",
+      "details": "Detalhes",
+      "guests": "pess."
     }
   }
 }

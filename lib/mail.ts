@@ -16,8 +16,15 @@ const getTransport = () =>
 /** `attachments`: documents sent with the e-mail (a quotation's PDF), passed to nodemailer as they are. */
 type Mail = { to: string; subject: string; html: string; text: string; replyTo?: string; attachments?: { filename: string; content: Buffer; contentType?: string }[] };
 
-/** Sends through SMTP, or logs the mail when SMTP is not configured (local dev, tests). */
+/** A customer created at the till without an e-mail gets an address on this reserved domain (RFC 2606): never sent. */
+export const NO_EMAIL_DOMAIN = 'no-email.invalid';
+
+/** Sends through SMTP, or logs the mail when SMTP is not configured (local dev, tests). Placeholder addresses are skipped. */
 export async function sendMail(mail: Mail) {
+  if (mail.to.toLowerCase().endsWith(`@${NO_EMAIL_DOMAIN}`)) {
+    console.info(`[mail] no e-mail address for this customer, not sent: "${mail.subject}"`);
+    return;
+  }
   if (!smtpConfigured()) {
     const files = mail.attachments?.map((a) => `${a.filename} (${Math.round(a.content.length / 1024)} KB)`).join(', ');
     console.info(`[mail] SMTP not configured, not sent: "${mail.subject}" → ${mail.to}${files ? ` with ${files}` : ''}`);

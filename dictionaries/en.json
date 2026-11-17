@@ -1258,6 +1258,73 @@
       "create": "Draft order",
       "creating": "Creating…",
       "error": "The order could not be created."
+    },
+    "sale": {
+      "title": "Sale",
+      "customer": "Customer",
+      "change": "Change",
+      "newCustomer": "New customer",
+      "cancel": "Cancel",
+      "items": "Items",
+      "noItems": "Scan or search an item.",
+      "results": "Results",
+      "notFound": "No item for “{{code}}”.",
+      "clamped": "Not enough stock: quantities were adjusted.",
+      "vat": "incl. VAT {{rate}} %",
+      "total": "Total incl. VAT",
+      "pay": "Payment",
+      "onsite": "Paid on site",
+      "onsiteHint": "Taken now",
+      "invoice": "Invoice later",
+      "invoiceHint": "To be paid on invoice",
+      "confirm": "Confirm the sale",
+      "placing": "Saving…",
+      "needCustomer": "Choose or create the customer first.",
+      "error": "The sale could not be saved. Try again.",
+      "outOfStock": "Stock changed: check the quantities and try again.",
+      "doneTitle": "Sale saved",
+      "donePaid": "Paid on site. Stock is up to date.",
+      "doneInvoice": "To invoice: the order awaits payment. Stock is up to date.",
+      "again": "New sale",
+      "remove": "Remove",
+      "qty": "Quantity"
+    },
+    "customers": {
+      "title": "Customers",
+      "search": {
+        "search": "Find a customer",
+        "placeholder": "Name, company, e-mail or phone",
+        "none": "No customer found."
+      },
+      "form": {
+        "name": "Name",
+        "phone": "Phone",
+        "email": "E-mail (optional)",
+        "emailHint": "Without an e-mail, the customer gets no messages and cannot sign in.",
+        "type": "Type",
+        "private": "Private",
+        "business": "Business",
+        "company": "Company",
+        "vatNumber": "VAT number (optional)",
+        "language": "Language",
+        "create": "Create the customer",
+        "save": "Save",
+        "pending": "Saving…",
+        "saved": "Customer saved."
+      },
+      "edit": "Edit",
+      "noEmail": "No e-mail",
+      "orders": "Latest orders",
+      "noOrders": "No orders."
+    },
+    "orders": {
+      "title": "Orders",
+      "orders": "Open orders",
+      "noOrders": "No open orders.",
+      "reservations": "Tables",
+      "noReservations": "No upcoming tables.",
+      "details": "Details",
+      "guests": "guests"
     }
   }
 }

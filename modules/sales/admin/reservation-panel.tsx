@@ -1,53 +1,19 @@
 import type { DefaultServerCellComponentProps, UIFieldServerProps } from 'payload';
-import DecisionBar, { type Decision } from '@/components/admin/decision-bar';
+import DecisionBar from '@/components/admin/decision-bar';
 import { DocCard, DocFacts, DocGrid, DocHead, DocHistory, DocPanel } from '@/components/admin/doc-panel';
 import { hasRole } from '@/lib/access';
 import { LOCALE_NAMES, type Locale } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { slotLabel, today } from '@/lib/time';
-import type { Order } from '@/payload-types';
-import { dueOf } from '@/modules/payments/service';
-import { decideReservation, recordOrderPayment } from '../actions';
+import { decideReservation } from '../actions';
 import { ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS, type PaymentStatus, RESERVATION_STATUS_LABELS, RESERVATION_STATUS_TONES } from '../collections';
-import { type OrderStatus, RESERVATION_FLOW, type ReservationStatus } from '../order-states';
-import { paymentFields } from './order-panel';
-import { type Lang, langOf, salesText } from './text';
+import type { OrderStatus, ReservationStatus } from '../order-states';
+import { reservationDecisions } from './decisions';
+import { langOf, salesText } from './text';
 
 // A table reservation's edit view (ui field `panel`): status and the decisions RESERVATION_FLOW allows, the guests'
 // details, the pre-order with its total, and the history. The list's attendance buttons (AttendanceCell below) offer
 // the same moves with the same dialogs.
-
-type Preorder = Pick<Order, 'id' | 'status' | 'totals' | 'payment'> | null;
-
-/**
- * The moves RESERVATION_FLOW allows from `status` (or only those of `only`), worded for staff, and "Encaisser" while
- * the pre-order of an accepted or completed reservation owes money. Attendance and payment are apart (APPLUX 15 Nov):
- * "Client arrivé" is one click and records no money; "Encaisser" records what the guests paid, on the pre-order
- * (`recordOrderPayment`), before or after the arrival. A visit that does not happen takes an optional reason, kept
- * in the history (GG-019).
- */
-export function reservationDecisions(status: ReservationStatus, preorder: Preorder, lang: Lang, only?: ReservationStatus[]): Decision[] {
-  const t = salesText(lang);
-  const moves: Decision[] = (RESERVATION_FLOW[status] as readonly ReservationStatus[])
-    .filter((to) => !only || only.includes(to))
-    .map((to) => {
-      const tone = to === 'rejected' || to === 'cancelled' || to === 'no_show' ? ('danger' as const) : ('primary' as const);
-      const words = t.reservations[to as keyof typeof t.reservations];
-      return { to, ...words, tone, reason: tone === 'danger', instant: to === 'completed' };
-    });
-  const due = preorder && (status === 'accepted' || status === 'completed') ? dueOf({ totalCents: preorder.totals?.totalCents ?? 0, paidCents: preorder.payment?.paidCents ?? 0, refundedCents: 0, refundDueCents: 0 }) : 0;
-  if (!preorder || due <= 0) return moves;
-  const encash: Decision = {
-    to: 'payment',
-    label: t.collect.encash.label,
-    hint: t.collect.encash.hint(formatMoney(due, lang)),
-    action: recordOrderPayment,
-    target: { order: preorder.id },
-    fields: paymentFields(t, due, preorder.payment?.method),
-  };
-  // Client arrivé · Encaisser · Client absent / Annuler.
-  return [...moves.filter((d) => d.tone !== 'danger'), encash, ...moves.filter((d) => d.tone === 'danger')];
-}
 
 export default async function ReservationPanel({ id, payload, i18n, user }: UIFieldServerProps) {
   if (!id) return null;

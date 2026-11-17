@@ -1258,6 +1258,73 @@
       "create": "Bestellentwurf",
       "creating": "Wird angelegt…",
       "error": "Die Bestellung konnte nicht angelegt werden."
+    },
+    "sale": {
+      "title": "Verkauf",
+      "customer": "Kunde",
+      "change": "Ändern",
+      "newCustomer": "Neuer Kunde",
+      "cancel": "Abbrechen",
+      "items": "Artikel",
+      "noItems": "Artikel scannen oder suchen.",
+      "results": "Treffer",
+      "notFound": "Kein Artikel für „{{code}}“.",
+      "clamped": "Nicht genug Bestand: Mengen wurden angepasst.",
+      "vat": "inkl. MwSt. {{rate}} %",
+      "total": "Gesamt inkl. MwSt.",
+      "pay": "Zahlung",
+      "onsite": "Vor Ort bezahlt",
+      "onsiteHint": "Jetzt kassiert",
+      "invoice": "Rechnung später",
+      "invoiceHint": "Zahlung per Rechnung",
+      "confirm": "Verkauf abschließen",
+      "placing": "Wird gespeichert…",
+      "needCustomer": "Wählen oder erstellen Sie zuerst den Kunden.",
+      "error": "Der Verkauf konnte nicht gespeichert werden. Erneut versuchen.",
+      "outOfStock": "Der Bestand hat sich geändert: Mengen prüfen und erneut versuchen.",
+      "doneTitle": "Verkauf gespeichert",
+      "donePaid": "Vor Ort bezahlt. Der Bestand ist aktuell.",
+      "doneInvoice": "Zu fakturieren: die Bestellung wartet auf Zahlung. Der Bestand ist aktuell.",
+      "again": "Neuer Verkauf",
+      "remove": "Entfernen",
+      "qty": "Menge"
+    },
+    "customers": {
+      "title": "Kunden",
+      "search": {
+        "search": "Kunden suchen",
+        "placeholder": "Name, Firma, E-Mail oder Telefon",
+        "none": "Kein Kunde gefunden."
+      },
+      "form": {
+        "name": "Name",
+        "phone": "Telefon",
+        "email": "E-Mail (optional)",
+        "emailHint": "Ohne E-Mail erhält der Kunde keine Nachrichten und kann sich nicht anmelden.",
+        "type": "Art",
+        "private": "Privat",
+        "business": "Firma",
+        "company": "Firma",
+        "vatNumber": "USt-IdNr. (optional)",
+        "language": "Sprache",
+        "create": "Kunden anlegen",
+        "save": "Speichern",
+        "pending": "Wird gespeichert…",
+        "saved": "Kunde gespeichert."
+      },
+      "edit": "Bearbeiten",
+      "noEmail": "Keine E-Mail",
+      "orders": "Letzte Bestellungen",
+      "noOrders": "Keine Bestellungen."
+    },
+    "orders": {
+      "title": "Bestellungen",
+      "orders": "Offene Bestellungen",
+      "noOrders": "Keine offenen Bestellungen.",
+      "reservations": "Tische",
+      "noReservations": "Keine kommenden Tische.",
+      "details": "Details",
+      "guests": "Pers."
     }
   }
 }

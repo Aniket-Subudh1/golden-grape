@@ -1,9 +1,12 @@
+import { randomBytes } from 'node:crypto';
 import { cookies } from 'next/headers';
 import { connection } from 'next/server';
 import { createLocalReq, logoutOperation, type Payload } from 'payload';
 import { AppError } from '@/lib/errors';
+import { NO_EMAIL_DOMAIN } from '@/lib/mail';
 import type { Locale } from '@/lib/i18n';
 import { getPayloadClient } from '@/lib/payload';
+import { model } from '@/lib/tx';
 import type { Customer } from '@/payload-types';
 import { attachToCustomer, checkOrderToken, getOrder, getReservation } from '@/modules/sales/service';
 import { normalizeVat } from './vat';
@@ -196,4 +199,84 @@ export async function signUpFromOrder(payload: Payload, input: { id: string; tok
     await saveAddress(payload, customer, { line1: address.line1, line2: address.line2 ?? undefined, postalCode: address.postalCode, city: address.city, country: 'LU', isDefault: true });
   }
   return customer;
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Staff screens (M3.1 T5): find, create and edit customers from the phone.
+
+/** Customers whose name, company, e-mail or phone contains `q` (at most 20), newest first. */
+export async function searchCustomers(payload: Payload, q: string) {
+  const text = q.trim();
+  if (text.length < 2) return [];
+  // Phones are stored formatted ("+352 621 123 456"): typed digits match with or without the spaces.
+  const digits = text.replace(/\D/g, '');
+  const byPhone =
+    digits.length >= 4 ? await model(payload, 'customers').find({ phone: { $regex: digits.split('').join('\\s?') } }, { _id: 1 }).limit(20).lean<{ _id: unknown }[]>() : [];
+  const { docs } = await payload.find({
+    collection: 'customers',
+    where: { or: [{ name: { like: text } }, { company: { like: text } }, { email: { like: text } }, { id: { in: byPhone.map((c) => String(c._id)) } }] },
+    sort: '-createdAt',
+    limit: 20,
+    depth: 0,
+    overrideAccess: true,
+  });
+  return docs;
+}
+
+/** True for the address given to a customer created without an e-mail (no mail is ever sent to it). */
+export const hasNoEmail = (email: string | null | undefined) => !email || email.toLowerCase().endsWith(`@${NO_EMAIL_DOMAIN}`);
+
+export type StaffCustomerInput = { name: string; phone: string; email?: string; type: 'private' | 'business'; company?: string; vatNumber?: string; locale: Locale };
+
+/**
+ * A customer created by staff at the till (A-16): the e-mail is optional. Without one, the account gets an address on
+ * a reserved domain that never receives mail, and a random password: it cannot sign in until a real e-mail is set
+ * (then "Mot de passe oublié" works). A known e-mail is refused, so a customer is never created twice.
+ */
+export async function createCustomerByStaff(payload: Payload, input: StaffCustomerInput) {
+  const email = input.email?.trim().toLowerCase() || `client-${randomBytes(6).toString('hex')}@${NO_EMAIL_DOMAIN}`;
+  const { totalDocs } = await payload.count({ collection: 'customers', where: { email: { equals: email } }, overrideAccess: true });
+  if (totalDocs > 0) throw new AppError('CONFLICT', 'emailTaken', 'email');
+  return payload.create({
+    collection: 'customers',
+    overrideAccess: true,
+    depth: 0,
+    data: {
+      name: input.name,
+      email,
+      password: randomBytes(24).toString('base64url'),
+      phone: input.phone,
+      type: input.type,
+      company: input.type === 'business' ? input.company : undefined,
+      vatNumber: input.type === 'business' && input.vatNumber ? normalizeVat(input.vatNumber) : undefined,
+      locale: input.locale,
+      marketingConsent: false,
+    },
+  });
+}
+
+/** Staff edit a customer's basics from the phone; an e-mail typed over a placeholder becomes the account's own. */
+export async function updateCustomerByStaff(payload: Payload, id: string, input: StaffCustomerInput) {
+  const current = await getCustomer(payload, id);
+  if (!current) throw new AppError('NOT_FOUND', 'customer');
+  const email = input.email?.trim().toLowerCase() || current.email;
+  if (email !== current.email) {
+    const { totalDocs } = await payload.count({ collection: 'customers', where: { email: { equals: email } }, overrideAccess: true });
+    if (totalDocs > 0) throw new AppError('CONFLICT', 'emailTaken', 'email');
+  }
+  return payload.update({
+    collection: 'customers',
+    id,
+    overrideAccess: true,
+    depth: 0,
+    data: {
+      name: input.name,
+      email,
+      phone: input.phone,
+      type: input.type,
+      company: input.type === 'business' ? input.company : current.company,
+      vatNumber: input.type === 'business' ? (input.vatNumber ? normalizeVat(input.vatNumber) : undefined) : current.vatNumber,
+      locale: input.locale,
+    },
+  });
 }

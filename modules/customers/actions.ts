@@ -2,12 +2,16 @@
 
 import { after } from 'next/server';
 import { z } from 'zod';
-import { clientIp, optionalPhoneField, publicAction } from '@/lib/action';
+import { action, clientIp, optionalPhoneField, phoneField, publicAction } from '@/lib/action';
 import { AppError } from '@/lib/errors';
 import { LOCALES } from '@/lib/i18n';
+import { audit } from '@/lib/audit';
 import { rateLimit } from '@/lib/rate-limit';
 import {
   changePassword,
+  createCustomerByStaff,
+  searchCustomers,
+  updateCustomerByStaff,
   currentCustomer,
   deleteAddress,
   forgotPassword,
@@ -156,4 +160,40 @@ export const deleteAddressAction = publicAction(z.object({ id: z.string().min(1)
 export const setDefaultAddressAction = publicAction(z.object({ id: z.string().min(1) }), async (input, { payload }) => {
   await setDefaultAddress(payload, await me(), input.id);
   return {};
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// Staff phone screens (M3.1 T5): find, create and edit customers. The e-mail is optional at the till (A-16).
+
+const staffRoles = { roles: ['sales' as const, 'manager' as const] };
+const staffCustomer = z
+  .object({
+    name: required(120),
+    phone: phoneField,
+    email: z.union([z.literal(''), email]).optional(),
+    type: z.enum(['private', 'business']),
+    company: text(160).optional(),
+    vatNumber: text(40).optional(),
+    locale: z.enum(LOCALES),
+  })
+  .superRefine((d, ctx) => {
+    if (d.type !== 'business') return;
+    if (!d.company) ctx.addIssue({ code: 'custom', path: ['company'], message: 'required' });
+    if (d.vatNumber && !isVatNumber(d.vatNumber)) ctx.addIssue({ code: 'custom', path: ['vatNumber'], message: 'vatNumber' });
+  });
+
+export const findCustomers = action(z.object({ q: z.string().trim().min(2).max(80) }), staffRoles, async ({ q }, { payload }) =>
+  (await searchCustomers(payload, q)).map((c) => ({ id: c.id, name: c.name, company: c.company ?? null, phone: c.phone ?? null, email: c.email, type: c.type })),
+);
+
+export const createCustomerStaff = action(staffCustomer, staffRoles, async (input, { payload, user }) => {
+  const customer = await createCustomerByStaff(payload, input);
+  await audit(payload, { user: user.id, action: 'doc.create', collection: 'customers', id: customer.id, ref: customer.name });
+  return { id: customer.id, name: customer.name, company: customer.company ?? null, phone: customer.phone ?? null, email: customer.email, type: customer.type };
+});
+
+export const updateCustomerStaff = action(staffCustomer.and(z.object({ id: z.string().min(1).max(40) })), staffRoles, async ({ id, ...input }, { payload, user }) => {
+  const customer = await updateCustomerByStaff(payload, id, input);
+  await audit(payload, { user: user.id, action: 'doc.update', collection: 'customers', id, ref: customer.name });
+  return { id };
 });
