@@ -474,6 +474,13 @@ export const businessSettings: GlobalConfig = {
       ],
     },
     {
+      // Team & access (/admin/team): the areas each role is given on top of its own. Edited there only.
+      name: 'access',
+      type: 'group',
+      admin: later,
+      fields: [{ name: 'grants', type: 'json' }],
+    },
+    {
       name: 'vat',
       type: 'array',
       admin: later,

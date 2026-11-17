@@ -263,6 +263,7 @@ export interface User {
   id: string;
   name: string;
   roles: ('admin' | 'manager' | 'sales' | 'stock' | 'attendance')[];
+  effectiveRoles?: ('admin' | 'manager' | 'sales' | 'stock' | 'attendance')[] | null;
   active?: boolean | null;
   locale: 'fr' | 'en' | 'de' | 'pt';
   updatedAt: string;
@@ -2397,6 +2398,7 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
   roles?: T;
+  effectiveRoles?: T;
   active?: T;
   locale?: T;
   updatedAt?: T;
@@ -4030,6 +4032,17 @@ export interface BusinessSetting {
       unitPrice?: string | null;
     };
   };
+  access?: {
+    grants?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
   vat?:
     | {
         key: 'standard' | 'intermediate' | 'reduced' | 'superReduced';
@@ -4491,6 +4504,11 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
               qty?: T;
               unitPrice?: T;
             };
+      };
+  access?:
+    | T
+    | {
+        grants?: T;
       };
   vat?:
     | T

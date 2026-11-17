@@ -100,6 +100,8 @@ export default buildConfig({
         sales: { Component: '@/modules/reporting/admin/sales-view', path: '/sales' },
         // Rating, the latest reviews, refresh, the review QR (M3.3 T1).
         reviews: { Component: '@/modules/reviews/admin/reviews-view', path: '/reviews' },
+        // The team, their roles, the areas each role is given, what each role opens (owner request, 17 Nov).
+        team: { Component: '@/modules/settings/admin/team-view', path: '/team' },
       },
     },
   },

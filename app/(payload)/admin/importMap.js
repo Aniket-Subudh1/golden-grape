@@ -83,6 +83,7 @@ import { default as default_8030b3f7edb9dc16d3547684ed039a06 } from '@/modules/p
 import { default as default_3979806158f105f174bae8f4a6e6eeca } from '@/modules/attendance/admin/report-view'
 import { default as default_a154a94ff7360b96472b6288363872fc } from '@/modules/reporting/admin/sales-view'
 import { default as default_9b63f0369280bda4ce90b0275a795068 } from '@/modules/reviews/admin/reviews-view'
+import { default as default_3544208aabb8b76242e87586b80626b1 } from '@/modules/settings/admin/team-view'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 
@@ -173,6 +174,7 @@ export const importMap = {
   "@/modules/attendance/admin/report-view#default": default_3979806158f105f174bae8f4a6e6eeca,
   "@/modules/reporting/admin/sales-view#default": default_a154a94ff7360b96472b6288363872fc,
   "@/modules/reviews/admin/reviews-view#default": default_9b63f0369280bda4ce90b0275a795068,
+  "@/modules/settings/admin/team-view#default": default_3544208aabb8b76242e87586b80626b1,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24
 }

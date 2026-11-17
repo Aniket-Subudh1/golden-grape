@@ -16,7 +16,7 @@ type Key = keyof ReturnType<typeof adminText>['nav'];
 // icon items in everyday words, then account links. Only what the user's role may open is listed.
 // An item opens a collection or global (`slug`, listed when the role may see it) or one of our admin pages (`path`, listed
 // for `roles`).
-const GROUPS: {
+export const GROUPS: {
   label: Key;
   items: {
     label: Key;
@@ -129,7 +129,7 @@ const GROUPS: {
       { label: 'slotRules', slug: 'slotRules', icon: 'slots' },
       { label: 'topMenu', slug: 'Header', global: true, icon: 'header' },
       { label: 'footer', slug: 'Footer', global: true, icon: 'footer' },
-      { label: 'team', slug: 'users', icon: 'users' },
+      { label: 'team', slug: 'users', path: '/admin/team', roles: ['manager'], icon: 'users' },
       { label: 'attendanceReport', slug: 'attendance-report', path: '/admin/attendance-report', roles: ['manager'], module: 'attendance', icon: 'slots' },
       { label: 'attendance', slug: 'attendance', roles: ['manager'], module: 'attendance', icon: 'slots' },
       { label: 'activity', slug: 'auditLogs', icon: 'audit' },

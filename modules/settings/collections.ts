@@ -1,18 +1,18 @@
 import { AUDIT_ACTIONS, type AuditAction } from '@/lib/audit';
 import { APIError, type CollectionConfig, type FieldAccess } from 'payload';
-import { hasRole, hiddenUnless, isStaff, none, ROLES } from '@/lib/access';
+import { effectiveRoles, type Grants, hasRole, hiddenUnless, isStaff, none, ROLES } from '@/lib/access';
 import { addButton, boolCell, l, type Label, listOnly } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 
 const adminOnly: FieldAccess = ({ req }) => hasRole(req.user, ['admin']);
 
 // What each role may do, in everyday words (the values stay the role codes of lib/access.ts).
-const ROLE_LABELS: Record<(typeof ROLES)[number], ReturnType<typeof l>> = {
-  admin: l('Propriétaire : tout', 'Owner: everything', 'Inhaber: alles', 'Proprietário: tudo'),
-  manager: l('Gérant : site et réglages', 'Manager: website and settings', 'Leitung: Website und Einstellungen', 'Gerente: site e definições'),
-  sales: l('Ventes : demandes traiteur', 'Sales: catering requests', 'Verkauf: Catering-Anfragen', 'Vendas: pedidos de catering'),
-  stock: l('Stock : boutique (bientôt)', 'Stock: shop (coming soon)', 'Lager: Shop (demnächst)', 'Stock: loja (em breve)'),
-  attendance: l('Pointage (bientôt)', 'Time clock (coming soon)', 'Zeiterfassung (demnächst)', 'Ponto (em breve)'),
+export const ROLE_LABELS: Record<(typeof ROLES)[number], ReturnType<typeof l>> = {
+  admin: l('Propriétaire : tout, l’équipe et les accès', 'Owner: everything, the team and access', 'Inhaber: alles, Team und Zugänge', 'Proprietário: tudo, a equipa e os acessos'),
+  manager: l('Gérant : site, réglages, chiffres', 'Manager: website, settings, figures', 'Leitung: Website, Einstellungen, Zahlen', 'Gerente: site, definições, números'),
+  sales: l('Ventes : commandes, clients, devis, factures', 'Sales: orders, customers, quotations, invoices', 'Verkauf: Bestellungen, Kunden, Angebote, Rechnungen', 'Vendas: encomendas, clientes, orçamentos, faturas'),
+  stock: l('Stock : produits, inventaires, réceptions', 'Stock: products, counts, deliveries', 'Lager: Produkte, Inventuren, Wareneingänge', 'Stock: produtos, inventários, receções'),
+  attendance: l('Pointage : arrivée et départ', 'Time clock: check in and out', 'Zeiterfassung: Kommen und Gehen', 'Ponto: entrada e saída'),
 };
 
 const users: CollectionConfig = {
@@ -61,6 +61,13 @@ const users: CollectionConfig = {
         if (removesOwnAdmin) throw new APIError('You cannot remove your own admin role.', 400, null, true);
         return data;
       },
+      // What every access check reads (lib/access.ts): the roles plus the areas Team & access gives them. Worked out
+      // on each save, so a role taken away never leaves its areas behind.
+      async ({ data, originalDoc, req }) => {
+        const settings = await req.payload.findGlobal({ slug: 'BusinessSettings', depth: 0, overrideAccess: true, req });
+        data.effectiveRoles = effectiveRoles((data.roles ?? originalDoc?.roles) as string[], settings.access?.grants as Grants);
+        return data;
+      },
     ],
   },
   fields: [
@@ -74,6 +81,16 @@ const users: CollectionConfig = {
       label: l('Peut gérer', 'May manage', 'Darf verwalten', 'Pode gerir'),
       options: ROLES.map((value) => ({ value, label: ROLE_LABELS[value] })),
       access: { create: adminOnly, update: adminOnly },
+    },
+    {
+      // Written only by the hook above and by Team & access; in the token, for the staff app.
+      name: 'effectiveRoles',
+      type: 'select',
+      hasMany: true,
+      saveToJWT: true,
+      options: [...ROLES],
+      access: { create: () => false, update: () => false },
+      admin: { hidden: true },
     },
     {
       type: 'row',

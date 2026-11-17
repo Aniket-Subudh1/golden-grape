@@ -79,6 +79,12 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-17 · Team & access (owner request)
+
+- **Asked:** one place in the admin where the owner adds people (staff and other owners) and sets what each role may open. Chosen: a team page plus editable access ("Team page + editable access").
+- **Built:** Settings › Team & access (`/admin/team`, owners edit, managers read): the team (add a person with name, e-mail, password, roles, language, may sign in; edit roles, switch off, new password) in Payload's own drawer; the access table (each role keeps its own area; the owner ticks other areas for it, e.g. Sales also gets Stock); "what each role opens", worked out from the same rules the app enforces (staff screens, the admin menu and each section's visibility rule). One enforcement point: `hasRole` (lib/access.ts) reads each account's `effectiveRoles` = its roles + the areas given to them (`BusinessSettings.access.grants`), written on every save of a person and for everyone when access is saved; so pages, menus, buttons and data access follow at once, for people already signed in too. The staff proxy's early 404 asks the server (`/api/staff/can`) before refusing, so a newly given tab opens without signing in again and a refused one still answers 404. Safeguards: owners only; an owner cannot drop their own owner role or switch themselves off; the last owner who can sign in stays; an e-mail is used once; passwords of 10 characters at least. Every change is in the activity log.
+- **Checked (production build):** walk-through 16/16 (menu → page; short password refused; person added; same e-mail refused with a message; own owner box locked; Sales given Stock → Count and Receive listed, "+ also Stock" on the sales person, the same signed-in sales session opens /staff/count (200), taken back → 404; switched-off person cannot sign in (401); manager read-only; phone 390 px fits, the access table becomes a list; sales has no Team page; no page error); data access with one session: stock counts 403 → 200 after the grant → 403 after taking it back; UX audit 15/15; tests `lib/access.test.ts` (3), `modules/settings/team.int.test.ts` (3); check 349, int 164, e2e 31 passed / 8 skipped.
+
 ### 2026-11-17 · Final UX pass before the M3 release (owner request)
 
 - **Reported:** pop-ups in the staff app felt jumpy ("shrinking, fumbling"), and lacked an entrance and exit worthy of the rest.
