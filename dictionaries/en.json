@@ -1114,5 +1114,37 @@
       "expiredText": "It was valid until {{date}}. Contact us for a new proposal:",
       "replaced": "This quotation has been replaced by a new version, sent by e-mail."
     }
+  },
+  "staff": {
+    "signOut": "Sign out",
+    "back": "Back",
+    "tabs": {
+      "home": "Home",
+      "scan": "Scan",
+      "sale": "Sale",
+      "orders": "Orders",
+      "receive": "Receive",
+      "count": "Count",
+      "customers": "Customers"
+    },
+    "home": {
+      "hello": "Hello {{name}}",
+      "ordersToday": "Today’s orders",
+      "ordersHint": "{{waiting}} to confirm · {{ready}} ready",
+      "reservations": "Upcoming tables",
+      "reservationsHint": "To confirm or accepted",
+      "lowStock": "Low stock",
+      "lowStockHint": "To reorder",
+      "lowStockNone": "Nothing to reorder"
+    },
+    "login": {
+      "eyebrow": "Team area",
+      "title": "Sign in",
+      "email": "E-mail",
+      "password": "Password",
+      "submit": "Sign in",
+      "pending": "Signing in…",
+      "invalid": "Wrong e-mail or password, or the account is disabled."
+    }
   }
 }

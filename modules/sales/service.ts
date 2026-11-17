@@ -568,6 +568,20 @@ export function returnItems(payload: Payload, orderId: string, input: { lines: {
 // ---------------------------------------------------------------------------------------------------------------
 // Reading
 
+/**
+ * The staff home's figures for `day` (M3.1 T1): orders whose slot is that day, by status (a table's pre-order follows
+ * its reservation and is left out), and the table reservations still to decide or to welcome from that day on.
+ */
+export async function staffDay(payload: Payload, day: string) {
+  const rows = await model(payload, 'orders').aggregate<{ _id: OrderStatus; n: number }>([
+    { $match: { 'slot.date': day, mode: { $ne: 'table' }, status: { $nin: RELEASED } } },
+    { $group: { _id: '$status', n: { $sum: 1 } } },
+  ]);
+  const byStatus = Object.fromEntries(rows.map((r) => [r._id, r.n])) as Partial<Record<OrderStatus, number>>;
+  const { totalDocs: reservations } = await payload.count({ collection: 'reservations', where: { 'slot.date': { greater_than_equal: day }, status: { in: HOLDING } }, overrideAccess: true });
+  return { byStatus, orders: rows.reduce((sum, r) => sum + r.n, 0), reservations };
+}
+
 export async function getOrder(payload: Payload, id: string) {
   return payload.findByID({ collection: 'orders', id, depth: 0, overrideAccess: true, disableErrors: true });
 }

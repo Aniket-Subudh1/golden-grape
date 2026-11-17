@@ -1114,5 +1114,37 @@
       "expiredText": "Es war gültig bis {{date}}. Kontaktieren Sie uns für ein neues Angebot:",
       "replaced": "Dieses Angebot wurde durch eine neue Version ersetzt, die per E-Mail gesendet wurde."
     }
+  },
+  "staff": {
+    "signOut": "Abmelden",
+    "back": "Zurück",
+    "tabs": {
+      "home": "Start",
+      "scan": "Scannen",
+      "sale": "Verkauf",
+      "orders": "Bestellungen",
+      "receive": "Wareneingang",
+      "count": "Inventur",
+      "customers": "Kunden"
+    },
+    "home": {
+      "hello": "Hallo {{name}}",
+      "ordersToday": "Bestellungen heute",
+      "ordersHint": "{{waiting}} zu bestätigen · {{ready}} bereit",
+      "reservations": "Kommende Tische",
+      "reservationsHint": "Zu bestätigen oder angenommen",
+      "lowStock": "Niedriger Bestand",
+      "lowStockHint": "Nachbestellen",
+      "lowStockNone": "Nichts nachzubestellen"
+    },
+    "login": {
+      "eyebrow": "Teambereich",
+      "title": "Anmelden",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "submit": "Anmelden",
+      "pending": "Anmeldung…",
+      "invalid": "E-Mail oder Passwort falsch, oder das Konto ist deaktiviert."
+    }
   }
 }

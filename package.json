@@ -34,6 +34,8 @@
     "@payloadcms/storage-s3": "3.92.1",
     "@radix-ui/react-slot": "1.5.0",
     "@react-pdf/renderer": "4.9.0",
+    "@zxing/browser": "0.2.1",
+    "@zxing/library": "0.23.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "graphql": "16.14.2",

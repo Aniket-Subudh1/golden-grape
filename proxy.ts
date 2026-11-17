@@ -13,6 +13,16 @@ export function proxy(request: NextRequest) {
     return NextResponse.next({ request: { headers } });
   }
 
+  // Staff screens (M3.1): no staff session cookie → sign-in first. Only an optimistic check: every staff page verifies
+  // the session with Payload itself (app/(staff)/staff/session.ts).
+  if (pathname === '/staff' || pathname.startsWith('/staff/')) {
+    if (pathname === '/staff/login' || request.cookies.has('payload-token')) return NextResponse.next();
+    const url = request.nextUrl.clone();
+    url.pathname = '/staff/login';
+    url.search = `?next=${encodeURIComponent(pathname + request.nextUrl.search)}`;
+    return NextResponse.redirect(url, 307);
+  }
+
   // Customer area: a visitor without the session cookie goes to sign-in before anything renders (a redirect thrown
   // while rendering breaks Next's instant-navigation check). An expired session is handled by the page itself.
   const account = /^\/(fr|en|de|pt)\/account(\/|$)/.exec(pathname);
@@ -32,6 +42,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // The admin pages, plus everything except APIs, the staff app, Next internals and files with an extension.
-  matcher: ['/admin', '/admin/:path*', '/((?!(?:admin|api|staff)(?:/|$)|_next/|.*\\.\\w+$).*)'],
+  // The admin pages, the staff screens, plus everything except APIs, Next internals and files with an extension.
+  matcher: ['/admin', '/admin/:path*', '/staff', '/staff/:path*', '/((?!(?:admin|api|staff)(?:/|$)|_next/|.*\\.\\w+$).*)'],
 };

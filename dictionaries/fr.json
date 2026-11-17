@@ -1114,5 +1114,37 @@
       "expiredText": "Il était valable jusqu’au {{date}}. Contactez-nous pour une nouvelle proposition :",
       "replaced": "Ce devis a été remplacé par une nouvelle version, envoyée par e-mail."
     }
+  },
+  "staff": {
+    "signOut": "Se déconnecter",
+    "back": "Retour",
+    "tabs": {
+      "home": "Accueil",
+      "scan": "Scanner",
+      "sale": "Vente",
+      "orders": "Commandes",
+      "receive": "Réception",
+      "count": "Inventaire",
+      "customers": "Clients"
+    },
+    "home": {
+      "hello": "Bonjour {{name}}",
+      "ordersToday": "Commandes du jour",
+      "ordersHint": "{{waiting}} à confirmer · {{ready}} prêtes",
+      "reservations": "Tables à venir",
+      "reservationsHint": "À confirmer ou acceptées",
+      "lowStock": "Stock bas",
+      "lowStockHint": "À recommander",
+      "lowStockNone": "Rien à recommander"
+    },
+    "login": {
+      "eyebrow": "Espace équipe",
+      "title": "Connexion",
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "pending": "Connexion…",
+      "invalid": "E-mail ou mot de passe incorrect, ou compte désactivé."
+    }
   }
 }

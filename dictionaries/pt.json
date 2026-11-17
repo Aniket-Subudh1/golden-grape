@@ -1114,5 +1114,37 @@
       "expiredText": "Era válido até {{date}}. Contacte-nos para uma nova proposta:",
       "replaced": "Este orçamento foi substituído por uma nova versão, enviada por e-mail."
     }
+  },
+  "staff": {
+    "signOut": "Terminar sessão",
+    "back": "Voltar",
+    "tabs": {
+      "home": "Início",
+      "scan": "Ler",
+      "sale": "Venda",
+      "orders": "Encomendas",
+      "receive": "Receção",
+      "count": "Inventário",
+      "customers": "Clientes"
+    },
+    "home": {
+      "hello": "Olá {{name}}",
+      "ordersToday": "Encomendas de hoje",
+      "ordersHint": "{{waiting}} por confirmar · {{ready}} prontas",
+      "reservations": "Mesas a seguir",
+      "reservationsHint": "Por confirmar ou aceites",
+      "lowStock": "Stock baixo",
+      "lowStockHint": "A encomendar",
+      "lowStockNone": "Nada a encomendar"
+    },
+    "login": {
+      "eyebrow": "Área da equipa",
+      "title": "Entrar",
+      "email": "E-mail",
+      "password": "Palavra-passe",
+      "submit": "Entrar",
+      "pending": "A entrar…",
+      "invalid": "E-mail ou palavra-passe incorretos, ou conta desativada."
+    }
   }
 }

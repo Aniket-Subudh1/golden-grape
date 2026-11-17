@@ -141,6 +141,12 @@ export async function onHand(payload: Payload, variantIds: string[]): Promise<Re
   return Object.fromEntries(variantIds.map((id) => [id, byVariant.get(id) ?? 0]));
 }
 
+/** How many sizes are at or below their alert level (the staff home tile, M3.1 T1). */
+export async function lowStockCount(payload: Payload) {
+  const { totalDocs } = await payload.count({ collection: 'stockLevels', where: { lowStock: { equals: true } }, overrideAccess: true });
+  return totalDocs;
+}
+
 /** Staff overview of several variants together (the product list): units on hand and whether any is low. */
 export async function stockSummary(payload: Payload, variantIds: string[]) {
   const { docs } = await payload.find({ collection: 'stockLevels', where: { variant: { in: variantIds } }, limit: 0, depth: 0, overrideAccess: true });

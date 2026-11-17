@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Cormorant_Garamond, Inter } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { CartSheet } from '@/components/site/cart-sheet';
@@ -16,16 +15,8 @@ import { getFooter, getHeader } from '@/modules/cms/service';
 import { directionsUrl, getSettings } from '@/modules/settings/service';
 import { TABLE_BOOKING } from '@/modules/sales/order-states';
 import { CartProvider } from '@/modules/webshop/cart';
+import { sans, serif } from '../../fonts';
 import '../../globals.css';
-
-const serif = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['300', '400', '500'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
-  display: 'swap',
-});
-const sans = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 
 export const generateStaticParams = () => LOCALES.map((locale) => ({ locale }));
 
