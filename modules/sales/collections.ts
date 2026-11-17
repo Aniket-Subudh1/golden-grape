@@ -172,6 +172,7 @@ const lineFields: Field[] = [
   { name: 'name', type: 'text', required: true },
   { name: 'detail', type: 'text' },
   { name: 'unitPriceCents', type: 'number', required: true },
+  { name: 'promoCents', type: 'number', defaultValue: 0 },
   { name: 'discountCents', type: 'number', defaultValue: 0 },
   { name: 'vatBp', type: 'number', required: true },
   { name: 'totalCents', type: 'number', required: true },
@@ -266,11 +267,27 @@ export const orders: CollectionConfig = {
         // The total shows in euros through its cell; the amounts in cents behind it are never columns (GG-07).
         fields: [
           { name: 'subtotalCents', type: 'number', required: true, admin: internal },
+          { name: 'promotionCents', type: 'number', defaultValue: 0, admin: internal },
           { name: 'discountCents', type: 'number', defaultValue: 0, admin: internal },
           { name: 'deliveryCents', type: 'number', defaultValue: 0, admin: internal },
           { name: 'vatCents', type: 'number', required: true, admin: internal },
           { name: 'totalCents', type: 'number', required: true, admin: internal },
           { name: 'vatBreakdown', type: 'array', admin: internal, fields: [{ name: 'rateBp', type: 'number' }, { name: 'baseCents', type: 'number' }, { name: 'vatCents', type: 'number' }] },
+        ],
+      },
+      {
+        // How the total was reached and paid for beyond money (M3.2): the code (its uses are counted by `redeem` in
+        // the order's transaction), the promotions, loyalty points and gift cards used, and what was left to pay.
+        name: 'pricing',
+        type: 'group',
+        admin: internal,
+        fields: [
+          { name: 'code', type: 'text', index: true },
+          { name: 'promotions', type: 'json' },
+          { name: 'loyaltyPoints', type: 'number', defaultValue: 0 },
+          { name: 'loyaltyCents', type: 'number', defaultValue: 0 },
+          { name: 'giftCards', type: 'array', fields: [{ name: 'code', type: 'text' }, { name: 'amountCents', type: 'number' }] },
+          { name: 'amountDueCents', type: 'number' },
         ],
       },
       {

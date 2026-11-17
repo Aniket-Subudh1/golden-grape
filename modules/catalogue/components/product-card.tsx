@@ -34,7 +34,8 @@ export function ProductCard({ product: p, locale, t, sizes, priority }: Props) {
           {p.priceCents !== null && (
             <span>
               {p.from && <span className="text-ink/50">{t.from} </span>}
-              {formatMoney(p.priceCents, locale)}
+              {p.wasCents !== null && <s className="mr-1.5 text-ink/40">{formatMoney(p.wasCents, locale)}</s>}
+              <span className={p.wasCents !== null ? 'text-gold-deep' : undefined}>{formatMoney(p.priceCents, locale)}</span>
             </span>
           )}
         </p>

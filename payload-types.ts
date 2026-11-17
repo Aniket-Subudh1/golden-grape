@@ -925,6 +925,7 @@ export interface Order {
         name: string;
         detail?: string | null;
         unitPriceCents: number;
+        promoCents?: number | null;
         discountCents?: number | null;
         vatBp: number;
         totalCents: number;
@@ -933,6 +934,7 @@ export interface Order {
     | null;
   totals?: {
     subtotalCents: number;
+    promotionCents?: number | null;
     discountCents?: number | null;
     deliveryCents?: number | null;
     vatCents: number;
@@ -945,6 +947,28 @@ export interface Order {
           id?: string | null;
         }[]
       | null;
+  };
+  pricing?: {
+    code?: string | null;
+    promotions?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    loyaltyPoints?: number | null;
+    loyaltyCents?: number | null;
+    giftCards?:
+      | {
+          code?: string | null;
+          amountCents?: number | null;
+          id?: string | null;
+        }[]
+      | null;
+    amountDueCents?: number | null;
   };
   payment?: {
     provider?: ('manual' | 'wallee') | null;
@@ -2504,6 +2528,7 @@ export interface OrdersSelect<T extends boolean = true> {
         name?: T;
         detail?: T;
         unitPriceCents?: T;
+        promoCents?: T;
         discountCents?: T;
         vatBp?: T;
         totalCents?: T;
@@ -2513,6 +2538,7 @@ export interface OrdersSelect<T extends boolean = true> {
     | T
     | {
         subtotalCents?: T;
+        promotionCents?: T;
         discountCents?: T;
         deliveryCents?: T;
         vatCents?: T;
@@ -2525,6 +2551,22 @@ export interface OrdersSelect<T extends boolean = true> {
               vatCents?: T;
               id?: T;
             };
+      };
+  pricing?:
+    | T
+    | {
+        code?: T;
+        promotions?: T;
+        loyaltyPoints?: T;
+        loyaltyCents?: T;
+        giftCards?:
+          | T
+          | {
+              code?: T;
+              amountCents?: T;
+              id?: T;
+            };
+        amountDueCents?: T;
       };
   payment?:
     | T

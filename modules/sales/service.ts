@@ -8,7 +8,7 @@ import { model, type Tx, withTx } from '@/lib/tx';
 import { postMovements } from '@/modules/inventory/service';
 import { type Movement, provider } from '@/modules/payments/provider';
 import { dueOf, type Figures, paymentState, refundableOf } from '@/modules/payments/service';
-import { quoteCart } from '@/modules/promotions/service';
+import { quoteCart, redeem } from '@/modules/promotions/service';
 import { NUMBERING } from '@/modules/settings/globals';
 import { activeAccounts, type BankAccount, getSettingsPrivate, transferAccount } from '@/modules/settings/service';
 import type { Customer, Order, Reservation, SlotRule as SlotRuleDoc } from '@/payload-types';
@@ -134,6 +134,8 @@ export type PlaceOrderInput = {
   payment: PaymentChoice;
   notes?: string;
   locale: Locale;
+  /** A discount code typed in the cart (M3.2). */
+  code?: string;
 };
 
 export type Placed = { kind: 'order' | 'reservation'; id: string; number: string; created: boolean };
@@ -148,12 +150,19 @@ const pricedLines = (q: Awaited<ReturnType<typeof quoteCart>>) => ({
     name: l.name,
     detail: l.detail,
     unitPriceCents: l.unitPriceCents,
+    promoCents: l.promoCents,
     discountCents: l.discountCents,
     vatBp: l.vatBp,
     totalCents: l.totalCents,
   })),
-  totals: { subtotalCents: q.subtotalCents, discountCents: q.discountCents, deliveryCents: q.deliveryCents, vatCents: q.vatCents, totalCents: q.totalCents, vatBreakdown: q.vatBreakdown },
+  totals: { subtotalCents: q.subtotalCents, promotionCents: q.promotionCents, discountCents: q.discountCents, deliveryCents: q.deliveryCents, vatCents: q.vatCents, totalCents: q.totalCents, vatBreakdown: q.vatBreakdown },
+  pricing: { code: q.code, promotions: q.promotions, loyaltyPoints: q.loyaltyPointsUsed, loyaltyCents: q.loyaltyCents, giftCards: q.giftCards, amountDueCents: q.amountDueCents },
 });
+
+/** A code typed but refused since the cart was shown (dates, uses, minimum): the order stops with the reason. */
+function assertCode(q: { codeRejected: string | null }) {
+  if (q.codeRejected) throw new AppError('VALIDATION', q.codeRejected, 'code');
+}
 
 /** The order or reservation already placed with this key (sequential reads: one transaction session runs one at a time). */
 async function findPlaced(payload: Payload, key: string, tx?: Tx): Promise<Placed | null> {
@@ -190,8 +199,9 @@ export async function placeOrder(payload: Payload, input: PlaceOrderInput, { cus
       const zone = input.mode === 'delivery' ? await zoneFor(payload, input.address!.postalCode, tx) : null;
       if (input.mode === 'delivery' && !zone) throw new AppError('VALIDATION', 'outsideZone', 'postalCode');
       const q = withLines
-        ? await quoteCart(payload, input.lines, { customer, channel: 'webshop', locale: input.locale, delivery: zone })
+        ? await quoteCart(payload, input.lines, { customer, channel: 'webshop', locale: input.locale, delivery: zone, code: input.code })
         : null;
+      if (q) assertCode(q);
       // The cart changed since it was shown (stock, availability): the visitor sees it corrected before paying.
       if (q && q.notices.length > 0) throw new AppError('OUT_OF_STOCK', 'cartChanged', 'lines');
       // A table's pre-order holds only the counter's dishes and drinks: a shop purchase is never booked as a table
@@ -231,6 +241,7 @@ export async function placeOrder(payload: Payload, input: PlaceOrderInput, { cus
             stockPosted: false,
           },
         });
+        await redeem(tx, q, { order: order.id, customer: customer?.id });
       }
 
       if (input.mode === 'table') {
@@ -277,6 +288,8 @@ export type StaffSaleInput = {
   /** "Paid on site": confirmed and paid in full. "Invoice later": confirmed, unpaid (the invoice comes with M3.2). */
   payment: 'onsite' | 'invoice';
   notes?: string;
+  /** A discount code (M3.2). */
+  code?: string;
 };
 
 /**
@@ -296,8 +309,9 @@ export async function placeStaffOrder(payload: Payload, input: StaffSaleInput, {
     return await withTx(payload, async (tx) => {
       const again = await findPlaced(payload, input.idempotencyKey, tx);
       if (again) return again;
-      const q = await quoteCart(payload, input.lines, { customer, channel: 'mobile', locale });
+      const q = await quoteCart(payload, input.lines, { customer, channel: 'mobile', locale, code: input.code });
       if (q.notices.length > 0) throw new AppError('OUT_OF_STOCK', 'cartChanged', 'lines');
+      assertCode(q);
       const { numbering } = await getSettingsPrivate();
       const day = today(now);
       const time = localStamp(now).slice(11, 16);
@@ -326,6 +340,7 @@ export async function placeStaffOrder(payload: Payload, input: StaffSaleInput, {
           stockPosted: false,
         },
       });
+      await redeem(tx, q, { order: order.id, customer: customer.id });
       const started = await provider(order.payment?.provider).start(tx, order);
       const money = figuresOf(order);
       const history: NonNullable<Order['history']> = [];

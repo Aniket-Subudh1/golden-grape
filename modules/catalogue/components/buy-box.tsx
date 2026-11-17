@@ -59,7 +59,8 @@ export function BuyBox({ options, locale, t }: { options: BuyOption[]; locale: L
                     </span>
                   </span>
                   <span className="text-right">
-                    <span className="block font-serif text-lg tabular-nums">{formatMoney(o.priceCents, locale)}</span>
+                    {o.wasCents !== null && <s className="block text-xs text-ink/40 tabular-nums">{formatMoney(o.wasCents, locale)}</s>}
+                    <span className={`block font-serif text-lg tabular-nums ${o.wasCents !== null ? 'text-gold-deep' : ''}`}>{formatMoney(o.priceCents, locale)}</span>
                     {out && <span className="eyebrow text-[9px] text-ink/50">{t.outOfStock}</span>}
                   </span>
                 </label>
@@ -69,7 +70,12 @@ export function BuyBox({ options, locale, t }: { options: BuyOption[]; locale: L
         </fieldset>
       )}
 
-      {options.length === 1 && <p className="font-serif text-3xl tabular-nums">{formatMoney(option.priceCents, locale)}</p>}
+      {options.length === 1 && (
+        <p className="font-serif text-3xl tabular-nums">
+          {option.wasCents !== null && <s className="mr-3 text-xl text-ink/40">{formatMoney(option.wasCents, locale)}</s>}
+          <span className={option.wasCents !== null ? 'text-gold-deep' : undefined}>{formatMoney(option.priceCents, locale)}</span>
+        </p>
+      )}
 
       {/* Availability, always said (APPLUX report 4, §1): in stock, the last ones, or sold out. */}
       <p className={cn('flex items-center gap-2 text-[11px] tracking-[0.18em] uppercase', soldOut ? 'text-burgundy' : room !== null && room <= 6 ? 'text-gold-deep' : 'text-emerald-800')}>

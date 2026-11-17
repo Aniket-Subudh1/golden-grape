@@ -27,10 +27,10 @@ export const slotsFor = publicAction(z.object({ mode: z.enum(SLOT_MODES) }), asy
 
 /** Checkout totals with the delivery fee of the postcode typed (server prices and zones only). */
 export const checkoutQuote = publicAction(
-  z.object({ locale: z.enum(LOCALES), mode: z.enum(SLOT_MODES), lines, postalCode: z.string().max(12).optional() }),
+  z.object({ locale: z.enum(LOCALES), mode: z.enum(SLOT_MODES), lines, postalCode: z.string().max(12).optional(), code: optionalText(40) }),
   async (input, { payload }) => {
     const zone = input.mode === 'delivery' && input.postalCode?.trim() ? await zoneFor(payload, input.postalCode) : null;
-    const quote = input.lines.length > 0 ? await quoteCart(payload, input.lines, { customer: await currentCustomer(), channel: 'webshop', locale: input.locale, delivery: zone }) : null;
+    const quote = input.lines.length > 0 ? await quoteCart(payload, input.lines, { customer: await currentCustomer(), channel: 'webshop', locale: input.locale, delivery: zone, code: input.code }) : null;
     return {
       quote,
       zone: zone && {
@@ -74,6 +74,7 @@ const checkout = z
     payment: z.enum(['onsite', 'transfer'], 'required'),
     notes: optionalText(2000),
     locale: z.enum(LOCALES),
+    code: optionalText(40),
     website: z.string().optional(), // honeypot
   })
   .superRefine((d, ctx) => {
@@ -229,15 +230,15 @@ export const decideReservation = action(
 const saleRoles = { roles: ORDER_ROLES };
 
 /** Live totals of the sale being built, priced for the chosen customer on the mobile channel. */
-export const quoteStaffSale = action(z.object({ customer: z.string().max(40).optional(), lines }), saleRoles, async (input, { payload, user }) => {
+export const quoteStaffSale = action(z.object({ customer: z.string().max(40).optional(), lines, code: optionalText(40) }), saleRoles, async (input, { payload, user }) => {
   const customer = input.customer ? await getCustomer(payload, input.customer) : null;
   if (input.lines.length === 0) return null;
-  return quoteCart(payload, input.lines, { customer, channel: 'mobile', locale: (customer?.locale ?? user.locale ?? 'fr') as (typeof LOCALES)[number] });
+  return quoteCart(payload, input.lines, { customer, channel: 'mobile', locale: (customer?.locale ?? user.locale ?? 'fr') as (typeof LOCALES)[number], code: input.code });
 });
 
 /** Places the sale: paid on site (confirmed and paid) or invoiced later (confirmed, unpaid). Stock out at once. */
 export const placeStaffSale = action(
-  z.object({ idempotencyKey: z.uuid(), customer: z.string().min(1).max(40), lines: lines.min(1), payment: z.enum(['onsite', 'invoice']), notes: optionalText(500) }),
+  z.object({ idempotencyKey: z.uuid(), customer: z.string().min(1).max(40), lines: lines.min(1), payment: z.enum(['onsite', 'invoice']), notes: optionalText(500), code: optionalText(40) }),
   saleRoles,
   async (input, { payload, user }) => {
     const placed = await placeStaffOrder(payload, input, { staff: user.id });
