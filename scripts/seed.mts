@@ -58,6 +58,10 @@ const PHOTOS: Record<string, { file: string; alt: Record<Locale, string> }> = {
   ivoTable: { file: 'catering-events/Catering_11.jpg', alt: { fr: 'Une grande table de réception dressée dans la boutique', en: 'A large catering table laid out in the shop', de: 'Eine große Catering-Tafel im Laden', pt: 'Uma grande mesa de catering na loja' } },
   // Home page photos (the prototype's lib/brand.ts slots that had no CMS photo yet).
   sandwiches: { file: 'catering-events/Catering_7.jpg', alt: { fr: 'Petits pains garnis servis sur une salade de tomates cerises', en: 'Filled bread rolls served on a cherry-tomato salad', de: 'Belegte Brötchen auf einem Kirschtomatensalat', pt: 'Pãezinhos recheados servidos sobre salada de tomate-cereja' } },
+  // The home page's banners and contact section (client request 17 Nov): upright, warm photos of each part of the house.
+  festive: { file: 'catering-events/Catering_4.jpg', alt: { fr: 'Table de réception couverte de fruits, macarons et douceurs devant le mur de vins', en: 'Reception table covered with fruit, macarons and sweets in front of the wine wall', de: 'Empfangstafel mit Obst, Macarons und Süßem vor der Weinwand', pt: 'Mesa de receção coberta de fruta, macarons e doces diante da parede de vinhos' } },
+  evening: { file: 'owners-team/Owners_2.jpg', alt: { fr: 'Une soirée musicale à la Maison, verre de vin à la main', en: 'A music evening at the House, glass of wine in hand', de: 'Ein Musikabend im Haus, mit einem Glas Wein in der Hand', pt: 'Uma noite de música na Casa, de copo de vinho na mão' } },
+  salon: { file: 'home-store/Home_9.jpg', alt: { fr: 'Le salon de la boutique au soleil, devant les étagères de vins', en: 'The shop’s lounge in the sun, in front of the wine shelves', de: 'Die Lounge des Ladens in der Sonne vor den Weinregalen', pt: 'A sala da loja ao sol, diante das prateleiras de vinhos' } },
   // Product photos: the prototype's choice per product (its routes/shop.tsx and snack.tsx), several reused as stand-ins.
   wines: { file: 'home-store/Home_2.jpg', alt: { fr: 'Bouteilles de vins portugais alignées devant les étagères de la boutique', en: 'Portuguese wine bottles lined up in front of the shop’s shelves', de: 'Portugiesische Weinflaschen vor den Regalen des Ladens', pt: 'Garrafas de vinho português alinhadas diante das prateleiras da loja' } },
   board: { file: 'shop-wines-gourmet/Shop_5.jpg', alt: { fr: 'Une bouteille de rouge du Douro sur une planche avec raisins et jambon', en: 'A bottle of Douro red on a board with grapes and cured ham', de: 'Eine Flasche Douro-Rotwein auf einem Brett mit Trauben und Schinken', pt: 'Uma garrafa de tinto do Douro numa tábua com uvas e presunto' } },
@@ -247,13 +251,14 @@ await global('Footer', (l) => {
 await global('HappyHour', (l) => ({ active: true, days: ['3', '4', '5'], from: '17:00', to: '20:00', ...c(l).happyHour, image: media.table }));
 log('Header, Footer, HappyHour saved');
 
-// The home page's four banner photos (client request 17 Nov) and the shop interior of the Contact page.
+// The home page's photos (four banners and the contact section, client request 17 Nov) and the Contact page's interior.
 await global('HomePage', () => ({
   photos: {
     shop: media.wines,
-    table: media.table,
-    catering: media.grazing,
-    events: media.piano,
+    table: media.bifana,
+    catering: media.festive,
+    events: media.evening,
+    contact: media.salon,
     interior: media.interior,
   },
 }));

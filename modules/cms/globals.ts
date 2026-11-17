@@ -210,10 +210,10 @@ export const homePage: GlobalConfig = {
   admin: {
     hidden: hiddenUnless('manager'),
     description: l(
-      'Les photos des quatre bannières de la page d’accueil. Une grande photo en largeur (au moins 2000 px) rend le mieux.',
-      'The photos of the home page’s four banners. A large landscape photo (at least 2000 px wide) works best.',
-      'Die Fotos der vier Banner der Startseite. Ein großes Querformat-Foto (mindestens 2000 px breit) wirkt am besten.',
-      'As fotos das quatro faixas da página inicial. Uma foto grande na horizontal (pelo menos 2000 px de largura) fica melhor.',
+      'Les photos de la page d’accueil. Les quatre bannières sont hautes et étroites sur ordinateur : une photo en hauteur (portrait, au moins 1400 px de haut) avec le sujet au centre rend le mieux.',
+      'The home page’s photos. The four banners are tall and narrow on computers: an upright photo (portrait, at least 1400 px high) with its subject in the centre works best.',
+      'Die Fotos der Startseite. Die vier Banner sind am Computer hoch und schmal: ein Hochformat-Foto (mindestens 1400 px hoch) mit dem Motiv in der Mitte wirkt am besten.',
+      'As fotos da página inicial. As quatro faixas são altas e estreitas no computador: uma foto na vertical (pelo menos 1400 px de altura) com o tema ao centro fica melhor.',
     ),
     preview: (_, { locale }) => `/${locale}`,
   },
@@ -232,6 +232,7 @@ export const homePage: GlobalConfig = {
             banner('table', l('Bannière 2 : Réserver une table', 'Banner 2: Book a table', 'Banner 2: Tisch reservieren', 'Faixa 2: Reservar uma mesa')),
             banner('catering', l('Bannière 3 : Services Catering', 'Banner 3: Catering services', 'Banner 3: Catering-Services', 'Faixa 3: Serviços de Catering')),
             banner('events', l('Bannière 4 : Événements', 'Banner 4: Events', 'Banner 4: Veranstaltungen', 'Faixa 4: Eventos')),
+            banner('contact', l('Section Contact (page d’accueil)', 'Contact section (home page)', 'Kontaktbereich (Startseite)', 'Secção Contacto (página inicial)')),
             banner('interior', l('Intérieur de la boutique (page Contact)', 'Shop interior (Contact page)', 'Ladeninneres (Kontaktseite)', 'Interior da loja (página Contacto)')),
           ],
         },

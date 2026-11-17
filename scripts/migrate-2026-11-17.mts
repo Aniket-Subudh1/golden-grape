@@ -75,4 +75,37 @@ for (const { name, collection } of stores) {
   }
   console.info(`[traiteur] ${name}: ${check ? 'would change' : 'changed'} ${changed} document(s).`);
 }
+
+// Client request 17 Nov: the home page's banners are tall on computers and the contact section has a photo. A slot that
+// is empty or still holds the photo the seed first put there takes the new choice (uploaded from public/brand if it is
+// not in the media library yet); a photo staff picked stays.
+const HOME: Record<string, { file: string; was: string[]; alt: string }> = {
+  shop: { file: 'home-store/Home_2.jpg', was: [], alt: 'Bouteilles de vins portugais alignées devant les étagères de la boutique' },
+  table: { file: 'snack-menu/Snack_3.jpg', was: ['Home_8.jpg'], alt: 'Sandwich chaud aux frites allumettes, servi avec un verre de vin rouge' },
+  catering: { file: 'catering-events/Catering_4.jpg', was: ['Catering_9.jpg'], alt: 'Table de réception couverte de fruits, macarons et douceurs devant le mur de vins' },
+  events: { file: 'owners-team/Owners_2.jpg', was: ['Home_11.jpg'], alt: 'Une soirée musicale à la Maison, verre de vin à la main' },
+  contact: { file: 'home-store/Home_9.jpg', was: [], alt: 'Le salon de la boutique au soleil, devant les étagères de vins' },
+};
+const home = await payload.findGlobal({ slug: 'HomePage', depth: 1, overrideAccess: true });
+const photos: Record<string, unknown> = { ...(home.photos ?? {}) };
+let moved = 0;
+for (const [slot, { file, was, alt }] of Object.entries(HOME)) {
+  const current = photos[slot] as { filename?: string } | string | null | undefined;
+  const name = typeof current === 'object' && current ? current.filename : undefined;
+  // Payload adds "-1" to a name already taken (Home_8-1.jpg).
+  if (current && !(name && was.includes(name.replace(/-\d+(\.\w+)$/, '$1')))) continue;
+  const filename = file.split('/').pop()!;
+  console.info(`[home] ${slot}: ${name ?? 'empty'} → ${filename}`);
+  moved++;
+  if (check) continue;
+  const found = await payload.find({ collection: 'media', where: { filename: { equals: filename } }, limit: 1, depth: 0, overrideAccess: true });
+  const doc = found.docs[0] ?? (await payload.create({ collection: 'media', data: { alt }, filePath: `public/brand/${file}`, locale: 'fr', overrideAccess: true }));
+  photos[slot] = doc.id;
+}
+if (moved > 0 && !check) {
+  const ids = Object.fromEntries(Object.entries(photos).map(([k, v]) => [k, typeof v === 'object' && v ? (v as { id: string }).id : v]));
+  // Outside Next the cache tag cannot be cleared here: the deploy's fresh build shows the new photos.
+  await payload.updateGlobal({ slug: 'HomePage', data: { photos: ids } as never, depth: 0, overrideAccess: true, context: { skipRevalidate: true } });
+}
+console.info(`[home] ${check ? 'would set' : 'set'} ${moved} photo(s).`);
 process.exit(0);

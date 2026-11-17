@@ -4075,7 +4075,7 @@ export interface BusinessSetting {
   createdAt?: string | null;
 }
 /**
- * The photos of the home page’s four banners. A large landscape photo (at least 2000 px wide) works best.
+ * The home page’s photos. The four banners are tall and narrow on computers: an upright photo (portrait, at least 1400 px high) with its subject in the centre works best.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "HomePage".
@@ -4087,6 +4087,7 @@ export interface HomePage {
     table?: (string | null) | Media;
     catering?: (string | null) | Media;
     events?: (string | null) | Media;
+    contact?: (string | null) | Media;
     interior?: (string | null) | Media;
   };
   updatedAt?: string | null;
@@ -4542,6 +4543,7 @@ export interface HomePageSelect<T extends boolean = true> {
         table?: T;
         catering?: T;
         events?: T;
+        contact?: T;
         interior?: T;
       };
   updatedAt?: T;

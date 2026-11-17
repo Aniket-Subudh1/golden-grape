@@ -34,7 +34,7 @@ async function BannersSection({ t, locale, hrefs }: { t: Dictionary['home']; loc
 }
 
 async function ContactSection({ t, locale }: { t: Dictionary; locale: Locale }) {
-  const settings = await getSettings();
+  const [settings, { photos }] = await Promise.all([getSettings(), getHomePage(locale)]);
   const { business: b, hours } = settings;
   if (!b?.street) return null; // BusinessSettings not filled in yet
   return (
@@ -43,6 +43,8 @@ async function ContactSection({ t, locale }: { t: Dictionary; locale: Locale }) 
       <HomeContact
         t={t.home.contact}
         labels={t.contactPage.info}
+        photo={mediaOf(photos?.contact)}
+        city={b.city}
         address={[b.street, `L-${b.postalCode} ${b.city}${b.country ? `, ${b.country}` : ''}`]}
         phone={b.phone}
         email={b.email}
@@ -66,15 +68,15 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
     events: localePath(locale, '/events'),
   };
   return (
-    <div className="bg-ink">
+    <>
       <h1 className="sr-only">{t.meta.home.title}</h1>
-      {/* The fallback is the same banners without their photos, so nothing moves when they arrive. */}
-      <Suspense fallback={<Banners t={t.home} hrefs={hrefs} />}>
+      {/* Until the photos arrive, the dark ground the banners open on (they open once, when they are there). */}
+      <Suspense fallback={<div className="h-svh bg-ink" />}>
         <BannersSection t={t.home} locale={locale} hrefs={hrefs} />
       </Suspense>
       <Suspense fallback={null}>
         <ContactSection t={t} locale={locale} />
       </Suspense>
-    </div>
+    </>
   );
 }

@@ -79,6 +79,15 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-17 · Home page redesign: four vertical banners (owner: "too plain, must look excellent")
+
+- **Found:** four identical dark boxes stacked down the page; the first screen showed only "Shop en ligne"; weak photos (glasses and napkins for the table); contact details dark on dark next to the dark footer.
+- **Now:** the brief's "quatre bannières verticales" taken literally. On computers four tall panels stand side by side and fill the first screen under the menu; the one under the pointer (or keyboard focus) widens, the others dim, its line opens and the arrow fills gold. On load they open once from the foot, one after the other (CSS only, still under reduced motion). Tablets: two by two; phones: one below the other, every line shown. Titles and buttons line up across the panels (one text block height from 768 px). The contact section is now light: the shop's salon photo beside "Golden Grape / *Bissen*", the details as ruled rows, Directions and Write to us.
+- **Photos (the client's own, `public/brand`):** shop Home_2 (bottles), table Snack_3 (wine and a bifana on a table), catering Catering_4 (fruit and macaron table), events Owners_2 (a music evening), contact Home_9 (the salon). All editable under Page d'accueil, which now has a sixth slot (Contact section) and asks for upright photos. `migrate-2026-11-17` sets them where a slot is empty or still holds the first seeded photo (Home_8, Catering_9, Home_11, also as "-1" copies); a photo staff chose stays.
+- Removed: the unused hero animations (`animate-rise`, `animate-slow-zoom`).
+- **Checked (dev server, throwaway seeded DB):** 1440 at rest, on hover and with keyboard focus; 1024 and 768 (FR, PT, DE); 390 (FR, PT); the opening frame; reduced motion; links (shop, table booking, takeaway, catering, events); the migration twice on the throwaway DB (4 photos set, then 0). `npm run check` (359), production build.
+- Not checked: Safari and real phones; the live database (run the migration with `--check` first).
+
 ### 2026-11-17 · Client feedback after first tests (delivery, home page, "Traiteur")
 - **Delivery = shop goods only.** Counter dishes (`kind: snack`) are never delivered; any other product can be kept to pickup with the new product box "Retrait uniquement" (`pickupOnly`). One rule, `isDeliverable()` (`modules/sales/zones.ts`): quote lines carry `deliverable`; `placeOrder` refuses a delivery basket with one such line (`notDeliverable`, nothing written); the checkout names the items with "Choisir plutôt à emporter" / "Retirer ces articles"; the cart says it in delivery mode; the delivery hint reads "Vins et produits de la boutique, livrés chez vous."; the Counter page lost its Delivery card.
 - **Delivery priced by driving distance.** `deliveryZones` is now a list of ranges ("up to X km": fee, minimum, free from), edited by Ivo under Réglages › Livraison par distance. Postcode → km from the shop is a shipped table (`postcode-km.json`, 4,201 postcodes, BD-Adresses CC0 + OSRM, built once by `scripts/postcode-distances.mts`), so changing a limit moves the postcodes at once, with no API key, no running cost and no outage at checkout. The range's form lists the places and postcodes it covers while the limit is typed, and checks any postcode. Checkout shows "Ettelbruck · 9,6 km · Livraison 5,00 €". Precision: one point per postcode (the address nearest its centre), enough for 10 km bands; a street-level price would need a paid geocoding/routing service (not taken).
@@ -86,7 +95,7 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 - **"Traiteur" → "Services Catering"** (EN Catering Services, DE Catering-Services, PT Serviços de Catering) in dictionaries, admin labels, seed content and photo descriptions; `migrate-2026-11-17` rewrites stored texts (menu, footer, pages, catering packages, media alt). The contact form's internal subject value stays `traiteur` (never shown).
 - Migration: run `npm run migrate:2026-11-17 -- --check`, then without `--check`, on the release.
 - Verified: `npm run check` (359), `npm run test:int` (165, incl. new: counter dish / pickup-only refused for delivery, 47 km refused). Browser on a production build with a throwaway seeded DB: home desktop + iPhone 14, nav "Services Catering", checkout (dish named + removed, 9,6 km fee, 9990 refused), admin range panel (10 → 12 km: 200 → 251 postcodes, 9011 checked). E2E specs updated, **not run** (need the seeded staging DB).
-- Open: Q — Ivo to confirm the starting ranges (≤10 km 5 €, min 30 €, free 80 €; ≤20 km 8 €, min 50 €, free 120 €) and to supply four landscape banner photos.
+- Open: Q — Ivo to confirm the starting ranges (≤10 km 5 €, min 30 €, free 80 €; ≤20 km 8 €, min 50 €, free 120 €) and to supply four banner photos (upright now, see the home page redesign above).
 
 ### 2026-11-17 · One frame for the admin pages built in M3 (owner request)
 
