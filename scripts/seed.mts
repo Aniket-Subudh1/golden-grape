@@ -2,7 +2,6 @@
 // catering packages and events, the prototype's catalogue (until DEP-04), plus the client's photos as media.
 // Re-running overwrites CMS edits to these.
 // Run: npm run seed -- --email you@example.lu --password '…' --name 'Your Name'
-import type { MongooseAdapter } from '@payloadcms/db-mongodb';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { type CollectionSlug, getPayload } from 'payload';
@@ -53,12 +52,11 @@ const PHOTOS: Record<string, { file: string; alt: Record<Locale, string> }> = {
   together: { file: 'owners-team/Owners_8.jpg', alt: { fr: 'Les propriétaires partageant un verre de vin rouge dans la cave', en: 'The owners sharing a glass of red wine in the cellar', de: 'Die Inhaber bei einem Glas Rotwein im Weinkeller', pt: 'Os proprietários a partilhar um copo de vinho tinto na garrafeira' } },
   cellar: { file: 'owners-team/Owners_9.jpg', alt: { fr: 'Une bouteille à la main, devant les casiers de la cave', en: 'Bottle in hand, in front of the cellar racks', de: 'Mit einer Flasche in der Hand vor den Weinregalen', pt: 'De garrafa na mão, diante das prateleiras da garrafeira' } },
   aguardente: { file: 'shop-wines-gourmet/Shop_9.jpg', alt: { fr: 'Une bouteille d’aguardente vínica présentée à la main', en: 'A bottle of aguardente vínica held in the hand', de: 'Eine Flasche Aguardente Vínica in der Hand', pt: 'Uma garrafa de aguardente vínica na mão' } },
-  platter: { file: 'catering-events/Catering_1.jpg', alt: { fr: 'Plateau traiteur de fromages, charcuterie et fruits', en: 'Catering platter of cheese, charcuterie and fruit', de: 'Catering-Platte mit Käse, Aufschnitt und Obst', pt: 'Travessa de catering com queijos, enchidos e fruta' } },
+  platter: { file: 'catering-events/Catering_1.jpg', alt: { fr: 'Plateau catering de fromages, charcuterie et fruits', en: 'Catering platter of cheese, charcuterie and fruit', de: 'Catering-Platte mit Käse, Aufschnitt und Obst', pt: 'Travessa de catering com queijos, enchidos e fruta' } },
   risotto: { file: 'catering-events/Catering_8.jpg', alt: { fr: 'Assiette de risotto servie à table', en: 'A plate of risotto served at the table', de: 'Ein Teller Risotto am Tisch serviert', pt: 'Prato de risoto servido à mesa' } },
-  grazing: { file: 'catering-events/Catering_9.jpg', alt: { fr: 'Longue table traiteur garnie de fromages et de pains', en: 'Long catering table laden with cheese and bread', de: 'Lange Catering-Tafel mit Käse und Brot', pt: 'Longa mesa de catering com queijos e pão' } },
-  ivoTable: { file: 'catering-events/Catering_11.jpg', alt: { fr: 'Une grande table traiteur dressée dans la boutique', en: 'A large catering table laid out in the shop', de: 'Eine große Catering-Tafel im Laden', pt: 'Uma grande mesa de catering na loja' } },
+  grazing: { file: 'catering-events/Catering_9.jpg', alt: { fr: 'Longue table de réception garnie de fromages et de pains', en: 'Long catering table laden with cheese and bread', de: 'Lange Catering-Tafel mit Käse und Brot', pt: 'Longa mesa de catering com queijos e pão' } },
+  ivoTable: { file: 'catering-events/Catering_11.jpg', alt: { fr: 'Une grande table de réception dressée dans la boutique', en: 'A large catering table laid out in the shop', de: 'Eine große Catering-Tafel im Laden', pt: 'Uma grande mesa de catering na loja' } },
   // Home page photos (the prototype's lib/brand.ts slots that had no CMS photo yet).
-  hero: { file: 'home-store/Home_9.jpg', alt: { fr: 'Le salon de la boutique : fauteuils, table basse et mur de bouteilles', en: 'The shop’s lounge: armchairs, low table and a wall of bottles', de: 'Die Lounge des Ladens: Sessel, Couchtisch und eine Wand voller Flaschen', pt: 'O salão da loja: cadeirões, mesa baixa e uma parede de garrafas' } },
   sandwiches: { file: 'catering-events/Catering_7.jpg', alt: { fr: 'Petits pains garnis servis sur une salade de tomates cerises', en: 'Filled bread rolls served on a cherry-tomato salad', de: 'Belegte Brötchen auf einem Kirschtomatensalat', pt: 'Pãezinhos recheados servidos sobre salada de tomate-cereja' } },
   // Product photos: the prototype's choice per product (its routes/shop.tsx and snack.tsx), several reused as stand-ins.
   wines: { file: 'home-store/Home_2.jpg', alt: { fr: 'Bouteilles de vins portugais alignées devant les étagères de la boutique', en: 'Portuguese wine bottles lined up in front of the shop’s shelves', de: 'Portugiesische Weinflaschen vor den Regalen des Ladens', pt: 'Garrafas de vinho português alinhadas diante das prateleiras da loja' } },
@@ -249,18 +247,13 @@ await global('Footer', (l) => {
 await global('HappyHour', (l) => ({ active: true, days: ['3', '4', '5'], from: '17:00', to: '20:00', ...c(l).happyHour, image: media.table }));
 log('Header, Footer, HappyHour saved');
 
-// The home page's photos (titles stay as edited; empty ones fall back to the dictionary on the site).
+// The home page's four banner photos (client request 17 Nov) and the shop interior of the Contact page.
 await global('HomePage', () => ({
-  hero: { image: media.hero },
   photos: {
-    shop: media.giftBasket,
-    snack: media.bifana,
+    shop: media.wines,
+    table: media.table,
     catering: media.grazing,
     events: media.piano,
-    port: media.aguardente,
-    cheese: media.platter,
-    pastel: media.dessert,
-    table: media.sandwiches,
     interior: media.interior,
   },
 }));
@@ -412,21 +405,6 @@ const imported = await importCatalogue(payload, rows, { newStatus: 'active' });
 if (imported.errors.length) throw new Error(`catalogue: ${imported.errors.map((e) => `row ${e.row} ${e.column}: ${e.message}`).join('; ')}`);
 log(`catalogue: ${SHOP_CATEGORIES.length + 1} categories, ${imported.created} products created, ${imported.updated} updated`);
 
-// Repair (M2.3): earlier seed runs saved the other languages with Payload's fallback on, which stored the French
-// hero texts in EN, DE and PT. A hero text identical to the French one in another language is that copy: cleared, so
-// the page shows that language's own text again.
-{
-  const globals = (payload.db as unknown as MongooseAdapter).globals;
-  const home = await globals.collection.findOne<{ hero?: Record<string, Record<string, string> | undefined> }>({ globalType: 'HomePage' });
-  const unset: Record<string, ''> = {};
-  for (const field of ['eyebrow', 'titleA', 'titleB', 'subtitle']) {
-    const value = home?.hero?.[field];
-    for (const l of OTHERS) if (value?.fr && value[l] === value.fr) unset[`hero.${field}.${l}`] = '';
-  }
-  if (Object.keys(unset).length) await globals.collection.updateOne({ globalType: 'HomePage' }, { $unset: unset });
-  log(`home hero: ${Object.keys(unset).length} copied French texts cleared`);
-}
-
 // 10. Time slots and delivery areas: assumption A-05 until DEP-06 (zones, hours, slot rules). Created only when missing,
 // so what staff set in the admin is never overwritten. Every mode follows the shop's opening hours.
 const SLOT_RULES = [
@@ -438,15 +416,16 @@ for (const rule of SLOT_RULES) {
   const { totalDocs } = await payload.count({ collection: 'slotRules', where: { mode: { equals: rule.mode } }, overrideAccess: true });
   if (totalDocs === 0) await payload.create({ collection: 'slotRules', data: rule, overrideAccess: true, context: seedContext() });
 }
-const ZONES = [
-  { name: 'Bissen', postalCodes: ['7760', '7770', '7780', '7790', '7795'], feeCents: 500, minOrderCents: 3000, freeFromCents: 8000 },
-  { name: 'Mersch et Colmar-Berg', postalCodes: ['7501', '7510', '7520', '7530', '7540', '7550', '7730', '7740', '7750'], feeCents: 800, minOrderCents: 5000, freeFromCents: 12000 },
+// Delivery by driving distance from the shop (client request 17 Nov): 0–10 km and 10–20 km, nothing beyond.
+const RANGES = [
+  { upToKm: 10, feeCents: 500, minOrderCents: 3000, freeFromCents: 8000 },
+  { upToKm: 20, feeCents: 800, minOrderCents: 5000, freeFromCents: 12000 },
 ];
-for (const zone of ZONES) {
-  const { totalDocs } = await payload.count({ collection: 'deliveryZones', where: { name: { equals: zone.name } }, overrideAccess: true });
-  if (totalDocs === 0) await payload.create({ collection: 'deliveryZones', data: { ...zone, active: true }, overrideAccess: true, context: seedContext() });
+for (const range of RANGES) {
+  const { totalDocs } = await payload.count({ collection: 'deliveryZones', where: { upToKm: { equals: range.upToKm } }, overrideAccess: true });
+  if (totalDocs === 0) await payload.create({ collection: 'deliveryZones', data: { ...range, active: true }, overrideAccess: true, context: seedContext() });
 }
-log(`time slots (${SLOT_RULES.length} modes) and ${ZONES.length} delivery areas checked`);
+log(`time slots (${SLOT_RULES.length} modes) and ${RANGES.length} delivery ranges checked`);
 
 await payload.destroy();
 log('done');

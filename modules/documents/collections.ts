@@ -119,7 +119,7 @@ export const quotations: CollectionConfig = {
     hidden: hiddenUnless('sales'),
     listSearchableFields: ['title', 'number', 'contact.name', 'contact.email'],
     description: l(
-      'Les devis traiteur : créés depuis une demande traiteur, envoyés au client par e-mail, signés en ligne.',
+      'Les devis catering : créés depuis une demande de catering, envoyés au client par e-mail, signés en ligne.',
       'Catering quotations: created from a catering request, e-mailed to the customer, signed online.',
       'Catering-Angebote: aus einer Catering-Anfrage erstellt, per E-Mail gesendet, online unterschrieben.',
       'Orçamentos de catering: criados a partir de um pedido, enviados por e-mail, assinados online.',
@@ -160,13 +160,13 @@ export const quotations: CollectionConfig = {
       type: 'select',
       defaultValue: 'catering',
       options: [
-        { value: 'catering', label: l('Traiteur', 'Catering', 'Catering', 'Catering') },
+        { value: 'catering', label: l('Services Catering', 'Catering Services', 'Catering-Services', 'Serviços de Catering') },
         { value: 'b2b', label: l('Professionnel', 'Business', 'Geschäftskunde', 'Profissional') },
       ],
       admin: hidden,
     },
     { name: 'order', type: 'relationship', relationTo: 'orders', index: true, label: l('Commande', 'Order', 'Bestellung', 'Encomenda'), admin: readOnly },
-    { name: 'cateringRequest', type: 'relationship', relationTo: 'cateringRequests', index: true, label: l('Demande traiteur', 'Catering request', 'Catering-Anfrage', 'Pedido de catering'), admin: readOnly },
+    { name: 'cateringRequest', type: 'relationship', relationTo: 'cateringRequests', index: true, label: l('Demande de catering', 'Catering request', 'Catering-Anfrage', 'Pedido de catering'), admin: readOnly },
     { name: 'customer', type: 'relationship', relationTo: 'customers', index: true, label: l('Compte client', 'Customer account', 'Kundenkonto', 'Conta de cliente'), admin: readOnly },
     {
       name: 'contact',

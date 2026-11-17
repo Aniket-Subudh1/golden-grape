@@ -18,7 +18,8 @@ import type { Customer, Order, Reservation, SlotRule as SlotRuleDoc } from '@/pa
 import type { SlotMode } from './collections';
 import { canTransition, effects as effectsOf, type Effect, type OrderStatus, PAYMENT_CHOICES, type PaymentChoice } from './order-states';
 import { generateSlots, type Hours, type Slot } from './slots';
-import { deliveryFee, resolveZone } from './zones';
+import postcodeKm from './postcode-km.json';
+import { deliveryFee, type PostcodeTable, resolveZone } from './zones';
 
 export { normalizePostalCode } from './zones';
 
@@ -103,12 +104,12 @@ async function takeSlot(tx: Tx, mode: SlotMode, date: string, from: string, need
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// Delivery zones
+// Delivery by distance (client request 17 Nov)
 
-/** The active delivery zone of a postcode, or null (checkout then suggests pickup). */
+/** The delivery range of a postcode by driving distance from the shop, or null (unknown or too far: pickup). */
 export async function zoneFor(payload: Payload, postalCode: string, tx?: Tx) {
   const { docs } = await payload.find({ collection: 'deliveryZones', where: { active: { equals: true } }, limit: 0, depth: 0, overrideAccess: true, ...(tx ? { req: tx.req } : {}) });
-  return resolveZone(postalCode, docs.map((z) => ({ ...z, postalCodes: z.postalCodes ?? [] })));
+  return resolveZone(postalCode, docs, postcodeKm as unknown as PostcodeTable);
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -221,6 +222,8 @@ export async function placeOrder(payload: Payload, input: PlaceOrderInput, { cus
       // A table's pre-order holds only the counter's dishes and drinks: a shop purchase is never booked as a table
       // (APPLUX audit 10 Nov, §1). The checkout sends only those; this is the rule, not a convenience.
       if (q && input.mode === 'table' && q.lines.some((l) => l.kind !== 'snack')) throw new AppError('VALIDATION', 'notPreorderable', 'lines');
+      // Only shop goods are delivered (client request 17 Nov): one counter dish or "pickup only" product stops it.
+      if (q && input.mode === 'delivery' && q.lines.some((l) => !l.deliverable)) throw new AppError('VALIDATION', 'notDeliverable', 'lines');
       if (q && zone && deliveryFee(zone, q.subtotalCents - q.discountCents).belowMinimum) throw new AppError('VALIDATION', 'belowMinimum', 'postalCode');
 
       const { numbering, business } = await getSettingsPrivate();

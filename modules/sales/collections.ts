@@ -3,7 +3,6 @@ import { hiddenUnless, isStaff, none, staffOrSelf } from '@/lib/access';
 import { addButton, badgeCell, boolCell, emptyList, l, type Label, listOnly, say, scaledNumber, type StatusTab, statusTabs, timeOfDay, WEEKDAYS } from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { ORDER_ROLES, ORDER_STATUSES, RESERVATION_STATUSES } from './order-states';
-import { isLuxPostalCode, splitPostalCodes } from './zones';
 
 // Orders, table reservations, slot rules and delivery zones (04 §4). Orders and reservations are written only by
 // the sales services (placeOrder, transition, the reservation actions): staff read them in the admin, where one
@@ -542,75 +541,68 @@ export const slotRules: CollectionConfig = {
   ],
 };
 
+// Delivery by driving distance (client request 17 Nov): each entry is a range, "up to 10 km", with its fee, minimum and
+// free threshold; it starts where the next shorter one ends. The postcodes of a range follow from the distance table
+// (zones.ts), so changing a limit moves them at once; the panel under the limit lists them while it is typed.
 export const deliveryZones: CollectionConfig = {
   slug: 'deliveryZones',
-  labels: { singular: l('Zone de livraison', 'Delivery area', 'Liefergebiet', 'Zona de entrega'), plural: l('Zones de livraison', 'Delivery areas', 'Liefergebiete', 'Zonas de entrega') },
+  defaultSort: 'upToKm',
+  labels: {
+    singular: l('Tranche de distance', 'Distance range', 'Entfernungsstufe', 'Escalão de distância'),
+    plural: l('Livraison par distance', 'Delivery by distance', 'Lieferung nach Entfernung', 'Entrega por distância'),
+  },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'postalCodes', 'feeCents', 'minOrderCents', 'freeFromCents', 'active'],
+    defaultColumns: ['name', 'feeCents', 'minOrderCents', 'freeFromCents', 'active'],
     hidden: hiddenUnless('manager'),
     description: l(
-      'Où vous livrez, à quel prix et à partir de quel montant. Un code postal hors zone se voit proposer l’emporter.',
-      'Where you deliver, at what price and from which amount. A postcode outside every area is offered pickup.',
-      'Wohin Sie liefern, zu welchem Preis und ab welchem Betrag. Eine Postleitzahl außerhalb wird zur Abholung eingeladen.',
-      'Onde entrega, a que preço e a partir de que valor. Um código postal fora de zona é convidado a levantar.',
+      'Le prix de la livraison selon la distance en voiture depuis la boutique. Chaque tranche commence où la précédente s’arrête ; au-delà de la plus longue, la livraison n’est pas proposée. Les codes postaux suivent tout seuls.',
+      'The delivery price by driving distance from the shop. Each range starts where the previous one ends; beyond the longest one, delivery is not offered. Postcodes follow by themselves.',
+      'Der Lieferpreis nach Fahrstrecke ab dem Laden. Jede Stufe beginnt, wo die vorige endet; über die längste hinaus wird nicht geliefert. Die Postleitzahlen folgen von selbst.',
+      'O preço da entrega segundo a distância de carro desde a loja. Cada escalão começa onde o anterior acaba; para além do mais longo, não há entrega. Os códigos postais seguem sozinhos.',
     ),
     components: {
-      ...addButton('deliveryZones', l('Ajouter une zone', 'Add an area', 'Gebiet hinzufügen', 'Adicionar uma zona')),
+      ...addButton('deliveryZones', l('Ajouter une tranche', 'Add a range', 'Stufe hinzufügen', 'Adicionar um escalão')),
       ...emptyList({
         icon: 'zones',
-        title: l('Aucune zone de livraison', 'No delivery areas yet', 'Noch keine Liefergebiete', 'Ainda sem zonas de entrega'),
+        title: l('Aucune tranche de distance', 'No distance ranges yet', 'Noch keine Entfernungsstufen', 'Ainda sem escalões de distância'),
         text: l(
-          'Sans zone, la livraison n’est proposée à personne. Ajoutez les codes postaux que vous desservez.',
-          'Without an area, delivery is offered to nobody. Add the postcodes you serve.',
-          'Ohne Gebiet wird niemandem Lieferung angeboten. Fügen Sie die belieferten Postleitzahlen hinzu.',
-          'Sem zona, a entrega não é proposta a ninguém. Adicione os códigos postais que serve.',
+          'Sans tranche, la livraison n’est proposée à personne. Ajoutez par exemple « jusqu’à 10 km » puis « jusqu’à 20 km ».',
+          'Without a range, delivery is offered to nobody. Add for example “up to 10 km”, then “up to 20 km”.',
+          'Ohne Stufe wird niemandem Lieferung angeboten. Fügen Sie z. B. „bis 10 km“ und dann „bis 20 km“ hinzu.',
+          'Sem escalão, a entrega não é proposta a ninguém. Adicione por exemplo «até 10 km» e depois «até 20 km».',
         ),
-        action: l('Ajouter une zone', 'Add an area', 'Gebiet hinzufügen', 'Adicionar uma zona'),
+        action: l('Ajouter une tranche', 'Add a range', 'Stufe hinzufügen', 'Adicionar um escalão'),
       }),
     },
   },
   access: { read: isStaff(), create: isStaff('manager'), update: isStaff('manager'), delete: isStaff('manager') },
+  hooks: {
+    // The list's title, from the limit: "≤ 10 km" (the start depends on the other ranges, so the panel shows it).
+    beforeChange: [({ data }) => ({ ...data, name: data.upToKm != null ? `≤ ${data.upToKm} km` : data.name })],
+  },
   fields: [
+    { name: 'name', type: 'text', label: l('Tranche', 'Range', 'Stufe', 'Escalão'), admin: { hidden: true } },
     {
       type: 'row',
       fields: [
-        { name: 'name', type: 'text', required: true, label: l('Nom de la zone', 'Area name', 'Name des Gebiets', 'Nome da zona'), admin: { width: '70%', placeholder: 'Bissen et environs' } },
+        {
+          name: 'upToKm',
+          type: 'number',
+          required: true,
+          min: 0.1,
+          max: 200,
+          label: l('Jusqu’à (km en voiture)', 'Up to (driving km)', 'Bis (Fahr-km)', 'Até (km de carro)'),
+          admin: { width: '70%', step: 0.5, placeholder: '10' },
+          validate: async (value: number | null | undefined, { req, id }: { req: PayloadRequest; id?: string | number }) => {
+            if (value == null) return say(req, l('Indiquez la distance.', 'Enter the distance.', 'Entfernung angeben.', 'Indique a distância.'));
+            if (value <= 0) return say(req, l('Plus de 0 km.', 'More than 0 km.', 'Mehr als 0 km.', 'Mais de 0 km.'));
+            const { totalDocs } = await req.payload.count({ collection: 'deliveryZones', req, overrideAccess: true, where: { upToKm: { equals: value }, ...(id ? { id: { not_equals: id } } : {}) } });
+            return totalDocs === 0 || say(req, l('Une autre tranche s’arrête déjà à cette distance.', 'Another range already ends at this distance.', 'Eine andere Stufe endet schon bei dieser Entfernung.', 'Outro escalão já acaba a esta distância.'));
+          },
+        },
         { name: 'active', type: 'checkbox', defaultValue: true, label: l('Active', 'Active', 'Aktiv', 'Ativa'), admin: { width: '30%', style: { alignSelf: 'flex-end' }, components: boolCell() } },
       ],
-    },
-    // GG-036: paste several codes at once (the box above the field), and anything pasted into the field itself is
-    // split and cleaned when saved.
-    { name: 'postalCodesPaste', type: 'ui', admin: { components: { Field: { path: '@/modules/sales/admin/postcode-paste', clientProps: { field: 'postalCodes' } } } } },
-    {
-      name: 'postalCodes',
-      type: 'text',
-      hasMany: true,
-      required: true,
-      index: true,
-      label: l('Codes postaux', 'Postcodes', 'Postleitzahlen', 'Códigos postais'),
-      hooks: { beforeValidate: [({ value }) => (Array.isArray(value) ? splitPostalCodes(value.map(String)) : value)] },
-      validate: (value: string[] | null | undefined, { req }: { req: PayloadRequest }) => {
-        const wrong = (value ?? []).filter((c) => !isLuxPostalCode(c));
-        if (wrong.length === 0) return (value ?? []).length > 0 || say(req, l('Ajoutez au moins un code postal.', 'Add at least one postcode.', 'Mindestens eine Postleitzahl angeben.', 'Indique pelo menos um código postal.'));
-        return say(
-          req,
-          l(
-            `Pas un code postal luxembourgeois (4 chiffres) : ${wrong.join(', ')}`,
-            `Not a Luxembourg postcode (4 digits): ${wrong.join(', ')}`,
-            `Keine luxemburgische Postleitzahl (4 Ziffern): ${wrong.join(', ')}`,
-            `Não é um código postal luxemburguês (4 algarismos): ${wrong.join(', ')}`,
-          ),
-        );
-      },
-      admin: {
-        description: l(
-          'Tapez un code et Entrée, ou collez-en plusieurs dans la case au-dessus. « L-7795 » et « 7795 » sont pareils.',
-          'Type a code and press Enter, or paste several in the box above. “L-7795” and “7795” are the same.',
-          'Code eingeben und Enter drücken, oder mehrere im Feld darüber einfügen. „L-7795“ und „7795“ sind gleich.',
-          'Escreva um código e Enter, ou cole vários na caixa acima. «L-7795» e «7795» são iguais.',
-        ),
-      },
     },
     {
       type: 'row',
@@ -626,6 +618,8 @@ export const deliveryZones: CollectionConfig = {
         },
       ],
     },
+    // Which postcodes this range covers right now, recomputed while the limit is typed.
+    { name: 'rangePostcodes', type: 'ui', admin: { disableListColumn: true, components: { Field: '@/modules/sales/admin/range-postcodes' } } },
   ],
 };
 

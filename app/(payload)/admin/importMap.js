@@ -58,7 +58,7 @@ import { default as default_1032e7f4a7ea2c2fe5848dd9521e5ee8 } from '@/modules/s
 import { PreorderCell as PreorderCell_2af359ddeeb3df48a49ffdf99c6a1917 } from '@/modules/sales/admin/cells'
 import { AttendanceCell as AttendanceCell_1032e7f4a7ea2c2fe5848dd9521e5ee8 } from '@/modules/sales/admin/reservation-panel'
 import { default as default_e878a1c008f508aed324fd57a4961771 } from '@/components/admin/weekday-bulk'
-import { default as default_e56de72a9d317b87d590db40d7733bc6 } from '@/modules/sales/admin/postcode-paste'
+import { default as default_9dfc238b639e18f2109744d3cfbf5bcf } from '@/modules/sales/admin/range-postcodes'
 import { default as default_5ae1914325a0ee108216435b317303b1 } from '@/modules/events/admin/booking-panel'
 import { default as default_d7d5ef2f5280292ebc8cb7d4f5d043cc } from '@/modules/events/admin/booking-tabs'
 import { default as default_e7547a6d616d19573a629279234f5127 } from '@/modules/documents/admin/quotation-panel'
@@ -149,7 +149,7 @@ export const importMap = {
   "@/modules/sales/admin/cells#PreorderCell": PreorderCell_2af359ddeeb3df48a49ffdf99c6a1917,
   "@/modules/sales/admin/reservation-panel#AttendanceCell": AttendanceCell_1032e7f4a7ea2c2fe5848dd9521e5ee8,
   "@/components/admin/weekday-bulk#default": default_e878a1c008f508aed324fd57a4961771,
-  "@/modules/sales/admin/postcode-paste#default": default_e56de72a9d317b87d590db40d7733bc6,
+  "@/modules/sales/admin/range-postcodes#default": default_9dfc238b639e18f2109744d3cfbf5bcf,
   "@/modules/events/admin/booking-panel#default": default_5ae1914325a0ee108216435b317303b1,
   "@/modules/events/admin/booking-tabs#default": default_d7d5ef2f5280292ebc8cb7d4f5d043cc,
   "@/modules/documents/admin/quotation-panel#default": default_e7547a6d616d19573a629279234f5127,

@@ -8,83 +8,6 @@
     "language": "Sprache",
     "shopLabel": "Shop"
   },
-  "hero": {
-    "eyebrow": "Seit 2019 · Luxemburg",
-    "titleA": "Die Seele Portugals,",
-    "titleB": "mit Hingabe serviert.",
-    "subtitle": "Ein Haus für Weine, Feinkost, Snacks, Catering und portugiesische Traditionen — im Herzen Luxemburgs.",
-    "cta": "Das Haus entdecken",
-    "secondaryCta": "Nächste Happy Hour",
-    "scroll": "Entdecken",
-    "ticker": {
-      "shop": "Shop",
-      "snack": "Snack",
-      "catering": "Catering",
-      "events": "Events",
-      "boutique": "Boutique"
-    }
-  },
-  "universes": {
-    "eyebrow": "Vier Welten · Ein Haus",
-    "titleA": "Viel mehr",
-    "titleB": "als ein Weinhandel.",
-    "shop": {
-      "title": "Shop",
-      "tagline": "Weine & Feinkost",
-      "desc": "Ausgesuchte portugiesische Weine, Portwein, DOP-Käse, Charcuterie, Feinkost und Geschenkboxen.",
-      "cta": "Zum Shop"
-    },
-    "snack": {
-      "title": "Theke",
-      "tagline": "Zum Mitnehmen",
-      "desc": "Bifana, Prego, Alheira, Pastel de Nata. Portugiesische Tradition zum Mitnehmen.",
-      "cta": "Menü ansehen"
-    },
-    "catering": {
-      "title": "Catering",
-      "tagline": "Empfänge",
-      "desc": "Drei Formate, um mit portugiesischer Seele zu empfangen — von Aperitif bis Dinner.",
-      "cta": "Unsere Formeln"
-    },
-    "events": {
-      "title": "Events",
-      "tagline": "Abende & Happy Hour",
-      "desc": "Fado-Abende, geführte Verkostungen, wöchentliche Happy Hour, Chef's Tables.",
-      "cta": "Agenda"
-    }
-  },
-  "craft": {
-    "eyebrow": "Werke der Handwerker",
-    "titleA": "Die Geste,",
-    "titleB": "vor allem.",
-    "body": "Jedes Produkt wird von Hand gewählt — bei Familien, die ihr Handwerk seit Generationen pflegen.",
-    "port": {
-      "label": "Vinho do Porto",
-      "title": "Tawny 20 Jahre",
-      "desc": "Noten von kandierter Feige, Walnuss, goldenem Karamell."
-    },
-    "cheese": {
-      "label": "DOP-Käse",
-      "title": "São Jorge, gereift",
-      "desc": "Gepresste Paste von den Azoren, 12 Monate im Keller."
-    },
-    "pastel": {
-      "label": "Gebäck",
-      "title": "Pastel de Nata",
-      "desc": "Alle zwei Stunden frisch gebacken, goldene Blätterteigtaschen."
-    }
-  },
-  "hospitality": {
-    "eyebrow": "Die Kunst des Empfangens",
-    "titleA": "Convívio.",
-    "titleB": "Portugiesische Seele.",
-    "body": "Bei Golden Grape servieren wir nicht nur Wein. Wir teilen einen Tisch, ein Lachen, eine Erinnerung. Portugal ist eine Lebenskunst — und eine Einladung.",
-    "bullets": [
-      "Herzliche Gastfreundschaft, ohne Protokoll",
-      "Familienküche, außergewöhnliche Produkte",
-      "Ein Ort zum Zusammenkommen, Feiern, Verweilen"
-    ]
-  },
   "store": {
     "eyebrow": "Die Boutique",
     "titleA": "Öffnen Sie",
@@ -97,10 +20,6 @@
     "openNow": "Jetzt geöffnet",
     "closedNow": "Gerade geschlossen"
   },
-  "story": {
-    "eyebrow": "Unsere Philosophie",
-    "quote": "Wir glauben: Ein Wein, ein Gericht, ein geteilter Moment — sind drei Arten, dasselbe zu sagen: <gold>bem-vindo</gold>."
-  },
   "happyHour": {
     "eyebrow": "Ritual des Hauses",
     "days": "Tage",
@@ -109,33 +28,6 @@
     "seconds": "Sekunden",
     "nextPour": "Nächster Ausschank",
     "reserve": "Tisch reservieren"
-  },
-  "eventsHome": {
-    "eyebrow": "Agenda",
-    "titleA": "Jede Woche",
-    "titleB": "ein Rendezvous.",
-    "fullCal": "Vollständige Agenda",
-    "reserve": "Reservieren",
-    "items": {
-      "friday": {
-        "date": "Freitagabend",
-        "time": "19:00 — 23:00",
-        "title": "Fado-Abend",
-        "desc": "Portugiesischer Live-Gesang, Tapas und Port — die Seele Lissabons in Luxemburg."
-      },
-      "golden": {
-        "date": "Jeden Mittwoch",
-        "time": "17:00 — 20:00",
-        "title": "Golden Hour",
-        "desc": "Willkommensglas geschenkt, Sharing-Boards und portugiesischer Jazz."
-      },
-      "tasting": {
-        "date": "Einmal im Monat samstags",
-        "time": "16:00 — 18:00",
-        "title": "Geführte Verkostung",
-        "desc": "Sechs Weine, ein Winzer zu Gast, eine Geografie des Geschmacks."
-      }
-    }
   },
   "socialProof": {
     "eyebrow": "Man spricht über uns",
@@ -149,18 +41,6 @@
     "report": "Melden",
     "order": "Die relevantesten Bewertungen, wie Google Maps sie zeigt. Quelle:",
     "stars": "{{count}} von 5 Sternen"
-  },
-  "marquee": {
-    "words": [
-      "Vinho",
-      "Convívio",
-      "Saudade",
-      "Bacalhau",
-      "Fado",
-      "Tinto",
-      "Azeite",
-      "Mesa"
-    ]
   },
   "footer": {
     "colContact": "Uns finden",
@@ -187,7 +67,7 @@
     },
     "hints": {
       "pickup": "Holen Sie Ihre Bestellung zur gewählten Zeit im Laden ab.",
-      "delivery": "Zu Ihnen nach Hause geliefert, zur gewählten Zeit.",
+      "delivery": "Weine und Produkte aus dem Laden, zu Ihnen geliefert.",
       "table": "Reservieren Sie einen Tisch und bestellen Sie auf Wunsch vor."
     },
     "empty": {
@@ -278,7 +158,8 @@
         "LOYALTY_SPENT": "Ihre Punkte haben sich inzwischen geändert. Bitte erneut versuchen.",
         "GIFT_CARD_SPENT": "Diese Geschenkkarte wurde inzwischen genutzt. Bitte prüfen und erneut versuchen."
       }
-    }
+    },
+    "deliveryShopNote": "Wir liefern nur Weine und Produkte aus dem Laden. Speisen von der Theke gibt es zum Mitnehmen oder vor Ort."
   },
   "shop": {
     "eyebrow": "Shop · Weine & Feinkost",
@@ -357,10 +238,9 @@
     "eyebrow": "Die Theke",
     "titleA": "Tradition,",
     "titleB": "zum Mitnehmen.",
-    "subtitle": "Wählen, anpassen, bestellen — in weniger als einer Minute. Abholung, Lieferung oder am Tisch.",
+    "subtitle": "Wählen, anpassen, bestellen — in weniger als einer Minute. Zum Mitnehmen oder am Tisch.",
     "ctas": {
       "pickup": "Abholung",
-      "delivery": "Lieferung",
       "table": "Tisch reservieren"
     },
     "tags": {
@@ -389,7 +269,7 @@
     }
   },
   "cateringPage": {
-    "eyebrow": "Catering",
+    "eyebrow": "Catering-Services",
     "titleA": "Empfangen",
     "titleB": "mit portugiesischer Seele.",
     "subtitle": "Drei Formeln für Ihr Event — Cocktail, Dinner oder Chef's Table. Bestätigung binnen 24h.",
@@ -482,7 +362,7 @@
       "subject": "Betreff",
       "subjects": {
         "boutique": "Shop",
-        "traiteur": "Catering",
+        "traiteur": "Catering-Services",
         "evenement": "Event",
         "autre": "Sonstiges"
       },
@@ -573,7 +453,7 @@
       "description": "Fado, Happy Hour, geführte Verkostungen und Chef’s Table in Bissen."
     },
     "catering": {
-      "title": "Catering — Portugiesische Empfänge · Golden Grape Luxembourg",
+      "title": "Catering-Services — Portugiesische Empfänge · Golden Grape Luxembourg",
       "description": "Drei portugiesische Catering-Pakete für Ihre Empfänge in Luxemburg. Anfrage in 30 Sekunden."
     },
     "shop": {
@@ -582,7 +462,7 @@
     },
     "snack": {
       "title": "Theke — Portugiesische Snacks zum Mitnehmen · Golden Grape",
-      "description": "Bifana, Prego, Pastel de Nata: portugiesische Tradition zum Mitnehmen, geliefert oder am Tisch in Bissen."
+      "description": "Bifana, Prego, Pastel de Nata: portugiesische Tradition zum Mitnehmen oder am Tisch in Bissen."
     },
     "product": {
       "title": "{{name}} · Golden Grape Luxemburg",
@@ -611,7 +491,7 @@
       "invalid": "Ungültiger Wert.",
       "slotFull": "Dieses Zeitfenster wurde gerade vergeben. Bitte wählen Sie ein anderes.",
       "slotUnavailable": "Dieses Zeitfenster ist nicht mehr verfügbar. Bitte wählen Sie ein anderes.",
-      "outsideZone": "In diese Postleitzahl liefern wir noch nicht.",
+      "outsideZone": "Diese Adresse liegt außerhalb unseres Liefergebiets.",
       "belowMinimum": "Ihre Bestellung liegt unter dem Mindestbestellwert für Lieferung.",
       "cartChanged": "Ihr Warenkorb hat sich geändert (Bestand). Bitte prüfen und erneut versuchen.",
       "emptyCart": "Ihr Warenkorb ist leer.",
@@ -620,7 +500,8 @@
       "event": "Diese Veranstaltung kann nicht mehr gebucht werden.",
       "notPreorderable": "Nur Speisen und Getränke von der Theke können mit einem Tisch vorbestellt werden.",
       "consent": "Kreuzen Sie das Kästchen an, um das Angebot anzunehmen.",
-      "notAcceptable": "Dieses Angebot kann nicht mehr angenommen werden (abgelaufen, bereits unterschrieben oder ersetzt). Die Seite wird aktualisiert."
+      "notAcceptable": "Dieses Angebot kann nicht mehr angenommen werden (abgelaufen, bereits unterschrieben oder ersetzt). Die Seite wird aktualisiert.",
+      "notDeliverable": "Theken-Speisen werden nicht geliefert: wählen Sie Abholung oder entfernen Sie sie."
     },
     "CONFLICT": "Das wurde gerade von jemand anderem geändert. Bitte erneut versuchen.",
     "OUT_OF_STOCK": "Ihr Warenkorb hat sich geändert (Bestand). Bitte prüfen und erneut versuchen."
@@ -972,10 +853,11 @@
       "fee": "Lieferung {{fee}}",
       "min": "Minimum {{min}}",
       "free": "kostenlos ab {{free}}",
-      "outside": "In diese Postleitzahl liefern wir noch nicht.",
+      "outside": "Diese Adresse liegt außerhalb unseres Liefergebiets.",
       "choosePickup": "Stattdessen Abholung wählen",
       "belowMin": "Noch {{missing}} bis zum Liefer-Minimum von {{min}}.",
-      "freeNow": "Lieferung kostenlos"
+      "freeNow": "Lieferung kostenlos",
+      "distance": "{{place}} · {{km}} km"
     },
     "preorder": {
       "label": "Speisen und Getränke vorbestellen",
@@ -1036,7 +918,12 @@
       "other": "Andere Adresse",
       "save": "Diese Adresse in meinem Konto speichern"
     },
-    "noSlots": "Eine Online-Buchung ist nicht möglich: Es ist keine Zeit verfügbar. Rufen Sie uns zum Buchen an."
+    "noSlots": "Eine Online-Buchung ist nicht möglich: Es ist keine Zeit verfügbar. Rufen Sie uns zum Buchen an.",
+    "notDeliverable": {
+      "title": "Nicht lieferbar: {{items}}.",
+      "text": "Wir liefern nur Weine und Produkte aus dem Laden. Speisen von der Theke gibt es zum Mitnehmen oder vor Ort.",
+      "remove": "Diese Artikel entfernen"
+    }
   },
   "order": {
     "next": {
@@ -1545,6 +1432,34 @@
       "error": "Das ging nicht. Bitte erneut versuchen.",
       "corrected": "Korrigiert",
       "mine": "Mein Stempeln"
+    }
+  },
+  "home": {
+    "shop": {
+      "title": "Online-Shop",
+      "text": "Portugiesische Weine, Portwein und Feinkost, geliefert oder in Bissen abgeholt.",
+      "cta": "Zum Shop"
+    },
+    "table": {
+      "title": "Tisch reservieren",
+      "text": "Vor Ort oder zum Mitnehmen.",
+      "cta": "Reservieren",
+      "takeaway": "Zum Mitnehmen bestellen"
+    },
+    "catering": {
+      "title": "Unsere Catering-Services",
+      "text": "Ihre Empfänge, auf portugiesische Art.",
+      "cta": "Angebot anfragen"
+    },
+    "events": {
+      "title": "Unsere Veranstaltungen",
+      "text": "Kommende Verkostungen und Abende.",
+      "cta": "Zum Kalender"
+    },
+    "contact": {
+      "eyebrow": "Kontakt",
+      "title": "Golden Grape",
+      "write": "Schreiben Sie uns"
     }
   }
 }

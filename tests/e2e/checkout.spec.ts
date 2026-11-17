@@ -4,7 +4,7 @@ import en from '../../dictionaries/en.json';
 import fr from '../../dictionaries/fr.json';
 
 // Journey #2 (06 §3.3): a snack and a wine → pickup → slot → confirmation page (and the e-mail in the chosen language
-// when MAILPIT_URL is set); delivery with the zone fee; a table with a pre-order, left pending.
+// when MAILPIT_URL is set); delivery priced by distance, without counter dishes; a table with a pre-order, left pending.
 // Needs a seeded database with stock (npm run seed, then stock entered) and SMTP pointed at Mailpit for the e-mails.
 
 const MAILPIT = process.env.MAILPIT_URL;
@@ -77,17 +77,22 @@ test('pickup in French: confirmation page and one e-mail in French', async ({ pa
   await expectMail(email, fr.mail.order.subject.split(' {{')[0]);
 });
 
-test('delivery in English: zone fee shown, transfer details on the confirmation page', async ({ page }) => {
+test('delivery in English: counter dishes refused, distance fee shown, transfer details on the confirmation page', async ({ page }) => {
   const email = unique('john');
-  await addBifana(page, 'en', 5, en.cart.plus);
+  await addBifana(page, 'en', 1, en.cart.plus);
+  await addWine(page, 'en', en.shop.buy.add);
   await page.goto('/en/checkout');
   await page.getByRole('radio', { name: new RegExp(en.cart.modes.delivery) }).click();
-  await page.fill('#postalCode', '1009');
+  // Only shop goods are delivered (client request 17 Nov): the Bifana is named, and one click takes it out.
+  await expect(page.getByText(en.checkout.notDeliverable.text).first()).toBeVisible();
+  await page.getByRole('button', { name: en.checkout.notDeliverable.remove }).click();
+  await expect(page.getByText(en.checkout.notDeliverable.text)).toHaveCount(0);
+  await page.fill('#postalCode', '9990'); // Weiswampach, 47 km by road: beyond the last range
   await expect(page.getByText(en.checkout.zone.outside).first()).toBeVisible();
   await page.fill('#line1', 'Rue Principale 12');
   await page.fill('#postalCode', 'L-7795');
   await page.fill('#city', 'Bissen');
-  await expect(page.getByText(/^Delivery €/).first()).toBeVisible();
+  await expect(page.getByText(/Bissen · 0\.7 km · Delivery €/).first()).toBeVisible();
   await pickTime(page);
   await details(page, 'John Smith', email);
   await page.getByRole('button', { name: en.checkout.submit }).click();

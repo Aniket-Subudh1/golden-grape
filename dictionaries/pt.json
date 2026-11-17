@@ -8,83 +8,6 @@
     "language": "Idioma",
     "shopLabel": "Loja"
   },
-  "hero": {
-    "eyebrow": "Desde 2019 · Luxemburgo",
-    "titleA": "A alma de Portugal,",
-    "titleB": "servida com paixão.",
-    "subtitle": "Uma casa de vinhos, mercearia gourmet, snacks, catering e tradições portuguesas — no coração do Luxemburgo.",
-    "cta": "Descobrir a casa",
-    "secondaryCta": "Próxima Happy Hour",
-    "scroll": "Descobrir",
-    "ticker": {
-      "shop": "Loja",
-      "snack": "Snack",
-      "catering": "Catering",
-      "events": "Eventos",
-      "boutique": "Boutique"
-    }
-  },
-  "universes": {
-    "eyebrow": "Quatro universos · Uma casa",
-    "titleA": "Muito mais",
-    "titleB": "do que uma garrafeira.",
-    "shop": {
-      "title": "Loja",
-      "tagline": "Vinhos & Mercearia",
-      "desc": "Vinhos portugueses de exceção, Porto, queijos DOP, charcutaria e caixas de oferta.",
-      "cta": "Entrar na loja"
-    },
-    "snack": {
-      "title": "Balcão",
-      "tagline": "Para levar",
-      "desc": "Bifana, Prego, Alheira, Pastel de Nata. A tradição portuguesa para levar.",
-      "cta": "Ver a ementa"
-    },
-    "catering": {
-      "title": "Catering",
-      "tagline": "Receções",
-      "desc": "Três fórmulas para receber com alma portuguesa — do aperitivo ao jantar.",
-      "cta": "As fórmulas"
-    },
-    "events": {
-      "title": "Eventos",
-      "tagline": "Noites & Happy Hour",
-      "desc": "Noites de Fado, provas guiadas, Happy Hour semanal, mesas do chef.",
-      "cta": "A agenda"
-    }
-  },
-  "craft": {
-    "eyebrow": "Objetos de artesãos",
-    "titleA": "O gesto,",
-    "titleB": "acima de tudo.",
-    "body": "Cada produto é escolhido à mão, junto de famílias que guardam saberes ao longo de gerações.",
-    "port": {
-      "label": "Vinho do Porto",
-      "title": "Tawny 20 anos",
-      "desc": "Notas de figo cristalizado, noz, caramelo dourado."
-    },
-    "cheese": {
-      "label": "Queijo DOP",
-      "title": "São Jorge curado",
-      "desc": "Pasta prensada dos Açores, 12 meses de cura."
-    },
-    "pastel": {
-      "label": "Pastelaria",
-      "title": "Pastel de Nata",
-      "desc": "Cozido de duas em duas horas, folhado dourado."
-    }
-  },
-  "hospitality": {
-    "eyebrow": "A arte de receber",
-    "titleA": "Convívio.",
-    "titleB": "O espírito português.",
-    "body": "Na Golden Grape não servimos apenas vinho. Partilhamos uma mesa, um riso, uma memória. Portugal é uma arte de viver — e um convite.",
-    "bullets": [
-      "Hospitalidade calorosa, sem protocolo",
-      "Cozinha de família, produtos de exceção",
-      "Um lugar para conviver, celebrar, prolongar"
-    ]
-  },
   "store": {
     "eyebrow": "A Boutique",
     "titleA": "Empurre",
@@ -97,10 +20,6 @@
     "openNow": "Aberto agora",
     "closedNow": "Fechado neste momento"
   },
-  "story": {
-    "eyebrow": "A nossa filosofia",
-    "quote": "Acreditamos que um vinho, um prato, um momento partilhado — são três formas de dizer o mesmo: <gold>bem-vindo</gold>."
-  },
   "happyHour": {
     "eyebrow": "Ritual da casa",
     "days": "Dias",
@@ -109,33 +28,6 @@
     "seconds": "Segundos",
     "nextPour": "Próximo serviço",
     "reserve": "Reservar mesa"
-  },
-  "eventsHome": {
-    "eyebrow": "Agenda",
-    "titleA": "Todas as semanas,",
-    "titleB": "um encontro.",
-    "fullCal": "Agenda completa",
-    "reserve": "Reservar",
-    "items": {
-      "friday": {
-        "date": "Sexta à noite",
-        "time": "19:00 — 23:00",
-        "title": "Noite de Fado",
-        "desc": "Canto ao vivo, petiscos e Porto — a alma de Lisboa no Luxemburgo."
-      },
-      "golden": {
-        "date": "Todas as quartas",
-        "time": "17:00 — 20:00",
-        "title": "Golden Hour",
-        "desc": "Copo de boas-vindas por conta da casa, tábuas e jazz português."
-      },
-      "tasting": {
-        "date": "Um sábado por mês",
-        "time": "16:00 — 18:00",
-        "title": "Prova guiada",
-        "desc": "Seis vinhos escolhidos, um produtor convidado — uma geografia do gosto."
-      }
-    }
   },
   "socialProof": {
     "eyebrow": "Falam de nós",
@@ -149,18 +41,6 @@
     "report": "Denunciar",
     "order": "As avaliações mais relevantes, como o Google Maps as apresenta. Fonte:",
     "stars": "{{count}} estrelas em 5"
-  },
-  "marquee": {
-    "words": [
-      "Vinho",
-      "Convívio",
-      "Saudade",
-      "Bacalhau",
-      "Fado",
-      "Tinto",
-      "Azeite",
-      "Mesa"
-    ]
   },
   "footer": {
     "colContact": "Encontrar-nos",
@@ -187,7 +67,7 @@
     },
     "hints": {
       "pickup": "Levante a sua encomenda na loja, à hora escolhida.",
-      "delivery": "Entregue em sua casa, à hora escolhida.",
+      "delivery": "Vinhos e produtos da loja, entregues em sua casa.",
       "table": "Reserve uma mesa e, se quiser, pré-encomende."
     },
     "empty": {
@@ -278,7 +158,8 @@
         "LOYALTY_SPENT": "Os seus pontos mudaram entretanto. Tente de novo.",
         "GIFT_CARD_SPENT": "Este cartão-presente foi usado entretanto. Verifique-o e tente de novo."
       }
-    }
+    },
+    "deliveryShopNote": "Entregamos apenas vinhos e produtos da loja. Os pratos do Balcão são para levar ou para comer no local."
   },
   "shop": {
     "eyebrow": "Loja · Vinhos & Mercearia",
@@ -357,10 +238,9 @@
     "eyebrow": "O Balcão",
     "titleA": "A tradição,",
     "titleB": "para levar.",
-    "subtitle": "Escolha, ajuste, encomende — em menos de um minuto. Para levantar, entrega ou à mesa.",
+    "subtitle": "Escolha, ajuste, encomende — em menos de um minuto. Para levar ou à mesa.",
     "ctas": {
       "pickup": "Levantar",
-      "delivery": "Entrega",
       "table": "Reservar mesa"
     },
     "tags": {
@@ -389,7 +269,7 @@
     }
   },
   "cateringPage": {
-    "eyebrow": "Catering",
+    "eyebrow": "Serviços de Catering",
     "titleA": "Receber",
     "titleB": "com alma portuguesa.",
     "subtitle": "Três fórmulas para o seu evento — cocktail, jantar ou mesa do chef. Confirmação em 24h.",
@@ -482,7 +362,7 @@
       "subject": "Assunto",
       "subjects": {
         "boutique": "Loja",
-        "traiteur": "Catering",
+        "traiteur": "Serviços de Catering",
         "evenement": "Evento",
         "autre": "Outro"
       },
@@ -573,7 +453,7 @@
       "description": "Fado, Happy Hour, provas guiadas e mesa do chef em Bissen."
     },
     "catering": {
-      "title": "Catering — Receções portuguesas · Golden Grape Luxembourg",
+      "title": "Serviços de Catering — Receções portuguesas · Golden Grape Luxembourg",
       "description": "Três propostas de catering portuguesas para as suas receções no Luxemburgo. Pedido em 30 segundos."
     },
     "shop": {
@@ -582,7 +462,7 @@
     },
     "snack": {
       "title": "Balcão — Petiscos portugueses para levar · Golden Grape",
-      "description": "Bifana, prego, pastel de nata: a tradição portuguesa para levar, entregue ou à mesa em Bissen."
+      "description": "Bifana, prego, pastel de nata: a tradição portuguesa para levar ou à mesa em Bissen."
     },
     "product": {
       "title": "{{name}} · Golden Grape Luxemburgo",
@@ -611,7 +491,7 @@
       "invalid": "Valor inválido.",
       "slotFull": "Este horário acabou de ser reservado. Escolha outro.",
       "slotUnavailable": "Este horário já não está disponível. Escolha outro.",
-      "outsideZone": "Ainda não entregamos neste código postal.",
+      "outsideZone": "Esta morada está fora da nossa zona de entrega.",
       "belowMinimum": "A sua encomenda não atinge o mínimo de entrega.",
       "cartChanged": "O seu saco mudou (stock). Verifique-o e tente de novo.",
       "emptyCart": "O seu saco está vazio.",
@@ -620,7 +500,8 @@
       "event": "Este evento já não pode ser reservado.",
       "notPreorderable": "Só pratos e bebidas do balcão podem ser pré-encomendados com uma mesa.",
       "consent": "Marque a caixa para aceitar o orçamento.",
-      "notAcceptable": "Este orçamento já não pode ser aceite (expirado, já assinado ou substituído). A página é atualizada."
+      "notAcceptable": "Este orçamento já não pode ser aceite (expirado, já assinado ou substituído). A página é atualizada.",
+      "notDeliverable": "Os pratos do Balcão não são entregues: escolha para levar ou retire-os."
     },
     "CONFLICT": "Isto acabou de ser alterado por outra pessoa. Tente de novo.",
     "OUT_OF_STOCK": "O seu saco mudou (stock). Verifique-o e tente de novo."
@@ -972,10 +853,11 @@
       "fee": "Entrega {{fee}}",
       "min": "mínimo {{min}}",
       "free": "grátis a partir de {{free}}",
-      "outside": "Ainda não entregamos neste código postal.",
+      "outside": "Esta morada está fora da nossa zona de entrega.",
       "choosePickup": "Escolher levantamento",
       "belowMin": "Faltam {{missing}} para o mínimo de entrega de {{min}}.",
-      "freeNow": "Entrega grátis"
+      "freeNow": "Entrega grátis",
+      "distance": "{{place}} · {{km}} km"
     },
     "preorder": {
       "label": "Pré-encomendar pratos e bebidas",
@@ -1036,7 +918,12 @@
       "other": "Outra morada",
       "save": "Guardar esta morada na minha conta"
     },
-    "noSlots": "A reserva online não é possível: não há horários disponíveis. Ligue-nos para reservar."
+    "noSlots": "A reserva online não é possível: não há horários disponíveis. Ligue-nos para reservar.",
+    "notDeliverable": {
+      "title": "Sem entrega: {{items}}.",
+      "text": "Entregamos apenas vinhos e produtos da loja. Os pratos do Balcão são para levar ou para comer no local.",
+      "remove": "Retirar estes artigos"
+    }
   },
   "order": {
     "next": {
@@ -1545,6 +1432,34 @@
       "error": "Não funcionou. Tente de novo.",
       "corrected": "Corrigido",
       "mine": "O meu ponto"
+    }
+  },
+  "home": {
+    "shop": {
+      "title": "Loja online",
+      "text": "Vinhos portugueses, porto e mercearia fina, entregues ou a levantar em Bissen.",
+      "cta": "Descobrir a loja"
+    },
+    "table": {
+      "title": "Reservar uma mesa",
+      "text": "No local ou para levar.",
+      "cta": "Reservar",
+      "takeaway": "Encomendar para levar"
+    },
+    "catering": {
+      "title": "Os nossos Serviços de Catering",
+      "text": "As suas receções, à portuguesa.",
+      "cta": "Pedir um orçamento"
+    },
+    "events": {
+      "title": "Os nossos Eventos",
+      "text": "Próximas provas e serões.",
+      "cta": "Ver a agenda"
+    },
+    "contact": {
+      "eyebrow": "Contacto",
+      "title": "Golden Grape",
+      "write": "Escreva-nos"
     }
   }
 }

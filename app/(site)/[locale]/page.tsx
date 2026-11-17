@@ -1,22 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
-import { Craft } from '@/components/site/home/craft';
-import { Events } from '@/components/site/home/events';
-import { HappyHour } from '@/components/site/home/happy-hour';
-import { Hero } from '@/components/site/home/hero';
-import { Hospitality } from '@/components/site/home/hospitality';
-import { Marquee } from '@/components/site/home/marquee';
-import { Store } from '@/components/site/home/store';
-import { Reviews } from '@/components/site/home/reviews';
-import { SocialBand } from '@/components/site/home/social-band';
-import { siteReviews } from '@/modules/reviews/service';
-import { Story } from '@/components/site/home/story';
-import { Universes } from '@/components/site/home/universes';
+import { Banners } from '@/components/site/home/banners';
+import { HomeContact } from '@/components/site/home/contact';
 import { JsonLd } from '@/components/site/json-ld';
 import { alternates, type Dictionary, getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
 import { groupedHours } from '@/lib/time';
-import { getHappyHour, getHomePage, mediaOf } from '@/modules/cms/service';
+import { getHomePage, mediaOf } from '@/modules/cms/service';
 import { TABLE_BOOKING } from '@/modules/sales/order-states';
 import { localBusinessJsonLd } from '@/modules/settings/seo';
 import { directionsUrl, getSettings } from '@/modules/settings/service';
@@ -34,123 +24,57 @@ export async function generateMetadata({ params }: PageProps<'/[locale]'>): Prom
   };
 }
 
-// The regions below read the CMS at request time (behind Suspense); the rest of the page is static.
+// The home page (client request 17 Nov): four banners (shop, table, catering, events), then the contact details.
+// The photos and the contact details are read at request time (behind Suspense); the rest is static.
 
-/** The Home page settings' photos (and hero texts), as plain URLs. */
-async function homeContent(locale: Locale) {
-  const home = await getHomePage(locale);
-  const photo = (key: keyof NonNullable<typeof home.photos>) => mediaOf(home.photos?.[key])?.src ?? null;
-  return {
-    hero: { eyebrow: home.hero?.eyebrow, titleA: home.hero?.titleA, titleB: home.hero?.titleB, subtitle: home.hero?.subtitle },
-    heroImage: mediaOf(home.hero?.image)?.src ?? null,
-    universes: { shop: photo('shop'), snack: photo('snack'), catering: photo('catering'), events: photo('events') },
-    craft: { port: photo('port'), cheese: photo('cheese'), pastel: photo('pastel') },
-    table: photo('table'),
-    interior: photo('interior'),
-  };
+async function BannersSection({ t, locale, hrefs }: { t: Dictionary['home']; locale: Locale; hrefs: Parameters<typeof Banners>[0]['hrefs'] }) {
+  const { photos } = await getHomePage(locale);
+  const photo = (key: 'shop' | 'table' | 'catering' | 'events') => mediaOf(photos?.[key])?.src ?? null;
+  return <Banners t={t} hrefs={hrefs} images={{ shop: photo('shop'), table: photo('table'), catering: photo('catering'), events: photo('events') }} />;
 }
 
-async function HeroSection({ t, locale }: { t: Dictionary['hero']; locale: Locale }) {
-  const c = await homeContent(locale);
-  return <Hero t={t} content={c.hero} image={c.heroImage} />;
-}
-
-async function UniversesSection({ t, locale, hrefs }: { t: Dictionary['universes']; locale: Locale; hrefs: Parameters<typeof Universes>[0]['hrefs'] }) {
-  return <Universes t={t} hrefs={hrefs} images={(await homeContent(locale)).universes} />;
-}
-
-async function HospitalitySection({ t, locale }: { t: Dictionary['hospitality']; locale: Locale }) {
-  return <Hospitality t={t} image={(await homeContent(locale)).table} />;
-}
-
-async function CraftSection({ t, locale }: { t: Dictionary['craft']; locale: Locale }) {
-  return <Craft t={t} images={(await homeContent(locale)).craft} />;
-}
-
-async function StoreSection({ t, locale }: { t: Dictionary['store']; locale: Locale }) {
-  const [{ business: b, hours, closedDates }, { interior }] = await Promise.all([getSettings(), homeContent(locale)]);
-  if (!b?.street) return null; // BusinessSettings not filled in yet
-  const address = [b.street, `L-${b.postalCode} ${b.city}${b.country ? `, ${b.country}` : ''}`];
-  return (
-    <Store
-      t={t}
-      address={address}
-      hours={groupedHours(hours, locale)}
-      schedule={hours}
-      closedDates={closedDates}
-      directionsHref={directionsUrl(b)}
-      tastingHref={localePath(locale, '/events')}
-      image={interior}
-    />
-  );
-}
-
-async function HappyHourSection({ t, locale }: { t: Dictionary['happyHour']; locale: Locale }) {
-  const hh = await getHappyHour(locale);
-  // An unsaved global has no days/time yet, whatever the generated types say.
-  if (!hh.active || !hh.days?.length || !hh.from || !hh.titleA) return null;
-  const content = {
-    titleA: hh.titleA,
-    titleB: hh.titleB,
-    text: hh.text,
-    image: mediaOf(hh.image)?.src,
-    days: hh.days.map(Number),
-    from: hh.from,
-  };
-  return <HappyHour t={t} locale={locale} content={content} reserveHref={localePath(locale, TABLE_BOOKING)} />;
-}
-
-async function BusinessJsonLd({ locale }: { locale: Locale }) {
+async function ContactSection({ t, locale }: { t: Dictionary; locale: Locale }) {
   const settings = await getSettings();
-  return settings.business?.street ? <JsonLd data={localBusinessJsonLd(settings, localePath(locale))} /> : null;
-}
-
-// "Ils parlent de nous": the Google Maps rating and reviews (M3.3 T1) when the module is on and fresh ones exist, then
-// the links. The prototype's hard-coded reviews were never shown.
-async function SocialSection({ t, locale }: { t: Dictionary['socialProof']; locale: Locale }) {
-  const [{ business: b }, reviews] = await Promise.all([getSettings(), siteReviews()]);
+  const { business: b, hours } = settings;
+  if (!b?.street) return null; // BusinessSettings not filled in yet
   return (
     <>
-      {reviews && <Reviews t={t} locale={locale} {...reviews} leaveHref={localePath(locale, '/r')} />}
-      {b?.street && <SocialBand t={t} instagram={b.instagram} facebook={b.facebook} googleHref={reviews?.mapsUri ?? directionsUrl(b)} />}
+      <JsonLd data={localBusinessJsonLd(settings, localePath(locale))} />
+      <HomeContact
+        t={t.home.contact}
+        labels={t.contactPage.info}
+        address={[b.street, `L-${b.postalCode} ${b.city}${b.country ? `, ${b.country}` : ''}`]}
+        phone={b.phone}
+        email={b.email}
+        hours={groupedHours(hours, locale)}
+        directions={{ label: t.store.directions, href: directionsUrl(b) }}
+        contactHref={localePath(locale, '/contact')}
+      />
     </>
   );
 }
+
 export default async function HomePage({ params }: PageProps<'/[locale]'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const t = await getDictionary(locale);
-  const hrefs = { shop: localePath(locale, '/shop'), snack: localePath(locale, '/snack'), catering: localePath(locale, '/catering'), events: localePath(locale, '/events') };
+  const hrefs = {
+    shop: localePath(locale, '/shop'),
+    table: localePath(locale, TABLE_BOOKING),
+    takeaway: localePath(locale, '/snack'),
+    catering: localePath(locale, '/catering'),
+    events: localePath(locale, '/events'),
+  };
   return (
-    <>
-      {/* Each section streams its CMS photo; the fallback is the same section without it, so nothing moves. */}
-      <Suspense fallback={<Hero t={t.hero} />}>
-        <HeroSection t={t.hero} locale={locale} />
+    <div className="bg-ink">
+      <h1 className="sr-only">{t.meta.home.title}</h1>
+      {/* The fallback is the same banners without their photos, so nothing moves when they arrive. */}
+      <Suspense fallback={<Banners t={t.home} hrefs={hrefs} />}>
+        <BannersSection t={t.home} locale={locale} hrefs={hrefs} />
       </Suspense>
       <Suspense fallback={null}>
-        <BusinessJsonLd locale={locale} />
+        <ContactSection t={t} locale={locale} />
       </Suspense>
-      <Suspense fallback={<Universes t={t.universes} hrefs={hrefs} />}>
-        <UniversesSection t={t.universes} locale={locale} hrefs={hrefs} />
-      </Suspense>
-      <Marquee t={t.marquee} />
-      <Suspense fallback={<Hospitality t={t.hospitality} />}>
-        <HospitalitySection t={t.hospitality} locale={locale} />
-      </Suspense>
-      <Suspense fallback={<Craft t={t.craft} />}>
-        <CraftSection t={t.craft} locale={locale} />
-      </Suspense>
-      <Suspense fallback={null}>
-        <StoreSection t={t.store} locale={locale} />
-      </Suspense>
-      <Suspense fallback={null}>
-        <HappyHourSection t={t.happyHour} locale={locale} />
-      </Suspense>
-      <Story t={t.story} />
-      <Events t={t.eventsHome} calendarHref={localePath(locale, '/events')} reserveHref={localePath(locale, '/events')} />
-      <Suspense fallback={null}>
-        <SocialSection t={t.socialProof} locale={locale} />
-      </Suspense>
-    </>
+    </div>
   );
 }

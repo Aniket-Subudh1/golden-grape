@@ -1,11 +1,6 @@
 import type { Field, GlobalConfig } from 'payload';
-import de from '@/dictionaries/de.json';
-import en from '@/dictionaries/en.json';
-import fr from '@/dictionaries/fr.json';
-import pt from '@/dictionaries/pt.json';
 import { hiddenUnless, isStaff, publicRead } from '@/lib/access';
-import { l, linkTo, timeOfDay, WEEKDAYS } from '@/lib/admin';
-import { isLocale } from '@/lib/i18n';
+import { l, type Label, linkTo, timeOfDay, WEEKDAYS } from '@/lib/admin';
 import { revalidateTagHook } from '@/lib/revalidate';
 
 const editable = { read: publicRead, update: isStaff('manager') };
@@ -206,13 +201,8 @@ export const happyHour: GlobalConfig = {
   ],
 };
 
-// The home page's big title. It opens filled with today's text (the dictionary), and the site falls back to that
-// text for any field left empty, so nothing changes until someone edits it.
-const HERO = { fr: fr.hero, en: en.hero, de: de.hero, pt: pt.hero };
-const heroDefault =
-  (key: 'eyebrow' | 'titleA' | 'titleB' | 'subtitle') =>
-  ({ locale }: { locale?: string }) =>
-    HERO[locale && isLocale(locale) ? locale : 'fr'][key];
+// The home page (client request 17 Nov): the photos of its four banners. Their titles are the site's texts.
+const banner = (name: string, label: Label): Field => ({ name, type: 'upload', relationTo: 'media', label, admin: { width: '50%' } });
 
 export const homePage: GlobalConfig = {
   slug: 'HomePage',
@@ -220,10 +210,10 @@ export const homePage: GlobalConfig = {
   admin: {
     hidden: hiddenUnless('manager'),
     description: l(
-      'Le grand titre et les photos de la page d’accueil. Les événements à venir s’y affichent tout seuls.',
-      'The big title and the photos of the home page. Upcoming events appear there by themselves.',
-      'Der große Titel und die Fotos der Startseite. Kommende Veranstaltungen erscheinen dort von selbst.',
-      'O título grande e as fotos da página inicial. Os próximos eventos aparecem lá sozinhos.',
+      'Les photos des quatre bannières de la page d’accueil. Une grande photo en largeur (au moins 2000 px) rend le mieux.',
+      'The photos of the home page’s four banners. A large landscape photo (at least 2000 px wide) works best.',
+      'Die Fotos der vier Banner der Startseite. Ein großes Querformat-Foto (mindestens 2000 px breit) wirkt am besten.',
+      'As fotos das quatro faixas da página inicial. Uma foto grande na horizontal (pelo menos 2000 px de largura) fica melhor.',
     ),
     preview: (_, { locale }) => `/${locale}`,
   },
@@ -231,189 +221,18 @@ export const homePage: GlobalConfig = {
   hooks: { afterChange: [revalidateTagHook('home')] },
   fields: [
     {
-      // Unnamed tabs only group the form; the stored data keeps its shape.
-      type: 'tabs',
-      tabs: [
+      name: 'photos',
+      type: 'group',
+      label: false,
+      fields: [
         {
-          label: l('Grand titre', 'Big title', 'Großer Titel', 'Título grande'),
+          type: 'row',
           fields: [
-            {
-              name: 'hero',
-              type: 'group',
-              label: false,
-              fields: [
-                {
-                  name: 'eyebrow',
-                  type: 'text',
-                  localized: true,
-                  defaultValue: heroDefault('eyebrow'),
-                  label: l(
-                    'Petite ligne au-dessus',
-                    'Small line above',
-                    'Kleine Zeile darüber',
-                    'Linha pequena por cima',
-                  ),
-                },
-                {
-                  type: 'row',
-                  fields: [
-                    {
-                      name: 'titleA',
-                      type: 'text',
-                      localized: true,
-                      defaultValue: heroDefault('titleA'),
-                      label: l('Titre', 'Title', 'Titel', 'Título'),
-                      admin: { width: '50%' },
-                    },
-                    {
-                      name: 'titleB',
-                      type: 'text',
-                      localized: true,
-                      defaultValue: heroDefault('titleB'),
-                      label: l(
-                        'Suite du titre, en or',
-                        'Rest of the title, in gold',
-                        'Rest des Titels, in Gold',
-                        'Resto do título, a dourado',
-                      ),
-                      admin: { width: '50%' },
-                    },
-                  ],
-                },
-                {
-                  name: 'subtitle',
-                  type: 'textarea',
-                  localized: true,
-                  defaultValue: heroDefault('subtitle'),
-                  label: l('Sous-titre', 'Subtitle', 'Untertitel', 'Subtítulo'),
-                },
-                {
-                  name: 'image',
-                  type: 'upload',
-                  relationTo: 'media',
-                  label: l('Photo de fond', 'Background photo', 'Hintergrundfoto', 'Foto de fundo'),
-                  admin: {
-                    description: l(
-                      'Vide : la photo actuelle du verre de vin.',
-                      'Empty: the current wine-glass photo.',
-                      'Leer: das aktuelle Weinglas-Foto.',
-                      'Vazio: a foto atual do copo de vinho.',
-                    ),
-                  },
-                },
-              ],
-            },
-          ],
-        },
-        {
-          label: l('Photos', 'Photos', 'Fotos', 'Fotos'),
-          description: l(
-            'Les photos des sections de la page d’accueil. « Intérieur de la boutique » sert aussi sur la page Contact.',
-            'The photos of the home page sections. “Shop interior” is also used on the Contact page.',
-            'Die Fotos der Abschnitte der Startseite. „Ladeninneres“ wird auch auf der Kontaktseite verwendet.',
-            'As fotos das secções da página inicial. «Interior da loja» também é usada na página Contacto.',
-          ),
-          fields: [
-            {
-              name: 'photos',
-              type: 'group',
-              label: false,
-              fields: [
-                {
-                  type: 'row',
-                  fields: [
-                    {
-                      name: 'shop',
-                      type: 'upload',
-                      relationTo: 'media',
-                      label: l('Univers : Boutique', 'Universe: Shop', 'Bereich: Shop', 'Universo: Loja'),
-                      admin: { width: '50%' },
-                    },
-                    {
-                      name: 'snack',
-                      type: 'upload',
-                      relationTo: 'media',
-                      label: l('Univers : Comptoir', 'Universe: Counter', 'Bereich: Theke', 'Universo: Balcão'),
-                      admin: { width: '50%' },
-                    },
-                    {
-                      name: 'catering',
-                      type: 'upload',
-                      relationTo: 'media',
-                      label: l('Univers : Traiteur', 'Universe: Catering', 'Bereich: Catering', 'Universo: Catering'),
-                      admin: { width: '50%' },
-                    },
-                    {
-                      name: 'events',
-                      type: 'upload',
-                      relationTo: 'media',
-                      label: l(
-                        'Univers : Événements',
-                        'Universe: Events',
-                        'Bereich: Veranstaltungen',
-                        'Universo: Eventos',
-                      ),
-                      admin: { width: '50%' },
-                    },
-                  ],
-                },
-                {
-                  type: 'row',
-                  fields: [
-                    {
-                      name: 'port',
-                      type: 'upload',
-                      relationTo: 'media',
-                      label: l('Savoir-faire : Porto', 'Craft: Port', 'Handwerk: Portwein', 'Saber-fazer: Porto'),
-                      admin: { width: '33%' },
-                    },
-                    {
-                      name: 'cheese',
-                      type: 'upload',
-                      relationTo: 'media',
-                      label: l('Savoir-faire : Fromages', 'Craft: Cheese', 'Handwerk: Käse', 'Saber-fazer: Queijos'),
-                      admin: { width: '33%' },
-                    },
-                    {
-                      name: 'pastel',
-                      type: 'upload',
-                      relationTo: 'media',
-                      label: l(
-                        'Savoir-faire : Pastel de nata',
-                        'Craft: Pastel de nata',
-                        'Handwerk: Pastel de nata',
-                        'Saber-fazer: Pastel de nata',
-                      ),
-                      admin: { width: '33%' },
-                    },
-                  ],
-                },
-                {
-                  type: 'row',
-                  fields: [
-                    {
-                      name: 'table',
-                      type: 'upload',
-                      relationTo: 'media',
-                      label: l(
-                        'Hospitalité : la table',
-                        'Hospitality: the table',
-                        'Gastfreundschaft: der Tisch',
-                        'Hospitalidade: a mesa',
-                      ),
-                      admin: { width: '50%' },
-                    },
-                    {
-                      name: 'interior',
-                      type: 'upload',
-                      relationTo: 'media',
-                      label: l('Intérieur de la boutique', 'Shop interior', 'Ladeninneres', 'Interior da loja'),
-                      admin: { width: '50%' },
-                    },
-                  ],
-                },
-              ],
-            },
+            banner('shop', l('Bannière 1 : Shop en ligne', 'Banner 1: Online shop', 'Banner 1: Online-Shop', 'Faixa 1: Loja online')),
+            banner('table', l('Bannière 2 : Réserver une table', 'Banner 2: Book a table', 'Banner 2: Tisch reservieren', 'Faixa 2: Reservar uma mesa')),
+            banner('catering', l('Bannière 3 : Services Catering', 'Banner 3: Catering services', 'Banner 3: Catering-Services', 'Faixa 3: Serviços de Catering')),
+            banner('events', l('Bannière 4 : Événements', 'Banner 4: Events', 'Banner 4: Veranstaltungen', 'Faixa 4: Eventos')),
+            banner('interior', l('Intérieur de la boutique (page Contact)', 'Shop interior (Contact page)', 'Ladeninneres (Kontaktseite)', 'Interior da loja (página Contacto)')),
           ],
         },
       ],

@@ -45,6 +45,8 @@ export function CartSheet({ locale, t }: { locale: Locale; t: Dictionary['cart']
   const checkoutHref = localePath(locale, view === 'table' ? TABLE_BOOKING : '/checkout');
   // At a table only the counter's dishes and drinks can be pre-ordered; shop items wait in the basket.
   const shopLinesAtTable = view === 'table' && lines.some((l) => l.kind !== 'snack');
+  // Only shop goods are delivered (client request 17 Nov): said as soon as the basket holds something that is not.
+  const undeliverableLines = view === 'delivery' && lines.some((l) => !l.deliverable);
 
   return (
     <Sheet open={open} onOpenChange={(next) => (next ? setOpen(true) : close())} label={t.panier} closeLabel={t.close}>
@@ -76,6 +78,7 @@ export function CartSheet({ locale, t }: { locale: Locale; t: Dictionary['cart']
         </div>
         <p className="mt-2 text-center text-[11px] text-ink/50">{t.hints[view]}</p>
         {shopLinesAtTable && <p className="mt-2 rounded-lg bg-champagne/70 px-3 py-2 text-center text-[11px] text-ink/70">{t.tableShopNote}</p>}
+        {undeliverableLines && <p className="mt-2 rounded-lg bg-champagne/70 px-3 py-2 text-center text-[11px] text-ink/70">{t.deliveryShopNote}</p>}
       </div>
 
       {items.length === 0 ? (

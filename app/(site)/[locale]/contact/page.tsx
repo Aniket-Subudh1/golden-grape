@@ -7,6 +7,8 @@ import { type ReactNode, Suspense } from 'react';
 import { Container } from '@/components/site/container';
 import { JsonLd } from '@/components/site/json-ld';
 import { PageHero } from '@/components/site/page-hero';
+import { Reviews } from '@/components/site/reviews';
+import { SocialBand } from '@/components/site/social-band';
 import { FacebookIcon, InstagramIcon } from '@/components/site/social-icons';
 import { Button } from '@/components/ui/button';
 import { alternates, type Dictionary, getDictionary, isLocale, type Locale, localePath } from '@/lib/i18n';
@@ -14,6 +16,7 @@ import { weekHours } from '@/lib/time';
 import { ContactForm } from '@/modules/cms/components/contact-form';
 import { getHomePage, mediaOf } from '@/modules/cms/service';
 import { TABLE_BOOKING } from '@/modules/sales/order-states';
+import { siteReviews } from '@/modules/reviews/service';
 import { localBusinessJsonLd } from '@/modules/settings/seo';
 import { directionsUrl, getSettings } from '@/modules/settings/service';
 
@@ -134,10 +137,22 @@ async function Location({ caption, directions }: { caption: string; directions: 
   );
 }
 
+// "Ils parlent de nous": the Google rating and reviews (M3.3 T1) when the module is on and fresh ones exist, then the
+// links. On the home page until it became four banners (client request 17 Nov).
+async function SocialSection({ t, locale }: { t: Dictionary['socialProof']; locale: Locale }) {
+  const [{ business: b }, reviews] = await Promise.all([getSettings(), siteReviews()]);
+  return (
+    <>
+      {reviews && <Reviews t={t} locale={locale} {...reviews} leaveHref={localePath(locale, '/r')} />}
+      {b?.street && <SocialBand t={t} instagram={b.instagram} facebook={b.facebook} googleHref={reviews?.mapsUri ?? directionsUrl(b)} />}
+    </>
+  );
+}
+
 export default async function ContactPage({ params }: PageProps<'/[locale]/contact'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const { contactPage: t, form, store, cart } = await getDictionary(locale);
+  const { contactPage: t, form, store, cart, socialProof } = await getDictionary(locale);
   return (
     <>
       <PageHero eyebrow={t.eyebrow} title={[t.titleA, t.titleB]} subtitle={t.subtitle} />
@@ -177,6 +192,9 @@ export default async function ContactPage({ params }: PageProps<'/[locale]/conta
           </Suspense>
         </Container>
       </section>
+      <Suspense fallback={null}>
+        <SocialSection t={socialProof} locale={locale} />
+      </Suspense>
     </>
   );
 }

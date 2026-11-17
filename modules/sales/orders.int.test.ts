@@ -27,7 +27,8 @@ beforeAll(async () => {
   for (const [mode, capacity] of [['pickup', 2], ['delivery', 3], ['table', 10]] as const) {
     await payload.create({ collection: 'slotRules', data: { mode, intervalMin: 30, capacityPerSlot: capacity, leadTimeMin: 60, maxDaysAhead: 14, days: everyDay }, overrideAccess: true });
   }
-  await payload.create({ collection: 'deliveryZones', data: { name: 'Bissen', postalCodes: ['7795'], feeCents: 500, minOrderCents: 3000, freeFromCents: 10000, active: true }, overrideAccess: true });
+  // Delivery by driving distance (client request 17 Nov): 7795 Bissen is 0.7 km from the shop, 9990 Weiswampach 47 km.
+  await payload.create({ collection: 'deliveryZones', data: { upToKm: 10, feeCents: 500, minOrderCents: 3000, freeFromCents: 10000, active: true }, overrideAccess: true });
   wine = await makeVariant(payload, { onHand: 100, price: 1500, packaging: [6] });
   // A table pre-order holds only counter items (APPLUX audit 10 Nov, §1): a tracked one, so its stock can be checked.
   dish = await makeVariant(payload, { onHand: 100, price: 650, kind: 'snack', trackStock: true });
@@ -165,9 +166,10 @@ describe('placeOrder', () => {
     expect(new Date(pays[0].at!).toISOString()).toBe(at.toISOString());
   });
 
-  it('delivery: outside every zone refused, below the minimum refused, otherwise the fee is in the total (AC-04)', async () => {
+  it('delivery: too far or unknown refused, below the minimum refused, otherwise the fee is in the total (AC-04)', async () => {
     const address = { line1: 'Rue Principale 1', postalCode: 'L-7795', city: 'Bissen' };
     const delivery = (over: Partial<PlaceOrderInput>) => order({ mode: 'delivery', payment: 'transfer', time: '12:00', address, ...over });
+    await expect(placeOrder(payload, delivery({ address: { ...address, postalCode: '9990' } }), { now: NOW })).rejects.toMatchObject({ message: 'outsideZone' });
     await expect(placeOrder(payload, delivery({ address: { ...address, postalCode: '1009' } }), { now: NOW })).rejects.toMatchObject({ message: 'outsideZone' });
     await expect(placeOrder(payload, delivery({ lines: [{ variant: wine.variant.id, qty: 1 }] }), { now: NOW })).rejects.toMatchObject({ message: 'belowMinimum' });
     await expect(placeOrder(payload, delivery({ payment: 'onsite' }), { now: NOW })).rejects.toMatchObject({ message: 'invalid' });
@@ -175,6 +177,19 @@ describe('placeOrder', () => {
     const doc = await payload.findByID({ collection: 'orders', id: placed.id, overrideAccess: true, depth: 0 });
     expect(doc.totals).toMatchObject({ subtotalCents: 3000, deliveryCents: 500, totalCents: 3500 });
     expect(doc.address).toMatchObject({ postalCode: 'L-7795', city: 'Bissen' });
+  });
+
+  it('only shop goods are delivered: a counter dish or a "pickup only" product in the basket refuses the whole order (client 17 Nov)', async () => {
+    const address = { line1: 'Rue Principale 1', postalCode: '7795', city: 'Bissen' };
+    const delivery = (lines: PlaceOrderInput['lines']) => order({ date: '2026-11-16', mode: 'delivery', payment: 'transfer', time: '12:00', address, lines });
+    const kept = await makeVariant(payload, { onHand: 10, price: 4000 });
+    await payload.update({ collection: 'products', id: kept.product.id, data: { pickupOnly: true }, overrideAccess: true });
+    const before = await payload.count({ collection: 'orders', overrideAccess: true });
+    await expect(placeOrder(payload, delivery([{ variant: wine.variant.id, qty: 2 }, { variant: dish.variant.id, qty: 1 }]), { now: NOW })).rejects.toMatchObject({ message: 'notDeliverable' });
+    await expect(placeOrder(payload, delivery([{ variant: kept.variant.id, qty: 1 }]), { now: NOW })).rejects.toMatchObject({ message: 'notDeliverable' });
+    expect((await payload.count({ collection: 'orders', overrideAccess: true })).totalDocs).toBe(before.totalDocs);
+    // The same dish is fine for pickup.
+    await expect(placeOrder(payload, order({ date: '2026-11-16', mode: 'pickup', time: '12:00', lines: [{ variant: dish.variant.id, qty: 1 }] }), { now: NOW })).resolves.toMatchObject({ created: true });
   });
 
   it('more than the stock → refused before anything is written', async () => {

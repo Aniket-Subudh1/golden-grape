@@ -19,15 +19,15 @@ export const REQUEST_STATUS = [
 export const cateringPackages: CollectionConfig = {
   slug: 'cateringPackages',
   labels: {
-    singular: l('Menu traiteur', 'Catering menu', 'Catering-Menü', 'Menu de catering'),
-    plural: l('Menus traiteur', 'Catering menus', 'Catering-Menüs', 'Menus de catering'),
+    singular: l('Menu catering', 'Catering menu', 'Catering-Menü', 'Menu de catering'),
+    plural: l('Menus catering', 'Catering menus', 'Catering-Menüs', 'Menus de catering'),
   },
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'pricePerGuestCents', 'minGuests'],
     hidden: hiddenUnless('manager'),
     description: l(
-      'Les formules de la page Traiteur, dans l’ordre choisi.',
+      'Les formules de la page Services Catering, dans l’ordre choisi.',
       'The menus on the Catering page, in the order you choose.',
       'Die Menüs der Catering-Seite, in Ihrer Reihenfolge.',
       'Os menus da página Catering, pela ordem escolhida.',
@@ -122,15 +122,15 @@ const quotedOnlyBySending: CollectionBeforeChangeHook = ({ data, originalDoc, re
 export const cateringRequests: CollectionConfig = {
   slug: 'cateringRequests',
   labels: {
-    singular: l('Demande traiteur', 'Catering request', 'Catering-Anfrage', 'Pedido de catering'),
-    plural: l('Demandes traiteur', 'Catering requests', 'Catering-Anfragen', 'Pedidos de catering'),
+    singular: l('Demande de catering', 'Catering request', 'Catering-Anfrage', 'Pedido de catering'),
+    plural: l('Demandes de catering', 'Catering requests', 'Catering-Anfragen', 'Pedidos de catering'),
   },
   admin: {
     useAsTitle: 'number',
     defaultColumns: ['number', 'date', 'guests', 'status', 'createdAt'],
     hidden: hiddenUnless('sales'),
     description: l(
-      'Les demandes envoyées depuis la page Traiteur. Changez le statut quand vous répondez.',
+      'Les demandes envoyées depuis la page Services Catering. Changez le statut quand vous répondez.',
       'Requests sent from the Catering page. Change the status when you reply.',
       'Anfragen von der Catering-Seite. Ändern Sie den Status, wenn Sie antworten.',
       'Pedidos enviados a partir da página Catering. Mude o estado quando responder.',

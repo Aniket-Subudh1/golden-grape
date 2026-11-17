@@ -15,7 +15,7 @@ const ROUTES = ['', '/maison', '/events', '/catering', '/contact'];
 
 /** Distinctive strings of a locale: dictionary keys plus a localized CMS field (the Maison hero). */
 const samples = (l: Locale) => [
-  DICTS[l].hero.titleA,
+  DICTS[l].home.table.title,
   DICTS[l].contactPage.titleA,
   DICTS[l].cateringPage.subtitle,
   DICTS[l].eventsPage.subtitle,

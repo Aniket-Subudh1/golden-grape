@@ -36,6 +36,8 @@ export const checkoutQuote = publicAction(
     return {
       quote,
       zone: zone && {
+        km: zone.km,
+        place: zone.place,
         feeCents: zone.feeCents,
         minOrderCents: zone.minOrderCents,
         freeFromCents: zone.freeFromCents ?? null,

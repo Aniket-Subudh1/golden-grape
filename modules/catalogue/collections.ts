@@ -520,6 +520,25 @@ export const products: CollectionConfig = {
       label: l('Ne rapporte pas de points', 'Earns no loyalty points', 'Bringt keine Treuepunkte', 'Não dá pontos'),
       admin: { position: 'sidebar', disableListColumn: true },
     },
+    // Client request 17 Nov: only shop goods are delivered. The counter's dishes never are (no box to tick); this keeps
+    // any other product to pickup too (a fragile magnum, a fresh cheese…).
+    {
+      name: 'pickupOnly',
+      type: 'checkbox',
+      defaultValue: false,
+      label: l('Retrait uniquement (pas de livraison)', 'Pickup only (no delivery)', 'Nur Abholung (keine Lieferung)', 'Só levantamento (sem entrega)'),
+      admin: {
+        position: 'sidebar',
+        disableListColumn: true,
+        condition: (data) => data?.kind !== 'snack',
+        description: l(
+          'Les plats du Comptoir ne sont jamais livrés. Cochez pour garder aussi ce produit au retrait en boutique.',
+          'Counter dishes are never delivered. Tick to keep this product to pickup in the shop too.',
+          'Theken-Speisen werden nie geliefert. Ankreuzen, um auch dieses Produkt nur zur Abholung anzubieten.',
+          'Os pratos do Balcão nunca são entregues. Marque para deixar também este produto só para levantamento.',
+        ),
+      },
+    },
     {
       name: 'giftCard',
       type: 'checkbox',

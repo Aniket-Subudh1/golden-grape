@@ -8,83 +8,6 @@
     "language": "Language",
     "shopLabel": "Shop"
   },
-  "hero": {
-    "eyebrow": "Since 2019 · Luxembourg",
-    "titleA": "The soul of Portugal,",
-    "titleB": "poured with care.",
-    "subtitle": "A house of wines, gourmet food, snacks, catering and Portuguese celebration — in the heart of Luxembourg.",
-    "cta": "Discover the House",
-    "secondaryCta": "Next Happy Hour",
-    "scroll": "Scroll",
-    "ticker": {
-      "shop": "Shop",
-      "snack": "Snack",
-      "catering": "Catering",
-      "events": "Events",
-      "boutique": "Boutique"
-    }
-  },
-  "universes": {
-    "eyebrow": "Four universes · One house",
-    "titleA": "Far more",
-    "titleB": "than a wine shop.",
-    "shop": {
-      "title": "Shop",
-      "tagline": "Wines & Grocery",
-      "desc": "Exceptional Portuguese wines, Port, DOP cheeses, charcuterie, fine grocery and gift boxes.",
-      "cta": "Enter the shop"
-    },
-    "snack": {
-      "title": "Counter",
-      "tagline": "Takeaway",
-      "desc": "Bifana, Prego, Alheira, Pastel de Nata. Portuguese tradition to go, every day.",
-      "cta": "See the menu"
-    },
-    "catering": {
-      "title": "Catering",
-      "tagline": "Receptions",
-      "desc": "Three formulas to host with Portuguese soul, from cocktails to seated dinners.",
-      "cta": "Our packages"
-    },
-    "events": {
-      "title": "Events",
-      "tagline": "Nights & Happy Hour",
-      "desc": "Fado nights, guided tastings, weekly Happy Hour, chef's tables.",
-      "cta": "The agenda"
-    }
-  },
-  "craft": {
-    "eyebrow": "Objects of artisans",
-    "titleA": "The gesture,",
-    "titleB": "above all.",
-    "body": "Every product is hand-picked from families who have carried a craft across generations.",
-    "port": {
-      "label": "Vinho do Porto",
-      "title": "Tawny 20 years",
-      "desc": "Notes of candied fig, walnut, golden caramel."
-    },
-    "cheese": {
-      "label": "DOP cheese",
-      "title": "São Jorge, matured",
-      "desc": "Pressed paste from the Azores, 12 months in the cellar."
-    },
-    "pastel": {
-      "label": "Pastry",
-      "title": "Pastel de Nata",
-      "desc": "Baked every two hours, golden puff pastry."
-    }
-  },
-  "hospitality": {
-    "eyebrow": "The art of hosting",
-    "titleA": "Convívio.",
-    "titleB": "The Portuguese soul.",
-    "body": "At Golden Grape, we don't just serve wine. We share a table, a laugh, a memory. Portugal is a way of life — and an invitation.",
-    "bullets": [
-      "Warm hospitality, no protocol",
-      "Family cooking, exceptional produce",
-      "A place to gather, celebrate, linger"
-    ]
-  },
   "store": {
     "eyebrow": "The Boutique",
     "titleA": "Push",
@@ -97,10 +20,6 @@
     "openNow": "Open now",
     "closedNow": "Closed right now"
   },
-  "story": {
-    "eyebrow": "Our philosophy",
-    "quote": "We believe a wine, a dish, a shared moment — are three ways of saying the same thing: <gold>bem-vindo</gold>."
-  },
   "happyHour": {
     "eyebrow": "House ritual",
     "days": "Days",
@@ -109,33 +28,6 @@
     "seconds": "Seconds",
     "nextPour": "Next pour",
     "reserve": "Reserve a table"
-  },
-  "eventsHome": {
-    "eyebrow": "The agenda",
-    "titleA": "Every week,",
-    "titleB": "a rendez-vous.",
-    "fullCal": "Full calendar",
-    "reserve": "Reserve",
-    "items": {
-      "friday": {
-        "date": "Friday evening",
-        "time": "7:00 — 11:00 PM",
-        "title": "Fado Night",
-        "desc": "Portuguese live singing, tapas and Port — Lisbon's soul, in Luxembourg."
-      },
-      "golden": {
-        "date": "Every Wednesday",
-        "time": "5:00 — 8:00 PM",
-        "title": "Golden Hour",
-        "desc": "Welcome glass on us, sharing boards and Portuguese jazz."
-      },
-      "tasting": {
-        "date": "One Saturday a month",
-        "time": "4:00 — 6:00 PM",
-        "title": "Guided tasting",
-        "desc": "Six chosen wines, a guest winemaker, a geography of taste."
-      }
-    }
   },
   "socialProof": {
     "eyebrow": "They talk about us",
@@ -149,18 +41,6 @@
     "report": "Report",
     "order": "The most relevant reviews, as Google Maps shows them. Source:",
     "stars": "{{count}} stars out of 5"
-  },
-  "marquee": {
-    "words": [
-      "Vinho",
-      "Convívio",
-      "Saudade",
-      "Bacalhau",
-      "Fado",
-      "Tinto",
-      "Azeite",
-      "Mesa"
-    ]
   },
   "footer": {
     "colContact": "Find us",
@@ -187,7 +67,7 @@
     },
     "hints": {
       "pickup": "Collect your order at the shop, at the time you choose.",
-      "delivery": "Delivered to your door, at the time you choose.",
+      "delivery": "Wines and shop products, delivered to your door.",
       "table": "Book a table, and pre-order if you like."
     },
     "empty": {
@@ -278,7 +158,8 @@
         "LOYALTY_SPENT": "Your points changed meanwhile. Please try again.",
         "GIFT_CARD_SPENT": "This gift card was used meanwhile. Please check it and try again."
       }
-    }
+    },
+    "deliveryShopNote": "We deliver wines and shop products only. Counter dishes are for takeaway or to enjoy here."
   },
   "shop": {
     "eyebrow": "Shop · Wines & Grocery",
@@ -357,10 +238,9 @@
     "eyebrow": "The Counter",
     "titleA": "Tradition,",
     "titleB": "to go.",
-    "subtitle": "Choose, adjust, order — in under a minute. Pick up, delivery or at your table.",
+    "subtitle": "Choose, adjust, order — in under a minute. Take away or at your table.",
     "ctas": {
       "pickup": "Pickup",
-      "delivery": "Delivery",
       "table": "Reserve a table"
     },
     "tags": {
@@ -389,7 +269,7 @@
     }
   },
   "cateringPage": {
-    "eyebrow": "Catering",
+    "eyebrow": "Catering Services",
     "titleA": "Hosting",
     "titleB": "with a Portuguese soul.",
     "subtitle": "Three formulas for your event — cocktail, seated dinner, or chef's table. Confirmed within 24h.",
@@ -482,7 +362,7 @@
       "subject": "Subject",
       "subjects": {
         "boutique": "Shop",
-        "traiteur": "Catering",
+        "traiteur": "Catering Services",
         "evenement": "Event",
         "autre": "Other"
       },
@@ -573,7 +453,7 @@
       "description": "Fado, Happy Hour, guided tastings and the chef’s table in Bissen."
     },
     "catering": {
-      "title": "Catering — Portuguese receptions · Golden Grape Luxembourg",
+      "title": "Catering Services — Portuguese receptions · Golden Grape Luxembourg",
       "description": "Three Portuguese catering packages for your receptions in Luxembourg. Request in 30 seconds."
     },
     "shop": {
@@ -582,7 +462,7 @@
     },
     "snack": {
       "title": "Counter — Portuguese snacks to go · Golden Grape",
-      "description": "Bifana, prego, pastel de nata: Portuguese tradition to take away, delivered or at the table in Bissen."
+      "description": "Bifana, prego, pastel de nata: Portuguese tradition to take away or at the table in Bissen."
     },
     "product": {
       "title": "{{name}} · Golden Grape Luxembourg",
@@ -611,7 +491,7 @@
       "invalid": "Invalid value.",
       "slotFull": "This time has just been taken. Please choose another one.",
       "slotUnavailable": "This time is no longer available. Please choose another one.",
-      "outsideZone": "We do not deliver to this postcode yet.",
+      "outsideZone": "This address is outside our delivery area.",
       "belowMinimum": "Your order is below the delivery minimum.",
       "cartChanged": "Your bag changed (stock). Please check it and try again.",
       "emptyCart": "Your bag is empty.",
@@ -620,7 +500,8 @@
       "event": "This event can no longer be booked.",
       "notPreorderable": "Only dishes and drinks from the counter can be pre-ordered with a table.",
       "consent": "Tick the box to accept the quotation.",
-      "notAcceptable": "This quotation can no longer be accepted (expired, already signed or replaced). The page updates."
+      "notAcceptable": "This quotation can no longer be accepted (expired, already signed or replaced). The page updates.",
+      "notDeliverable": "Counter dishes are not delivered: choose takeaway or remove them."
     },
     "CONFLICT": "This was just changed by someone else. Please try again.",
     "OUT_OF_STOCK": "Your bag changed (stock). Please check it and try again."
@@ -972,10 +853,11 @@
       "fee": "Delivery {{fee}}",
       "min": "minimum {{min}}",
       "free": "free from {{free}}",
-      "outside": "We do not deliver to this postcode yet.",
+      "outside": "This address is outside our delivery area.",
       "choosePickup": "Choose pickup instead",
       "belowMin": "Add {{missing}} more to reach the {{min}} delivery minimum.",
-      "freeNow": "Delivery is free"
+      "freeNow": "Delivery is free",
+      "distance": "{{place}} · {{km}} km"
     },
     "preorder": {
       "label": "Pre-order dishes and drinks",
@@ -1036,7 +918,12 @@
       "other": "Another address",
       "save": "Save this address to my account"
     },
-    "noSlots": "Booking online is not possible: no time is available. Call us to book."
+    "noSlots": "Booking online is not possible: no time is available. Call us to book.",
+    "notDeliverable": {
+      "title": "Not for delivery: {{items}}.",
+      "text": "We deliver wines and shop products only. Counter dishes are for takeaway or to enjoy here.",
+      "remove": "Remove these items"
+    }
   },
   "order": {
     "next": {
@@ -1545,6 +1432,34 @@
       "error": "That did not work. Try again.",
       "corrected": "Corrected",
       "mine": "My check-in"
+    }
+  },
+  "home": {
+    "shop": {
+      "title": "Online shop",
+      "text": "Portuguese wines, port and fine food, delivered or picked up in Bissen.",
+      "cta": "Discover the shop"
+    },
+    "table": {
+      "title": "Book a table",
+      "text": "Dine in or take away.",
+      "cta": "Book",
+      "takeaway": "Order takeaway"
+    },
+    "catering": {
+      "title": "Our Catering Services",
+      "text": "Your receptions, the Portuguese way.",
+      "cta": "Ask for a quote"
+    },
+    "events": {
+      "title": "Our Events",
+      "text": "Upcoming tastings and evenings.",
+      "cta": "See the calendar"
+    },
+    "contact": {
+      "eyebrow": "Contact",
+      "title": "Golden Grape",
+      "write": "Write to us"
     }
   }
 }

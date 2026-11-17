@@ -80,6 +80,7 @@ Access: read is public **only through `getSettings()`, which strips the bank and
 | `vatClass` | select of `BusinessSettings.vat` keys | required |
 | `status` | `draft` \| `active` \| `archived`, index | only `active` is sellable |
 | `loyaltyExcluded` | checkbox | lines of this product earn no points (M3.2) |
+| `pickupOnly` | checkbox | never delivered (client request 17 Nov). Counter dishes (`kind: snack`) are never delivered whatever the box says: `isDeliverable()` in `modules/sales/zones.ts`, checked by `placeOrder` (`notDeliverable`) and shown at checkout |
 | `giftCard` | checkbox | the variants are gift-card amounts; selling one issues a card (M3.2) |
 | `seo` | group as pages | |
 
@@ -145,8 +146,8 @@ Indexes: `{ status, createdAt: -1 }`, `{ customer, createdAt: -1 }`, `{ channel,
 ### `slotRules` (global-like collection, one doc per mode)
 `mode` (unique: `pickup`, `delivery`, `table`), `intervalMin`, `capacityPerSlot` (orders, or guests for `table`), `leadTimeMin`, `days` (overrides `BusinessSettings.hours`, optional), `maxDaysAhead`.
 
-### `deliveryZones`
-`name`, `postalCodes` (text array, index), `feeCents`, `minOrderCents`, `freeFromCents` (optional), `active`.
+### `deliveryZones` (delivery by distance, client request 17 Nov)
+One doc per **distance range**: `upToKm` (required, unique among ranges, validated), `feeCents`, `minOrderCents`, `freeFromCents` (optional), `active`, `name` (hidden, set from the limit: "≤ 10 km"). List sorted by `upToKm`. A range starts where the next shorter active range ends (0 for the first); the limit belongs to its range; beyond the longest active range there is no delivery. A postcode's driving km from the shop comes from `modules/sales/postcode-km.json` (all 4,201 Luxembourg postcodes, built by `scripts/postcode-distances.mts` from BD-Adresses CC0 + OSRM; rebuilt only if the shop moves or the State adds postcodes). Nothing external runs at checkout. Replaces M2.3's `postalCodes` lists (`migrate-2026-11-17` turns them into two starting ranges).
 
 ### `events` (module `events`)
 `title` L, `slug`, `startsAt`, `endsAt`, `image`, `description` L, `priceCents` (0 = free), `capacity`, `booked` (int cache, written only by the booking service), `status` (draft/published), `seo`.

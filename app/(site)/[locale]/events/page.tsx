@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { Container } from '@/components/site/container';
+import { HappyHour } from '@/components/site/happy-hour';
 import { MediaCard } from '@/components/site/media-card';
 import { MediaGrid } from '@/components/site/media-grid';
 import { PageHero } from '@/components/site/page-hero';
@@ -9,9 +10,10 @@ import { alternates, type Dictionary, getDictionary, interpolate, isLocale, type
 import { formatMoney } from '@/lib/money';
 import { stripMarkdown } from '@/lib/rich-text';
 import { eventDate } from '@/lib/time';
-import { mediaOf } from '@/modules/cms/service';
+import { getHappyHour, mediaOf } from '@/modules/cms/service';
 import { ReserveDialog } from '@/modules/events/components/reserve-dialog';
 import { seatsLeft, upcomingEvents } from '@/modules/events/service';
+import { TABLE_BOOKING } from '@/modules/sales/order-states';
 
 export async function generateMetadata({ params }: PageProps<'/[locale]/events'>): Promise<Metadata> {
   const { locale } = await params;
@@ -79,6 +81,16 @@ async function EventList({ locale, t, dict }: { locale: Locale; t: Dictionary['e
   );
 }
 
+// The weekly Happy Hour (Home page settings › Happy Hour), under the events since the home page became four banners
+// (client request 17 Nov). Hidden while it is switched off or not filled in.
+async function HappyHourSection({ t, locale }: { t: Dictionary['happyHour']; locale: Locale }) {
+  const hh = await getHappyHour(locale);
+  // An unsaved global has no days/time yet, whatever the generated types say.
+  if (!hh.active || !hh.days?.length || !hh.from || !hh.titleA) return null;
+  const content = { titleA: hh.titleA, titleB: hh.titleB, text: hh.text, image: mediaOf(hh.image)?.src, days: hh.days.map(Number), from: hh.from };
+  return <HappyHour t={t} locale={locale} content={content} reserveHref={localePath(locale, TABLE_BOOKING)} />;
+}
+
 export default async function EventsPage({ params }: PageProps<'/[locale]/events'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
@@ -94,6 +106,9 @@ export default async function EventsPage({ params }: PageProps<'/[locale]/events
           </Suspense>
         </Container>
       </section>
+      <Suspense fallback={null}>
+        <HappyHourSection t={dict.happyHour} locale={locale} />
+      </Suspense>
     </>
   );
 }

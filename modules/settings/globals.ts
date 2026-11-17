@@ -43,7 +43,7 @@ const row = (...fields: Field[]): Field => ({ type: 'row', fields });
 // everyday words (docs/03-CODING-LAWS.md: a screen shows only what a feature uses).
 const later = { hidden: true };
 
-/** The conditions a new catering quotation starts with until Golden Grape writes its own (Shop details › Devis traiteur). */
+/** The conditions a new catering quotation starts with until Golden Grape writes its own (Shop details › Devis catering). */
 const QUOTATION_CONDITIONS = {
   fr: 'Prix TTC. Le nombre définitif de convives est à confirmer au plus tard 7 jours avant la prestation ; il sert de base à la facture. Toute prestation supplémentaire fait l’objet d’un nouveau devis. Ce devis est valable jusqu’à la date indiquée.',
   en: 'Prices include VAT. The final number of guests is to be confirmed at least 7 days before the event; the invoice is based on it. Any additional service is subject to a new quotation. This quotation is valid until the date shown.',
@@ -266,7 +266,7 @@ export const businessSettings: GlobalConfig = {
         },
         {
           // Catering quotations (Q-12): what every new quotation starts with; staff can change them per quotation.
-          label: l('Devis traiteur', 'Catering quotations', 'Catering-Angebote', 'Orçamentos de catering'),
+          label: l('Devis catering', 'Catering quotations', 'Catering-Angebote', 'Orçamentos de catering'),
           fields: [
             {
               name: 'quotationConditions',

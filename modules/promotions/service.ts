@@ -6,6 +6,7 @@ import type { Media } from '@/payload-types';
 import { findSellable } from '@/modules/catalogue/service';
 import { availability } from '@/modules/inventory/service';
 import type { ModuleName } from '@/modules/settings/globals';
+import { isDeliverable } from '@/modules/sales/zones';
 import { getSettingsPrivate } from '@/modules/settings/service';
 import {
   type Channel,
@@ -341,7 +342,7 @@ export async function quoteCart(
     ...q,
     lines: q.lines.map((l, i) => {
       const v = sellable.find((s) => s.id === l.variant) as Sellable;
-      const product = v.product as { name: string; slug: string; kind: string; images?: unknown[] };
+      const product = v.product as { name: string; slug: string; kind: string; pickupOnly?: boolean | null; images?: unknown[] };
       const unit = l.unit ? v.units.find((u) => u.id === l.unit) : undefined;
       const sizeLabel = unit?.label ?? (v.label && v.label !== product.name ? v.label : null);
       return {
@@ -350,6 +351,7 @@ export async function quoteCart(
         detail: sizeLabel,
         slug: product.slug,
         kind: product.kind,
+        deliverable: isDeliverable(product),
         image: imageOf.get(idOf(product.images?.[0]) ?? '') ?? null,
         maxQty: lines[i].maxQty,
       };

@@ -55,7 +55,7 @@ export const linkTo = (width?: string): Field => ({
     { value: '/snack', label: l('Comptoir', 'Counter', 'Theke', 'Balcão') },
     { value: '/maison', label: l('La Maison', 'The House', 'Das Haus', 'A Casa') },
     { value: '/events', label: l('Événements', 'Events', 'Veranstaltungen', 'Eventos') },
-    { value: '/catering', label: l('Traiteur', 'Catering', 'Catering', 'Catering') },
+    { value: '/catering', label: l('Services Catering', 'Catering Services', 'Catering-Services', 'Serviços de Catering') },
     { value: '/contact', label: l('Contact', 'Contact', 'Kontakt', 'Contacto') },
   ],
   admin: {

@@ -3,13 +3,13 @@
     "nav": {
       "shop": "Boutique",
       "snack": "Comptoir",
-      "catering": "Traiteur",
+      "catering": "Services Catering",
       "events": "Événements",
       "maison": "Maison",
       "contact": "Contact"
     },
     "footer": {
-      "tagline": "Une maison portugaise au cœur de Luxembourg. Vins, épicerie, comptoir, traiteur et soirées.",
+      "tagline": "Une maison portugaise au cœur de Luxembourg. Vins, épicerie, comptoir, services catering et soirées.",
       "colMaison": "La Maison",
       "colServices": "Services",
       "links": {
@@ -17,7 +17,7 @@
         "shop": "Boutique",
         "counter": "Comptoir",
         "contact": "Contact",
-        "catering": "Traiteur",
+        "catering": "Services Catering",
         "events": "Événements",
         "happy": "Happy Hour",
         "gifts": "Coffrets cadeaux"
@@ -285,7 +285,7 @@
     "nav": {
       "shop": "Shop",
       "snack": "Counter",
-      "catering": "Catering",
+      "catering": "Catering Services",
       "events": "Events",
       "maison": "House",
       "contact": "Contact"
@@ -299,7 +299,7 @@
         "shop": "Shop",
         "counter": "Counter",
         "contact": "Contact",
-        "catering": "Catering",
+        "catering": "Catering Services",
         "events": "Events",
         "happy": "Happy Hour",
         "gifts": "Gift boxes"
@@ -567,7 +567,7 @@
     "nav": {
       "shop": "Shop",
       "snack": "Theke",
-      "catering": "Catering",
+      "catering": "Catering-Services",
       "events": "Events",
       "maison": "Haus",
       "contact": "Kontakt"
@@ -581,7 +581,7 @@
         "shop": "Shop",
         "counter": "Theke",
         "contact": "Kontakt",
-        "catering": "Catering",
+        "catering": "Catering-Services",
         "events": "Events",
         "happy": "Happy Hour",
         "gifts": "Geschenkboxen"
@@ -849,7 +849,7 @@
     "nav": {
       "shop": "Loja",
       "snack": "Balcão",
-      "catering": "Catering",
+      "catering": "Serviços de Catering",
       "events": "Eventos",
       "maison": "A Casa",
       "contact": "Contacto"
@@ -863,7 +863,7 @@
         "shop": "Loja",
         "counter": "Balcão",
         "contact": "Contacto",
-        "catering": "Catering",
+        "catering": "Serviços de Catering",
         "events": "Eventos",
         "happy": "Happy Hour",
         "gifts": "Caixas de oferta"

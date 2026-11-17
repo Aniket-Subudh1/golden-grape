@@ -2961,34 +2961,55 @@ body:has(.gg-create) .no-results__actions {
   color: var(--gg-text-2);
 }
 
-/* ---- Paste several postcodes (modules/sales/admin/postcode-paste.tsx, GG-036) ---------------------------- */
-.gg-paste {
+/* ---- Postcodes of a delivery range (modules/sales/admin/range-postcodes.tsx) ------------------------------ */
+.gg-range {
   display: grid;
-  gap: 8px;
-  margin: 0 0 12px;
-}
-.gg-paste label {
-  display: grid;
-  gap: 6px;
+  gap: 10px;
+  margin: 4px 0 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--gg-line-2);
+  border-radius: 8px;
   font-size: 13px;
   color: var(--gg-text-2);
 }
-.gg-paste textarea {
-  padding: 8px 10px;
-  border: 1px solid var(--gg-line-2);
-  border-radius: 6px;
-  background: #ffffff;
-  font: 400 14px var(--font-body);
-  color: var(--gg-ink);
-  resize: vertical;
+.gg-range p {
+  margin: 0;
 }
-.gg-paste__actions {
+.gg-range strong {
+  color: var(--gg-ink);
+  font-weight: 500;
+}
+.gg-range__places {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 180px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+.gg-range__places li {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--gg-line);
+  color: var(--gg-ink);
+}
+.gg-range__places span {
+  color: var(--gg-text-2);
+}
+.gg-range__check {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  font-size: 13px;
-  color: var(--gg-text-2);
+  gap: 8px;
+}
+.gg-range__check input {
+  width: 90px;
+  padding: 6px 8px;
+  border: 1px solid var(--gg-line-2);
+  border-radius: 6px;
+  font: 400 14px var(--font-body);
 }
 
 /* ---- Dashboard tiles: what waits (GG-045) and the key figures (components/admin/dashboard.tsx) ------------ */

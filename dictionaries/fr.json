@@ -8,83 +8,6 @@
     "language": "Langue",
     "shopLabel": "Boutique"
   },
-  "hero": {
-    "eyebrow": "Depuis 2019 · Luxembourg",
-    "titleA": "L'âme du Portugal,",
-    "titleB": "servie avec passion.",
-    "subtitle": "Une maison de vins, de produits gourmets, de snacks, de service traiteur et de traditions portugaises, au cœur du Luxembourg.",
-    "cta": "Découvrir la maison",
-    "secondaryCta": "Prochain Happy Hour",
-    "scroll": "Découvrir",
-    "ticker": {
-      "shop": "Boutique",
-      "snack": "Snack",
-      "catering": "Traiteur",
-      "events": "Événements",
-      "boutique": "Boutique physique"
-    }
-  },
-  "universes": {
-    "eyebrow": "Quatre univers · Une maison",
-    "titleA": "Bien plus",
-    "titleB": "qu'une cave à vins.",
-    "shop": {
-      "title": "Boutique",
-      "tagline": "Vins & Épicerie",
-      "desc": "Vins portugais d'exception, Porto, fromages DOP, charcuteries, épicerie fine et coffrets cadeaux.",
-      "cta": "Explorer la boutique"
-    },
-    "snack": {
-      "title": "Comptoir",
-      "tagline": "À emporter",
-      "desc": "Bifana, Prego, Alheira, Pastel de Nata. La tradition portugaise à emporter, chaque midi.",
-      "cta": "Voir le menu"
-    },
-    "catering": {
-      "title": "Traiteur",
-      "tagline": "Réceptions",
-      "desc": "Trois formules pour recevoir avec l'âme portugaise, de l'apéro au dîner assis.",
-      "cta": "Nos formules"
-    },
-    "events": {
-      "title": "Événements",
-      "tagline": "Soirées & Happy Hour",
-      "desc": "Soirées Fado, dégustations guidées, Happy Hour hebdomadaire, tables du chef.",
-      "cta": "L'agenda"
-    }
-  },
-  "craft": {
-    "eyebrow": "Objets d'artisans",
-    "titleA": "Le geste,",
-    "titleB": "avant tout.",
-    "body": "Chaque produit est choisi à la main, chez des familles qui perpétuent un savoir-faire depuis des générations.",
-    "port": {
-      "label": "Vinho do Porto",
-      "title": "Tawny 20 ans",
-      "desc": "Notes de figue confite, noix, caramel doré."
-    },
-    "cheese": {
-      "label": "Fromage DOP",
-      "title": "São Jorge affiné",
-      "desc": "Pâte pressée des Açores, 12 mois de cave."
-    },
-    "pastel": {
-      "label": "Pâtisserie",
-      "title": "Pastel de Nata",
-      "desc": "Cuit au four toutes les deux heures, feuilletage doré."
-    }
-  },
-  "hospitality": {
-    "eyebrow": "L'art de recevoir",
-    "titleA": "Convívio.",
-    "titleB": "L'esprit portugais.",
-    "body": "Chez Golden Grape, on ne sert pas seulement du vin. On partage une table, un rire, un souvenir. Le Portugal, c'est un art de vivre — et une invitation.",
-    "bullets": [
-      "Hospitalité chaleureuse, sans protocole",
-      "Cuisine familiale, produits d'exception",
-      "Un lieu pour se retrouver, célébrer, prolonger"
-    ]
-  },
   "store": {
     "eyebrow": "La Boutique",
     "titleA": "Poussez",
@@ -97,10 +20,6 @@
     "openNow": "Ouvert maintenant",
     "closedNow": "Fermé en ce moment"
   },
-  "story": {
-    "eyebrow": "Notre philosophie",
-    "quote": "Nous croyons qu'un vin, un plat, un moment partagé — sont trois manières de dire la même chose : <gold>bem-vindo</gold>."
-  },
   "happyHour": {
     "eyebrow": "Rituel de la maison",
     "days": "Jours",
@@ -109,33 +28,6 @@
     "seconds": "Secondes",
     "nextPour": "Prochain service",
     "reserve": "Réserver une table"
-  },
-  "eventsHome": {
-    "eyebrow": "L'agenda",
-    "titleA": "Chaque semaine,",
-    "titleB": "un rendez-vous.",
-    "fullCal": "Agenda complet",
-    "reserve": "Réserver",
-    "items": {
-      "friday": {
-        "date": "Vendredi soir",
-        "time": "19:00 — 23:00",
-        "title": "Soirée Fado",
-        "desc": "Chants portugais, tapas et Porto — l'âme de Lisbonne, à Luxembourg."
-      },
-      "golden": {
-        "date": "Chaque mercredi",
-        "time": "17:00 — 20:00",
-        "title": "Golden Hour",
-        "desc": "Le verre de bienvenue offert, planches de partage et jazz portugais."
-      },
-      "tasting": {
-        "date": "Un samedi par mois",
-        "time": "16:00 — 18:00",
-        "title": "Dégustation guidée",
-        "desc": "Six vins choisis, un vigneron invité, une géographie du goût."
-      }
-    }
   },
   "socialProof": {
     "eyebrow": "Ils en parlent",
@@ -149,18 +41,6 @@
     "report": "Signaler",
     "order": "Les avis les plus pertinents, tels que Google Maps les présente. Source :",
     "stars": "{{count}} étoiles sur 5"
-  },
-  "marquee": {
-    "words": [
-      "Vinho",
-      "Convívio",
-      "Saudade",
-      "Bacalhau",
-      "Fado",
-      "Tinto",
-      "Azeite",
-      "Mesa"
-    ]
   },
   "footer": {
     "colContact": "Nous trouver",
@@ -187,7 +67,7 @@
     },
     "hints": {
       "pickup": "Retirez votre commande en boutique, à l’heure choisie.",
-      "delivery": "Livrée chez vous, à l’heure choisie.",
+      "delivery": "Vins et produits de la boutique, livrés chez vous.",
       "table": "Réservez une table, et pré-commandez si vous le souhaitez."
     },
     "empty": {
@@ -278,7 +158,8 @@
         "LOYALTY_SPENT": "Vos points ont changé entre-temps. Réessayez.",
         "GIFT_CARD_SPENT": "Cette carte cadeau vient d’être utilisée. Vérifiez-la et réessayez."
       }
-    }
+    },
+    "deliveryShopNote": "Nous livrons uniquement les vins et produits de la boutique. Les plats du Comptoir sont à emporter ou à déguster sur place."
   },
   "shop": {
     "eyebrow": "Boutique · Vins & Épicerie",
@@ -357,10 +238,9 @@
     "eyebrow": "Le Comptoir",
     "titleA": "La tradition,",
     "titleB": "à emporter.",
-    "subtitle": "Choisissez, ajustez, commandez — en moins d'une minute. À récupérer au comptoir, en livraison, ou à table.",
+    "subtitle": "Choisissez, ajustez, commandez — en moins d’une minute. À emporter ou à table.",
     "ctas": {
       "pickup": "À emporter",
-      "delivery": "Livraison",
       "table": "Réserver une table"
     },
     "tags": {
@@ -389,7 +269,7 @@
     }
   },
   "cateringPage": {
-    "eyebrow": "Traiteur",
+    "eyebrow": "Services Catering",
     "titleA": "Recevoir",
     "titleB": "avec l'âme portugaise.",
     "subtitle": "Trois formules pour votre événement — cocktail, repas assis, ou table du chef. Confirmation sous 24h.",
@@ -469,7 +349,7 @@
     "eyebrow": "Contact",
     "titleA": "Écrivez-nous,",
     "titleB": "passez nous voir.",
-    "subtitle": "La Maison vous répond sous 24h. Pour toute question, un événement ou une demande traiteur.",
+    "subtitle": "La Maison vous répond sous 24h. Pour toute question, un événement ou une demande de catering.",
     "info": {
       "address": "Adresse",
       "phone": "Téléphone",
@@ -482,7 +362,7 @@
       "subject": "Sujet",
       "subjects": {
         "boutique": "Boutique",
-        "traiteur": "Traiteur",
+        "traiteur": "Services Catering",
         "evenement": "Événement",
         "autre": "Autre"
       },
@@ -559,22 +439,22 @@
   },
   "meta": {
     "home": {
-      "title": "Golden Grape Luxembourg — Vins portugais, comptoir, traiteur & événements",
-      "description": "Golden Grape, la maison gourmande portugaise de Luxembourg — vins rares, snacks artisanaux, traiteur et dégustations du vendredi. Mäi Wäin.",
+      "title": "Golden Grape Luxembourg — Vins portugais, comptoir, services catering & événements",
+      "description": "Golden Grape, la maison gourmande portugaise de Luxembourg — vins rares, snacks artisanaux, services catering et dégustations du vendredi. Mäi Wäin.",
       "ogTitle": "Golden Grape · La maison portugaise de Luxembourg",
-      "ogDescription": "Vins portugais d’exception, épicerie fine, traiteur et événements au cœur du Luxembourg."
+      "ogDescription": "Vins portugais d’exception, épicerie fine, services catering et événements au cœur du Luxembourg."
     },
     "contact": {
       "title": "Contact — Golden Grape Luxembourg",
-      "description": "Boutique, réservations et devis traiteur. Venez rencontrer la Maison au cœur du Luxembourg."
+      "description": "Boutique, réservations et devis catering. Venez rencontrer la Maison au cœur du Luxembourg."
     },
     "events": {
       "title": "Événements — Dégustations & soirées · Golden Grape",
       "description": "Fado, Happy Hour, dégustations guidées et table du chef à Bissen."
     },
     "catering": {
-      "title": "Traiteur — Réceptions portugaises · Golden Grape Luxembourg",
-      "description": "Trois formules traiteur portugaises pour vos réceptions au Luxembourg. Demande en 30 secondes."
+      "title": "Services Catering — Réceptions portugaises · Golden Grape Luxembourg",
+      "description": "Trois formules de catering portugaises pour vos réceptions au Luxembourg. Demande en 30 secondes."
     },
     "shop": {
       "title": "Boutique — Vins portugais & épicerie fine · Golden Grape",
@@ -582,7 +462,7 @@
     },
     "snack": {
       "title": "Comptoir — Snacks portugais à emporter · Golden Grape",
-      "description": "Bifana, prego, pastel de nata : la tradition portugaise à emporter, en livraison ou à table à Bissen."
+      "description": "Bifana, prego, pastel de nata : la tradition portugaise à emporter ou à table à Bissen."
     },
     "product": {
       "title": "{{name}} · Golden Grape Luxembourg",
@@ -611,7 +491,7 @@
       "invalid": "Valeur invalide.",
       "slotFull": "Ce créneau vient d’être pris. Choisissez-en un autre.",
       "slotUnavailable": "Ce créneau n’est plus disponible. Choisissez-en un autre.",
-      "outsideZone": "Nous ne livrons pas encore ce code postal.",
+      "outsideZone": "Cette adresse est hors de notre zone de livraison.",
       "belowMinimum": "Votre commande n’atteint pas le minimum de livraison.",
       "cartChanged": "Votre panier a changé (stock). Vérifiez-le et réessayez.",
       "emptyCart": "Votre panier est vide.",
@@ -620,7 +500,8 @@
       "event": "Cet événement ne peut plus être réservé.",
       "notPreorderable": "Seuls les plats et boissons du Comptoir peuvent être pré-commandés avec une table.",
       "consent": "Cochez la case pour accepter le devis.",
-      "notAcceptable": "Ce devis ne peut plus être accepté (expiré, déjà signé ou remplacé). La page se met à jour."
+      "notAcceptable": "Ce devis ne peut plus être accepté (expiré, déjà signé ou remplacé). La page se met à jour.",
+      "notDeliverable": "Les plats du Comptoir ne sont pas livrés : choisissez à emporter ou retirez-les."
     },
     "CONFLICT": "Quelqu’un vient de modifier cet élément. Réessayez.",
     "OUT_OF_STOCK": "Votre panier a changé (stock). Vérifiez-le et réessayez."
@@ -635,8 +516,8 @@
       "yourMessage": "Votre message"
     },
     "catering": {
-      "staffSubject": "Demande traiteur {{number}} — {{name}}",
-      "confirmSubject": "Votre demande traiteur {{number}}",
+      "staffSubject": "Demande de catering {{number}} — {{name}}",
+      "confirmSubject": "Votre demande de catering {{number}}",
       "confirmBody": "Merci pour votre demande. Nous revenons vers vous avec un devis personnalisé dans les plus brefs délais.",
       "estimateNote": "Estimation indicative, hors boissons supplémentaires et livraison. Le devis définitif vous sera envoyé par notre équipe."
     },
@@ -905,7 +786,7 @@
     },
     "quotations": {
       "title": "Mes devis",
-      "empty": "Aucun devis pour l’instant. Les devis traiteur que nous vous envoyons apparaissent ici.",
+      "empty": "Aucun devis pour l’instant. Les devis catering que nous vous envoyons apparaissent ici.",
       "open": "Voir le devis",
       "status": {
         "sent": "À signer",
@@ -972,10 +853,11 @@
       "fee": "Livraison {{fee}}",
       "min": "minimum {{min}}",
       "free": "offerte dès {{free}}",
-      "outside": "Nous ne livrons pas encore ce code postal.",
+      "outside": "Cette adresse est hors de notre zone de livraison.",
       "choosePickup": "Choisir plutôt à emporter",
       "belowMin": "Ajoutez encore {{missing}} pour atteindre le minimum de livraison de {{min}}.",
-      "freeNow": "Livraison offerte"
+      "freeNow": "Livraison offerte",
+      "distance": "{{place}} · {{km}} km"
     },
     "preorder": {
       "label": "Pré-commander plats et boissons",
@@ -1036,7 +918,12 @@
       "other": "Autre adresse",
       "save": "Enregistrer cette adresse dans mon compte"
     },
-    "noSlots": "La réservation en ligne n’est pas possible : aucun créneau n’est disponible. Appelez-nous pour réserver."
+    "noSlots": "La réservation en ligne n’est pas possible : aucun créneau n’est disponible. Appelez-nous pour réserver.",
+    "notDeliverable": {
+      "title": "Pas en livraison : {{items}}.",
+      "text": "Nous livrons uniquement les vins et produits de la boutique. Les plats du Comptoir sont à emporter ou à déguster sur place.",
+      "remove": "Retirer ces articles"
+    }
   },
   "order": {
     "next": {
@@ -1545,6 +1432,34 @@
       "error": "Cela n’a pas marché. Réessayez.",
       "corrected": "Corrigé",
       "mine": "Mon pointage"
+    }
+  },
+  "home": {
+    "shop": {
+      "title": "Shop en ligne",
+      "text": "Vins portugais, porto et épicerie fine, livrés ou à retirer à Bissen.",
+      "cta": "Découvrir le shop"
+    },
+    "table": {
+      "title": "Réserver une table",
+      "text": "Sur place ou à emporter.",
+      "cta": "Réserver",
+      "takeaway": "Commander à emporter"
+    },
+    "catering": {
+      "title": "Nos Services Catering",
+      "text": "Vos réceptions, à la portugaise.",
+      "cta": "Demander un devis"
+    },
+    "events": {
+      "title": "Nos Événements",
+      "text": "Dégustations et soirées à venir.",
+      "cta": "Voir l’agenda"
+    },
+    "contact": {
+      "eyebrow": "Contact",
+      "title": "Golden Grape",
+      "write": "Nous écrire"
     }
   }
 }

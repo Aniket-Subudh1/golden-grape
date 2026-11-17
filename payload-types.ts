@@ -777,6 +777,10 @@ export interface Product {
   };
   loyaltyExcluded?: boolean | null;
   /**
+   * Counter dishes are never delivered. Tick to keep this product to pickup in the shop too.
+   */
+  pickupOnly?: boolean | null;
+  /**
    * Its sizes are the amounts (25, 50, 100 €). The code is sent when the order is confirmed.
    */
   giftCard?: boolean | null;
@@ -1604,19 +1608,16 @@ export interface SlotRule {
   createdAt: string;
 }
 /**
- * Where you deliver, at what price and from which amount. A postcode outside every area is offered pickup.
+ * The delivery price by driving distance from the shop. Each range starts where the previous one ends; beyond the longest one, delivery is not offered. Postcodes follow by themselves.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "deliveryZones".
  */
 export interface DeliveryZone {
   id: string;
-  name: string;
+  name?: string | null;
+  upToKm: number;
   active?: boolean | null;
-  /**
-   * Type a code and press Enter, or paste several in the box above. “L-7795” and “7795” are the same.
-   */
-  postalCodes: string[];
   feeCents: number;
   minOrderCents: number;
   freeFromCents?: number | null;
@@ -2748,6 +2749,7 @@ export interface ProductsSelect<T extends boolean = true> {
         description?: T;
       };
   loyaltyExcluded?: T;
+  pickupOnly?: T;
   giftCard?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3139,8 +3141,8 @@ export interface SlotRulesSelect<T extends boolean = true> {
  */
 export interface DeliveryZonesSelect<T extends boolean = true> {
   name?: T;
+  upToKm?: T;
   active?: T;
-  postalCodes?: T;
   feeCents?: T;
   minOrderCents?: T;
   freeFromCents?: T;
@@ -4073,32 +4075,18 @@ export interface BusinessSetting {
   createdAt?: string | null;
 }
 /**
- * The big title and the photos of the home page. Upcoming events appear there by themselves.
+ * The photos of the home page’s four banners. A large landscape photo (at least 2000 px wide) works best.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "HomePage".
  */
 export interface HomePage {
   id: string;
-  hero?: {
-    eyebrow?: string | null;
-    titleA?: string | null;
-    titleB?: string | null;
-    subtitle?: string | null;
-    /**
-     * Empty: the current wine-glass photo.
-     */
-    image?: (string | null) | Media;
-  };
   photos?: {
     shop?: (string | null) | Media;
-    snack?: (string | null) | Media;
+    table?: (string | null) | Media;
     catering?: (string | null) | Media;
     events?: (string | null) | Media;
-    port?: (string | null) | Media;
-    cheese?: (string | null) | Media;
-    pastel?: (string | null) | Media;
-    table?: (string | null) | Media;
     interior?: (string | null) | Media;
   };
   updatedAt?: string | null;
@@ -4547,26 +4535,13 @@ export interface BusinessSettingsSelect<T extends boolean = true> {
  * via the `definition` "HomePage_select".
  */
 export interface HomePageSelect<T extends boolean = true> {
-  hero?:
-    | T
-    | {
-        eyebrow?: T;
-        titleA?: T;
-        titleB?: T;
-        subtitle?: T;
-        image?: T;
-      };
   photos?:
     | T
     | {
         shop?: T;
-        snack?: T;
+        table?: T;
         catering?: T;
         events?: T;
-        port?: T;
-        cheese?: T;
-        pastel?: T;
-        table?: T;
         interior?: T;
       };
   updatedAt?: T;

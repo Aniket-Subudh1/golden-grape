@@ -301,6 +301,8 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
   const quote = summary?.quote ?? null;
   const zone = mode === 'delivery' ? (summary?.zone ?? null) : null;
   const outside = mode === 'delivery' && Boolean(summary?.outside);
+  // Only shop goods are delivered (client request 17 Nov): the lines that stop a delivery, by name, as the server sees them.
+  const undeliverable = mode === 'delivery' ? (quote?.lines ?? []).filter((l) => !l.deliverable) : [];
 
   const submit: typeof placeOrderAction = async (prev, data) => {
     const result = await placeOrderAction(prev, data);
@@ -379,6 +381,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
   const blockers = [
     noSlots ? t.noSlots : null,
     withLines && lines.length === 0 ? t.preorder.empty : null,
+    undeliverable.length > 0 ? interpolate(t.notDeliverable.title, { items: undeliverable.map((l) => l.name).join(', ') }) : null,
     outside ? t.zone.outside : null,
     zone?.belowMinimum ? interpolate(t.zone.belowMin, { missing: money(zone.minOrderCents - (quote?.subtotalCents ?? 0)), min: money(zone.minOrderCents) }) : null,
     // A code or gift card refused (M3.2): remove it or fix it before ordering; the reason is the cart's.
@@ -582,6 +585,22 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                 </label>
               )}
               {customer && !savedMatch && keepAddress && <input type="hidden" name="saveAddress" value="on" />}
+              {undeliverable.length > 0 && (
+                <div className="mt-6">
+                  <Notice tone="warning">
+                    <p className="font-medium">{interpolate(t.notDeliverable.title, { items: undeliverable.map((l) => l.name).join(', ') })}</p>
+                    <p className="mt-1">{t.notDeliverable.text}</p>
+                    <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
+                      <button type="button" onClick={() => setMode('pickup')} className="border-b border-gold-deep text-[11px] tracking-[0.22em] text-gold-deep uppercase">
+                        {t.zone.choosePickup}
+                      </button>
+                      <button type="button" onClick={() => cart.remove(undeliverable)} className="border-b border-gold-deep text-[11px] tracking-[0.22em] text-gold-deep uppercase">
+                        {t.notDeliverable.remove}
+                      </button>
+                    </div>
+                  </Notice>
+                </div>
+              )}
               <div className="mt-6">
                 {!postalCode.trim() ? (
                   <Notice>{t.zone.enterCode}</Notice>
@@ -596,6 +615,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                   <Notice tone={zone.belowMinimum ? 'warning' : 'info'}>
                     <p>
                       {[
+                        interpolate(t.zone.distance, { place: zone.place, km: zone.km.toLocaleString(locale) }),
                         quote?.deliveryCents === 0 && quote.lines.length > 0 ? t.zone.freeNow : interpolate(t.zone.fee, { fee: money(zone.feeCents) }),
                         zone.minOrderCents > 0 && interpolate(t.zone.min, { min: money(zone.minOrderCents) }),
                         zone.freeFromCents != null && interpolate(t.zone.free, { free: money(zone.freeFromCents) }),
