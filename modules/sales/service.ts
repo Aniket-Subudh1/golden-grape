@@ -340,6 +340,10 @@ export async function placeStaffOrder(payload: Payload, input: StaffSaleInput, {
         history,
       });
       if (started.status === 'confirmed') await postSale(tx, placed, staff);
+      // Paid at the till = handed over at once (Q-18, 17 Nov): the order closes as completed through the state machine
+      // (its history row); the customer gets no handover e-mail, they are standing at the counter. Invoice later stays
+      // confirmed until its invoice (M3.2).
+      if (input.payment === 'onsite' && started.status === 'confirmed') await applyTransition(tx, order.id, 'completed', { user: staff });
       return { kind: 'order' as const, id: order.id, number: order.number ?? '', created: true };
     });
   } catch (error) {

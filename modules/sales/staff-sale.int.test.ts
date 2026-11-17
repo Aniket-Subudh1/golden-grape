@@ -21,13 +21,14 @@ const company = await createCustomerByStaff(payload, { name: 'Rui Costa', phone:
 const NOW = new Date('2026-11-17T14:05:00Z'); // 15:05 in Luxembourg
 
 describe('placeStaffOrder', () => {
-  it('paid on site: mobile order, confirmed and paid, movements with channel mobile and user = staff', async () => {
+  it('paid on site: mobile order, completed (handed over) and paid, movements with channel mobile and user = staff', async () => {
     const placed = await placeStaffOrder(payload, { idempotencyKey: randomUUID(), customer: customer.id, lines: [{ variant: wine.variant.id, qty: 2 }], payment: 'onsite' }, { staff: staff.id, now: NOW });
     const order = await payload.findByID({ collection: 'orders', id: placed.id, overrideAccess: true, depth: 0 });
-    expect(order).toMatchObject({ channel: 'mobile', mode: 'instore', status: 'confirmed', staff: staff.id, customer: customer.id, slot: { date: '2026-11-17', from: '15:05' }, slotAt: '2026-11-17T15:05', locale: 'pt' });
+    expect(order).toMatchObject({ channel: 'mobile', mode: 'instore', status: 'completed', staff: staff.id, customer: customer.id, slot: { date: '2026-11-17', from: '15:05' }, slotAt: '2026-11-17T15:05', locale: 'pt' });
     expect(order.number).toMatch(/^CMD-2026-\d{5}$/);
     expect(order.totals?.totalCents).toBe(3000);
     expect(order.payment).toMatchObject({ method: 'onsite', status: 'paid', paidCents: 3000 });
+    expect(order.history?.map((h) => h.to)).toEqual(['payment', 'completed']);
     const payments = await paymentsOf(payload, order.id);
     expect(payments.map((p) => [p.kind, p.amountCents, p.method])).toEqual([['charge', 3000, 'onsite']]);
     const { docs } = await payload.find({ collection: 'stockMovements', where: { 'ref.value': { equals: order.id } }, overrideAccess: true, depth: 0 });
