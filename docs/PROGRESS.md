@@ -79,6 +79,14 @@ Format: `Q-nn · question · owner · blocks: Mx.y · status`.
 
 ## 4. Log
 
+### 2026-11-18 · Client request: table hours, and delivery shows only what is delivered
+
+- **Tables (point 1).** Already in place: date, time, guests, optional pre-order of the Counter's dishes and quantities, a table without any pre-order, slots counted per guest. Added: `slotRules.firstSlot` / `lastSlot` (Réglages › Créneaux › Tables: "Premier créneau", "Dernier créneau (inclus)"), beside the existing "Délai minimum"; Ivo sets all three. Tables: 11:30–17:30, every quarter hour, 30 min notice (seed; `migrate-2026-11-17` sets it once while the table rule has no first/last slot, keeping its capacity, which now counts guests per quarter hour). The client's examples are unit tests: 11:00 → 11:30, 12:15 → 12:45, 17:00 → 17:30, 17:15 → none today; slots stay inside the opening hours (a day closing at 15:00 ends at 14:45).
+- **Delivery (point 2).** In Delivery mode the Counter page shows no dishes but a note (the Counter does not deliver; Order for takeaway switches the mode, Book a table, See the shop); the shop hides "pickup only" products (with a line saying how many) and their page offers "Switch to takeaway" instead of Add; the cart tags each undelivered line "Not delivered", offers "Remove these items" and keeps Checkout disabled until they are gone or the mode changes; checkout already blocks them; the server already refuses such an order (`notDeliverable`, int test). Takeaway and Table show everything as before. One client component (`modules/webshop/components/delivery-gate.tsx`) on the one rule `isDeliverable`.
+- **Test fix:** the accountant's CSV test dated a refund's credit note by the clock and broke when the day changed; the date is now pinned in the test.
+- **Checked:** `npm run check` (365), `npm run test:int` (165); production build on a throwaway DB, 14/14 delivery steps (counter hidden and back, cart tag + disabled checkout + remove, pickup-only product hidden in the shop and blocked on its page, a wine still added) and the table picker (today at 10:07: 25 times, 11:30 … 17:30).
+- To go live: deploy, then `migrate-2026-11-17` on production (`--check` first).
+
 ### 2026-11-17 · Home page redesign: four vertical banners (owner: "too plain, must look excellent")
 
 - **Found:** four identical dark boxes stacked down the page; the first screen showed only "Shop en ligne"; weak photos (glasses and napkins for the table); contact details dark on dark next to the dark footer.

@@ -114,6 +114,7 @@ async function Product({ params }: Pick<Props, 'params'>) {
                 {options.length > 0 ? (
                   <BuyBox
                     options={options}
+                    deliverable={data.deliverable}
                     locale={locale}
                     t={{ ...s.buy, outOfStock: s.outOfStock, minus: t.cart.minus, plus: t.cart.plus }}
                   />

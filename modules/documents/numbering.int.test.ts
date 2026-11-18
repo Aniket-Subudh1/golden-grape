@@ -154,13 +154,19 @@ describe('credit notes', () => {
   it('a refund of an invoiced order issues a credit note in its own series and credits the invoice (AC-M3.2-04)', async () => {
     const id = await order(2, 'onsite');
     const invoice = await issueInvoice(payload, id, { now: NOW });
-    await recordRefund(payload, id, {
-      amountCents: 2340,
-      at: NOW,
-      method: 'onsite',
-      reason: 'bottles returned',
-      user: staff.id,
-    });
+    // The credit note is dated when it is issued: pinned to NOW so the export of 17 Nov below finds it on any day.
+    vi.useFakeTimers({ toFake: ['Date'], now: NOW });
+    try {
+      await recordRefund(payload, id, {
+        amountCents: 2340,
+        at: NOW,
+        method: 'onsite',
+        reason: 'bottles returned',
+        user: staff.id,
+      });
+    } finally {
+      vi.useRealTimers();
+    }
     const notes = (
       await payload.find({
         collection: 'creditNotes',
@@ -180,6 +186,7 @@ describe('credit notes', () => {
   it('part of an invoice by line and quantity, then the rest; never more than it holds', async () => {
     const invoice = await issueInvoice(payload, await order(4), { now: NOW });
     const part = await issueCreditNote(payload, invoice.id, {
+      now: NOW, // the export below reads 17 Nov: dated like the invoice, not by the clock
       reason: 'one bottle broken',
       lines: [{ index: 0, qty: 1 }],
     });
@@ -190,7 +197,7 @@ describe('credit notes', () => {
     await expect(
       issueCreditNote(payload, invoice.id, { reason: 'too much', lines: [{ index: 0, qty: 4 }] }),
     ).rejects.toMatchObject({ message: 'creditTooHigh' });
-    const rest = await issueCreditNote(payload, invoice.id, { reason: 'the rest' });
+    const rest = await issueCreditNote(payload, invoice.id, { now: NOW, reason: 'the rest' });
     expect(rest.totals?.totalCents).toBe(3510);
     expect(
       (await payload.findByID({ collection: 'invoices', id: invoice.id, overrideAccess: true, depth: 0 })).status,

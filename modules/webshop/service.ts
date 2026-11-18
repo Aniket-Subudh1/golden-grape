@@ -5,6 +5,7 @@ import { getProduct, listCategories, listProducts, type ProductFilters, shopFace
 import { availability } from '@/modules/inventory/service';
 import { unitPrices } from '@/modules/promotions/service';
 import { normalizePostalCode } from '@/modules/sales/service';
+import { isDeliverable } from '@/modules/sales/zones';
 import { type AddressSuggestion, localitiesOf, parseAddressLabel } from './address';
 import { currentCustomer } from '@/modules/customers/service';
 
@@ -37,6 +38,8 @@ export type ProductCardData = {
   from: boolean;
   inStock: boolean;
   maxQty: number | null;
+  /** False for a counter dish or a "pickup only" product: hidden in Delivery mode (client request 18 Nov). */
+  deliverable: boolean;
   description?: unknown;
   allergens?: string[];
   ingredients?: string | null;
@@ -66,6 +69,7 @@ async function cards(payload: Payload, products: Product[], locale: Locale): Pro
       from: options > 1,
       inStock: size ? (stock[size.id]?.inStock ?? false) : false,
       maxQty: size ? (stock[size.id]?.maxQty ?? null) : null,
+      deliverable: isDeliverable(p),
       description: p.description,
       allergens: p.snack?.allergens ?? [],
       ingredients: p.snack?.ingredients ?? null,
@@ -115,6 +119,7 @@ export async function productPage(payload: Payload, slug: string, locale: Locale
     brand: typeof product.brand === 'object' ? product.brand : null,
     photos: (product.images ?? []).map((m) => photoOf(m, product.name)).filter((p): p is Photo => p !== null),
     options,
+    deliverable: isDeliverable(product),
     inStock: options.some((o) => o.maxQty === null || o.maxQty > 0),
     related: await cards(payload, related, locale),
     categoryId: idOf(product.category),

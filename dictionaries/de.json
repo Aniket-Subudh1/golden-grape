@@ -159,7 +159,9 @@
         "GIFT_CARD_SPENT": "Diese Geschenkkarte wurde inzwischen genutzt. Bitte prüfen und erneut versuchen."
       }
     },
-    "deliveryShopNote": "Wir liefern nur Weine und Produkte aus dem Laden. Speisen von der Theke gibt es zum Mitnehmen oder vor Ort."
+    "deliveryShopNote": "Wir liefern nur Weine und Produkte aus dem Laden. Speisen von der Theke gibt es zum Mitnehmen oder vor Ort.",
+    "notDelivered": "Nicht geliefert",
+    "removeUndeliverable": "Diese Artikel entfernen"
   },
   "shop": {
     "eyebrow": "Shop · Weine & Feinkost",
@@ -226,13 +228,16 @@
       "add": "In den Warenkorb",
       "added": "In den Warenkorb gelegt",
       "left": "Nur noch {{count}} verfügbar",
-      "inStock": "Auf Lager"
+      "inStock": "Auf Lager",
+      "pickupOnly": "Nur Abholung: dieses Produkt wird nicht geliefert.",
+      "switchPickup": "Zu Abholung wechseln"
     },
     "related": {
       "eyebrow": "Aus demselben Keller",
       "titleA": "Das könnte Ihnen",
       "titleB": "auch gefallen."
-    }
+    },
+    "hiddenInDelivery": "Lieferung: Produkte nur zur Abholung werden nicht angezeigt ({{count}})."
   },
   "snackPage": {
     "eyebrow": "Die Theke",
@@ -266,6 +271,13 @@
       "sulphites": "Sulfite",
       "lupin": "Lupinen",
       "molluscs": "Weichtiere"
+    },
+    "delivery": {
+      "title": "Die Theke liefert nicht",
+      "text": "Unsere Gerichte werden frisch zubereitet: vor Ort genießen oder mitnehmen. Geliefert werden Weine und Produkte aus dem Laden.",
+      "pickup": "Zum Mitnehmen bestellen",
+      "table": "Tisch reservieren",
+      "shop": "Zum Shop"
     }
   },
   "cateringPage": {

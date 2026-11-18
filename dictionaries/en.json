@@ -159,7 +159,9 @@
         "GIFT_CARD_SPENT": "This gift card was used meanwhile. Please check it and try again."
       }
     },
-    "deliveryShopNote": "We deliver wines and shop products only. Counter dishes are for takeaway or to enjoy here."
+    "deliveryShopNote": "We deliver wines and shop products only. Counter dishes are for takeaway or to enjoy here.",
+    "notDelivered": "Not delivered",
+    "removeUndeliverable": "Remove these items"
   },
   "shop": {
     "eyebrow": "Shop · Wines & Grocery",
@@ -226,13 +228,16 @@
       "add": "Add to bag",
       "added": "Added to bag",
       "left": "Only {{count}} left",
-      "inStock": "In stock"
+      "inStock": "In stock",
+      "pickupOnly": "Pickup only: this product is not delivered.",
+      "switchPickup": "Switch to takeaway"
     },
     "related": {
       "eyebrow": "From the same cellar",
       "titleA": "You may",
       "titleB": "also like."
-    }
+    },
+    "hiddenInDelivery": "Delivery: products for pickup only are not shown ({{count}})."
   },
   "snackPage": {
     "eyebrow": "The Counter",
@@ -266,6 +271,13 @@
       "sulphites": "Sulphites",
       "lupin": "Lupin",
       "molluscs": "Molluscs"
+    },
+    "delivery": {
+      "title": "The Counter does not deliver",
+      "text": "Our dishes are made to order: enjoy them here or take them away. For delivery we bring wines and shop products.",
+      "pickup": "Order for takeaway",
+      "table": "Book a table",
+      "shop": "See the shop"
     }
   },
   "cateringPage": {

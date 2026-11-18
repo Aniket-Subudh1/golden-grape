@@ -4,21 +4,43 @@ import { addDays, fromLocal, toLocal, today } from '@/lib/time';
 // every conversion goes through lib/time.ts.
 
 export type Hours = { day: string | number; open: string; close: string }[];
-/** `lastCallMin` (GG-025): the last start is at least this long before closing (kitchen closes at 14:00, last table 13:30 → 30). */
-export type SlotRule = { intervalMin: number; capacityPerSlot: number; leadTimeMin: number; maxDaysAhead: number; lastCallMin?: number | null; days?: Hours | null };
+/**
+ * `lastCallMin` (GG-025): the last start is at least this long before closing (kitchen closes at 14:00, last table 13:30 → 30).
+ * `firstSlot` / `lastSlot` (client request 18 Nov): the first and last start time of any day ("HH:mm", the last one
+ * included), e.g. tables 11:30–17:30; empty: from opening / until the last slot that ends by closing.
+ */
+export type SlotRule = {
+  intervalMin: number;
+  capacityPerSlot: number;
+  leadTimeMin: number;
+  maxDaysAhead: number;
+  lastCallMin?: number | null;
+  firstSlot?: string | null;
+  lastSlot?: string | null;
+  days?: Hours | null;
+};
 export type Slot = { from: string; to: string; available: number };
 
 const minutes = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
 /** A closing time at or before the opening (00:00, 01:00 after a 17:00 opening) runs to midnight: slots never cross into the next day. */
-const closing = (w: { open: string; close: string }) => (minutes(w.close) <= minutes(w.open) ? 24 * 60 : minutes(w.close));
-const hhmm = (total: number) => `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+const closing = (w: { open: string; close: string }) =>
+  minutes(w.close) <= minutes(w.open) ? 24 * 60 : minutes(w.close);
+const hhmm = (total: number) =>
+  `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
 
 /**
- * The slots of `date` (`YYYY-MM-DD`): inside the opening hours (or the rule's own days), every `intervalMin`, starting
- * no earlier than `now + leadTimeMin`, within `maxDaysAhead`, none on a closed date. `available` = capacity minus what
+ * The slots of `date` (`YYYY-MM-DD`): inside the opening hours (or the rule's own days) and between the rule's first and
+ * last slot, every `intervalMin`, starting no earlier than `now + leadTimeMin`, within `maxDaysAhead`, none on a closed date. `available` = capacity minus what
  * is `taken` at that start time (orders, or guests for tables).
  */
-export function generateSlots(input: { date: string; rule: SlotRule; hours: Hours; closedDates: string[]; now: Date; taken: Record<string, number> }): Slot[] {
+export function generateSlots(input: {
+  date: string;
+  rule: SlotRule;
+  hours: Hours;
+  closedDates: string[];
+  now: Date;
+  taken: Record<string, number>;
+}): Slot[] {
   const { date, rule, hours, closedDates, now, taken } = input;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || rule.intervalMin < 5) return [];
   const first = today(now);
@@ -26,7 +48,9 @@ export function generateSlots(input: { date: string; rule: SlotRule; hours: Hour
   const [y, m, d] = date.split('-').map(Number);
   const weekday = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
   const earliest = now.getTime() + rule.leadTimeMin * 60_000;
-  const windows = (rule.days?.length ? rule.days : hours).filter((h) => Number(h.day) === weekday).sort((a, b) => minutes(a.open) - minutes(b.open));
+  const windows = (rule.days?.length ? rule.days : hours)
+    .filter((h) => Number(h.day) === weekday)
+    .sort((a, b) => minutes(a.open) - minutes(b.open));
 
   const slots: Slot[] = [];
   for (const w of windows) {
@@ -36,8 +60,14 @@ export function generateSlots(input: { date: string; rule: SlotRule; hours: Hour
       if (local.hour * 60 + local.minute !== start) continue; // skipped by the spring DST change
       if (instant.getTime() < earliest) continue;
       if (rule.lastCallMin && start > closing(w) - rule.lastCallMin) continue;
+      if ((rule.firstSlot && start < minutes(rule.firstSlot)) || (rule.lastSlot && start > minutes(rule.lastSlot)))
+        continue;
       const from = hhmm(start);
-      slots.push({ from, to: hhmm(start + rule.intervalMin), available: Math.max(0, rule.capacityPerSlot - (taken[from] ?? 0)) });
+      slots.push({
+        from,
+        to: hhmm(start + rule.intervalMin),
+        available: Math.max(0, rule.capacityPerSlot - (taken[from] ?? 0)),
+      });
     }
   }
   return slots;

@@ -10,6 +10,7 @@ import { alternates, type Dictionary, getDictionary, isLocale, type Locale, loca
 import { getPayloadClient } from '@/lib/payload';
 import { Filters } from '@/modules/catalogue/components/filters';
 import { ProductCard } from '@/modules/catalogue/components/product-card';
+import { HiddenInDelivery } from '@/modules/webshop/components/delivery-gate';
 import { shopPage } from '@/modules/webshop/service';
 
 type Props = PageProps<'/[locale]/shop'>;
@@ -19,13 +20,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!isLocale(locale)) notFound();
   const { meta } = await getDictionary(locale);
   // Filtered views share the shop's canonical: one page in search results, not one per filter.
-  return { ...meta.shop, alternates: alternates('/shop', locale), openGraph: { title: meta.shop.title, description: meta.shop.description, images: ['/brand/shop-wines-gourmet/Shop_14.jpg'] } };
+  return {
+    ...meta.shop,
+    alternates: alternates('/shop', locale),
+    openGraph: {
+      title: meta.shop.title,
+      description: meta.shop.description,
+      images: ['/brand/shop-wines-gourmet/Shop_14.jpg'],
+    },
+  };
 }
 
 const one = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)?.trim() || undefined;
 const cents = (value: string | undefined) => (value && /^\d+$/.test(value) ? Number(value) * 100 : undefined);
 
-async function Results({ locale, t, searchParams }: { locale: Locale; t: Dictionary; searchParams: Props['searchParams'] }) {
+async function Results({
+  locale,
+  t,
+  searchParams,
+}: {
+  locale: Locale;
+  t: Dictionary;
+  searchParams: Props['searchParams'];
+}) {
   await connection();
   const sp = await searchParams;
   const page = Math.max(1, Number(one(sp.page)) || 1);
@@ -41,7 +58,9 @@ async function Results({ locale, t, searchParams }: { locale: Locale; t: Diction
     page,
   });
   const pageHref = (n: number) => {
-    const next = new URLSearchParams(Object.entries(sp).flatMap(([k, v]) => (v && k !== 'page' ? [[k, String(one(v))]] : [])));
+    const next = new URLSearchParams(
+      Object.entries(sp).flatMap(([k, v]) => (v && k !== 'page' ? [[k, String(one(v))]] : [])),
+    );
     if (n > 1) next.set('page', String(n));
     const query = next.toString();
     return `${localePath(locale, '/shop')}${query ? `?${query}` : ''}`;
@@ -58,10 +77,11 @@ async function Results({ locale, t, searchParams }: { locale: Locale; t: Diction
       <section className="pt-6 pb-16 md:pt-8">
         <Container>
           {data.products.length === 0 ? (
-            <p className="py-24 text-center text-ink/50 italic">{s.empty}</p>
+            <p className="text-ink/50 py-24 text-center italic">{s.empty}</p>
           ) : (
             <>
-              <p className="eyebrow mb-4 text-ink/40">{s.count.replace('{{count}}', String(data.total))}</p>
+              <p className="eyebrow text-ink/40 mb-4">{s.count.replace('{{count}}', String(data.total))}</p>
+              <HiddenInDelivery count={data.products.filter((p) => !p.deliverable).length} text={s.hiddenInDelivery} />
               <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:gap-8 lg:grid-cols-4">
                 {data.products.map((p, i) => (
                   <ProductCard key={p.id} product={p} locale={locale} t={s} priority={i < 4} />
@@ -76,7 +96,10 @@ async function Results({ locale, t, searchParams }: { locale: Locale; t: Diction
                   key={n}
                   href={pageHref(n)}
                   aria-current={n === data.page ? 'page' : undefined}
-                  className={cn('grid h-10 w-10 place-items-center rounded-full border text-sm tabular-nums transition', n === data.page ? 'border-ink bg-ink text-bone' : 'border-border hover:border-ink')}
+                  className={cn(
+                    'grid h-10 w-10 place-items-center rounded-full border text-sm tabular-nums transition',
+                    n === data.page ? 'border-ink bg-ink text-bone' : 'border-border hover:border-ink',
+                  )}
                 >
                   {n}
                 </Link>
@@ -96,7 +119,7 @@ export default async function ShopPage({ params, searchParams }: Props) {
   return (
     <>
       <PageHero eyebrow={t.shop.eyebrow} title={[t.shop.titleA, t.shop.titleB]} subtitle={t.shop.subtitle} />
-      <Suspense fallback={<div className="min-h-[60vh] border-y border-border/60" />}>
+      <Suspense fallback={<div className="border-border/60 min-h-[60vh] border-y" />}>
         <Results locale={locale} t={t} searchParams={searchParams} />
       </Suspense>
     </>

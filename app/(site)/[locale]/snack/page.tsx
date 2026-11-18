@@ -9,6 +9,7 @@ import { alternates, type Dictionary, getDictionary, isLocale, type Locale } fro
 import { getPayloadClient } from '@/lib/payload';
 import { MenuCard } from '@/modules/catalogue/components/menu-card';
 import { CounterCtas } from '@/modules/catalogue/components/counter-ctas';
+import { CounterDeliveryNote, NotInDelivery } from '@/modules/webshop/components/delivery-gate';
 import { counterMenu } from '@/modules/webshop/service';
 
 type Props = PageProps<'/[locale]/snack'>;
@@ -17,17 +18,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const { meta } = await getDictionary(locale);
-  return { ...meta.snack, alternates: alternates('/snack', locale), openGraph: { title: meta.snack.title, description: meta.snack.description, images: ['/brand/snack-menu/Snack_3.jpg'] } };
+  return {
+    ...meta.snack,
+    alternates: alternates('/snack', locale),
+    openGraph: {
+      title: meta.snack.title,
+      description: meta.snack.description,
+      images: ['/brand/snack-menu/Snack_3.jpg'],
+    },
+  };
 }
 
 async function Menu({ locale, t }: { locale: Locale; t: Dictionary }) {
   await connection();
   const items = await counterMenu(await getPayloadClient(), locale);
-  if (items.length === 0) return <p className="py-24 text-center text-ink/50 italic">{t.snackPage.empty}</p>;
+  if (items.length === 0) return <p className="text-ink/50 py-24 text-center italic">{t.snackPage.empty}</p>;
   return (
     <MediaGrid cols={3} hairline>
       {items.map((item) => (
-        <MenuCard key={item.id} item={item} locale={locale} t={t.snackPage} steps={{ minus: t.cart.minus, plus: t.cart.plus }} />
+        <MenuCard
+          key={item.id}
+          item={item}
+          locale={locale}
+          t={t.snackPage}
+          steps={{ minus: t.cart.minus, plus: t.cart.plus }}
+        />
       ))}
     </MediaGrid>
   );
@@ -39,14 +54,21 @@ export default async function SnackPage({ params }: Props) {
   const t = await getDictionary(locale);
   return (
     <>
-      <PageHero eyebrow={t.snackPage.eyebrow} title={[t.snackPage.titleA, t.snackPage.titleB]} subtitle={t.snackPage.subtitle}>
+      <PageHero
+        eyebrow={t.snackPage.eyebrow}
+        title={[t.snackPage.titleA, t.snackPage.titleB]}
+        subtitle={t.snackPage.subtitle}
+      >
         <CounterCtas t={t.snackPage.ctas} hints={t.cart.hints} />
       </PageHero>
       <section className="pb-32">
         <Container>
-          <Suspense fallback={<div className="min-h-[60vh]" />}>
-            <Menu locale={locale} t={t} />
-          </Suspense>
+          {/* In Delivery mode the dishes are not offered (client request 18 Nov): why, and the ways to have them. */}
+          <NotInDelivery fallback={<CounterDeliveryNote t={t.snackPage.delivery} locale={locale} />}>
+            <Suspense fallback={<div className="min-h-[60vh]" />}>
+              <Menu locale={locale} t={t} />
+            </Suspense>
+          </NotInDelivery>
         </Container>
       </section>
     </>

@@ -159,7 +159,9 @@
         "GIFT_CARD_SPENT": "Este cartão-presente foi usado entretanto. Verifique-o e tente de novo."
       }
     },
-    "deliveryShopNote": "Entregamos apenas vinhos e produtos da loja. Os pratos do Balcão são para levar ou para comer no local."
+    "deliveryShopNote": "Entregamos apenas vinhos e produtos da loja. Os pratos do Balcão são para levar ou para comer no local.",
+    "notDelivered": "Não entregue",
+    "removeUndeliverable": "Retirar estes artigos"
   },
   "shop": {
     "eyebrow": "Loja · Vinhos & Mercearia",
@@ -226,13 +228,16 @@
       "add": "Adicionar ao cesto",
       "added": "Adicionado ao cesto",
       "left": "Só restam {{count}}",
-      "inStock": "Em stock"
+      "inStock": "Em stock",
+      "pickupOnly": "Só levantamento: este produto não é entregue.",
+      "switchPickup": "Mudar para levar"
     },
     "related": {
       "eyebrow": "Da mesma garrafeira",
       "titleA": "Também vai",
       "titleB": "gostar."
-    }
+    },
+    "hiddenInDelivery": "Entrega: os produtos só para levantamento não são mostrados ({{count}})."
   },
   "snackPage": {
     "eyebrow": "O Balcão",
@@ -266,6 +271,13 @@
       "sulphites": "Sulfitos",
       "lupin": "Tremoço",
       "molluscs": "Moluscos"
+    },
+    "delivery": {
+      "title": "O Balcão não faz entregas",
+      "text": "Os nossos pratos são feitos na hora: para comer aqui ou levar. Em entrega levamos os vinhos e os produtos da loja.",
+      "pickup": "Encomendar para levar",
+      "table": "Reservar uma mesa",
+      "shop": "Ver a loja"
     }
   },
   "cateringPage": {

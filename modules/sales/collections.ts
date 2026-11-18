@@ -1,6 +1,21 @@
 import type { CollectionConfig, Field, PayloadRequest } from 'payload';
 import { hiddenUnless, isStaff, none, staffOrSelf } from '@/lib/access';
-import { addButton, badgeCell, boolCell, emptyList, l, type Label, listOnly, say, scaledNumber, type StatusTab, statusTabs, timeOfDay, WEEKDAYS } from '@/lib/admin';
+import {
+  addButton,
+  badgeCell,
+  boolCell,
+  emptyList,
+  l,
+  type Label,
+  listOnly,
+  QUARTER_HOURS,
+  say,
+  scaledNumber,
+  type StatusTab,
+  statusTabs,
+  timeOfDay,
+  WEEKDAYS,
+} from '@/lib/admin';
 import { LOCALE_NAMES, LOCALES } from '@/lib/i18n';
 import { ORDER_ROLES, ORDER_STATUSES, RESERVATION_STATUSES } from './order-states';
 
@@ -48,48 +63,90 @@ export const RESERVATION_TABS: StatusTab[] = [
     statuses: ['pending', 'accepted', 'completed', 'no_show'],
     day: 'today',
     sort: 'slotAt',
-    empty: l('Aucune réservation aujourd’hui', 'No reservations today', 'Heute keine Reservierungen', 'Sem reservas hoje'),
+    empty: l(
+      'Aucune réservation aujourd’hui',
+      'No reservations today',
+      'Heute keine Reservierungen',
+      'Sem reservas hoje',
+    ),
   },
   {
     label: l('À venir', 'Upcoming', 'Anstehend', 'Próximas'),
     statuses: ['pending', 'accepted'],
     day: 'fromToday',
     sort: 'slotAt',
-    empty: l('Aucune réservation à venir', 'No upcoming reservations', 'Keine anstehenden Reservierungen', 'Sem reservas futuras'),
+    empty: l(
+      'Aucune réservation à venir',
+      'No upcoming reservations',
+      'Keine anstehenden Reservierungen',
+      'Sem reservas futuras',
+    ),
   },
   {
     label: l('À confirmer', 'To confirm', 'Zu bestätigen', 'Por confirmar'),
     statuses: ['pending'],
     sort: 'slotAt',
     urgent: true,
-    empty: l('Aucune réservation à confirmer', 'No reservations to confirm', 'Keine Reservierungen zu bestätigen', 'Sem reservas por confirmar'),
+    empty: l(
+      'Aucune réservation à confirmer',
+      'No reservations to confirm',
+      'Keine Reservierungen zu bestätigen',
+      'Sem reservas por confirmar',
+    ),
   },
   {
     label: l('Acceptées', 'Accepted', 'Angenommen', 'Aceites'),
     statuses: ['accepted'],
     sort: 'slotAt',
-    empty: l('Aucune réservation acceptée en cours', 'No accepted reservations open', 'Keine offenen angenommenen Reservierungen', 'Sem reservas aceites em aberto'),
+    empty: l(
+      'Aucune réservation acceptée en cours',
+      'No accepted reservations open',
+      'Keine offenen angenommenen Reservierungen',
+      'Sem reservas aceites em aberto',
+    ),
   },
   {
     label: l('Terminées', 'Completed', 'Abgeschlossen', 'Concluídas'),
     statuses: ['completed', 'no_show'],
     sort: '-slotAt',
-    empty: l('Aucune réservation terminée', 'No completed reservations', 'Keine abgeschlossenen Reservierungen', 'Sem reservas concluídas'),
+    empty: l(
+      'Aucune réservation terminée',
+      'No completed reservations',
+      'Keine abgeschlossenen Reservierungen',
+      'Sem reservas concluídas',
+    ),
   },
   {
     label: l('Refusées / annulées', 'Declined / cancelled', 'Abgelehnt / storniert', 'Recusadas / canceladas'),
     statuses: ['rejected', 'cancelled'],
     sort: '-slotAt',
-    empty: l('Aucune réservation refusée ou annulée', 'No declined or cancelled reservations', 'Keine abgelehnten oder stornierten Reservierungen', 'Sem reservas recusadas ou canceladas'),
+    empty: l(
+      'Aucune réservation refusée ou annulée',
+      'No declined or cancelled reservations',
+      'Keine abgelehnten oder stornierten Reservierungen',
+      'Sem reservas recusadas ou canceladas',
+    ),
   },
   {
     label: l('Toutes (historique)', 'All (history)', 'Alle (Verlauf)', 'Todas (histórico)'),
     sort: '-slotAt',
     opens: true,
-    empty: l('Aucune réservation pour l’instant', 'No reservations yet', 'Noch keine Reservierungen', 'Ainda sem reservas'),
+    empty: l(
+      'Aucune réservation pour l’instant',
+      'No reservations yet',
+      'Noch keine Reservierungen',
+      'Ainda sem reservas',
+    ),
   },
 ];
-export const RESERVATION_STATUS_TONES = { pending: 'warning', accepted: 'success', rejected: 'danger', cancelled: 'danger', completed: 'neutral', no_show: 'danger' } as const;
+export const RESERVATION_STATUS_TONES = {
+  pending: 'warning',
+  accepted: 'success',
+  rejected: 'danger',
+  cancelled: 'danger',
+  completed: 'neutral',
+  no_show: 'danger',
+} as const;
 
 export const MODE_LABELS = {
   pickup: l('À emporter', 'Pickup', 'Abholung', 'Levantamento'),
@@ -116,7 +173,12 @@ export const PAYMENT_STATUS_LABELS = {
   authorized: l('Autorisé', 'Authorised', 'Autorisiert', 'Autorizado'),
   paid: l('Payé', 'Paid', 'Bezahlt', 'Pago'),
   refund_pending: l('Remboursement à effectuer', 'Refund pending', 'Erstattung ausstehend', 'Reembolso pendente'),
-  partially_refunded: l('Partiellement remboursé', 'Partially refunded', 'Teilweise erstattet', 'Parcialmente reembolsado'),
+  partially_refunded: l(
+    'Partiellement remboursé',
+    'Partially refunded',
+    'Teilweise erstattet',
+    'Parcialmente reembolsado',
+  ),
   refunded: l('Remboursé', 'Refunded', 'Erstattet', 'Reembolsado'),
   voided: l('Annulé', 'Voided', 'Storniert', 'Anulado'),
 };
@@ -134,7 +196,8 @@ export const PAYMENT_STATUS_TONES = {
   voided: 'neutral',
 } as const;
 
-const options = <K extends string>(labels: Record<K, Label>) => (Object.keys(labels) as K[]).map((value) => ({ value, label: labels[value] }));
+const options = <K extends string>(labels: Record<K, Label>) =>
+  (Object.keys(labels) as K[]).map((value) => ({ value, label: labels[value] }));
 
 const contactGroup = (cell?: string): Field => ({
   name: 'contact',
@@ -161,7 +224,13 @@ const localeField: Field = {
 const internal = { disableListColumn: true, disableListFilter: true } as const;
 
 // What is inside an `internal` group or list, and every list's row id, stays out too (payload.config.ts, listFields).
-const historyFields: Field[] = [{ name: 'at', type: 'date' }, { name: 'from', type: 'text' }, { name: 'to', type: 'text' }, { name: 'user', type: 'relationship', relationTo: 'users' }, { name: 'reason', type: 'text' }];
+const historyFields: Field[] = [
+  { name: 'at', type: 'date' },
+  { name: 'from', type: 'text' },
+  { name: 'to', type: 'text' },
+  { name: 'user', type: 'relationship', relationTo: 'users' },
+  { name: 'reason', type: 'text' },
+];
 
 const lineFields: Field[] = [
   { name: 'variant', type: 'relationship', relationTo: 'variants', required: true },
@@ -179,7 +248,10 @@ const lineFields: Field[] = [
 
 export const orders: CollectionConfig = {
   slug: 'orders',
-  labels: { singular: l('Commande', 'Order', 'Bestellung', 'Encomenda'), plural: l('Commandes', 'Orders', 'Bestellungen', 'Encomendas') },
+  labels: {
+    singular: l('Commande', 'Order', 'Bestellung', 'Encomenda'),
+    plural: l('Commandes', 'Orders', 'Bestellungen', 'Encomendas'),
+  },
   admin: {
     useAsTitle: 'number',
     // What staff act on (QA 12 Nov, GG-07): number, slot, pickup or delivery, customer, payment, total, stage.
@@ -199,7 +271,11 @@ export const orders: CollectionConfig = {
   access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
   defaultSort: '-createdAt',
   fields: [
-    { name: 'panel', type: 'ui', admin: { disableListColumn: true, components: { Field: '@/modules/sales/admin/order-panel' } } },
+    {
+      name: 'panel',
+      type: 'ui',
+      admin: { disableListColumn: true, components: { Field: '@/modules/sales/admin/order-panel' } },
+    },
     ...[
       { name: 'number', type: 'text', required: true, unique: true, label: l('Numéro', 'Number', 'Nummer', 'Número') },
       {
@@ -225,9 +301,22 @@ export const orders: CollectionConfig = {
           { value: 'pos', label: l('Caisse', 'Till', 'Kasse', 'Caixa') },
         ],
       },
-      { name: 'mode', type: 'select', required: true, label: l('Type', 'Type', 'Art', 'Tipo'), options: options(MODE_LABELS), admin: { components: { Cell: '@/modules/sales/admin/cells#ModeCell' } } },
+      {
+        name: 'mode',
+        type: 'select',
+        required: true,
+        label: l('Type', 'Type', 'Art', 'Tipo'),
+        options: options(MODE_LABELS),
+        admin: { components: { Cell: '@/modules/sales/admin/cells#ModeCell' } },
+      },
       { name: 'idempotencyKey', type: 'text', required: true, unique: true, admin: internal },
-      { name: 'customer', type: 'relationship', relationTo: 'customers', index: true, label: l('Compte client', 'Customer account', 'Kundenkonto', 'Conta de cliente') },
+      {
+        name: 'customer',
+        type: 'relationship',
+        relationTo: 'customers',
+        index: true,
+        label: l('Compte client', 'Customer account', 'Kundenkonto', 'Conta de cliente'),
+      },
       contactGroup('@/modules/sales/admin/cells#ContactCell'),
       {
         name: 'address',
@@ -236,10 +325,30 @@ export const orders: CollectionConfig = {
         // An optional column on one line (GG-07); the code postal and the town can be filtered.
         admin: { components: { Cell: '@/modules/sales/admin/cells#AddressCell' } },
         fields: [
-          { name: 'line1', type: 'text', label: l('Rue et numéro', 'Street and number', 'Straße und Nummer', 'Rua e número'), admin: { disableListColumn: true } },
-          { name: 'line2', type: 'text', label: l('Complément', 'Address line 2', 'Adresszusatz', 'Complemento'), admin: internal },
-          { name: 'postalCode', type: 'text', label: l('Code postal', 'Postcode', 'Postleitzahl', 'Código postal'), admin: { disableListColumn: true } },
-          { name: 'city', type: 'text', label: l('Localité', 'Town', 'Ort', 'Localidade'), admin: { disableListColumn: true } },
+          {
+            name: 'line1',
+            type: 'text',
+            label: l('Rue et numéro', 'Street and number', 'Straße und Nummer', 'Rua e número'),
+            admin: { disableListColumn: true },
+          },
+          {
+            name: 'line2',
+            type: 'text',
+            label: l('Complément', 'Address line 2', 'Adresszusatz', 'Complemento'),
+            admin: internal,
+          },
+          {
+            name: 'postalCode',
+            type: 'text',
+            label: l('Code postal', 'Postcode', 'Postleitzahl', 'Código postal'),
+            admin: { disableListColumn: true },
+          },
+          {
+            name: 'city',
+            type: 'text',
+            label: l('Localité', 'Town', 'Ort', 'Localidade'),
+            admin: { disableListColumn: true },
+          },
           { name: 'country', type: 'text', label: l('Pays', 'Country', 'Land', 'País'), admin: internal },
         ],
       },
@@ -256,8 +365,20 @@ export const orders: CollectionConfig = {
         ],
       },
       // `YYYY-MM-DDTHH:mm` of the slot: the list's "today and upcoming" filter and its sort.
-      { name: 'slotAt', type: 'text', index: true, label: l('Créneau', 'Time slot', 'Zeitfenster', 'Horário'), admin: { disableListColumn: true } },
-      { name: 'lines', type: 'array', label: l('Articles', 'Items', 'Artikel', 'Artigos'), admin: internal, fields: lineFields },
+      {
+        name: 'slotAt',
+        type: 'text',
+        index: true,
+        label: l('Créneau', 'Time slot', 'Zeitfenster', 'Horário'),
+        admin: { disableListColumn: true },
+      },
+      {
+        name: 'lines',
+        type: 'array',
+        label: l('Articles', 'Items', 'Artikel', 'Artigos'),
+        admin: internal,
+        fields: lineFields,
+      },
       {
         name: 'totals',
         type: 'group',
@@ -271,7 +392,16 @@ export const orders: CollectionConfig = {
           { name: 'deliveryCents', type: 'number', defaultValue: 0, admin: internal },
           { name: 'vatCents', type: 'number', required: true, admin: internal },
           { name: 'totalCents', type: 'number', required: true, admin: internal },
-          { name: 'vatBreakdown', type: 'array', admin: internal, fields: [{ name: 'rateBp', type: 'number' }, { name: 'baseCents', type: 'number' }, { name: 'vatCents', type: 'number' }] },
+          {
+            name: 'vatBreakdown',
+            type: 'array',
+            admin: internal,
+            fields: [
+              { name: 'rateBp', type: 'number' },
+              { name: 'baseCents', type: 'number' },
+              { name: 'vatCents', type: 'number' },
+            ],
+          },
         ],
       },
       {
@@ -285,7 +415,14 @@ export const orders: CollectionConfig = {
           { name: 'promotions', type: 'json' },
           { name: 'loyaltyPoints', type: 'number', defaultValue: 0 },
           { name: 'loyaltyCents', type: 'number', defaultValue: 0 },
-          { name: 'giftCards', type: 'array', fields: [{ name: 'code', type: 'text' }, { name: 'amountCents', type: 'number' }] },
+          {
+            name: 'giftCards',
+            type: 'array',
+            fields: [
+              { name: 'code', type: 'text' },
+              { name: 'amountCents', type: 'number' },
+            ],
+          },
           { name: 'amountDueCents', type: 'number' },
         ],
       },
@@ -294,11 +431,35 @@ export const orders: CollectionConfig = {
         type: 'group',
         label: l('Paiement', 'Payment', 'Zahlung', 'Pagamento'),
         // One column: the payment's state as a badge and its method (GG-07/08: transfers awaited stand out).
-        admin: { components: { Cell: { path: '@/modules/sales/admin/cells#PaymentCell', clientProps: { tones: PAYMENT_STATUS_TONES, states: PAYMENT_STATUS_LABELS, methods: PAYMENT_METHOD_LABELS } } } },
+        admin: {
+          components: {
+            Cell: {
+              path: '@/modules/sales/admin/cells#PaymentCell',
+              clientProps: {
+                tones: PAYMENT_STATUS_TONES,
+                states: PAYMENT_STATUS_LABELS,
+                methods: PAYMENT_METHOD_LABELS,
+              },
+            },
+          },
+        },
         fields: [
           { name: 'provider', type: 'select', defaultValue: 'manual', options: ['manual', 'wallee'], admin: internal },
-          { name: 'method', type: 'select', options: options(PAYMENT_METHOD_LABELS), label: l('Moyen de paiement', 'Payment method', 'Zahlungsart', 'Meio de pagamento'), admin: { disableListColumn: true } },
-          { name: 'status', type: 'select', defaultValue: 'none', options: options(PAYMENT_STATUS_LABELS), label: l('État du paiement', 'Payment state', 'Zahlungsstand', 'Estado do pagamento'), admin: { disableListColumn: true } },
+          {
+            name: 'method',
+            type: 'select',
+            options: options(PAYMENT_METHOD_LABELS),
+            label: l('Moyen de paiement', 'Payment method', 'Zahlungsart', 'Meio de pagamento'),
+            admin: { disableListColumn: true },
+          },
+          {
+            name: 'status',
+            type: 'select',
+            defaultValue: 'none',
+            options: options(PAYMENT_STATUS_LABELS),
+            label: l('État du paiement', 'Payment state', 'Zahlungsstand', 'Estado do pagamento'),
+            admin: { disableListColumn: true },
+          },
           { name: 'ref', type: 'text', admin: internal },
           // Kept equal to the sums of the order's `payments` rows (service.ts), plus the refund staff asked for.
           { name: 'paidCents', type: 'number', defaultValue: 0, admin: internal },
@@ -323,7 +484,11 @@ export const orders: CollectionConfig = {
       localeField,
       { name: 'staff', type: 'relationship', relationTo: 'users', admin: internal },
       { name: 'stockPosted', type: 'checkbox', defaultValue: false, admin: internal },
-      { name: 'notes', type: 'textarea', label: l('Message du client', 'Customer’s message', 'Nachricht des Kunden', 'Mensagem do cliente') },
+      {
+        name: 'notes',
+        type: 'textarea',
+        label: l('Message du client', 'Customer’s message', 'Nachricht des Kunden', 'Mensagem do cliente'),
+      },
       { name: 'history', type: 'array', admin: internal, fields: historyFields },
     ].map((f) => listOnly(f as Field)),
   ],
@@ -334,14 +499,20 @@ export const orders: CollectionConfig = {
       { fields: { channel: 1, createdAt: -1 } },
       { fields: { 'slot.date': 1, mode: 1 } },
       // Refunds still to send: read by the sidebar, the bell and the dashboard on every page.
-      { fields: { 'payment.status': 1 }, options: { name: 'refund_pending', partialFilterExpression: { 'payment.status': 'refund_pending' } } },
+      {
+        fields: { 'payment.status': 1 },
+        options: { name: 'refund_pending', partialFilterExpression: { 'payment.status': 'refund_pending' } },
+      },
     ],
   },
 };
 
 export const reservations: CollectionConfig = {
   slug: 'reservations',
-  labels: { singular: l('Réservation', 'Reservation', 'Reservierung', 'Reserva'), plural: l('Réservations', 'Reservations', 'Reservierungen', 'Reservas') },
+  labels: {
+    singular: l('Réservation', 'Reservation', 'Reservierung', 'Reserva'),
+    plural: l('Réservations', 'Reservations', 'Reservierungen', 'Reservas'),
+  },
   admin: {
     useAsTitle: 'number',
     defaultColumns: ['number', 'slot', 'contact', 'guests', 'status', 'attendance', 'preorder'],
@@ -359,7 +530,11 @@ export const reservations: CollectionConfig = {
   access: { read: staffOrSelf('customer'), create: none, update: none, delete: none },
   defaultSort: '-createdAt',
   fields: [
-    { name: 'panel', type: 'ui', admin: { disableListColumn: true, components: { Field: '@/modules/sales/admin/reservation-panel' } } },
+    {
+      name: 'panel',
+      type: 'ui',
+      admin: { disableListColumn: true, components: { Field: '@/modules/sales/admin/reservation-panel' } },
+    },
     ...[
       { name: 'number', type: 'text', required: true, unique: true, label: l('Numéro', 'Number', 'Nummer', 'Número') },
       {
@@ -372,7 +547,13 @@ export const reservations: CollectionConfig = {
         admin: { components: badgeCell(RESERVATION_STATUS_TONES) },
       },
       { name: 'idempotencyKey', type: 'text', required: true, unique: true, admin: internal },
-      { name: 'customer', type: 'relationship', relationTo: 'customers', index: true, label: l('Compte client', 'Customer account', 'Kundenkonto', 'Conta de cliente') },
+      {
+        name: 'customer',
+        type: 'relationship',
+        relationTo: 'customers',
+        index: true,
+        label: l('Compte client', 'Customer account', 'Kundenkonto', 'Conta de cliente'),
+      },
       contactGroup('@/modules/sales/admin/cells#ContactCell'),
       {
         name: 'slot',
@@ -380,13 +561,31 @@ export const reservations: CollectionConfig = {
         label: l('Date et heure', 'Date and time', 'Datum und Uhrzeit', 'Data e hora'),
         admin: { components: { Cell: '@/modules/sales/admin/cells#SlotCell' } },
         fields: [
-          { name: 'date', type: 'text', required: true, label: l('Jour', 'Day', 'Tag', 'Dia'), admin: { disableListColumn: true } },
+          {
+            name: 'date',
+            type: 'text',
+            required: true,
+            label: l('Jour', 'Day', 'Tag', 'Dia'),
+            admin: { disableListColumn: true },
+          },
           { name: 'from', type: 'text', required: true, label: l('Heure', 'Time', 'Uhrzeit', 'Hora'), admin: internal },
           { name: 'to', type: 'text', label: l('Jusqu’à', 'Until', 'Bis', 'Até'), admin: internal },
         ],
       },
-      { name: 'slotAt', type: 'text', index: true, label: l('Date et heure', 'Date and time', 'Datum und Uhrzeit', 'Data e hora'), admin: { disableListColumn: true } },
-      { name: 'guests', type: 'number', required: true, min: 1, label: l('Personnes', 'Guests', 'Personen', 'Pessoas') },
+      {
+        name: 'slotAt',
+        type: 'text',
+        index: true,
+        label: l('Date et heure', 'Date and time', 'Datum und Uhrzeit', 'Data e hora'),
+        admin: { disableListColumn: true },
+      },
+      {
+        name: 'guests',
+        type: 'number',
+        required: true,
+        min: 1,
+        label: l('Personnes', 'Guests', 'Personen', 'Pessoas'),
+      },
       {
         name: 'preorder',
         type: 'relationship',
@@ -394,11 +593,20 @@ export const reservations: CollectionConfig = {
         label: l('Pré-commande', 'Pre-order', 'Vorbestellung', 'Pré-encomenda'),
         admin: { components: { Cell: '@/modules/sales/admin/cells#PreorderCell' } },
       },
-      { name: 'notes', type: 'textarea', label: l('Message du client', 'Customer’s message', 'Nachricht des Kunden', 'Mensagem do cliente') },
+      {
+        name: 'notes',
+        type: 'textarea',
+        label: l('Message du client', 'Customer’s message', 'Nachricht des Kunden', 'Mensagem do cliente'),
+      },
       localeField,
       { name: 'history', type: 'array', admin: internal, fields: historyFields },
       // Arrived / absent straight from the list during service (GG-05, GG-23): buttons on accepted rows, nothing stored.
-      { name: 'attendance', type: 'ui', label: l('Présence', 'Attendance', 'Anwesenheit', 'Presença'), admin: { components: { Cell: '@/modules/sales/admin/reservation-panel#AttendanceCell' } } },
+      {
+        name: 'attendance',
+        type: 'ui',
+        label: l('Présence', 'Attendance', 'Anwesenheit', 'Presença'),
+        admin: { components: { Cell: '@/modules/sales/admin/reservation-panel#AttendanceCell' } },
+      },
     ].map((f) => listOnly(f as Field)),
   ],
   custom: { indexes: [{ fields: { 'slot.date': 1, status: 1 } }] },
@@ -408,7 +616,10 @@ const MODE_OPTIONS = SLOT_MODES.map((value) => ({ value, label: MODE_LABELS[valu
 
 export const slotRules: CollectionConfig = {
   slug: 'slotRules',
-  labels: { singular: l('Créneaux', 'Time slots', 'Zeitfenster', 'Horários'), plural: l('Créneaux', 'Time slots', 'Zeitfenster', 'Horários') },
+  labels: {
+    singular: l('Créneaux', 'Time slots', 'Zeitfenster', 'Horários'),
+    plural: l('Créneaux', 'Time slots', 'Zeitfenster', 'Horários'),
+  },
   admin: {
     useAsTitle: 'mode',
     defaultColumns: ['mode', 'intervalMin', 'capacityPerSlot', 'leadTimeMin', 'maxDaysAhead'],
@@ -441,7 +652,12 @@ export const slotRules: CollectionConfig = {
           required: true,
           min: 5,
           defaultValue: 30,
-          label: l('Un créneau toutes les (minutes)', 'One slot every (minutes)', 'Ein Zeitfenster alle (Minuten)', 'Um horário a cada (minutos)'),
+          label: l(
+            'Un créneau toutes les (minutes)',
+            'One slot every (minutes)',
+            'Ein Zeitfenster alle (Minuten)',
+            'Um horário a cada (minutos)',
+          ),
           admin: { width: '50%' },
         },
       ],
@@ -473,8 +689,21 @@ export const slotRules: CollectionConfig = {
           required: true,
           min: 0,
           defaultValue: 60,
-          label: l('Délai minimum (minutes)', 'Notice needed (minutes)', 'Vorlaufzeit (Minuten)', 'Antecedência (minutos)'),
-          admin: { width: '33%', description: l('Le temps de préparer.', 'Time to prepare.', 'Zeit zur Vorbereitung.', 'Tempo para preparar.') },
+          label: l(
+            'Délai minimum (minutes)',
+            'Notice needed (minutes)',
+            'Vorlaufzeit (Minuten)',
+            'Antecedência (minutos)',
+          ),
+          admin: {
+            width: '33%',
+            description: l(
+              'Le temps de préparer. Tables : 30 → à 12:15, première réservation à 12:45.',
+              'Time to prepare. Tables: 30 → at 12:15, the first booking is 12:45.',
+              'Zeit zur Vorbereitung. Tische: 30 → um 12:15 ist die erste Reservierung 12:45.',
+              'Tempo para preparar. Mesas: 30 → às 12:15, a primeira reserva é às 12:45.',
+            ),
+          },
         },
         {
           name: 'maxDaysAhead',
@@ -482,7 +711,12 @@ export const slotRules: CollectionConfig = {
           required: true,
           min: 0,
           defaultValue: 14,
-          label: l('Jusqu’à (jours à l’avance)', 'Up to (days ahead)', 'Bis zu (Tage im Voraus)', 'Até (dias de antecedência)'),
+          label: l(
+            'Jusqu’à (jours à l’avance)',
+            'Up to (days ahead)',
+            'Bis zu (Tage im Voraus)',
+            'Até (dias de antecedência)',
+          ),
           admin: {
             width: '33%',
             description: l(
@@ -496,11 +730,51 @@ export const slotRules: CollectionConfig = {
       ],
     },
     {
+      // Client request 18 Nov: tables are booked 11:30–17:30 whatever the shop's hours; Ivo sets the two times here.
+      type: 'row',
+      fields: (['firstSlot', 'lastSlot'] as const).map((name) => ({
+        name,
+        type: 'select' as const,
+        options: QUARTER_HOURS,
+        label:
+          name === 'firstSlot'
+            ? l('Premier créneau', 'First slot', 'Erstes Zeitfenster', 'Primeiro horário')
+            : l(
+                'Dernier créneau (inclus)',
+                'Last slot (included)',
+                'Letztes Zeitfenster (inklusive)',
+                'Último horário (incluído)',
+              ),
+        admin: {
+          width: '50%',
+          description:
+            name === 'firstSlot'
+              ? l(
+                  'Tables : l’heure des premières réservations (ex. 11:30). Vide : dès l’ouverture.',
+                  'Tables: the time of the first bookings (e.g. 11:30). Empty: from opening.',
+                  'Tische: Uhrzeit der ersten Reservierungen (z. B. 11:30). Leer: ab Öffnung.',
+                  'Mesas: a hora das primeiras reservas (ex. 11:30). Vazio: desde a abertura.',
+                )
+              : l(
+                  'Tables : l’heure de la dernière réservation (ex. 17:30). Vide : jusqu’à la fermeture. Les créneaux restent dans les horaires d’ouverture.',
+                  'Tables: the time of the last booking (e.g. 17:30). Empty: until closing. Slots stay within the opening hours.',
+                  'Tische: Uhrzeit der letzten Reservierung (z. B. 17:30). Leer: bis zur Schließung. Die Zeitfenster bleiben in den Öffnungszeiten.',
+                  'Mesas: a hora da última reserva (ex. 17:30). Vazio: até ao fecho. Os horários ficam dentro do horário de abertura.',
+                ),
+        },
+      })),
+    },
+    {
       name: 'lastCallMin',
       type: 'number',
       min: 0,
       defaultValue: 0,
-      label: l('Dernière arrivée (minutes avant la fermeture)', 'Last arrival (minutes before closing)', 'Letzte Ankunft (Minuten vor Schließung)', 'Última chegada (minutos antes do fecho)'),
+      label: l(
+        'Dernière arrivée (minutes avant la fermeture)',
+        'Last arrival (minutes before closing)',
+        'Letzte Ankunft (Minuten vor Schließung)',
+        'Última chegada (minutos antes do fecho)',
+      ),
       // GG-025: the last booking can be earlier than the closing time (kitchen closes at 14:00, last table 13:30).
       admin: {
         description: l(
@@ -511,12 +785,24 @@ export const slotRules: CollectionConfig = {
         ),
       },
     },
-    { name: 'daysBulk', type: 'ui', admin: { components: { Field: { path: '@/components/admin/weekday-bulk', clientProps: { array: 'days' } } } } },
+    {
+      name: 'daysBulk',
+      type: 'ui',
+      admin: { components: { Field: { path: '@/components/admin/weekday-bulk', clientProps: { array: 'days' } } } },
+    },
     {
       name: 'days',
       type: 'array',
-      label: l('Horaires propres (facultatif)', 'Own hours (optional)', 'Eigene Zeiten (optional)', 'Horário próprio (opcional)'),
-      labels: { singular: l('Créneau', 'Time range', 'Zeitraum', 'Período'), plural: l('Créneaux', 'Time ranges', 'Zeiträume', 'Períodos') },
+      label: l(
+        'Horaires propres (facultatif)',
+        'Own hours (optional)',
+        'Eigene Zeiten (optional)',
+        'Horário próprio (opcional)',
+      ),
+      labels: {
+        singular: l('Créneau', 'Time range', 'Zeitraum', 'Período'),
+        plural: l('Créneaux', 'Time ranges', 'Zeiträume', 'Períodos'),
+      },
       admin: {
         description: l(
           'Vide : les horaires d’ouverture de la boutique. Sinon, seulement ces jours et heures.',
@@ -529,7 +815,14 @@ export const slotRules: CollectionConfig = {
         {
           type: 'row',
           fields: [
-            { name: 'day', type: 'select', required: true, options: WEEKDAYS, label: l('Jour', 'Day', 'Tag', 'Dia'), admin: { width: '40%', isClearable: false } },
+            {
+              name: 'day',
+              type: 'select',
+              required: true,
+              options: WEEKDAYS,
+              label: l('Jour', 'Day', 'Tag', 'Dia'),
+              admin: { width: '40%', isClearable: false },
+            },
             timeOfDay('open', l('De', 'From', 'Von', 'De'), '30%'),
             timeOfDay('close', l('À', 'To', 'Bis', 'Até'), '30%'),
           ],
@@ -562,10 +855,18 @@ export const deliveryZones: CollectionConfig = {
       'O preço da entrega segundo a distância de carro desde a loja. Cada escalão começa onde o anterior acaba; para além do mais longo, não há entrega. Os códigos postais seguem sozinhos.',
     ),
     components: {
-      ...addButton('deliveryZones', l('Ajouter une tranche', 'Add a range', 'Stufe hinzufügen', 'Adicionar um escalão')),
+      ...addButton(
+        'deliveryZones',
+        l('Ajouter une tranche', 'Add a range', 'Stufe hinzufügen', 'Adicionar um escalão'),
+      ),
       ...emptyList({
         icon: 'zones',
-        title: l('Aucune tranche de distance', 'No distance ranges yet', 'Noch keine Entfernungsstufen', 'Ainda sem escalões de distância'),
+        title: l(
+          'Aucune tranche de distance',
+          'No distance ranges yet',
+          'Noch keine Entfernungsstufen',
+          'Ainda sem escalões de distância',
+        ),
         text: l(
           'Sans tranche, la livraison n’est proposée à personne. Ajoutez par exemple « jusqu’à 10 km » puis « jusqu’à 20 km ».',
           'Without a range, delivery is offered to nobody. Add for example “up to 10 km”, then “up to 20 km”.',
@@ -594,32 +895,85 @@ export const deliveryZones: CollectionConfig = {
           max: 200,
           label: l('Jusqu’à (km en voiture)', 'Up to (driving km)', 'Bis (Fahr-km)', 'Até (km de carro)'),
           admin: { width: '70%', step: 0.5, placeholder: '10' },
-          validate: async (value: number | null | undefined, { req, id }: { req: PayloadRequest; id?: string | number }) => {
-            if (value == null) return say(req, l('Indiquez la distance.', 'Enter the distance.', 'Entfernung angeben.', 'Indique a distância.'));
+          validate: async (
+            value: number | null | undefined,
+            { req, id }: { req: PayloadRequest; id?: string | number },
+          ) => {
+            if (value == null)
+              return say(
+                req,
+                l('Indiquez la distance.', 'Enter the distance.', 'Entfernung angeben.', 'Indique a distância.'),
+              );
             if (value <= 0) return say(req, l('Plus de 0 km.', 'More than 0 km.', 'Mehr als 0 km.', 'Mais de 0 km.'));
-            const { totalDocs } = await req.payload.count({ collection: 'deliveryZones', req, overrideAccess: true, where: { upToKm: { equals: value }, ...(id ? { id: { not_equals: id } } : {}) } });
-            return totalDocs === 0 || say(req, l('Une autre tranche s’arrête déjà à cette distance.', 'Another range already ends at this distance.', 'Eine andere Stufe endet schon bei dieser Entfernung.', 'Outro escalão já acaba a esta distância.'));
+            const { totalDocs } = await req.payload.count({
+              collection: 'deliveryZones',
+              req,
+              overrideAccess: true,
+              where: { upToKm: { equals: value }, ...(id ? { id: { not_equals: id } } : {}) },
+            });
+            return (
+              totalDocs === 0 ||
+              say(
+                req,
+                l(
+                  'Une autre tranche s’arrête déjà à cette distance.',
+                  'Another range already ends at this distance.',
+                  'Eine andere Stufe endet schon bei dieser Entfernung.',
+                  'Outro escalão já acaba a esta distância.',
+                ),
+              )
+            );
           },
         },
-        { name: 'active', type: 'checkbox', defaultValue: true, label: l('Active', 'Active', 'Aktiv', 'Ativa'), admin: { width: '30%', style: { alignSelf: 'flex-end' }, components: boolCell() } },
+        {
+          name: 'active',
+          type: 'checkbox',
+          defaultValue: true,
+          label: l('Active', 'Active', 'Aktiv', 'Ativa'),
+          admin: { width: '30%', style: { alignSelf: 'flex-end' }, components: boolCell() },
+        },
       ],
     },
     {
       type: 'row',
       fields: [
-        { name: 'feeCents', type: 'number', required: true, min: 0, label: l('Frais de livraison', 'Delivery fee', 'Liefergebühr', 'Taxa de entrega'), admin: { width: '33%', components: scaledNumber('€') } },
-        { name: 'minOrderCents', type: 'number', required: true, min: 0, defaultValue: 0, label: l('Commande minimum', 'Minimum order', 'Mindestbestellwert', 'Encomenda mínima'), admin: { width: '33%', components: scaledNumber('€') } },
+        {
+          name: 'feeCents',
+          type: 'number',
+          required: true,
+          min: 0,
+          label: l('Frais de livraison', 'Delivery fee', 'Liefergebühr', 'Taxa de entrega'),
+          admin: { width: '33%', components: scaledNumber('€') },
+        },
+        {
+          name: 'minOrderCents',
+          type: 'number',
+          required: true,
+          min: 0,
+          defaultValue: 0,
+          label: l('Commande minimum', 'Minimum order', 'Mindestbestellwert', 'Encomenda mínima'),
+          admin: { width: '33%', components: scaledNumber('€') },
+        },
         {
           name: 'freeFromCents',
           type: 'number',
           min: 0,
-          label: l('Gratuite dès (facultatif)', 'Free from (optional)', 'Kostenlos ab (optional)', 'Grátis a partir de (opcional)'),
+          label: l(
+            'Gratuite dès (facultatif)',
+            'Free from (optional)',
+            'Kostenlos ab (optional)',
+            'Grátis a partir de (opcional)',
+          ),
           admin: { width: '33%', components: scaledNumber('€') },
         },
       ],
     },
     // Which postcodes this range covers right now, recomputed while the limit is typed.
-    { name: 'rangePostcodes', type: 'ui', admin: { disableListColumn: true, components: { Field: '@/modules/sales/admin/range-postcodes' } } },
+    {
+      name: 'rangePostcodes',
+      type: 'ui',
+      admin: { disableListColumn: true, components: { Field: '@/modules/sales/admin/range-postcodes' } },
+    },
   ],
 };
 
