@@ -31,7 +31,8 @@ export function CounterDeliveryNote({ t, locale }: { t: Dictionary['snackPage'][
       <Bike className="text-gold-deep mx-auto h-6 w-6" />
       <h2 className="mt-4 font-serif text-3xl font-light">{t.title}</h2>
       <p className="text-ink/65 mx-auto mt-3 max-w-md text-sm leading-relaxed">{t.text}</p>
-      <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+      {/* Wraps when the three do not fit in the box side by side (client report 22 Nov: they overlapped). */}
+      <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
         <Button onClick={() => setMode('pickup')}>{t.pickup}</Button>
         <Button asChild variant="outline">
           <Link href={localePath(locale, TABLE_BOOKING)}>{t.table}</Link>

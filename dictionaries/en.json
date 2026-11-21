@@ -161,6 +161,7 @@
     },
     "deliveryShopNote": "We deliver wines and shop products only. Counter dishes are for takeaway or to enjoy here.",
     "notDelivered": "Not delivered",
+    "deliveryOff": "Delivery isn't available for this basket: Counter dishes and pickup-only items are not delivered.",
     "removeUndeliverable": "Remove these items"
   },
   "shop": {

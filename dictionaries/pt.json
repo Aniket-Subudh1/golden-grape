@@ -161,6 +161,7 @@
     },
     "deliveryShopNote": "Entregamos apenas vinhos e produtos da loja. Os pratos do Balcão são para levar ou para comer no local.",
     "notDelivered": "Não entregue",
+    "deliveryOff": "Entrega indisponível para este carrinho: os pratos do Balcão e os artigos só para levantar não são entregues.",
     "removeUndeliverable": "Retirar estes artigos"
   },
   "shop": {

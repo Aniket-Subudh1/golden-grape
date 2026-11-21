@@ -4,6 +4,7 @@ import { Bike, ShoppingBag, Trash2, UtensilsCrossed } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { NoPhoto } from '@/components/site/media-card';
 import { Button } from '@/components/ui/button';
 import { Sheet } from '@/components/ui/sheet';
 import { cn } from '@/lib/cn';
@@ -29,10 +30,11 @@ const percent = (bp: number, locale: Locale) =>
  * it is forgotten on close, and the button carries it in the link (APPLUX audit 10 Nov, §1/§3).
  */
 export function CartSheet({ locale, t }: { locale: Locale; t: Dictionary['cart'] }) {
-  const { open, setOpen, mode, openMode, setMode, items, quote, pending, setQty, remove, extras, setExtras } =
+  const { open, setOpen, mode, deliveryOff, openMode, setMode, items, quote, pending, setQty, remove, extras, setExtras } =
     useCart();
   const [picked, setPicked] = useState<CartMode | null>(null);
-  const view = picked ?? openMode ?? mode;
+  const chosen = picked ?? openMode ?? mode;
+  const view = chosen === 'delivery' && deliveryOff ? 'pickup' : chosen;
   const lines = quote?.lines ?? [];
   const count = items.reduce((sum, i) => sum + i.qty, 0);
   const steps = { minus: t.minus, plus: t.plus };
@@ -73,10 +75,11 @@ export function CartSheet({ locale, t }: { locale: Locale; t: Dictionary['cart']
               type="button"
               role="radio"
               aria-checked={view === id}
+              disabled={id === 'delivery' && deliveryOff}
               onClick={() => pick(id)}
               className={cn(
-                'inline-flex h-9 items-center justify-center gap-1.5 rounded-full text-[10px] tracking-[0.22em] uppercase transition',
-                view === id ? 'bg-ink text-bone shadow-sm' : 'text-ink/60 hover:text-ink',
+                'inline-flex h-9 items-center justify-center gap-1.5 rounded-full text-[10px] tracking-[0.22em] uppercase transition disabled:cursor-not-allowed disabled:opacity-35',
+                view === id ? 'bg-ink text-bone shadow-sm' : 'text-ink/60 enabled:hover:text-ink',
               )}
             >
               <Icon className="h-3.5 w-3.5" />
@@ -85,6 +88,7 @@ export function CartSheet({ locale, t }: { locale: Locale; t: Dictionary['cart']
           ))}
         </div>
         <p className="text-ink/50 mt-2 text-center text-[11px]">{t.hints[view]}</p>
+        {deliveryOff && <p className="text-ink/50 mt-1 text-center text-[11px]">{t.deliveryOff}</p>}
         {shopLinesAtTable && (
           <p className="bg-champagne/70 text-ink/70 mt-2 rounded-lg px-3 py-2 text-center text-[11px]">
             {t.tableShopNote}
@@ -154,7 +158,7 @@ export function CartSheet({ locale, t }: { locale: Locale; t: Dictionary['cart']
             {lines.map((line) => (
               <li key={`${line.variant}:${line.unit ?? ''}`} className="flex items-center gap-4">
                 <div className="bg-champagne/60 relative h-16 w-16 shrink-0 overflow-hidden rounded-md">
-                  {line.image && <Image src={line.image} alt="" fill sizes="64px" className="object-cover" />}
+                  {line.image ? <Image src={line.image} alt="" fill sizes="64px" className="object-cover" /> : <NoPhoto />}
                 </div>
                 <div className="min-w-0 flex-1">
                   <Link

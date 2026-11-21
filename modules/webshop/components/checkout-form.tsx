@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { NoPhoto } from '@/components/site/media-card';
 import { QtyStepper } from '@/components/site/qty-stepper';
 import { ActionForm, SubmitButton, useFieldError } from '@/components/ui/action-form';
 import { Button } from '@/components/ui/button';
@@ -44,7 +45,7 @@ type Props = {
   initialMode: CartMode | null;
   customer: CheckoutCustomer;
   t: Dictionary['checkout'];
-  cartT: Pick<Dictionary['cart'], 'modes' | 'hints' | 'minus' | 'plus' | 'toShop' | 'toCounter' | 'vatIncluded' | 'tableShopNote' | 'extras'>;
+  cartT: Pick<Dictionary['cart'], 'modes' | 'hints' | 'minus' | 'plus' | 'toShop' | 'toCounter' | 'vatIncluded' | 'tableShopNote' | 'deliveryOff' | 'extras'>;
   formT: Dictionary['form'];
   signInHref: string;
   /** The shop's phone (Shop details), offered when nothing can be booked online. */
@@ -196,7 +197,9 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
   // basket's pickup or delivery. Choosing pickup or delivery here also becomes the basket's mode; a table never does,
   // so a booking never turns a later shop purchase into a table.
   const [picked, setPicked] = useState<CartMode | null>(initialMode);
-  const mode: CartMode = picked ?? cart.mode;
+  const chosen: CartMode = picked ?? cart.mode;
+  // A basket of things never delivered cannot be in Delivery (client request 22 Nov): it shows as pickup.
+  const mode: CartMode = chosen === 'delivery' && cart.deliveryOff ? 'pickup' : chosen;
   const setMode = (m: CartMode) => {
     setPicked(m);
     if (m !== 'table') cart.setMode(m);
@@ -437,10 +440,11 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                   type="button"
                   role="radio"
                   aria-checked={mode === id}
+                  disabled={id === 'delivery' && cart.deliveryOff}
                   onClick={() => setMode(id)}
                   className={cn(
-                    'flex flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 text-center transition sm:items-start sm:px-4 sm:text-left',
-                    mode === id ? 'border-ink bg-ink text-bone' : 'border-border bg-bone hover:border-ink',
+                    'flex flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 text-center transition disabled:cursor-not-allowed disabled:opacity-40 sm:items-start sm:px-4 sm:text-left',
+                    mode === id ? 'border-ink bg-ink text-bone' : 'border-border bg-bone enabled:hover:border-ink',
                   )}
                 >
                   <span className="flex flex-col items-center gap-1.5 sm:flex-row sm:gap-2.5">
@@ -451,6 +455,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                 </button>
               ))}
             </div>
+            {cart.deliveryOff && <p className="mt-2 text-xs text-ink/50">{cartT.deliveryOff}</p>}
           </Step>
 
           {mode === 'table' && (
@@ -688,7 +693,7 @@ export function CheckoutForm({ locale, initialMode, customer, t, cartT, formT, s
                 {quote.lines.map((l) => (
                   <li key={`${l.variant}:${l.unit ?? ''}`} className="flex items-center gap-3">
                     <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md bg-champagne">
-                      {l.image && <Image src={l.image} alt="" fill sizes="48px" className="object-cover" />}
+                      {l.image ? <Image src={l.image} alt="" fill sizes="48px" className="object-cover" /> : <NoPhoto />}
                       <span className="absolute -top-0 -right-0 grid h-5 min-w-5 place-items-center rounded-bl-md bg-ink px-1 text-[10px] text-bone tabular-nums">{l.qty}</span>
                     </span>
                     <span className="min-w-0 flex-1">

@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { cn } from '@/lib/cn';
-import { Ribbon } from '@/components/site/media-card';
+import { NoPhoto, Ribbon } from '@/components/site/media-card';
 import type { Photo } from '@/modules/webshop/service';
 
 /** Product photos: the chosen one large, the others as thumbnails beneath. */
@@ -16,7 +16,7 @@ export function Gallery({ photos, name, ribbon }: { photos: Photo[]; name: strin
         {photo ? (
           <Image src={photo.src} alt={photo.alt || name} fill loading="eager" fetchPriority="high" sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
         ) : (
-          <div className="bg-azulejo absolute inset-0 opacity-20" aria-hidden="true" />
+          <NoPhoto />
         )}
         {ribbon && <Ribbon>{ribbon}</Ribbon>}
       </div>

@@ -42,6 +42,19 @@ export function Poster({ src, alt, sizes, priority, zoom }: { src: string; alt: 
   );
 }
 
+/**
+ * A product without a photo yet (GG-038): the house mark on a light tile, never an empty box. The same on the cards,
+ * the product page, the cart and the checkout (client report 22 Nov: the dark tile read as a broken image). Fills its
+ * positioned parent.
+ */
+export function NoPhoto() {
+  return (
+    <span aria-hidden className="bg-champagne absolute inset-0 grid place-items-center">
+      <Image src="/brand/mark.png" alt="" width={223} height={240} className="h-auto w-2/5 max-w-16 opacity-60" />
+    </span>
+  );
+}
+
 /** The sold-out corner band, on product cards and the product page's photo. */
 export function Ribbon({ children }: { children: ReactNode }) {
   return (
@@ -55,8 +68,7 @@ export function MediaCard({ image, alt, ratio, tag, ribbon, href, fit, action, c
   return (
     <article className="group relative flex flex-col bg-bone">
       <div className={cn('relative overflow-hidden bg-ink', RATIO[ratio])}>
-        {/* No photo yet (GG-038): the house mark on the dark tile, never an empty box. */}
-        {!image && <Image src="/brand/mark.png" alt="" width={223} height={240} className="absolute top-1/2 left-1/2 w-16 -translate-x-1/2 -translate-y-1/2 opacity-30" />}
+        {!image && <NoPhoto />}
         {image && fit === 'contain' && <Poster src={image} alt={alt} sizes={sizes} priority={priority} zoom />}
         {image && !fit && (
           <Image

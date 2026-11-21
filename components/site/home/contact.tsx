@@ -85,7 +85,8 @@ export function HomeContact({ t, labels, photo, city, address, phone, email, hou
               ))}
             </Row>
           </dl>
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          {/* Wraps when the two labels do not fit side by side (German at 1024 px scrolled the page sideways). */}
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Button asChild variant="solid" size="lg">
               <a href={directions.href} target="_blank" rel="noopener noreferrer">
                 {directions.label}

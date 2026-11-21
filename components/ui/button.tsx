@@ -29,8 +29,10 @@ const buttonVariants = cva(
     compoundVariants: [
       { variant: 'goldGlass', size: 'md', className: 'h-auto px-7 py-3.5' },
       { variant: 'goldGlass', size: 'lg', className: 'h-auto px-8 py-4' },
-      { variant: ['ghost', 'icon'], size: 'sm', className: 'w-9 px-0' },
-      { variant: ['ghost', 'icon'], size: 'md', className: 'h-10 w-10 px-0' },
+      // Square sizes for the icon button only: a ghost button carries text, and a fixed width let it spill over its
+      // neighbours ("Voir la boutique" on the Comptoir, the address buttons in the account; client report 22 Nov).
+      { variant: 'icon', size: 'sm', className: 'w-9 px-0' },
+      { variant: 'icon', size: 'md', className: 'h-10 w-10 px-0' },
       { variant: 'chip', active: true, className: 'border-ink bg-ink text-bone' },
       { variant: 'chip', active: false, className: 'border-border bg-transparent text-ink/70 hover:border-ink' },
     ],

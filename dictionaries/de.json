@@ -161,6 +161,7 @@
     },
     "deliveryShopNote": "Wir liefern nur Weine und Produkte aus dem Laden. Speisen von der Theke gibt es zum Mitnehmen oder vor Ort.",
     "notDelivered": "Nicht geliefert",
+    "deliveryOff": "Lieferung für diesen Warenkorb nicht möglich: Speisen von der Theke und Artikel nur zur Abholung werden nicht geliefert.",
     "removeUndeliverable": "Diese Artikel entfernen"
   },
   "shop": {

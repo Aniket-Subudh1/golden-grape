@@ -25,7 +25,8 @@ export function ContactForm({ t, form, locale }: { t: Dictionary['contactPage'][
       <fieldset>
         <legend className="eyebrow mb-2 block text-ink/60">{t.subject}</legend>
         <input type="hidden" name="subject" value={subject} />
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+        {/* Chips sized to their words, flowing onto a second row when a subject is long ("Serviços de Catering"). */}
+        <div className="flex flex-wrap gap-2">
           {SUBJECTS.map((id) => (
             <Button
               key={id}
@@ -34,7 +35,7 @@ export function ContactForm({ t, form, locale }: { t: Dictionary['contactPage'][
               active={subject === id}
               aria-pressed={subject === id}
               onClick={() => setSubject(id)}
-              className="h-10 px-2 text-[10px]"
+              className="h-10 px-4 text-[10px]"
             >
               {t.subjects[id]}
             </Button>

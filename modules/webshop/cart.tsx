@@ -27,6 +27,9 @@ type CartContext = {
   /** Pickup or delivery for the basket, remembered between visits. A table booking is never remembered: it is
    *  chosen each time (APPLUX audit 10 Nov, §1/§3), through `openAs('table')` or a `?mode=table` link. */
   mode: BasketMode;
+  /** The basket holds only things that are never delivered (counter dishes, "pickup only" products): Delivery is not
+   *  offered, and a basket left in Delivery moves to pickup (client request 22 Nov). */
+  deliveryOff: boolean;
   /** The view the drawer was opened in (`openAs`), until it closes. */
   openMode: CartMode | null;
   open: boolean;
@@ -62,8 +65,10 @@ export function useCart(): CartContext {
   const cart = useContext(Context);
   const hydrated = useSyncExternalStore(noSubscribe, () => true, () => false);
   if (!cart) throw new Error('useCart outside CartProvider');
-  return hydrated ? cart : { ...cart, ready: false, items: [], count: 0, quote: null, qtyOf: () => 0 };
+  return hydrated ? cart : { ...cart, ready: false, items: [], count: 0, quote: null, deliveryOff: false, qtyOf: () => 0 };
 }
+
+const onlyUndelivered = (quote: CartQuote | null) => quote !== null && quote.lines.length > 0 && quote.lines.every((l) => !l.deliverable);
 
 const same = (a: { variant: string; unit?: string }, b: { variant: string; unit?: string }) => a.variant === b.variant && (a.unit ?? '') === (b.unit ?? '');
 
@@ -142,6 +147,7 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
       setPending(false);
       if (!result.ok) return;
       setQuote(result.data);
+      if (onlyUndelivered(result.data)) setMode((m) => (m === 'delivery' ? 'pickup' : m));
       if (result.data.notices.length > 0) {
         setItems((current) =>
           current
@@ -176,6 +182,7 @@ export function CartProvider({ locale, notices, children }: { locale: Locale; no
       ready: loaded,
       items,
       mode,
+      deliveryOff: onlyUndelivered(quote),
       openMode,
       open,
       quote,

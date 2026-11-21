@@ -161,6 +161,7 @@
     },
     "deliveryShopNote": "Nous livrons uniquement les vins et produits de la boutique. Les plats du Comptoir sont à emporter ou à déguster sur place.",
     "notDelivered": "Non livré",
+    "deliveryOff": "Livraison indisponible pour ce panier : les plats du Comptoir et les articles en retrait uniquement ne sont pas livrés.",
     "removeUndeliverable": "Retirer ces articles"
   },
   "shop": {
